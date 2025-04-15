@@ -15,3 +15,9 @@ v2:
 
 v3:
 - Use some library to get urls properly... there may be .net, .org. etc.
+
+v4:
+- Almost everything done! 
+- Add Ctrl+A to clear current typed message? No, because Ctrl+X already does that
+- Maybe add player icon in front of chat; as a config option on/off
+- Make icon, mb similar to this? Made a bad scrapped one in Old folder. https://steamcommunity.com/sharedfiles/filedetails/?id=2566083800&searchtext=chat+improver

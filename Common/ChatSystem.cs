@@ -11,19 +11,14 @@ namespace LinksInChat.Common
 {
     public class ChatSystem : ModSystem
     {
-        private ILog Log;
         private Mod mod;
 
         public override void OnWorldLoad()
         {
-            Log = ModContent.GetInstance<LinksInChat>().Logger;
             mod = ModContent.GetInstance<LinksInChat>();
             On_RemadeChatMonitor.AddNewMessage += AddNewMessageDetour;
         }
 
-        // Converts all snippets in the chat message to CustomSnippets
-        // In CustomSnippets, we make links hoverable, underlined, clickable, and blue
-        /// <see cref="CustomSnippets">
         private void AddNewMessageDetour(On_RemadeChatMonitor.orig_AddNewMessage orig, RemadeChatMonitor self, string text, Color color, int widthLimitInPixels)
         {
             // Call original

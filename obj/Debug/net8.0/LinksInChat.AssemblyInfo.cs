@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LinksInChat")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+27aac383cac497abcf534ffb113091b789181705")]
 [assembly: System.Reflection.AssemblyProductAttribute("LinksInChat")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LinksInChat")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

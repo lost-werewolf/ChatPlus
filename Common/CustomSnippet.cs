@@ -15,88 +15,91 @@ namespace LinksInChat.Common
     public class CustomSnippet : TextSnippet
     {
         private readonly TextSnippet _wrappedSnippet;
-        private readonly Mod _mod;
-        private string text;
+        private readonly string text; // trimmed text for consistency
+
+        // Holds the bounding rectangle from the last draw call.
+        private Rectangle lastDrawRect = Rectangle.Empty;
+        // Track the update frame when we last drew the underline so we only do it once per frame.
+        private int lastUnderlineDrawFrame = -1;
 
         public CustomSnippet(TextSnippet toWrap, Mod mod)
             : base(toWrap.Text, toWrap.Color, toWrap.Scale)
         {
             _wrappedSnippet = toWrap;
-            _mod = mod;
             CheckForHover = toWrap.CheckForHover;
             DeleteWhole = toWrap.DeleteWhole;
-
-            // my variables
-            this.text = toWrap.Text.Trim(); // remove leading/trailing whitespace
+            this.text = toWrap.Text.Trim();
         }
 
         public override Color GetVisibleColor()
         {
-            // Only color recognized links in blue; everything else uses the wrapped snippet's color
-            if (URL.IsLink(text))
-                return Colors.Blue;
-
-            // Let the wrapped snippet handle color
+            // Always use a link color for link snippets.
+            if (IsWholeLink(text))
+            {
+                // Optionally, you can choose a different color if the mouse is hovering.
+                // Here we check if Main.MouseScreen is within lastDrawRect.
+                bool isHovered = lastDrawRect.Contains(Main.MouseScreen.ToPoint());
+                return isHovered ? new Color(7, 55, 99) : new Color(17, 85, 204);
+            }
             return _wrappedSnippet.GetVisibleColor();
         }
 
-        public override bool UniqueDraw(
-            bool justCheckingString,
-            out Vector2 size,
-            SpriteBatch spriteBatch,
-            Vector2 position,
-            Color color,
-            float scale)
+        public override void Update()
         {
-            // If it's a link, force "blue" color for drawing
-            if (URL.IsLink(text))
-                color = Colors.Blue;
+            // Nothing extra to update; rely on UniqueDraw for the rectangle.
+            _wrappedSnippet.Update();
+        }
 
-            // IMPORTANT: forward the draw call to the wrapped snippet, not base!
-            // This ensures we keep the snippet’s original logic/behavior.
-            bool result = _wrappedSnippet.UniqueDraw(justCheckingString, out size, spriteBatch, position, color, scale);
+        public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch spriteBatch, Vector2 position = default, Color color = default, float scale = 1)
+        {
+            // First, calculate the text size.
+            Vector2 textSize = FontAssets.MouseText.Value.MeasureString(text) * scale;
+            // Store the bounding box of this snippet.
+            lastDrawRect = new Rectangle((int)position.X + 8, (int)position.Y, (int)textSize.X, (int)textSize.Y);
 
-            // Draw the underline ourselves if it’s a link and not just measuring
-            if (!justCheckingString && URL.IsLink(Text))
+            // Debug hitbox
+            // spriteBatch.Draw(TextureAssets.MagicPixel.Value, lastDrawRect, new Color(255, 0, 0, 100)); // Red hitbox for debugging
+
+            // Draw the underline only during the actual drawing pass
+            // and ensure it is drawn only once per update frame.
+            if (!justCheckingString && IsWholeLink(text))
             {
-                Vector2 textSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, Text, new Vector2(scale));
-                float underlineY = position.Y + textSize.Y - 1f;
-
-                Rectangle underlineRect = new Rectangle(
-                    (int)position.X,
-                    (int)underlineY,
-                    (int)textSize.X,
-                    1
-                );
-
-                // Draw underline in blue (or your snippet color)
-                spriteBatch.Draw(TextureAssets.MagicPixel.Value, underlineRect, color);
+                if (Main.GameUpdateCount != lastUnderlineDrawFrame)
+                {
+                    lastUnderlineDrawFrame = (int)Main.GameUpdateCount;
+                    // Define the underline rectangle. Adjust the Y offset as needed.
+                    Rectangle underlineRect = new Rectangle((int)position.X + 8, (int)(position.Y + textSize.Y - 9), (int)textSize.X, 1);
+                    // Use the same color that GetVisibleColor() returns.
+                    Color underlineColor = GetVisibleColor();
+                    spriteBatch.Draw(TextureAssets.MagicPixel.Value, underlineRect, underlineColor);
+                }
             }
 
-            return result;
+            // Forward the draw call to the wrapped snippet.
+            return _wrappedSnippet.UniqueDraw(justCheckingString, out size, spriteBatch, position, color, scale);
         }
 
         public override void OnHover()
         {
-            // Let the original snippet do its hover behavior
             _wrappedSnippet?.OnHover();
-
-            Log.Info($"Hovering: '{text}'");
-
-            if (URL.IsLink(text))
-                UICommon.TooltipMouseText("Open " + text); // TODO better tooltip
+            if (IsWholeLink(text))
+            {
+                // Display a tooltip on hover.
+                UICommon.TooltipMouseText("Open link");
+            }
         }
 
         public override void OnClick()
         {
-            // Original snippet's click behavior
             _wrappedSnippet?.OnClick();
-
-            // Then open the link if recognized
-            if (URL.IsLink(text))
-            {
+            if (IsWholeLink(text))
                 URL.OpenURL(text);
-            }
+        }
+
+        // Helper method: returns true if the input exactly matches a URL pattern.
+        private bool IsWholeLink(string input)
+        {
+            return Regex.IsMatch(input, @"^(https?://|www\.)\S+\.\S+$", RegexOptions.IgnoreCase);
         }
     }
 }
