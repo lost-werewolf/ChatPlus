@@ -1,0 +1,3 @@
+displayName = Links In Chat
+author = Erky
+version = 0.1

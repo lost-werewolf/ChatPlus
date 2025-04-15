@@ -1,0 +1,17 @@
+Description:
+A mod that allows you to click on links in chat to open them in the web browser.
+
+Relevant sources:
+- DecompiledBetterChat
+- DecompiledChatImprover
+- DecompiledChatSource
+
+Vanilla sources:
+- TextSnippet
+- Main.NewText
+- RemadeChatMonitor
+
+Technologies:
+- Reflection
+- Regex
+

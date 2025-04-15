@@ -1,0 +1,17 @@
+Todo:
+- Cursor change to pointing index thingy
+- Color blue only on link
+- Hover tooltip
+- Identify links better
+- Underline links
+- Unhovered link color
+- Hovered link color
+- Visited link color (pressed status)
+
+v2:
+- Blue link unhovered: RGB(51,102,204)
+- On hover: underline and tooltip
+- On visit: purple, fix later...
+
+v3:
+- Use some library to get urls properly... there may be .net, .org. etc.
