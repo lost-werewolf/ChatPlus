@@ -21,3 +21,23 @@ v4:
 - Add Ctrl+A to clear current typed message? No, because Ctrl+X already does that
 - Maybe add player icon in front of chat; as a config option on/off
 - Make icon, mb similar to this? Made a bad scrapped one in Old folder. https://steamcommunity.com/sharedfiles/filedetails/?id=2566083800&searchtext=chat+improver
+- Make hover better (Main.hover... instead of UICommon)
+- Improve hover to match tooltip and hover color change!
+- Investigate underline thing out of focus
+
+Config options:
+- Format links (meaning make them blue, underlined, hoverable.)
+- Link tooltip: "none, light, descriptive"
+- Show player icons
+- Scroll chat messages
+- Left right input
+
+v5:
+- Implement the stuff in config
+- Improve hover link
+- Fix link underline
+- Make player choose their own color
+- Scroll with mousewheel
+- Left right arrows to insert characters ins type stuff
+- Ctrl+shift+leftarrow to mark words?
+- BetterChat color thing but better?

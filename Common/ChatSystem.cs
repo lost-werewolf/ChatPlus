@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
-using log4net;
 using Microsoft.Xna.Framework;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
@@ -13,10 +11,15 @@ namespace LinksInChat.Common
     {
         private Mod mod;
 
-        public override void OnWorldLoad()
+        public override void Load()
         {
             mod = ModContent.GetInstance<LinksInChat>();
             On_RemadeChatMonitor.AddNewMessage += AddNewMessageDetour;
+        }
+
+        public override void Unload()
+        {
+            On_RemadeChatMonitor.AddNewMessage -= AddNewMessageDetour;
         }
 
         private void AddNewMessageDetour(On_RemadeChatMonitor.orig_AddNewMessage orig, RemadeChatMonitor self, string text, Color color, int widthLimitInPixels)

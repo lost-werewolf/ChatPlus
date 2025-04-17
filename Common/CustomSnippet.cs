@@ -8,6 +8,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
+using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace LinksInChat.Common
@@ -75,6 +76,10 @@ namespace LinksInChat.Common
                 }
             }
 
+            // then, if this is the link and the mouse is over it, draw the fancy underline + text
+            if (IsWholeLink(text) && lastDrawRect.Contains(Main.MouseScreen.ToPoint()))
+                DrawLinkHover(spriteBatch);
+
             // Forward the draw call to the wrapped snippet.
             return _wrappedSnippet.UniqueDraw(justCheckingString, out size, spriteBatch, position, color, scale);
         }
@@ -82,12 +87,36 @@ namespace LinksInChat.Common
         public override void OnHover()
         {
             _wrappedSnippet?.OnHover();
-            if (IsWholeLink(text))
-            {
-                // Display a tooltip on hover.
-                UICommon.TooltipMouseText("Open link");
-            }
         }
+
+        private void DrawLinkHover(SpriteBatch sb)
+        {
+            // 1) Use the current mouse position
+            Vector2 pos = Main.MouseScreen + new Vector2(25, 10);
+
+            string ex = "Open link";
+            var font = FontAssets.MouseText.Value;
+            float scale = 0.8f;
+
+            // 2) Measure the *scaled* text
+            Vector2 textSize = font.MeasureString(ex) * scale;
+
+            // 1) Build a snippet array
+            var linkSnips = ChatManager.ParseMessage(ex, Color.White).ToArray();
+            // 2) Call the snippet overload with an 'out' hovered parameter
+            int hovered;
+            ChatManager.DrawColorCodedStringWithShadow(
+                sb,
+                FontAssets.MouseText.Value,
+                linkSnips,         // TextSnippet[]
+                pos,           // Vector2 position
+                0f,                // float rotation
+                Vector2.Zero,      // Vector2 origin
+                new Vector2(1.0f),// Vector2 baseScale
+                out hovered        // out int hoveredSnippet
+            );
+        }
+
 
         public override void OnClick()
         {

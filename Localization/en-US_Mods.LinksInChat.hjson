@@ -1,1 +1,50 @@
+Configs: {
+	Config: {
+		DisplayName: Config
 
+		Headers: {
+			Settings: Settings
+			Preview: Preview
+		}
+
+		ShowLinksInChat: {
+			Label: Show Links In Chat
+			Tooltip: ""
+		}
+
+		ShowLinks: {
+			Label: Show Links
+			Tooltip: ""
+		}
+
+		ShowPlayerIcons: {
+			Label: Show Player Icons
+			Tooltip: ""
+		}
+
+		ShowSettingsIcon: {
+			Label: Show Settings Icon
+			Tooltip: ""
+		}
+
+		ChatBoxPreviewElement: {
+			Label: Chat Box Preview Element
+			Tooltip: ""
+		}
+
+		PlayerColors: {
+			Label: Player Colors
+			Tooltip: ""
+		}
+
+		Format: {
+			Label: Format
+			Tooltip: ""
+		}
+
+		PlayerFormat: {
+			Label: Player Format
+			Tooltip: ""
+		}
+	}
+}

@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Terraria;
 
 namespace LinksInChat.Utilities
 {
@@ -21,6 +22,7 @@ namespace LinksInChat.Utilities
             }
             catch (Exception)
             {
+                Main.NewText($"Failed to open URL: {url}");
                 Log.Warn($"Failed to open URL: {url}");
             }
         }
