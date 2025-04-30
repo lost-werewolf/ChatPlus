@@ -5,6 +5,11 @@ Configs: {
 		Headers: {
 			Settings: Settings
 			Preview: Preview
+			ChatNewFeatures: Chat New Features Header
+			ChatBoxSettings: Chat Box Settings Header
+			ChatFeatures: Chat Features Header
+			ChatStyle: Chat Style Header
+			ChatLimits: Chat Limits Header
 		}
 
 		ShowLinksInChat: {
@@ -46,5 +51,56 @@ Configs: {
 			Label: Player Format
 			Tooltip: ""
 		}
+
+		ShowConfigIcon: {
+			Label: Show Config Icon
+			Tooltip: ""
+		}
+
+		ChatBoxOffset: {
+			Label: Chat Box Offset
+			Tooltip: ""
+		}
+
+		ShowCount: {
+			Label: Show Count
+			Tooltip: ""
+		}
+
+		ChatMessageShowTime: {
+			Label: Chat Message Show Time
+			Tooltip: ""
+		}
+
+		ChatBoxColor: {
+			Label: Chat Box Color
+			Tooltip: ""
+		}
+
+		ChatBoxTextColor: {
+			Label: Chat Box Text Color
+			Tooltip: ""
+		}
+
+		IconPosition: {
+			Label: Icon Position
+			Tooltip: ""
+		}
+
+		PlayerNameFormat: {
+			Label: Player Name Format
+			Tooltip: ""
+		}
+
+		ChatBoxPosition: {
+			Label: Chat Box Position
+			Tooltip: ""
+		}
+	}
+
+	PlayerFormats: {
+		Tooltip: ""
+		ColonFormat.Label: Colon Format
+		ArrowFormat.Label: Arrow Format
 	}
 }

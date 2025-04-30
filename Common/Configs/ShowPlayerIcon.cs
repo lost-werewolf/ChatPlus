@@ -58,13 +58,13 @@ namespace LinksInChat.Common.Configs
             Player player = Main.LocalPlayer;
 
             CalculatedStyle dims = GetDimensions();
-            int xOffset = 16+150;
+            int xOffset = 16 + 150;
             int yOffset = 14;
             Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
 
             // assign the shouldFlipHeadDraw flag to the direction of the player,
             // meaning the head will be flipped if the player is facing left
-            PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
+            // PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
 
             Color color = Color.White * 1.0f;
             if (Value == false)
@@ -80,7 +80,7 @@ namespace LinksInChat.Common.Configs
                 0.6f, // scale
                 color // border color
             );
-            PlayerHeadFlipSystem.shouldFlipHeadDraw = false;
+            // PlayerHeadFlipSystem.shouldFlipHeadDraw = false;
         }
 
         private void DrawToggleTexture(SpriteBatch sb)

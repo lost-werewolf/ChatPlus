@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using LinksInChat.Utilities;
@@ -13,17 +13,17 @@ using Terraria.UI.Chat;
 
 namespace LinksInChat.Common
 {
-    public class CustomSnippet : TextSnippet
+    public class MessageSnippet : TextSnippet
     {
-        private readonly TextSnippet _wrappedSnippet;
-        private readonly string text; // trimmed text for consistency
+        private TextSnippet _wrappedSnippet;
+        private string text; // trimmed text for consistency
 
         // Holds the bounding rectangle from the last draw call.
         private Rectangle lastDrawRect = Rectangle.Empty;
         // Track the update frame when we last drew the underline so we only do it once per frame.
         private int lastUnderlineDrawFrame = -1;
 
-        public CustomSnippet(TextSnippet toWrap, Mod mod)
+        public MessageSnippet(TextSnippet toWrap, Mod mod)
             : base(toWrap.Text, toWrap.Color, toWrap.Scale)
         {
             _wrappedSnippet = toWrap;
@@ -53,35 +53,55 @@ namespace LinksInChat.Common
 
         public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch spriteBatch, Vector2 position = default, Color color = default, float scale = 1)
         {
-            // First, calculate the text size.
+            // Calculate the text size for this snippet
             Vector2 textSize = FontAssets.MouseText.Value.MeasureString(text) * scale;
-            // Store the bounding box of this snippet.
             lastDrawRect = new Rectangle((int)position.X + 8, (int)position.Y, (int)textSize.X, (int)textSize.Y);
 
-            // Debug hitbox
-            // spriteBatch.Draw(TextureAssets.MagicPixel.Value, lastDrawRect, new Color(255, 0, 0, 100)); // Red hitbox for debugging
+            // Draw the player head next to the snippet
+            Player player = Main.LocalPlayer;
+            Vector2 headPosition = new((int)position.X - 98, (int)position.Y + 6); // Draw at the start of the snippet
+            float headScale = 0.9f;
 
-            // Draw the underline only during the actual drawing pass
-            // and ensure it is drawn only once per update frame.
+            if (!justCheckingString && color != Color.Black)
+            {
+                // PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == 1;
+                //Log.Info("before" + PlayerHeadFlipSystem.shouldFlipHeadDraw);
+                int oldDir = player.direction;
+                player.direction = 1;
+                Main.MapPlayerRenderer.DrawPlayerHead(
+                    Main.Camera,
+                    player,
+                    headPosition,
+                    1f,
+                    headScale,
+                    Color.White
+                );
+                // PlayerHeadFlipSystem.shouldFlipHeadDraw = true;
+                player.direction = oldDir;
+            }
+
+            // Offset the text so it doesn't overlap the head
+            float headWidth = 40f * headScale; // 40 is the default head width in pixels
+            Vector2 textPosition = position + new Vector2(headWidth + 2, 0);
+
+            // Draw underline for links
             if (!justCheckingString && IsWholeLink(text))
             {
                 if (Main.GameUpdateCount != lastUnderlineDrawFrame)
                 {
                     lastUnderlineDrawFrame = (int)Main.GameUpdateCount;
-                    // Define the underline rectangle. Adjust the Y offset as needed.
-                    Rectangle underlineRect = new Rectangle((int)position.X + 8, (int)(position.Y + textSize.Y - 9), (int)textSize.X, 1);
-                    // Use the same color that GetVisibleColor() returns.
+                    Rectangle underlineRect = new Rectangle((int)textPosition.X, (int)(textPosition.Y + textSize.Y - 9), (int)textSize.X, 1);
                     Color underlineColor = GetVisibleColor();
                     spriteBatch.Draw(TextureAssets.MagicPixel.Value, underlineRect, underlineColor);
                 }
             }
 
-            // then, if this is the link and the mouse is over it, draw the fancy underline + text
+            // Draw hover effect for links
             if (IsWholeLink(text) && lastDrawRect.Contains(Main.MouseScreen.ToPoint()))
                 DrawLinkHover(spriteBatch);
 
-            // Forward the draw call to the wrapped snippet.
-            return _wrappedSnippet.UniqueDraw(justCheckingString, out size, spriteBatch, position, color, scale);
+            // Draw the wrapped snippet's text at the offset position
+            return _wrappedSnippet.UniqueDraw(justCheckingString, out size, spriteBatch, textPosition, color, scale);
         }
 
         public override void OnHover()
@@ -126,9 +146,7 @@ namespace LinksInChat.Common
         }
 
         // Helper method: returns true if the input exactly matches a URL pattern.
-        private bool IsWholeLink(string input)
-        {
-            return Regex.IsMatch(input, @"^(https?://|www\.)\S+\.\S+$", RegexOptions.IgnoreCase);
-        }
+        private static bool IsWholeLink(string s)
+            => Regex.IsMatch(s, @"^(https?://|www\.)\S+\.\S+$", RegexOptions.IgnoreCase);
     }
 }

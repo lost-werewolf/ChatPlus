@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LinksInChat.Helpers;
 using LinksInChat.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -71,12 +72,12 @@ namespace LinksInChat.Common.Configs
 
             int count = 2 + (Conf.C.ShowLinks ? 1 : 0);
             const int maxSlots = 3; // total possible icon lines
-            PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
+            // PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
             for (int i = 0; i < count; i++)
             {
                 // bottom‑align: skip the top (maxSlots - count) slots
                 float y = 30 * (maxSlots - count + i);
-                Vector2 pos = new(dims.X + 56-10f, dims.Y + 18f + y);
+                Vector2 pos = new(dims.X + 56 - 10f, dims.Y + 18f + y);
                 Main.MapPlayerRenderer.DrawPlayerHead(
                 Main.Camera,
                 player,
@@ -86,7 +87,7 @@ namespace LinksInChat.Common.Configs
                 Color.White
                         );
             }
-            PlayerHeadFlipSystem.shouldFlipHeadDraw = false;
+            // PlayerHeadFlipSystem.shouldFlipHeadDraw = false;
         }
 
         private void DrawConfigIfOn(SpriteBatch sb)
@@ -180,8 +181,8 @@ namespace LinksInChat.Common.Configs
             // Build a list of (prefix, message) pairs up‑front:
             var chatLines = new List<KeyValuePair<string, string>>
             {
-                new(FormatPrefix(Main.LocalPlayer.name),      "How are you?"),
-                new(FormatPrefix(Main.LocalPlayer.name + "2"), "Good, thank you!")
+                new(FormatPrefix(Main.LocalPlayer.name + "1"),      " How are you?"),
+                new(FormatPrefix(Main.LocalPlayer.name + "2"), " Good, thank you!")
             };
 
             // Add link
@@ -202,14 +203,8 @@ namespace LinksInChat.Common.Configs
                 Vector2 pos = new Vector2(panelPos.X + 2f, startY + i * lineHeight);
 
                 // Draw player color
-                List<Color> colors = [
-                new Color(112, 128, 144),
-                new Color(153, 153, 102),
-                new Color(153, 102, 128),
-                ];
-
                 Color msgColor = Conf.C.PlayerColors
-                    ? colors[i % 3]
+                    ? ColorHelper.PlayerColors[i % 3]
                     : Color.White;
 
                 var preSnips = ChatManager.ParseMessage(prefix, msgColor).ToArray();
@@ -233,19 +228,23 @@ namespace LinksInChat.Common.Configs
             }
         }
 
-        // helper to expand your format string
+        // rewrites the player name to match the format in the config
         private string FormatPrefix(string rawName)
         {
             // Conf.C.PlayerFormat is either "<PlayerName>" or "PlayerName:"
             // so replace the placeholder with the actual name
-            var fmt = Conf.C.PlayerFormat.Replace("PlayerName", rawName);
-            // always add a trailing space
-            return fmt.EndsWith(" ") ? fmt : fmt + " ";
+            if (Conf.C.PlayerNameFormat == "PlayerName:")
+            {
+                // Find all instances of < and > and remove them
+                rawName = rawName.Replace("<", "").Replace(">", "");
+                return $"{rawName}:"; // "PlayerName"
+            }
+            return $"<{rawName}>"; // "<PlayerName>"
         }
 
         private void DrawLinkExample(SpriteBatch sb, Vector2 position)
         {
-            string ex = "https://forums.terraria.org/";
+            string ex = " https://forums.terraria.org/";
             var font = FontAssets.MouseText.Value;
             float scale = 0.8f;
 
@@ -255,7 +254,7 @@ namespace LinksInChat.Common.Configs
             // 1) underline in dark blue
             var underlineRect = new Rectangle(
                 (int)position.X,
-                (int)(position.Y + textSize.Y-6),
+                (int)(position.Y + textSize.Y - 6),
                 (int)textSize.X, 2
             );
             sb.Draw(TextureAssets.MagicPixel.Value, underlineRect, new Color(10, 15, 154));

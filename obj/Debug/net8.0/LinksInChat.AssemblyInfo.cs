@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: System.Runtime.CompilerServices.IgnoresAccessChecksToAttribute("tModLoader")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("LinksInChat")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c26cbc12fe99d646f9b771142124d26ce70c8d1e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2fb54d2c41ad05213321fdffce715484b0adb9ed")]
 [assembly: System.Reflection.AssemblyProductAttribute("LinksInChat")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LinksInChat")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

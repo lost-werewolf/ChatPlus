@@ -1,3 +1,4 @@
+using LinksInChat.Helpers;
 using LinksInChat.Utilities;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Xna.Framework;
@@ -56,10 +57,10 @@ namespace LinksInChat.Common.Configs
                 return;
             }
 
-            string ex = $"<{Main.LocalPlayer.name}>";
+            string PlayerNameText = $"{Main.LocalPlayer.name}";
             CalculatedStyle dims = this.GetDimensions();
             Vector2 pos = dims.Position();
-            Vector2 textSize = FontAssets.MouseText.Value.MeasureString(ex);
+            Vector2 textSize = FontAssets.MouseText.Value.MeasureString(PlayerNameText);
             int xOffset = 150;
 
             // Draw text
@@ -67,9 +68,9 @@ namespace LinksInChat.Common.Configs
             ChatManager.DrawColorCodedStringWithShadow(
                 sb,
                 FontAssets.ItemStack.Value,
-                ex,
+                PlayerNameText,
                 textPos,
-                Color.Orange,
+                ColorHelper.PlayerColors[0],
                 0f,
                 Vector2.Zero,
                 baseScale: new Vector2(0.8f)

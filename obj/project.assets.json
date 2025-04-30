@@ -2,12 +2,44 @@
   "version": 3,
   "targets": {
     "net8.0": {
+      "Krafs.Publicizer/2.2.1": {
+        "type": "package",
+        "contentFiles": {
+          "contentfiles/cs/any/Publicizer/IgnoresAccessChecksToAttribute.cs": {
+            "buildAction": "Compile",
+            "codeLanguage": "cs",
+            "copyToOutput": false
+          }
+        },
+        "build": {
+          "build/Krafs.Publicizer.props": {},
+          "build/Krafs.Publicizer.targets": {}
+        }
+      },
       "tModLoader.CodeAssist/0.1.5": {
         "type": "package"
       }
     }
   },
   "libraries": {
+    "Krafs.Publicizer/2.2.1": {
+      "sha512": "QGI4nMGQbKsuFUUboixVHu4mv3lHB5RejIa7toIlzTmwLkuCYYEpUBJjmy3OpXYyj5dVSZAXVbr4oeMSloE67Q==",
+      "type": "package",
+      "path": "krafs.publicizer/2.2.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "build/Krafs.Publicizer.props",
+        "build/Krafs.Publicizer.targets",
+        "build/net472/Publicizer.dll",
+        "build/net472/dnlib.dll",
+        "contentfiles/cs/any/Publicizer/IgnoresAccessChecksToAttribute.cs",
+        "icon.png",
+        "krafs.publicizer.2.2.1.nupkg.sha512",
+        "krafs.publicizer.nuspec"
+      ]
+    },
     "tModLoader.CodeAssist/0.1.5": {
       "sha512": "Sg/jKEg/z5eN+Cdi3/9CU4JfJwvXHVH+UDJf4Lipo26uTa+guLLJXH1XDJNPShTFwKK8jMUYbthINP4QhsgHSA==",
       "type": "package",
@@ -27,6 +59,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "Krafs.Publicizer >= 2.2.1",
       "tModLoader.CodeAssist >= 0.1.*"
     ]
   },
@@ -80,6 +113,11 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "Krafs.Publicizer": {
+            "suppressParent": "None",
+            "target": "Package",
+            "version": "[2.2.1, )"
+          },
           "tModLoader.CodeAssist": {
             "target": "Package",
             "version": "[0.1.*, )"

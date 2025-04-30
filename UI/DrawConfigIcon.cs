@@ -34,6 +34,11 @@ namespace LinksInChat.UI
 
         public override void LeftClick(UIMouseEvent evt)
         {
+            if (!Main.drawingPlayerChat || !Conf.C.ShowConfigIcon)
+            {
+                return;
+            }
+
             Conf.C.Open();
         }
     }

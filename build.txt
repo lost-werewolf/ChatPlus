@@ -1,5 +1,5 @@
 displayName = Improved Chat Box
 author = Erky
 version = 0.1
-side = both
-ignore = /Old
+side = client
+ignore = /Assets/Workshop

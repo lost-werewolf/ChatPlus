@@ -41,3 +41,14 @@ v5:
 - Left right arrows to insert characters ins type stuff
 - Ctrl+shift+leftarrow to mark words?
 - BetterChat color thing but better?
+
+v6:
+- Change box color
+- Change box position
+- Change max number of shown messages
+- Change time to show messages
+- Add scrollwheel like UIScrollbar?
+- Add scale to chat box
+- Add scale to messages
+- Add favorited messages? That saves as a .json for the player ID, like little notes?
+- Bug: Resizing window removes the formatting!
