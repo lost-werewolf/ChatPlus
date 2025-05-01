@@ -52,3 +52,5 @@ v6:
 - Add scale to messages
 - Add favorited messages? That saves as a .json for the player ID, like little notes?
 - Bug: Resizing window removes the formatting!
+- Add emojis to chat?
+- Add images to chat?
