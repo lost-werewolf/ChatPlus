@@ -1,4 +1,4 @@
-using LinksInChat.Utilities;
+using LinksInChat.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;

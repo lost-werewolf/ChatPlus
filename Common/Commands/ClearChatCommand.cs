@@ -1,11 +1,11 @@
-using LinksInChat.Common.Configs;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace LinksInChat.Common.Commands
 {
-    public class OpenConfigCommand : ModCommand
+    public class ClearChatCommand : ModCommand
     {
-        public override string Command => "c";
+        public override string Command => "clear";
 
         public override string Description => "Open Chat Config";
 
@@ -13,7 +13,10 @@ namespace LinksInChat.Common.Commands
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            Conf.C.Open();
+            for(int i = 0; i < 10; i++)
+            {
+                Main.NewText("");
+            }
         }
     }
 }

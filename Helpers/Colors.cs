@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace LinksInChat.Utilities
+namespace LinksInChat.Helpers
 {
     public static class Colors
     {

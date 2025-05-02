@@ -1,5 +1,4 @@
 using LinksInChat.Helpers;
-using LinksInChat.Utilities;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

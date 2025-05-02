@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using LinksInChat.Utilities;
+using LinksInChat.Common.Hooks;
+using LinksInChat.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -55,34 +56,16 @@ namespace LinksInChat.Common
         {
             // Calculate the text size for this snippet
             Vector2 textSize = FontAssets.MouseText.Value.MeasureString(text) * scale;
-            lastDrawRect = new Rectangle((int)position.X + 8, (int)position.Y, (int)textSize.X, (int)textSize.Y);
+            lastDrawRect = new Rectangle((int)position.X, (int)position.Y, (int)textSize.X, (int)textSize.Y);
 
             // Draw the player head next to the snippet
             Player player = Main.LocalPlayer;
-            Vector2 headPosition = new((int)position.X - 98, (int)position.Y + 6); // Draw at the start of the snippet
-            float headScale = 0.9f;
 
-            if (!justCheckingString && color != Color.Black)
-            {
-                // PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == 1;
-                //Log.Info("before" + PlayerHeadFlipSystem.shouldFlipHeadDraw);
-                int oldDir = player.direction;
-                player.direction = 1;
-                Main.MapPlayerRenderer.DrawPlayerHead(
-                    Main.Camera,
-                    player,
-                    headPosition,
-                    1f,
-                    headScale,
-                    Color.White
-                );
-                // PlayerHeadFlipSystem.shouldFlipHeadDraw = true;
-                player.direction = oldDir;
-            }
+            Vector2 headPosition = new((int)65+ChatPosHelper.OffsetX, (int)lastDrawRect.Y + 6); // Draw at the start of the snippet
+            DrawHelper.DrawPlayerHead(headPosition);
 
             // Offset the text so it doesn't overlap the head
-            float headWidth = 40f * headScale; // 40 is the default head width in pixels
-            Vector2 textPosition = position + new Vector2(headWidth + 2, 0);
+            Vector2 textPosition = position + new Vector2(12f, 0f);
 
             // Draw underline for links
             if (!justCheckingString && IsWholeLink(text))

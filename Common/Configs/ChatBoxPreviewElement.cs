@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using LinksInChat.Helpers;
-using LinksInChat.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -147,6 +146,13 @@ namespace LinksInChat.Common.Configs
             string previewText = Main.chatText ?? string.Empty;
             if (textBlinkerVisible)
                 previewText += "|";
+
+            if (!IsMouseHovering)
+            {
+                Main.drawingPlayerChat = false;
+                PlayerInput.WritingText = false;
+                return;
+            }
 
             var textSnips = ChatManager.ParseMessage(previewText, Color.White).ToArray();
 

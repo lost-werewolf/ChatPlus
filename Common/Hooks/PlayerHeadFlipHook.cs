@@ -1,24 +1,21 @@
 ﻿using System;
-using LinksInChat.Utilities;
+using LinksInChat.Helpers;
 using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using Terraria.Graphics.Renderers;
 using Terraria.ModLoader;
 
-namespace LinksInChat.Common
+namespace LinksInChat.Common.Hooks
 {
     /// <summary>
     /// Modifies the DrawPlayerHead method in the MapHeadRenderer class to force the player head icon to be drawn facing right.
     /// The default behaviour is to draw the head icon facing the direction of the player, so this is overriding that.
     /// </summary>
-    public class PlayerHeadFlipSystem : ModSystem
+    public class PlayerHeadFlipHook : ModSystem
     {
         public static bool shouldFlipHeadDraw = true;
 
-        public override void Load()
-        {
-            MonoModHooks.Modify(typeof(MapHeadRenderer).GetMethod("DrawPlayerHead"), IL_MapHeadRenderer_DrawPlayerHead);
-        }
+        public override void Load() => IL_MapHeadRenderer.DrawPlayerHead += IL_MapHeadRenderer_DrawPlayerHead;
 
         public static void IL_MapHeadRenderer_DrawPlayerHead(ILContext il)
         {
@@ -32,7 +29,7 @@ namespace LinksInChat.Common
 
                 ILLabel skipCentering = il.DefineLabel();
 
-                c.EmitLdsfld(typeof(PlayerHeadFlipSystem).GetField(nameof(shouldFlipHeadDraw)));
+                c.EmitLdsfld(typeof(PlayerHeadFlipHook).GetField(nameof(shouldFlipHeadDraw)));
                 c.EmitBrfalse(skipCentering);
                 c.EmitDelegate<Func<Vector2, Vector2>>(inCenter =>
                 {
@@ -42,27 +39,13 @@ namespace LinksInChat.Common
                 c.MarkLabel(skipCentering);
 
                 // find where the draw data loads the 
-                c.GotoNext(MoveType.Before, i => i.MatchLdcI4(0));
-
-                // define the labels for the if, else statement
-                ILLabel normRet = il.DefineLabel();
-                ILLabel altLabel = il.DefineLabel();
-
-                c.EmitLdsfld(typeof(PlayerHeadFlipSystem).GetField(nameof(shouldFlipHeadDraw)));
-                c.EmitBrtrue(altLabel); // if(!shouldFlipHeadDraw)
-                                        // {
-                c.Index++;                // push 0
-                c.EmitBr(normRet);        // }
-                                          // else
-                c.MarkLabel(altLabel);    // {
-                c.EmitLdcI4(1);            // push 1
-                c.MarkLabel(normRet);    // }
+                c.GotoNext(MoveType.After, i => i.MatchLdcI4(0));
+                c.EmitLdsfld(typeof(PlayerHeadFlipHook).GetField(nameof(shouldFlipHeadDraw)));
+                c.EmitXor();
             }
             catch (Exception e)
             {
                 Log.Info("Error in IL_MapHeadRenderer_DrawPlayerHead: " + e.Message);
-                // oop!
-                // MonoModHooks.DumpIL(ModContent.GetInstance<XGWorld>(), il);
             }
         }
     }

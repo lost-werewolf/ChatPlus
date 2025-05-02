@@ -1,0 +1,59 @@
+﻿using System.Reflection;
+using Microsoft.Xna.Framework;          // XNA Vector2
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using Terraria;
+using Terraria.GameContent.UI.Chat;
+using Terraria.ModLoader;
+
+namespace LinksInChat.Common.Hooks;
+
+// ── offsets, kept as two floats ───────────────────────────────────
+public static class ChatPosHelper
+{
+    public static float OffsetX = 0;         // +right / –left
+    public static float OffsetY = 0;         // +down  / –up
+}
+
+// ── IL hook that patches *both* methods ───────────────────────────
+public class ChatPosHook : ModSystem
+{
+    public override void Load()
+    {
+        IL_Main.DrawPlayerChat += InjectOffset;
+        IL_RemadeChatMonitor.DrawChat += InjectOffset;
+    }
+
+    public override void Unload()
+    {
+        IL_Main.DrawPlayerChat -= InjectOffset;
+        IL_RemadeChatMonitor.DrawChat -= InjectOffset;
+    }
+
+    /// <summary>Adds new Vector2(OffsetX, OffsetY) to every Vector2 literal.</summary>
+    private static void InjectOffset(ILContext il)
+    {
+        var vec2Ctor = typeof(Vector2).GetConstructor(new[] { typeof(float), typeof(float) });
+        var vec2Add = typeof(Vector2).GetMethod("op_Addition",
+                         BindingFlags.Public | BindingFlags.Static,
+                         null, new[] { typeof(Vector2), typeof(Vector2) }, null);
+
+        var fldX = typeof(ChatPosHelper).GetField(nameof(ChatPosHelper.OffsetX));
+        var fldY = typeof(ChatPosHelper).GetField(nameof(ChatPosHelper.OffsetY));
+
+        ILCursor c = new(il);
+
+        while (c.TryGotoNext(i => i.MatchNewobj(vec2Ctor)))
+        {
+            c.Index++;                              // insert right after newobj
+
+            // push new Vector2(OffsetX, OffsetY)
+            c.Emit(OpCodes.Ldsfld, fldX);           // float OffsetX
+            c.Emit(OpCodes.Ldsfld, fldY);           // float OffsetY
+            c.Emit(OpCodes.Newobj, vec2Ctor);       // Vector2(offsetX, offsetY)
+
+            // add the two vectors
+            c.Emit(OpCodes.Call, vec2Add);          // original + offset
+        }
+    }
+}

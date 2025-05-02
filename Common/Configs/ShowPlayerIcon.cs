@@ -1,4 +1,5 @@
-using LinksInChat.Utilities;
+using LinksInChat.Common.Hooks;
+using LinksInChat.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -49,38 +50,12 @@ namespace LinksInChat.Common.Configs
 
         private void DrawPlayerIcon(SpriteBatch sb)
         {
-            if (Main.LocalPlayer == null)
-            {
-                Log.Error("No player err!");
-                return;
-            }
-
-            Player player = Main.LocalPlayer;
-
             CalculatedStyle dims = GetDimensions();
             int xOffset = 16 + 150;
             int yOffset = 14;
             Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
 
-            // assign the shouldFlipHeadDraw flag to the direction of the player,
-            // meaning the head will be flipped if the player is facing left
-            // PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
-
-            Color color = Color.White * 1.0f;
-            if (Value == false)
-            {
-                //color = Color.Red;
-            }
-
-            Main.MapPlayerRenderer.DrawPlayerHead(
-                Main.Camera,
-                player, // player to draw
-                drawPosition,
-                1f, // alpha/transparency
-                0.6f, // scale
-                color // border color
-            );
-            // PlayerHeadFlipSystem.shouldFlipHeadDraw = false;
+            DrawHelper.DrawPlayerHead(drawPosition);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)

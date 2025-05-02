@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using LinksInChat.Common.Hooks;
 using LinksInChat.Helpers;
-using LinksInChat.Utilities;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
@@ -48,6 +48,27 @@ namespace LinksInChat.Common.Configs
         [DefaultValue("PlayerName:")]
         public string PlayerNameFormat;
 
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [Range(0.5f, 1.5f)]
+        [DrawTicks]
+        [Increment(0.1f)]
+        [DefaultValue(1f)]
+        public float TextScale;
+
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [Range(0, 900)]
+        [DrawTicks]
+        [Increment(10)]
+        [DefaultValue(0)]
+        public int ChatOffsetX;
+
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [Range(0, -900)]
+        [DrawTicks]
+        [Increment(10)]
+        [DefaultValue(0)]
+        public int ChatOffsetY;
+
         // [BackgroundColor(255, 192, 8)] // Golden Yellow
         // [DefaultValue(typeof(Color), "255,255,255,255")]
         // public Color ChatBoxColor = Color.White;
@@ -64,7 +85,7 @@ namespace LinksInChat.Common.Configs
         [Header("ChatLimits")]
 
         [BackgroundColor(192, 54, 64)] // Calamity Red
-        [Range(1, 20)]
+        [Range(1, 30)]
         [DrawTicks]
         [Increment(1)]
         [DefaultValue(10)]
@@ -84,11 +105,23 @@ namespace LinksInChat.Common.Configs
         [CustomModConfigItem(typeof(ChatBoxPreviewElement))]
         public int ChatBoxPreviewElement; // int is just a placeholder, it doesnt matter
 
+        [Header("Misc")]
+        [DefaultValue(true)]
+        public bool ShowDebugMessages;
+
         public override void OnChanged()
         {
             base.OnChanged();
 
-            Log.Info("Config changed!");
+            if (Conf.C == null)
+            {
+                Log.Error("Config is null!");
+                return;
+            }
+            else
+            {
+                Log.Info("Config changed!");
+            }
 
             // Get ChatMonitor
             var chatMonitor = typeof(RemadeChatMonitor);
@@ -96,7 +129,14 @@ namespace LinksInChat.Common.Configs
 
             // Update the ShowCount value.
             var showCountField = chatMonitor.GetField("_showCount", BindingFlags.NonPublic | BindingFlags.Instance);
-            showCountField?.SetValue(chatMonitorInstance, ShowCount);
+            showCountField?.SetValue(chatMonitorInstance, (int)ShowCount);
+
+            // Update Chat offset.
+            ChatPosHelper.OffsetX = Conf.C.ChatOffsetX;
+            ChatPosHelper.OffsetY = Conf.C.ChatOffsetY;
+
+            // Log it
+            Log.Info($"x: " + ChatPosHelper.OffsetX);
         }
     }
 

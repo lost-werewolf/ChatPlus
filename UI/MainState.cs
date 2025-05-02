@@ -1,4 +1,4 @@
-﻿using LinksInChat.Utilities;
+﻿using LinksInChat.Helpers;
 using Terraria.UI;
 
 namespace LinksInChat.UI

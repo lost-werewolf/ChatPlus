@@ -28,7 +28,7 @@ namespace LinksInChat.UI
 
             if (IsMouseHovering)
             {
-                Main.hoverItemName = "Open config";
+                Main.hoverItemName = "Chat Settings";
             }
         }
 

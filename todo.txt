@@ -43,14 +43,36 @@ v5:
 - BetterChat color thing but better?
 
 v6:
-- Change box color
-- Change box position
-- Change max number of shown messages
-- Change time to show messages
-- Add scrollwheel like UIScrollbar?
-- Add scale to chat box
-- Add scale to messages
-- Add favorited messages? That saves as a .json for the player ID, like little notes?
-- Bug: Resizing window removes the formatting!
-- Add emojis to chat?
-- Add images to chat?
+- [CONTINUE] Change box color
+- [x] Change box position
+- [x] Change max number of shown messages
+- [x] Change time until message disappear
+- [NO] Add scrollwheel like UIScrollbar? Nahh
+- [x-ish] Add scale to chat box (added scale to text but didnt rly help)
+- [x] Add scale to messages
+- [NO] Add favorited messages? That saves as a .json for the player ID, like little notes?
+- [CONTINUE] Add emojis to chat (icon button ON the chat box, to the left)
+- [CONTINUE] Add images to chat (icon button ON the chat box, to the left to take screenshot and send.)
+- [CONTINUE] Add padding between messages
+- [x] Fix so player icon only shows up for PLAYER messages, not all messages
+- [NO] Adding themes like DPSPanel to chat box? NO! Resource packs do this
+
+v7:
+- Add box color (easy)
+- Add text color (easy)
+- Add timestamp to messages (easy)
+- Add padding between messages AND scale. Config option: Scale Low, Medium, High.
+
+- Add emojis 
+- Add screenshots
+
+- Add REBIND chat
+
+- Add left right arrows to navigate input box
+- Add mouse scroll
+- Add scrollbar
+
+- Bug: Resizing window removes the formatting! (kinda low priority)
+
+Idea:
+- Add draggable chat box?

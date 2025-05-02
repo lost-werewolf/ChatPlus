@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.ModLoader;
 
-namespace LinksInChat.Utilities
+namespace LinksInChat.Helpers
 {
     /// <summary>
     /// To add a new asset, simply add a new field like:
