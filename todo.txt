@@ -79,6 +79,7 @@ Idea:
 
 v8:
 https://steamcommunity.com/sharedfiles/filedetails/?id=3448785552 adds icons, timestamps,etc. also typing indicators. also check out global chat.
+- who used boss summon 
 
 Name ideas:
 "Advanced Chat Features"
