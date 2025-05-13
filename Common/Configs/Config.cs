@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using LinksInChat.Common.Hooks;
-using LinksInChat.Helpers;
+using AdvancedChatFeatures.Common.Hooks;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 
-namespace LinksInChat.Common.Configs
+namespace AdvancedChatFeatures.Common.Configs
 {
     public class Config : ModConfig
     {
@@ -132,11 +132,11 @@ namespace LinksInChat.Common.Configs
             showCountField?.SetValue(chatMonitorInstance, (int)ShowCount);
 
             // Update Chat offset.
-            ChatPosHelper.OffsetX = Conf.C.ChatOffsetX;
-            ChatPosHelper.OffsetY = Conf.C.ChatOffsetY;
+            ChatPosHook.OffsetX = Conf.C.ChatOffsetX;
+            ChatPosHook.OffsetY = Conf.C.ChatOffsetY;
 
             // Log it
-            Log.Info($"x: " + ChatPosHelper.OffsetX);
+            Log.Info($"x: " + ChatPosHook.OffsetX);
         }
     }
 

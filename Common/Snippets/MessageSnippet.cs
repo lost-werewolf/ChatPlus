@@ -12,8 +12,12 @@ using Terraria.ModLoader.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common
+namespace AdvancedChatFeatures.Common.Snippets
 {
+    // Changes the style, behaviour and functionality of a TextSnippet.
+    // In this case the MessageSnippet is extracted to be only the "message" part 
+    // that is sent only when a message is sent by a PLAYER. 
+    // See AddNewMessageHook for more details.
     public class MessageSnippet : TextSnippet
     {
         private TextSnippet _wrappedSnippet;
@@ -30,7 +34,7 @@ namespace AdvancedChatFeatures.Common
             _wrappedSnippet = toWrap;
             CheckForHover = toWrap.CheckForHover;
             DeleteWhole = toWrap.DeleteWhole;
-            this.text = toWrap.Text.Trim();
+            text = toWrap.Text.Trim();
         }
 
         public override Color GetVisibleColor()
@@ -58,10 +62,7 @@ namespace AdvancedChatFeatures.Common
             Vector2 textSize = FontAssets.MouseText.Value.MeasureString(text) * scale;
             lastDrawRect = new Rectangle((int)position.X, (int)position.Y, (int)textSize.X, (int)textSize.Y);
 
-            // Draw the player head next to the snippet
-            Player player = Main.LocalPlayer;
-
-            Vector2 headPosition = new((int)65 + ChatPosHook.OffsetX, (int)lastDrawRect.Y + 6); // Draw at the start of the snippet
+            Vector2 headPosition = new(65 + ChatPosHook.OffsetX, lastDrawRect.Y + 6); // Draw at the start of the snippet
             DrawHelper.DrawPlayerHead(headPosition);
 
             // Offset the text so it doesn't overlap the head

@@ -1,7 +1,7 @@
-using LinksInChat.Common.Configs;
+using AdvancedChatFeatures.Common.Configs;
 using Terraria.ModLoader;
 
-namespace LinksInChat.Common.Commands
+namespace AdvancedChatFeatures.Common.Commands
 {
     public class OpenConfigCommand : ModCommand
     {

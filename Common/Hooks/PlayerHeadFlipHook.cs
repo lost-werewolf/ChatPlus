@@ -1,11 +1,11 @@
 ﻿using System;
-using LinksInChat.Helpers;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using Terraria.Graphics.Renderers;
 using Terraria.ModLoader;
 
-namespace LinksInChat.Common.Hooks
+namespace AdvancedChatFeatures.Common.Hooks
 {
     /// <summary>
     /// Modifies the DrawPlayerHead method in the MapHeadRenderer class to force the player head icon to be drawn facing right.

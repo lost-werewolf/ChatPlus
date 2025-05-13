@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using LinksInChat.Common.Configs;
+using AdvancedChatFeatures.Common.Configs;
 using log4net;
 using Terraria.ModLoader;
 
-namespace LinksInChat.Helpers
+namespace AdvancedChatFeatures.Helpers
 {
     public static class Log
     {
-        private static ILog LoggerInstance => ModContent.GetInstance<LinksInChat>().Logger;
+        private static ILog LoggerInstance => ModContent.GetInstance<AdvancedChatFeatures>().Logger;
 
         private static DateTime lastLogTime;
 
@@ -30,7 +30,7 @@ namespace LinksInChat.Helpers
 
             // Extract the class name from the caller's file path.
             string className = Path.GetFileNameWithoutExtension(callerFilePath);
-            var instance = ModContent.GetInstance<LinksInChat>();
+            var instance = ModContent.GetInstance<AdvancedChatFeatures>();
             if (instance == null || instance.Logger == null)
                 return; // Skip logging if the mod is unloading or null
 
@@ -51,7 +51,7 @@ namespace LinksInChat.Helpers
 
             // Extract the class name from the caller's file path.
             string className = Path.GetFileNameWithoutExtension(callerFilePath);
-            var instance = ModContent.GetInstance<LinksInChat>();
+            var instance = ModContent.GetInstance<AdvancedChatFeatures>();
             if (instance == null || instance.Logger == null)
                 return; // Skip logging if the mod is unloading or null
 

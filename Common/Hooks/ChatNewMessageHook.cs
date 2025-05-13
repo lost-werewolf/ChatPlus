@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Common.Snippets;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -8,9 +9,9 @@ using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Systems
+namespace AdvancedChatFeatures.Common.Hooks
 {
-    public class ChatHook : ModSystem
+    public class ChatNewMessageHook : ModSystem
     {
         // Player colors
         private static readonly Dictionary<string, Color> PlayerNameColors = [];
@@ -47,7 +48,7 @@ namespace AdvancedChatFeatures.Common.Systems
 
                 // Set time left
                 var timeLeftField = typeof(ChatMessageContainer).GetField("_timeLeft", BindingFlags.NonPublic | BindingFlags.Instance);
-                timeLeftField?.SetValue(msg, (int)(Conf.C.ChatMessageShowTime * 60));
+                timeLeftField?.SetValue(msg, Conf.C.ChatMessageShowTime * 60);
 
                 // Wrap snippets in CustomSnippet to add custom behavior
                 ProcessSnippets(parsedList);
@@ -94,7 +95,7 @@ namespace AdvancedChatFeatures.Common.Systems
                     Mod mod = ModContent.GetInstance<AdvancedChatFeatures>();
                     var custom = new MessageSnippet(msgSnippet, mod)
                     {
-                        Scale = Conf.C.TextScale              // keep your settings
+                        //Scale = Conf.C.TextScale              // keep your settings
                     };
                     snippetArray[1] = custom;
                 }

@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using Terraria;
 
-namespace LinksInChat.Helpers
+namespace AdvancedChatFeatures.Helpers
 {
     public static class URL
     {

@@ -1,10 +1,10 @@
-﻿using LinksInChat.Common.Hooks;
-using LinksInChat.Helpers;
+﻿using AdvancedChatFeatures.Common.Hooks;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace LinksInChat.Common.Commands;
+namespace AdvancedChatFeatures.Common.Commands;
 
 /// <summary>Move chat horizontally:  <c>/x &lt;pixels&gt;</c></summary>
 public class XPosCommand : ModCommand
@@ -16,9 +16,9 @@ public class XPosCommand : ModCommand
     {
         if (args.Length > 0 && int.TryParse(args[0], out int delta))
         {
-            ChatPosHelper.OffsetX += delta;
-            string msg = $"Chat offset → X={ChatPosHelper.OffsetX}, " +
-                         $"Y={ChatPosHelper.OffsetY}";
+            ChatPosHook.OffsetX += delta;
+            string msg = $"Chat offset → X={ChatPosHook.OffsetX}, " +
+                         $"Y={ChatPosHook.OffsetY}";
             Main.NewText(msg, Color.LightGreen);
             Mod.Logger.Info(msg);
         }

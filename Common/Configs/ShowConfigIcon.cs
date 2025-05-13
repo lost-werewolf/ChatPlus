@@ -1,4 +1,4 @@
-using LinksInChat.Helpers;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -8,7 +8,7 @@ using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace LinksInChat.Common.Configs
+namespace AdvancedChatFeatures.Common.Configs
 {
     /// <summary>
     /// Reference:
@@ -49,7 +49,7 @@ namespace LinksInChat.Common.Configs
 
         private void DrawConfigIcon(SpriteBatch sb)
         {
-            DrawHelper.DrawProperScale(sb, element: this, tex: Ass.ButtonModConfig.Value, scale: 0.75f, x: 6+150, y: 4);
+            DrawHelper.DrawProperScale(sb, element: this, tex: Ass.ButtonModConfig.Value, scale: 0.75f, x: 6 + 150, y: 4);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)

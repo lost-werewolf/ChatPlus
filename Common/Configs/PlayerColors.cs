@@ -1,4 +1,4 @@
-using LinksInChat.Helpers;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,7 +9,7 @@ using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace LinksInChat.Common.Configs
+namespace AdvancedChatFeatures.Common.Configs
 {
     /// <summary>
     /// Reference:

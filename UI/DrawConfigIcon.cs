@@ -1,11 +1,11 @@
-using LinksInChat.Common.Configs;
+using AdvancedChatFeatures.Common.Configs;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-namespace LinksInChat.UI
+namespace AdvancedChatFeatures.UI
 {
     public class DrawConfigIcon : UIImageButton
     {

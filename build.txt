@@ -1,5 +1,3 @@
-displayName = Improved Chat Box
+displayName = Advanced Chat Features
 author = Erky
 version = 0.1
-side = client
-ignore = /Assets/Workshop

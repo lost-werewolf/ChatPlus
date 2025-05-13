@@ -6,18 +6,14 @@ using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 
-namespace LinksInChat.Common.Hooks;
-
-// ── offsets, kept as two floats ───────────────────────────────────
-public static class ChatPosHelper
-{
-    public static float OffsetX = 0;         // +right / –left
-    public static float OffsetY = 0;         // +down  / –up
-}
+namespace AdvancedChatFeatures.Common.Hooks;
 
 // ── IL hook that patches *both* methods ───────────────────────────
 public class ChatPosHook : ModSystem
 {
+    public static float OffsetX = 0;         // +right / –left
+    public static float OffsetY = 0;         // +down  / –up
+
     public override void Load()
     {
         IL_Main.DrawPlayerChat += InjectOffset;
@@ -38,8 +34,8 @@ public class ChatPosHook : ModSystem
                          BindingFlags.Public | BindingFlags.Static,
                          null, new[] { typeof(Vector2), typeof(Vector2) }, null);
 
-        var fldX = typeof(ChatPosHelper).GetField(nameof(ChatPosHelper.OffsetX));
-        var fldY = typeof(ChatPosHelper).GetField(nameof(ChatPosHelper.OffsetY));
+        var fldX = typeof(ChatPosHook).GetField(nameof(OffsetX));
+        var fldY = typeof(ChatPosHook).GetField(nameof(OffsetY));
 
         ILCursor c = new(il);
 

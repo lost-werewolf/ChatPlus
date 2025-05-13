@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace LinksInChat.UI
+namespace AdvancedChatFeatures.UI
 {
     [Autoload(Side = ModSide.Client)]
     public class MainSystem : ModSystem

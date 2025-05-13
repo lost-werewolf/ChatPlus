@@ -1,7 +1,7 @@
-﻿using LinksInChat.Helpers;
+﻿using AdvancedChatFeatures.Helpers;
 using Terraria.UI;
 
-namespace LinksInChat.UI
+namespace AdvancedChatFeatures.UI
 {
     public class MainState : UIState
     {

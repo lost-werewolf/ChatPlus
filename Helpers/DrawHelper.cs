@@ -1,6 +1,6 @@
 using System;
-using LinksInChat.Common;
-using LinksInChat.Common.Hooks;
+using AdvancedChatFeatures.Common;
+using AdvancedChatFeatures.Common.Hooks;
 using log4net;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,11 +8,11 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace LinksInChat.Helpers
+namespace AdvancedChatFeatures.Helpers
 {
     public static class DrawHelper
     {
-        public static void DrawPlayerHead(Vector2 position, float scale=0.9f)
+        public static void DrawPlayerHead(Vector2 position, float scale = 0.9f)
         {
             if (Main.LocalPlayer == null)
             {

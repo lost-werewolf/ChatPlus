@@ -8,7 +8,7 @@ using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace LinksInChat.Common.Configs
+namespace AdvancedChatFeatures.Common.Configs
 {
     /// <summary>
     /// Reference:
@@ -66,7 +66,7 @@ namespace LinksInChat.Common.Configs
             sb.Draw(TextureAssets.MagicPixel.Value, underlineRect, underlineColor);
 
             // 2. Draw text in blue
-            Vector2 textPos = new(pos.X + 8 + xOffset, pos.Y + textSize.Y/2 - 9);
+            Vector2 textPos = new(pos.X + 8 + xOffset, pos.Y + textSize.Y / 2 - 9);
             ChatManager.DrawColorCodedStringWithShadow(
                 sb,
                 FontAssets.ItemStack.Value,

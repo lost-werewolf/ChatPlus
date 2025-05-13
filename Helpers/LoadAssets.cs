@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.ModLoader;
 
-namespace LinksInChat.Helpers
+namespace AdvancedChatFeatures.Helpers
 {
     /// <summary>
     /// To add a new asset, simply add a new field like:
@@ -38,7 +38,7 @@ namespace LinksInChat.Helpers
 
         private static Asset<Texture2D> RequestAsset(string path)
         {
-            return ModContent.Request<Texture2D>($"LinksInChat/Assets/" + path, AssetRequestMode.AsyncLoad);
+            return ModContent.Request<Texture2D>($"AdvancedChatFeatures/Assets/" + path, AssetRequestMode.AsyncLoad);
         }
     }
 }
