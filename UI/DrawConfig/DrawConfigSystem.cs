@@ -9,32 +9,32 @@ namespace AdvancedChatFeatures.UI.DrawConfig
     [Autoload(Side = ModSide.Client)]
     public class DrawConfigSystem : ModSystem
     {
-        public UserInterface userInterface;
+        public UserInterface ui;
         public DrawConfigState drawConfigState;
 
         public override void OnWorldLoad()
         {
-            userInterface = new();
+            ui = new();
             drawConfigState = new();
-            userInterface.SetState(drawConfigState);
+            ui.SetState(drawConfigState);
         }
 
         public override void OnWorldUnload()
         {
             // Cleanup
-            userInterface?.SetState(null);
-            userInterface = null;
+            ui?.SetState(null);
+            ui = null;
             drawConfigState = null;
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
             // Only update when chat is open and the setting is enabled
-            if (userInterface?.CurrentState == null) return;
+            if (ui?.CurrentState == null) return;
             if (!Common.Configs.Conf.C.ConfigIcon) return;
             if (!Main.drawingPlayerChat) return;
 
-            userInterface.Update(gameTime);
+            ui.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -46,11 +46,11 @@ namespace AdvancedChatFeatures.UI.DrawConfig
                     "AdvancedChatFeatures: DrawConfigSystem",
                     () =>
                     {
-                        if (userInterface?.CurrentState != null &&
+                        if (ui?.CurrentState != null &&
                             Common.Configs.Conf.C.ConfigIcon &&
                             Main.drawingPlayerChat)
                         {
-                            userInterface.Draw(Main.spriteBatch, new GameTime());
+                            ui.Draw(Main.spriteBatch, new GameTime());
                         }
                         return true;
                     },

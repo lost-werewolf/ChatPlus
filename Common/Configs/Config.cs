@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.UI.Commands;
+using AdvancedChatFeatures.UI.DrawConfig;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
@@ -101,17 +102,38 @@ namespace AdvancedChatFeatures.Common.Configs
             var showCountField = chatMonitor.GetField("_showCount", BindingFlags.NonPublic | BindingFlags.Instance);
             showCountField?.SetValue(chatMonitorInstance, (int)ShowCount);
 
-            // Update the DrawConfigState
-            var drawConfigSystem = ModContent.GetInstance<CommandsSystem>();
-            var drawConfigState = drawConfigSystem.commandsListState;
+            // Update the ConfigSystem
+            var drawConfigSystem = ModContent.GetInstance<DrawConfigSystem>();
+            if (drawConfigSystem == null)
+            {
+                Log.Error("DrawConfigSystem null!!");
+                return;
+            }
 
             if (Conf.C.ConfigIcon)
             {
-                drawConfigSystem.ui?.SetState(drawConfigState);
+                drawConfigSystem.ui?.SetState(drawConfigSystem.drawConfigState);
             }
             else
             {
                 drawConfigSystem.ui?.SetState(null);
+            }
+
+            // Update the CommandSystem
+            var commandSystem = ModContent.GetInstance<CommandsSystem>();
+            if (commandSystem == null)
+            {
+                Log.Error("commandSystem null!!");
+                return;
+            }
+
+            if (Conf.C.ConfigIcon)
+            {
+                commandSystem.ui?.SetState(commandSystem.commandsListState);
+            }
+            else
+            {
+                commandSystem.ui?.SetState(null);
             }
         }
     }

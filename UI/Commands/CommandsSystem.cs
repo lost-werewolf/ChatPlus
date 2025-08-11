@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -33,10 +34,11 @@ namespace AdvancedChatFeatures.UI.Commands
             if (ui == null) return;
 
             bool chatOpen = Main.drawingPlayerChat;
-            bool enabled = Common.Configs.Conf.C.AutoCompleteCommands;
-            enabled = true;
+            bool enabled = Conf.C.AutoCompleteCommands;
             string text = Main.chatText ?? string.Empty;
             bool shouldOpen = chatOpen && enabled && text.Length > 0 && text[0] == '/';
+
+            //Main.NewText(shouldOpen.ToString());
 
             var target = shouldOpen ? (UIState)commandsListState : null;
             if (ui.CurrentState != target)

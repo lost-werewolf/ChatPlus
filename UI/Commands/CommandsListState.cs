@@ -5,11 +5,13 @@ namespace AdvancedChatFeatures.UI.Commands
 {
     public class CommandsListState : UIState
     {
+        public CommandsPanel commandsPanel;
+
         public CommandsListState()
         {
             // Initialize the UI elements
-            CommandsPanel commandsList = new();
-            Append(commandsList);
+            commandsPanel = new();
+            Append(commandsPanel);
         }
     }
 }

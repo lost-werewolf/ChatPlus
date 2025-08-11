@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
+using Terraria.GameInput;
+using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace AdvancedChatFeatures.UI.Commands.Elements
@@ -20,8 +22,11 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
 
         public override void Update(GameTime gameTime)
         {
+            DisableItemUseOnHover();
+
             if (dragging)
             {
+
                 float dragDistance = Vector2.Distance(new Vector2(Main.mouseX, Main.mouseY), mouseDownPos);
                 if (dragDistance > DragThreshold)
                 {
@@ -34,6 +39,8 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
 
         public override void LeftMouseDown(UIMouseEvent evt)
         {
+            if (IsHoveringScrollbar()) return;
+            
             // start dragging
             mouseDownPos = evt.MousePosition;
             base.LeftMouseDown(evt);
@@ -46,6 +53,30 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
             base.LeftMouseUp(evt);
             dragging = false; // stop dragging
             Recalculate();
+        }
+
+        private void DisableItemUseOnHover()
+        {
+            if (IsMouseHovering)
+            {
+                // disable item use
+                Main.LocalPlayer.mouseInterface = true;
+
+                // disable hotbar scroll use
+                PlayerInput.ScrollWheelDelta = 0;
+                PlayerInput.Triggers.Current.HotbarPlus = false;
+                PlayerInput.Triggers.Current.HotbarMinus = false;
+            }
+        }
+
+        private bool IsHoveringScrollbar()
+        {
+            var sys = ModContent.GetInstance<CommandsSystem>();
+            if (sys != null)
+            {
+                return sys.commandsListState.commandsPanel.scrollbar.IsMouseHovering;
+            }
+            return false;
         }
     }
 }

@@ -1,6 +1,9 @@
 using AdvancedChatFeatures.Common.Configs;
+using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
+using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.Common.Commands
 {
@@ -14,10 +17,13 @@ namespace AdvancedChatFeatures.Common.Commands
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            for (int i = 0; i < Conf.C.ShowCount; i++)
-            {
-                Main.NewText("");
-            }
+            // Get ChatMonitor
+            var chatMonitor = typeof(RemadeChatMonitor);
+            var chatMonitorInstance = Main.chatMonitor as RemadeChatMonitor;
+
+            chatMonitorInstance._messages.Clear();
+
+            Main.NewText("Chat cleared! ", Color.Green);
         }
     }
 }
