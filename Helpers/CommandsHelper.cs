@@ -15,6 +15,21 @@ namespace AdvancedChatFeatures.Helpers
 {
     public static class CommandsHelper
     {
+        public static List<ModCommand> GetAllCommands()
+        {
+            List<ModCommand> res = [];
+
+            foreach (var cmdList in CommandLoader.Commands.Values)
+            {
+                foreach (ModCommand cmd in cmdList)
+                {
+                    res.Add(cmd);
+                }
+            }
+
+            return res;
+        }
+
         public static Texture2D GetModIcon(TmodFile tmodFile)
         {
             try

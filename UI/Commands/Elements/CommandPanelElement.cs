@@ -26,9 +26,8 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
         private Texture2D icon;
         private string modName;
 
-        // Selection functionality
-        private bool isSelected;
-        public event Action<CommandPanelElement> OnHovered;
+        // Selected
+        public bool isSelected;
 
         public CommandPanelElement(string name, string usage, Texture2D icon = null, string modName = null)
         {
@@ -43,44 +42,12 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
             Width.Set(0, 1);
         }
 
-        public void SetSelected(bool selected)
-        {
-            isSelected = selected;
-        }
-
-        public override void MouseOver(UIMouseEvent evt)
-        {
-            base.MouseOver(evt);
-            OnHovered?.Invoke(this);
-        }
-
-        public override void MouseOut(UIMouseEvent evt)
-        {
-            base.MouseOut(evt);
-        }
-
-
         public override void LeftClick(UIMouseEvent evt)
         {
             base.LeftClick(evt);
 
-            string commandText = "/" + name;
-
-            // Run through command processor
-            var message = new ChatMessage(commandText);
-            var caller = new ChatCommandCaller();
-
-            if (CommandLoader.HandleCommand(message.Text, caller))
-            {
-                // Command executed
-            }
-            else
-            {
-                // Fallback: show it in chat
-                //Main.NewText(commandText, Color.White);
-            }
+            Main.chatText = "/" + name;
         }
-
 
         public override void Update(GameTime gameTime)
         {
@@ -92,15 +59,11 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
             base.Draw(sb);
 
             var dims = GetDimensions();
-            var rect = new Rectangle((int)dims.X, (int)dims.Y, (int)dims.Width, (int)dims.Height);
-
-            // Background highlight for selected/hovered
-            if (isSelected)
-                sb.Draw(TextureAssets.MagicPixel.Value, rect, new Color(60, 120, 255, 100));
-            //else if (IsMouseHovering)
-                //sb.Draw(TextureAssets.MagicPixel.Value, rect, new Color(255, 255, 255, 30));
-
             Vector2 position = dims.Position();
+
+            // Draw highlight of entire element
+            if (isSelected)
+                sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)dims.X, (int)dims.Y, (int)dims.Width, (int)dims.Height), new Color(60, 120, 255, 100));
 
             // Draw icon
             if (icon != null)
@@ -112,7 +75,7 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
                 sb.Draw(icon, iconPos, Color.White);
             }
 
-            // Draw text next to icon
+            // Draw text
             Utils.DrawBorderString(sb, name, position + new Vector2(36, 6), Color.White);
 
             // Draw tooltip of mod name if hovering icon
@@ -122,16 +85,21 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
                 UICommon.TooltipMouseText(modName);
             }
 
-            // Draw tooltip of usage if hovering icon
+            // Draw tooltip of usage
             if (Main.MouseScreen.Between(
                 new Vector2((int)position.X + 30, (int)position.Y + 2), 
                 new Vector2((int)position.X + 270, (int)position.Y + 28)))
             {
-                //DrawHelper.DrawTextAtMouse(sb, modName);
-                if (!string.IsNullOrEmpty(usage))
+                if (name == "help")
+                {
+                    UICommon.TooltipMouseText("Lists all the commands you can use");
+                }
+                else if (!string.IsNullOrEmpty(usage))
                 {
                     UICommon.TooltipMouseText(usage);
                 }
+
+                //DrawHelper.DrawTextAtMouse(sb, modName);
             }
         }
     }

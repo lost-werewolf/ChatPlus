@@ -12,6 +12,7 @@ namespace AdvancedChatFeatures.Helpers
     {
         // Add assets here
         public static Asset<Texture2D> ButtonModConfig;
+        public static Asset<Texture2D> ButtonModFilter;
         public static Asset<Texture2D> VanillaIcon;
 
         // This bool automatically initializes all specified assets
