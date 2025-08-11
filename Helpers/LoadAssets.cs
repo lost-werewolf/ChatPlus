@@ -6,39 +6,40 @@ using Terraria.ModLoader;
 namespace AdvancedChatFeatures.Helpers
 {
     /// <summary>
-    /// To add a new asset, simply add a new field like:
-    /// public static Asset<Texture2D> MyAsset;
+    /// Static class to hold all assets used in the mod.
     /// </summary>
-    public class LoadAssets : ModSystem
-    {
-        public override void Load()
-        {
-            _ = Ass.Initialized;
-        }
-    }
     public static class Ass
     {
-        // My textures
+        // Add assets here
         public static Asset<Texture2D> ButtonModConfig;
+        public static Asset<Texture2D> VanillaIcon;
 
-        // Bool for checking if assets are loaded
+        // This bool automatically initializes all specified assets
         public static bool Initialized { get; set; }
 
-        // Constructor
         static Ass()
         {
             foreach (FieldInfo field in typeof(Ass).GetFields())
             {
                 if (field.FieldType == typeof(Asset<Texture2D>))
                 {
-                    field.SetValue(null, RequestAsset(field.Name));
+                    string modName = "AdvancedChatFeatures";
+                    string path = field.Name;
+                    var asset = ModContent.Request<Texture2D>($"{modName}/Assets/{path}", AssetRequestMode.AsyncLoad);
+                    field.SetValue(null, asset);
                 }
             }
         }
+    }
 
-        private static Asset<Texture2D> RequestAsset(string path)
+    /// <summary>
+    /// System that automatically initializes assets
+    /// </summary>
+    public class LoadAssets : ModSystem
+    {
+        public override void Load()
         {
-            return ModContent.Request<Texture2D>($"AdvancedChatFeatures/Assets/" + path, AssetRequestMode.AsyncLoad);
+            _ = Ass.Initialized;
         }
     }
 }

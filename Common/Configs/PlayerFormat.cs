@@ -53,7 +53,7 @@ namespace AdvancedChatFeatures.Common.Configs
             int xOffset = 150;
 
             // Set the format!
-            if (Conf.C.PlayerNameFormat == "PlayerName:")
+            if (Conf.C.PlayerFormat == "PlayerName:")
             {
                 PlayerNameText = PlayerNameText.Replace("<", "").Replace(">", "");
             }

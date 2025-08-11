@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using AdvancedChatFeatures.Common.Hooks;
 using AdvancedChatFeatures.Helpers;
-using Microsoft.Xna.Framework;
+using AdvancedChatFeatures.UI.Commands;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
@@ -17,24 +15,17 @@ namespace AdvancedChatFeatures.Common.Configs
     {
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
-        [Header("ChatFeatures")]
+        [Header("Features")]
 
-        [BackgroundColor(85, 111, 64)] // Damp Green
-        [CustomModConfigItem(typeof(ShowLinks))]
-        [DefaultValue(true)]
-        public bool ShowLinks;
-
-        [BackgroundColor(85, 111, 64)] // Damp Green
-        [CustomModConfigItem(typeof(ShowPlayerIcon))]
-        [DefaultValue(true)]
-        public bool ShowPlayerIcons;
-
-        [BackgroundColor(85, 111, 64)] // Damp Green
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
         [CustomModConfigItem(typeof(ShowConfigIcon))]
         [DefaultValue(true)]
-        public bool ShowConfigIcon;
+        public bool ConfigIcon;
 
-        [Header("ChatStyle")]
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [CustomModConfigItem(typeof(ShowPlayerIcon))]
+        [DefaultValue(true)]
+        public bool PlayerIcons;
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [CustomModConfigItem(typeof(PlayerColors))]
@@ -46,43 +37,22 @@ namespace AdvancedChatFeatures.Common.Configs
         [DrawTicks]
         [OptionStrings(["<PlayerName>", "PlayerName:"])]
         [DefaultValue("PlayerName:")]
-        public string PlayerNameFormat;
+        public string PlayerFormat;
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [Range(0.5f, 1.5f)]
-        [DrawTicks]
-        [Increment(0.1f)]
-        [DefaultValue(1f)]
-        public float TextScale;
+        [CustomModConfigItem(typeof(ShowLinks))]
+        [DefaultValue(true)]
+        public bool Links;
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [Range(0, 900)]
-        [DrawTicks]
-        [Increment(10)]
-        [DefaultValue(0)]
-        public int ChatOffsetX;
+        [DefaultValue(true)]
+        public bool AutoCompleteCommands;
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [Range(0, -900)]
-        [DrawTicks]
-        [Increment(10)]
-        [DefaultValue(0)]
-        public int ChatOffsetY;
+        [DefaultValue(true)]
+        public bool Emojis;
 
-        // [BackgroundColor(255, 192, 8)] // Golden Yellow
-        // [DefaultValue(typeof(Color), "255,255,255,255")]
-        // public Color ChatBoxColor = Color.White;
-
-        // [BackgroundColor(255, 192, 8)] // Golden Yellow
-        // [DefaultValue(typeof(Color), "255,255,255,255")]
-        // public Color ChatBoxTextColor = Color.White;
-
-        // [BackgroundColor(255, 192, 8)] // Golden Yellow
-        // [DefaultValue(typeof(Vector2), "0.1, 0.9")]
-        // [Increment(0.1f)]
-        // public Vector2 ChatBoxPosition;
-
-        [Header("ChatLimits")]
+        [Header("ChatMessageDisplay")]
 
         [BackgroundColor(192, 54, 64)] // Calamity Red
         [Range(1, 30)]
@@ -130,6 +100,19 @@ namespace AdvancedChatFeatures.Common.Configs
             // Update the ShowCount value.
             var showCountField = chatMonitor.GetField("_showCount", BindingFlags.NonPublic | BindingFlags.Instance);
             showCountField?.SetValue(chatMonitorInstance, (int)ShowCount);
+
+            // Update the DrawConfigState
+            var drawConfigSystem = ModContent.GetInstance<CommandsSystem>();
+            var drawConfigState = drawConfigSystem.commandsListState;
+
+            if (Conf.C.ConfigIcon)
+            {
+                drawConfigSystem.ui?.SetState(drawConfigState);
+            }
+            else
+            {
+                drawConfigSystem.ui?.SetState(null);
+            }
         }
     }
 

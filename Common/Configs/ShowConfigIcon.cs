@@ -30,7 +30,7 @@ namespace AdvancedChatFeatures.Common.Configs
             {
                 Value = !Value;
 
-                Conf.C.ShowConfigIcon = Value;
+                Conf.C.ConfigIcon = Value;
             };
         }
 

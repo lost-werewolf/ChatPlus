@@ -56,7 +56,7 @@ namespace AdvancedChatFeatures.Common.Configs
                 return;
             }
 
-            if (!Conf.C.ShowPlayerIcons)
+            if (!Conf.C.PlayerIcons)
             {
                 chatXOffset = 40f;
                 return;
@@ -66,32 +66,22 @@ namespace AdvancedChatFeatures.Common.Configs
             chatXOffset = 40f + 20f;
 
             // Draw player head icon at top-left of this element
-            Player player = Main.LocalPlayer;
             CalculatedStyle dims = GetDimensions();
-
-            int count = 2 + (Conf.C.ShowLinks ? 1 : 0);
+            int count = 2 + (Conf.C.Links ? 1 : 0);
             const int maxSlots = 3; // total possible icon lines
-            // PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
+
             for (int i = 0; i < count; i++)
             {
                 // bottom‑align: skip the top (maxSlots - count) slots
                 float y = 30 * (maxSlots - count + i);
                 Vector2 pos = new(dims.X + 56 - 10f, dims.Y + 18f + y);
-                Main.MapPlayerRenderer.DrawPlayerHead(
-                Main.Camera,
-                player,
-                pos,
-                1f,
-                0.6f,
-                Color.White
-                        );
+                DrawHelper.DrawPlayerHead(pos, 0.8f);
             }
-            // PlayerHeadFlipSystem.shouldFlipHeadDraw = false;
         }
 
         private void DrawConfigIfOn(SpriteBatch sb)
         {
-            if (!Conf.C.ShowConfigIcon)
+            if (!Conf.C.ConfigIcon)
                 return;
 
             // Draw settings cog to left of preview box chat
@@ -192,7 +182,7 @@ namespace AdvancedChatFeatures.Common.Configs
             };
 
             // Add link
-            if (Conf.C.ShowLinks)
+            if (Conf.C.Links)
                 chatLines.Add(new KeyValuePair<string, string>(
                     FormatPrefix(Main.LocalPlayer.name + "3"),
                     ""
@@ -226,8 +216,8 @@ namespace AdvancedChatFeatures.Common.Configs
                 ChatManager.DrawColorCodedStringWithShadow(
                     sb, FontAssets.MouseText.Value, msgSnips, msgPos, 0f, Vector2.Zero, Vector2.One, out _);
 
-                // If this is the link line, underline the URL portion
-                if (i == 2 && Conf.C.ShowLinks)
+                // If this is the link line, underline the URLHelper portion
+                if (i == 2 && Conf.C.Links)
                 {
                     DrawLinkExample(sb, msgPos);
                 }
@@ -239,7 +229,7 @@ namespace AdvancedChatFeatures.Common.Configs
         {
             // Conf.C.PlayerFormat is either "<PlayerName>" or "PlayerName:"
             // so replace the placeholder with the actual name
-            if (Conf.C.PlayerNameFormat == "PlayerName:")
+            if (Conf.C.PlayerFormat == "PlayerName:")
             {
                 // Find all instances of < and > and remove them
                 rawName = rawName.Replace("<", "").Replace(">", "");
@@ -288,7 +278,7 @@ namespace AdvancedChatFeatures.Common.Configs
             {
                 Main.LocalPlayer.mouseInterface = true;
                 if (Main.mouseLeft && Main.mouseLeftRelease)
-                    URL.OpenURL(ex);
+                    URLHelper.OpenURL(ex);
             }
         }
 

@@ -31,7 +31,7 @@ namespace AdvancedChatFeatures.Common.Configs
             {
                 Value = !Value;
 
-                Conf.C.ShowPlayerIcons = Value;
+                Conf.C.PlayerIcons = Value;
             };
         }
 

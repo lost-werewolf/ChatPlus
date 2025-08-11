@@ -5,7 +5,7 @@ using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.UI
+namespace AdvancedChatFeatures.UI.DrawConfig
 {
     public class DrawConfigIcon : UIImageButton
     {
@@ -19,26 +19,16 @@ namespace AdvancedChatFeatures.UI
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (!Main.drawingPlayerChat || !Conf.C.ShowConfigIcon)
-            {
-                return;
-            }
-
             base.Draw(spriteBatch);
 
             if (IsMouseHovering)
             {
-                Main.hoverItemName = "Chat Settings";
+                Main.hoverItemName = "Advanced Chat Features";
             }
         }
 
         public override void LeftClick(UIMouseEvent evt)
         {
-            if (!Main.drawingPlayerChat || !Conf.C.ShowConfigIcon)
-            {
-                return;
-            }
-
             Conf.C.Open();
         }
     }

@@ -30,7 +30,7 @@ namespace AdvancedChatFeatures.Common.Configs
             {
                 Value = !Value;
 
-                Conf.C.ShowLinks = Value;
+                Conf.C.Links = Value;
             };
         }
 

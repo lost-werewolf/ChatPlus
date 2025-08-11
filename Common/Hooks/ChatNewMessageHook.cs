@@ -86,7 +86,7 @@ namespace AdvancedChatFeatures.Common.Hooks
                 nameSnippet.Color = nameColor;
 
                 // Optional format change “<Bob>” → “Bob:”
-                if (Conf.C.PlayerNameFormat == "PlayerName:")
+                if (Conf.C.PlayerFormat == "PlayerName:")
                     nameSnippet.Text = $"{playerName}:";
 
                 // -------- 3. Only wrap the *message* if the name == me ----------

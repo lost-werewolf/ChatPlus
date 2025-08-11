@@ -4,7 +4,7 @@ using Terraria;
 
 namespace AdvancedChatFeatures.Helpers
 {
-    public static class URL
+    public static class URLHelper
     {
         public static void OpenURL(string url)
         {
@@ -13,10 +13,10 @@ namespace AdvancedChatFeatures.Helpers
 
             try
             {
-                // Use the default browser to open the URL by assigning url to FileName.
+                // Use the default browser to open the URLHelper by assigning url to FileName.
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = url, // Specify the URL to open
+                    FileName = url, // Specify the URLHelper to open
                     UseShellExecute = true
                 });
             }

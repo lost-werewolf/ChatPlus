@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Common.Snippets;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -85,7 +86,7 @@ namespace AdvancedChatFeatures.Common.Systems
                 nameSnippet.Color = nameColor;
 
                 // Optional format change “<Bob>” → “Bob:”
-                if (Conf.C.PlayerNameFormat == "PlayerName:")
+                if (Conf.C.PlayerFormat == "PlayerName:")
                     nameSnippet.Text = $"{playerName}:";
 
                 // -------- 3. Only wrap the *message* if the name == me ----------
@@ -94,7 +95,7 @@ namespace AdvancedChatFeatures.Common.Systems
                     Mod mod = ModContent.GetInstance<AdvancedChatFeatures>();
                     var custom = new MessageSnippet(msgSnippet, mod)
                     {
-                        Scale = Conf.C.TextScale              // keep your settings
+                        // Scale = Conf.C.TextScale              // keep your settings
                     };
                     snippetArray[1] = custom;
                 }

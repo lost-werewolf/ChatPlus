@@ -1,0 +1,67 @@
+Configs: {
+	Config: {
+		Headers: {
+			Misc: Misc
+			Preview: Chat Preview
+			Features: Features
+			ChatMessageDisplay: Chat Message Display
+		}
+
+		ChatBoxPreviewElement: {
+			Tooltip: ""
+			Label: Chat Box Preview Element
+		}
+
+		ChatMessageShowTime: {
+			Tooltip: The time a chat message is shown
+			Label: Chat Message Show Time
+		}
+
+		ShowCount: {
+			Tooltip: The total number of chat messages that shows when opening the chat
+			Label: Show Count
+		}
+
+		DisplayName: Config
+
+		ConfigIcon: {
+			Label: Config Icon
+			Tooltip: ""
+		}
+
+		PlayerIcons: {
+			Label: Player Icons
+			Tooltip: ""
+		}
+
+		PlayerColors: {
+			Label: Player Colors
+			Tooltip: ""
+		}
+
+		PlayerFormat: {
+			Label: Player Format
+			Tooltip: ""
+		}
+
+		Links: {
+			Label: Links
+			Tooltip: ""
+		}
+
+		ShowDebugMessages: {
+			Label: Show Debug Messages
+			Tooltip: ""
+		}
+
+		AutoCompleteCommands: {
+			Label: Auto Complete Commands
+			Tooltip: ""
+		}
+
+		Emojis: {
+			Label: Emojis
+			Tooltip: ""
+		}
+	}
+}

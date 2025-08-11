@@ -94,7 +94,7 @@ namespace AdvancedChatFeatures.Common.Snippets
             // 1) Use the current mouse position
             Vector2 pos = Main.MouseScreen + new Vector2(25, 10);
 
-            string ex = "Open link";
+            string ex = text;
             var font = FontAssets.MouseText.Value;
             float scale = 0.8f;
 
@@ -122,10 +122,10 @@ namespace AdvancedChatFeatures.Common.Snippets
         {
             _wrappedSnippet?.OnClick();
             if (IsWholeLink(text))
-                URL.OpenURL(text);
+                URLHelper.OpenURL(text);
         }
 
-        // Helper method: returns true if the input exactly matches a URL pattern.
+        // Helper method: returns true if the input exactly matches a URLHelper pattern.
         private static bool IsWholeLink(string s)
             => Regex.IsMatch(s, @"^(https?://|www\.)\S+\.\S+$", RegexOptions.IgnoreCase);
     }

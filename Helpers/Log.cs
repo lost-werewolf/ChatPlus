@@ -20,7 +20,7 @@ namespace AdvancedChatFeatures.Helpers
                 return;
             }
 
-            LoggerInstance.Info(message);
+            LoggerInstance.Error(message);
         }
 
         public static void SlowInfo(string message, int seconds = 1, [CallerFilePath] string callerFilePath = "")
