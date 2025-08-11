@@ -11,7 +11,7 @@ using Terraria.UI;
 
 namespace AdvancedChatFeatures.UI.Commands.Elements
 {
-    internal class ModFilterButton : UIColoredImageButton
+    public class ModFilterButton : UIColoredImageButton
     {
         private List<Mod> modsWithCommands = [];
         private int currentIndex = -1; // -1 = All
@@ -35,9 +35,11 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
             base.RightClick(evt);
             CycleIndex(-1); // cycle backward on right click
         }
-        private void CycleIndex(int delta)
+        public void CycleIndex(int delta)
         {
             int n = modsWithCommands.Count;
+            if (n == 0) return;
+
             currentIndex += delta;
             if (currentIndex > n - 1) currentIndex = -1;
             if (currentIndex < -1) currentIndex = n - 1;
@@ -47,9 +49,10 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
             var sys = ModContent.GetInstance<CommandsSystem>();
             sys?.commandsListState?.commandsPanel?.Repopulate(selected);
 
-            Asset<Texture2D> icon = (ModLoader.TryGetMod("ModLoader", out var tml) && tml.File != null)
-        ? (CommandsHelper.GetModIcon(tml.File) ?? Ass.ButtonModFilter)
-        : Ass.ButtonModFilter;
+            Asset<Texture2D> icon =
+                (ModLoader.TryGetMod("ModLoader", out var tml) && tml.File != null)
+                    ? (CommandsHelper.GetModIcon(tml.File) ?? Ass.ButtonModFilter)
+                    : Ass.ButtonModFilter;
 
             try
             {
@@ -60,15 +63,15 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
 
             SetImageWithoutSettingSize(icon);
 
-            SetImageWithoutSettingSize(icon);
-
             Main.NewText(selected == null
                 ? "Filter: All mods"
-                : $"Filter: {selected.DisplayName} (i: {currentIndex}/{modsWithCommands.Count})");
+                : $"Filter: {selected.DisplayName} (i: {currentIndex}/{n})");
         }
 
         public override void Draw(SpriteBatch sb)
         {
+            //base.Draw(spriteBatch);
+
             // draw the panel bits (same as base, but without the final _texture draw)
             var dims = GetDimensions();
             var pos = dims.Position() + new Vector2(dims.Width, dims.Height) / 2f;
@@ -102,25 +105,18 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
 
             if (IsMouseHovering)
             {
-                //Mod selected = currentIndex < 0 ? null : modsWithCommands[currentIndex];
-                //UICommon.TooltipMouseText(selected.DisplayNameClean);
-            }
+                Mod selected = (currentIndex >= 0 && currentIndex < modsWithCommands.Count)
+                    ? modsWithCommands[currentIndex]
+                    : null;
 
-            //base.Draw(spriteBatch);
+                string modName = selected?.DisplayNameClean ?? "All mods";
+                UICommon.TooltipMouseText(modName);
+            }
         }
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
-            // Tab: cycle forwards
-            // Shift+Tab: cycle backwards
-            bool tab = Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Tab) && Main.oldKeyState.IsKeyUp(Microsoft.Xna.Framework.Input.Keys.Tab);
-            if (tab)
-            {
-                bool backwards = Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftShift) || Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.RightShift);
-                CycleIndex(backwards ? -1 : +1);
-            }
         }
     }
 }

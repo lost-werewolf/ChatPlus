@@ -10,7 +10,7 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
 {
     public class HeaderPanel : UIPanel
     {
-        private ModFilterButton modFilterButton;
+        public ModFilterButton modFilterButton;
         private UIColoredImageButton closeButton;
 
         public HeaderPanel(string text)

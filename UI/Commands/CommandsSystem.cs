@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.UI.Commands;
+using AdvancedChatFeatures.UI.Commands.Elements;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -55,6 +57,21 @@ namespace AdvancedChatFeatures.UI
             else if (ui.CurrentState != null)
             {
                 ui.SetState(null);
+            }
+
+            // Mod filter cycle
+            if (ui.CurrentState == commandsListState)
+            {
+                HeaderPanel header = commandsListState?.commandsPanel?.header;
+                if (header != null)
+                {
+                    bool tab = Main.keyState.IsKeyDown(Keys.Tab) && Main.oldKeyState.IsKeyUp(Keys.Tab);
+                    if (tab)
+                    {
+                        bool back = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift);
+                        header.modFilterButton?.CycleIndex(back ? -1 : +1);
+                    }
+                }
             }
 
             ui.Update(gameTime);
