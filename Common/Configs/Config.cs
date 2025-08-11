@@ -130,13 +130,6 @@ namespace AdvancedChatFeatures.Common.Configs
             // Update the ShowCount value.
             var showCountField = chatMonitor.GetField("_showCount", BindingFlags.NonPublic | BindingFlags.Instance);
             showCountField?.SetValue(chatMonitorInstance, (int)ShowCount);
-
-            // Update Chat offset.
-            ChatPosHook.OffsetX = Conf.C.ChatOffsetX;
-            ChatPosHook.OffsetY = Conf.C.ChatOffsetY;
-
-            // Log it
-            Log.Info($"x: " + ChatPosHook.OffsetX);
         }
     }
 

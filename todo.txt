@@ -85,3 +85,12 @@ Name ideas:
 "Advanced Chat Features"
 "x Chat?"
 
+v9:
+- See trello.
+
+v10:
+
+Current features:
+- Player colors and formatting
+- Links in chat
+- Timestamps

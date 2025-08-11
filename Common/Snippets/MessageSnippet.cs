@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using AdvancedChatFeatures.Common.Hooks;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
@@ -8,8 +6,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
-using Terraria.ModLoader.UI;
-using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.Common.Snippets
@@ -62,7 +58,7 @@ namespace AdvancedChatFeatures.Common.Snippets
             Vector2 textSize = FontAssets.MouseText.Value.MeasureString(text) * scale;
             lastDrawRect = new Rectangle((int)position.X, (int)position.Y, (int)textSize.X, (int)textSize.Y);
 
-            Vector2 headPosition = new(65 + ChatPosHook.OffsetX, lastDrawRect.Y + 6); // Draw at the start of the snippet
+            Vector2 headPosition = new(65, lastDrawRect.Y + 6); // Draw at the start of the snippet
             DrawHelper.DrawPlayerHead(headPosition);
 
             // Offset the text so it doesn't overlap the head
@@ -74,7 +70,7 @@ namespace AdvancedChatFeatures.Common.Snippets
                 if (Main.GameUpdateCount != lastUnderlineDrawFrame)
                 {
                     lastUnderlineDrawFrame = (int)Main.GameUpdateCount;
-                    Rectangle underlineRect = new Rectangle((int)textPosition.X, (int)(textPosition.Y + textSize.Y - 9), (int)textSize.X, 1);
+                    Rectangle underlineRect = new((int)textPosition.X, (int)(textPosition.Y + textSize.Y - 9), (int)textSize.X, 1);
                     Color underlineColor = GetVisibleColor();
                     spriteBatch.Draw(TextureAssets.MagicPixel.Value, underlineRect, underlineColor);
                 }

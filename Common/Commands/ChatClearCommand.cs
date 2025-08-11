@@ -6,7 +6,7 @@ namespace AdvancedChatFeatures.Common.Commands
 {
     public class ChatClearCommand : ModCommand
     {
-        public override string Command => "chatclear";
+        public override string Command => "clear";
 
         public override string Description => "Clears the last few messages.";
 
