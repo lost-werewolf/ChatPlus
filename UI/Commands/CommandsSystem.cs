@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using AdvancedChatFeatures.Common.Configs;
-using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.UI.Commands;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.UI.Commands
+namespace AdvancedChatFeatures.UI
 {
     [Autoload(Side = ModSide.Client)]
     public class CommandsSystem : ModSystem
@@ -14,38 +14,50 @@ namespace AdvancedChatFeatures.UI.Commands
         public UserInterface ui;
         public CommandsListState commandsListState;
 
+        // When the user hits Close, we keep the UI hidden until `/` goes away once.
+        internal bool _snoozed;
+
         public override void OnWorldLoad()
         {
-            ui = new();
-            commandsListState = new();
-            ui.SetState(commandsListState);
+            Main.QueueMainThreadAction(() =>
+            {
+                ui = new UserInterface();
+                commandsListState = new CommandsListState();
+                ui.SetState(null); // start hidden
+            });
         }
 
         public override void OnWorldUnload()
         {
-            // Cleanup
             ui?.SetState(null);
             ui = null;
             commandsListState = null;
+            _snoozed = false;
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            if (ui == null) return;
+            if (!Conf.C.AutoCompleteCommands || ui == null)
+                return;
 
             bool chatOpen = Main.drawingPlayerChat;
-            bool enabled = Conf.C.AutoCompleteCommands;
             string text = Main.chatText ?? string.Empty;
-            bool shouldOpen = chatOpen && enabled && text.Length > 0 && text[0] == '/';
+            bool hasSlash = chatOpen && text.Length > 0 && text[0] == '/';
 
-            //Main.NewText(shouldOpen.ToString());
+            if (!hasSlash && _snoozed)
+                _snoozed = false;
 
-            var target = shouldOpen ? (UIState)commandsListState : null;
-            if (ui.CurrentState != target)
-                ui.SetState(target);
+            if (hasSlash && !_snoozed)
+            {
+                if (ui.CurrentState != commandsListState)
+                    ui.SetState(commandsListState);
+            }
+            else if (ui.CurrentState != null)
+            {
+                ui.SetState(null);
+            }
 
-            if (ui.CurrentState != null)
-                ui.Update(gameTime);
+            ui.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

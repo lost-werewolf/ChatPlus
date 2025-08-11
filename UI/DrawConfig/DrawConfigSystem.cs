@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AdvancedChatFeatures.Common.Configs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -30,8 +31,8 @@ namespace AdvancedChatFeatures.UI.DrawConfig
         public override void UpdateUI(GameTime gameTime)
         {
             // Only update when chat is open and the setting is enabled
+            if (!Conf.C.ConfigIcon) return;
             if (ui?.CurrentState == null) return;
-            if (!Common.Configs.Conf.C.ConfigIcon) return;
             if (!Main.drawingPlayerChat) return;
 
             ui.Update(gameTime);

@@ -11,6 +11,7 @@ namespace AdvancedChatFeatures.Helpers
     public static class Ass
     {
         // Add assets here
+        public static Asset<Texture2D> ButtonBack;
         public static Asset<Texture2D> ButtonModConfig;
         public static Asset<Texture2D> ButtonModFilter;
         public static Asset<Texture2D> VanillaIcon;

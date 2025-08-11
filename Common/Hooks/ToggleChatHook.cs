@@ -1,5 +1,6 @@
 ﻿using System;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.UI;
 using AdvancedChatFeatures.UI.Commands;
 using MonoMod.Cil;
 using Terraria;

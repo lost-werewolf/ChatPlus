@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.UI;
 using AdvancedChatFeatures.UI.Commands;
 using AdvancedChatFeatures.UI.DrawConfig;
 using Terraria;

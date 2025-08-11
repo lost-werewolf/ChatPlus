@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
@@ -12,7 +13,7 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
         // Elements
         public HeaderPanel header;
         public UIScrollbar scrollbar;
-        private UIList commandList;
+        private UIList list;
 
         // Selection handling
         private readonly List<CommandPanelElement> items = [];
@@ -32,7 +33,7 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
             Append(header);
 
             // List + scrollbar
-            commandList = new UIList
+            list = new UIList
             {
                 ListPadding = 0f,
                 Width = { Pixels = -28f, Percent = 1f },
@@ -49,45 +50,49 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
                 Width = { Pixels = 20f },
                 Left = { Pixels = -6f },
             };
-            commandList.SetScrollbar(scrollbar);
+            list.SetScrollbar(scrollbar);
 
             // Add command elements initially in the constructor
-            foreach (ModCommand cmd in CommandsHelper.GetAllCommands())
-            {
-                Texture2D icon = CommandsHelper.GetModIcon(cmd.Mod.File);
+            Repopulate(modFilter: null);
 
-                var element = new CommandPanelElement(cmd.Command, cmd.Description, icon, cmd.Mod.DisplayNameClean);
-                //element.OnMouseOver += (_, _) => OnItemHovered(element);
-
-                items.Add(element);
-                commandList.Add(element);
-            }
-
-            Append(commandList);
+            Append(list);
             Append(scrollbar);
         }
 
-        public void Repopulate()
+        public void Repopulate(Mod modFilter = null)
         {
-            commandList.Clear();
+            list.Clear();
 
-            // Add command elements
             foreach (ModCommand cmd in CommandsHelper.GetAllCommands())
             {
-                Texture2D icon = CommandsHelper.GetModIcon(cmd.Mod.File);
+                if (modFilter != null && cmd.Mod != modFilter)
+                    continue;
+
+                Texture2D icon = Ass.VanillaIcon.Value;
+                try
+                {
+                    var file = cmd.Mod?.File;               // can be null!
+                    if (file != null && cmd.Mod.Name != "Terraria")
+                        icon = CommandsHelper.GetModIcon(file).Value ?? Ass.VanillaIcon.Value;
+                }
+                catch
+                {
+                    // swallow & use fallback icon 
+                    icon = Ass.VanillaIcon.Value;
+                }
 
                 var element = new CommandPanelElement(cmd.Command, cmd.Description, icon, cmd.Mod.DisplayNameClean);
-                //element.OnMouseOver += (_, _) => OnItemHovered(element);
-
-                items.Add(element);
-                commandList.Add(element);
+                list.Add(element);
             }
+
+            list.Recalculate();
+            scrollbar?.Recalculate();
         }
 
         public override void Update(GameTime gameTime)
         {
             // Hot reload
-            //commandList.Height.Set(165, 0);
+            //list.Height.Set(165, 0);
             OverflowHidden = false;
 
             base.Update(gameTime);

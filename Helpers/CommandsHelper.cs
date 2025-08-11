@@ -30,8 +30,38 @@ namespace AdvancedChatFeatures.Helpers
             return res;
         }
 
-        public static Texture2D GetModIcon(TmodFile tmodFile)
+        public static List<Mod> GetModsWithCommands()
         {
+            List<Mod> res = [];
+
+            // count commands per mod
+            var countByMod = new Dictionary<Mod, int>();
+            foreach (var cmd in CommandsHelper.GetAllCommands())
+            {
+                if (cmd?.Mod == null) continue;
+                countByMod.TryGetValue(cmd.Mod, out int c);
+                countByMod[cmd.Mod] = c + 1;
+            }
+
+            // keep only mods that have commands
+            foreach (var kv in countByMod)
+                if (kv.Value > 0)
+                    res.Add(kv.Key);
+
+            // sort alphabetically by display name
+            res.Sort((a, b) => string.Compare(a.DisplayName, b.DisplayName, System.StringComparison.OrdinalIgnoreCase));
+
+            return res;
+        }
+
+        public static Asset<Texture2D> GetModIcon(TmodFile tmodFile)
+        {
+            if (tmodFile == null)
+            {
+                Log.Info("null file, returning null.");
+                return null;
+            }
+
             try
             {
                 // Check if the file contains "icon.png"
@@ -48,7 +78,7 @@ namespace AdvancedChatFeatures.Helpers
                     Asset<Texture2D> iconTexture = Main.Assets.CreateUntracked<Texture2D>(stream, ".png", AssetRequestMode.ImmediateLoad);
 
                     // Log.Info("Successfully loaded icon from TmodFile.");
-                    return iconTexture.Value;
+                    return iconTexture;
                 }
             }
             catch (Exception ex)

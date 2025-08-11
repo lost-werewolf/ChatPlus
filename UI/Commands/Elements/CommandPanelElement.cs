@@ -82,7 +82,7 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
             if (Main.MouseScreen.Between(new Vector2((int)position.X, (int)position.Y + 2), new Vector2((int)position.X + 30, (int)position.Y + 28)))
             {
                 //DrawHelper.DrawTextAtMouse(sb, modName);
-                UICommon.TooltipMouseText(modName);
+                //UICommon.TooltipMouseText(modName);
             }
 
             // Draw tooltip of usage
