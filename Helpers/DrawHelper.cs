@@ -96,6 +96,22 @@ namespace AdvancedChatFeatures.Helpers
             Utils.DrawBorderStringFourWay(
                 sb, FontAssets.MouseText.Value, text, vector.X, vector.Y, new Color(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor), Color.Black, Vector2.Zero);
         }
+
+        public static void DrawCurrentlyHighlightedCommandElement(SpriteBatch sb, CalculatedStyle dims)
+        {
+            Texture2D pixel = TextureAssets.MagicPixel.Value;
+            Rectangle r = new((int)dims.X, (int)dims.Y, (int)dims.Width, (int)dims.Height);
+
+            // fill (slightly brighter blue, semi-transparent)
+            sb.Draw(pixel, r, new Color(70, 120, 220, 140));
+
+            // white border
+            const int b = 2;
+            sb.Draw(pixel, new Rectangle(r.X, r.Y, r.Width, b), Color.White);                 // top
+            sb.Draw(pixel, new Rectangle(r.X, r.Bottom - b, r.Width, b), Color.White);        // bottom
+            sb.Draw(pixel, new Rectangle(r.X, r.Y, b, r.Height), Color.White);                // left
+            sb.Draw(pixel, new Rectangle(r.Right - b, r.Y, b, r.Height), Color.White);        // right
+        }
     }
 }
 

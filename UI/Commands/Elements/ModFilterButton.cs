@@ -63,9 +63,7 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
 
             SetImageWithoutSettingSize(icon);
 
-            Main.NewText(selected == null
-                ? "Filter: All mods"
-                : $"Filter: {selected.DisplayName} (i: {currentIndex}/{n})");
+            //Main.NewText(selected == null? "Filter: All mods": $"Filter: {selected.DisplayName} (i: {currentIndex}/{n})");
         }
 
         public override void Draw(SpriteBatch sb)

@@ -27,17 +27,22 @@ namespace AdvancedChatFeatures.Common.Hooks
             var sys = ModContent.GetInstance<CommandsSystem>();
             if (sys != null)
             {
-                //if (sys.commandsListState.commandsPanel.dragging
+                if (sys.ui.CurrentState == sys.commandsListState)
+                {
+                    // Prevent scroll wheel from moving the hotbar
+                    PlayerInput.ScrollWheelDelta = 0;
+
+                    // Also block hotbar +/- keybinds
+                    PlayerInput.Triggers.Current.HotbarPlus = false;
+                    PlayerInput.Triggers.Current.HotbarMinus = false;
+                }
             }
-
-            // Prevent scroll wheel from moving the hotbar
-            PlayerInput.ScrollWheelDelta = 0;
-
-            // Also block hotbar +/- keybinds
-            PlayerInput.Triggers.Current.HotbarPlus = false;
-            PlayerInput.Triggers.Current.HotbarMinus = false;
         }
 
+        /// <summary>
+        /// Skips the text lines offset changing when scrolling up and down
+        /// if the command window is open
+        /// </summary>
         private void ModifyToggleChat(ILContext il)
         {
             try

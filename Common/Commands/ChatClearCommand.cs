@@ -11,7 +11,7 @@ namespace AdvancedChatFeatures.Common.Commands
     {
         public override string Command => "clear";
 
-        public override string Description => "Clears the last few messages.";
+        public override string Description => "Clears all chat messages in history.";
 
         public override CommandType Type => CommandType.Chat;
 

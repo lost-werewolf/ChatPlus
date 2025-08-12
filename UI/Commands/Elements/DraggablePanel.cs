@@ -61,11 +61,6 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
             {
                 // disable item use
                 Main.LocalPlayer.mouseInterface = true;
-
-                // disable hotbar scroll use
-                PlayerInput.ScrollWheelDelta = 0;
-                PlayerInput.Triggers.Current.HotbarPlus = false;
-                PlayerInput.Triggers.Current.HotbarMinus = false;
             }
         }
 

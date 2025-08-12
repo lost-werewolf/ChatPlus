@@ -1,16 +1,10 @@
-﻿using System;
-using AdvancedChatFeatures.Helpers;
+﻿using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using Terraria;
-using Terraria.Chat;
 using Terraria.GameContent;
-using Terraria.GameContent.Bestiary;
-using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
-using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.UI.Commands.Elements
 {
@@ -24,18 +18,17 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
         public string name { get; private set; }
         private string usage;
         private Texture2D icon;
-        private string modName;
 
-        // Selected
-        public bool isSelected;
+        // Selection
+        private bool isSelected;
+        public bool SetSelected(bool val) => isSelected = val;
 
-        public CommandPanelElement(string name, string usage, Texture2D icon = null, string modName = null)
+        public CommandPanelElement(string name, string usage, Texture2D icon = null)
         {
             // Class variables
             this.name = name;
             this.icon = icon ?? Ass.VanillaIcon.Value;
             this.usage = usage;
-            this.modName = modName;
 
             // Dimensions
             Height.Set(30, 0);
@@ -46,6 +39,7 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
         {
             base.LeftClick(evt);
 
+            // Clicking the command makes it appear in the chat
             Main.chatText = "/" + name;
         }
 
@@ -58,14 +52,13 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
         {
             base.Draw(sb);
 
+            // Draw background color if selected
             var dims = GetDimensions();
-            Vector2 position = dims.Position();
-
-            // Draw highlight of entire element
             if (isSelected)
-                sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)dims.X, (int)dims.Y, (int)dims.Width, (int)dims.Height), new Color(60, 120, 255, 100));
+                DrawHelper.DrawCurrentlyHighlightedCommandElement(sb, dims);
 
             // Draw icon
+            Vector2 position = dims.Position();
             if (icon != null)
             {
                 Rectangle iconPos = new((int)position.X + 4, (int)position.Y + 2, 26, 26);
@@ -77,13 +70,6 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
 
             // Draw text
             Utils.DrawBorderString(sb, name, position + new Vector2(36, 6), Color.White);
-
-            // Draw tooltip of mod name if hovering icon
-            if (Main.MouseScreen.Between(new Vector2((int)position.X, (int)position.Y + 2), new Vector2((int)position.X + 30, (int)position.Y + 28)))
-            {
-                //DrawHelper.DrawTextAtMouse(sb, modName);
-                //UICommon.TooltipMouseText(modName);
-            }
 
             // Draw tooltip of usage
             if (Main.MouseScreen.Between(

@@ -87,5 +87,22 @@ namespace AdvancedChatFeatures.Helpers
             }
             return null;
         }
+
+        public static void ExecuteCommand(string commandText)
+        {
+            // Run through command processor
+            var message = new ChatMessage(commandText);
+            var caller = new ChatCommandCaller();
+
+            if (CommandLoader.HandleCommand("/" + message.Text, caller))
+            {
+                Main.NewText("executed " + commandText);
+                // Command executed.
+            }
+            else
+            {
+                Main.NewText("failed " + commandText);
+            }
+        }
     }
 }

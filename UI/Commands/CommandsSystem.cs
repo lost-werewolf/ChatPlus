@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.UI.Commands;
 using AdvancedChatFeatures.UI.Commands.Elements;
 using Microsoft.Xna.Framework;
@@ -39,12 +40,41 @@ namespace AdvancedChatFeatures.UI
 
         public override void UpdateUI(GameTime gameTime)
         {
+            HandleEnterPressed();
+            HandleState();
+            HandleModFilterCycle();
+
+            ui.Update(gameTime);
+        }
+
+        private void HandleEnterPressed()
+        {
+            bool just(Keys k) => Main.keyState.IsKeyDown(k) && Main.oldKeyState.IsKeyUp(k);
+
+            if (ui.CurrentState == commandsListState)
+            {
+                var panel = commandsListState?.commandsPanel;
+                if (panel != null)
+                {
+                    if (just(Keys.Enter) && panel.TryExecuteSelected())
+                    {
+                        Log.Info("enter2"!);
+                        _snoozed = true;       // hide after executing
+                        ui.SetState(null);
+                        return;                // stop; don't run show/hide below this frame
+                    }
+                }
+            }
+        }
+
+        private void HandleState()
+        {
             if (!Conf.C.AutoCompleteCommands || ui == null)
                 return;
 
             bool chatOpen = Main.drawingPlayerChat;
             string text = Main.chatText ?? string.Empty;
-            bool hasSlash = chatOpen && text.Length > 0 && text[0] == '/';
+            bool hasSlash = text.Length > 0 && text[0] == '/';
 
             if (!hasSlash && _snoozed)
                 _snoozed = false;
@@ -58,8 +88,10 @@ namespace AdvancedChatFeatures.UI
             {
                 ui.SetState(null);
             }
+        }
 
-            // Mod filter cycle
+        private void HandleModFilterCycle()
+        {
             if (ui.CurrentState == commandsListState)
             {
                 HeaderPanel header = commandsListState?.commandsPanel?.header;
@@ -73,8 +105,6 @@ namespace AdvancedChatFeatures.UI
                     }
                 }
             }
-
-            ui.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
