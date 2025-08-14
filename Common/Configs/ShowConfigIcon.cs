@@ -49,7 +49,7 @@ namespace AdvancedChatFeatures.Common.Configs
 
         private void DrawConfigIcon(SpriteBatch sb)
         {
-            DrawHelper.DrawProperScale(sb, element: this, tex: Ass.ButtonModConfig.Value, scale: 0.75f, x: 6 + 150, y: 4);
+            DrawHelper.DrawProperScale(sb, element: this, tex: Ass.ConfigButton.Value, scale: 0.75f, x: 6 + 150, y: 4);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)

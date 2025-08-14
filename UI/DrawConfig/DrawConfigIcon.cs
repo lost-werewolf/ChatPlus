@@ -23,7 +23,7 @@ namespace AdvancedChatFeatures.UI.DrawConfig
 
             if (IsMouseHovering)
             {
-                Main.hoverItemName = "Advanced Chat Features";
+                Main.hoverItemName = "Open config";
             }
         }
 

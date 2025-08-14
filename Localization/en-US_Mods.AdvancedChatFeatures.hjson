@@ -5,6 +5,7 @@ Configs: {
 			Preview: Chat Preview
 			Features: Features
 			ChatMessageDisplay: Chat Message Display
+			Autocomplete: Autocomplete Header
 		}
 
 		ChatBoxPreviewElement: {
@@ -61,6 +62,16 @@ Configs: {
 
 		Emojis: {
 			Label: Emojis
+			Tooltip: ""
+		}
+
+		ShowTooltips: {
+			Label: Show Tooltips
+			Tooltip: ""
+		}
+
+		ItemsVisible: {
+			Label: Items Visible
 			Tooltip: ""
 		}
 	}

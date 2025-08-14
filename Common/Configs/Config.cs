@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI;
 using AdvancedChatFeatures.UI.Commands;
 using AdvancedChatFeatures.UI.DrawConfig;
 using Terraria;
@@ -48,11 +47,24 @@ namespace AdvancedChatFeatures.Common.Configs
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
+        public bool Emojis;
+
+        [Header("Autocomplete")]
+
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [DefaultValue(true)]
         public bool AutoCompleteCommands;
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
-        public bool Emojis;
+        public bool ShowTooltips;
+
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [Range(3, 20)]
+        [DrawTicks]
+        [Increment(1)]
+        [DefaultValue(10)]
+        public int ItemsVisible;
 
         [Header("ChatMessageDisplay")]
 
@@ -121,7 +133,7 @@ namespace AdvancedChatFeatures.Common.Configs
             }
 
             // Update the CommandSystem
-            var commandSystem = ModContent.GetInstance<CommandsSystem>();
+            var commandSystem = ModContent.GetInstance<CommandSystem>();
             if (commandSystem == null)
             {
                 Log.Error("commandSystem null!!");
@@ -130,11 +142,29 @@ namespace AdvancedChatFeatures.Common.Configs
 
             if (Conf.C.ConfigIcon)
             {
-                commandSystem.ui?.SetState(commandSystem.commandsListState);
+                commandSystem.ui?.SetState(commandSystem.commandState);
             }
             else
             {
                 commandSystem.ui?.SetState(null);
+            }
+
+            // Update autocomplete
+            commandSystem.commandState.commandPanel.UpdateItemCount(Conf.C.ItemsVisible);
+
+            if (Conf.C.ShowTooltips)
+            {
+                if (!commandSystem.commandState.HasChild(commandSystem.commandState.tooltipPanel))
+                {
+                    commandSystem.commandState.Append(commandSystem.commandState.tooltipPanel);
+                }
+            }
+            else
+            {
+                if (commandSystem.commandState.HasChild(commandSystem.commandState.tooltipPanel))
+                {
+                    commandSystem.commandState.RemoveChild(commandSystem.commandState.tooltipPanel);
+                }
             }
         }
     }

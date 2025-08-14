@@ -11,6 +11,13 @@
 			"executablePath": "$(DotNetName)",
 			"commandLineArgs": "$(tMLServerPath)",
 			"workingDirectory": "$(tMLSteamPath)"
+		},
+
+		"Terraria Fast": {
+			"commandName": "Executable",
+			"executablePath": "$(DotNetName)",
+			"commandLineArgs": "$(tMLServerPath) -skipselect TestPlayer:Test1",
+			"workingDirectory": "$(tMLSteamPath)"
 		}
 	}
 }

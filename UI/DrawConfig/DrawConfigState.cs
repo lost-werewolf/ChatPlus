@@ -9,7 +9,7 @@ namespace AdvancedChatFeatures.UI.DrawConfig
         public DrawConfigState()
         {
             // Initialize the UI elements
-            DrawConfigIcon configIcon = new(Ass.ButtonModConfig);
+            DrawConfigIcon configIcon = new(Ass.ConfigButton);
             Append(configIcon);
         }
     }

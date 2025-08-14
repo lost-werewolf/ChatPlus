@@ -88,7 +88,7 @@ namespace AdvancedChatFeatures.Common.Configs
             DrawHelper.DrawProperScale(
                 sb,
                 element: this,
-                tex: Ass.ButtonModConfig.Value,
+                tex: Ass.ConfigButton.Value,
                 scale: 0.15f,
                 x: 8,
                 y: 112

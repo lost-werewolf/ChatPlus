@@ -11,10 +11,12 @@ namespace AdvancedChatFeatures.Helpers
     public static class Ass
     {
         // Add assets here
-        public static Asset<Texture2D> ButtonBack;
-        public static Asset<Texture2D> ButtonModConfig;
-        public static Asset<Texture2D> ButtonModFilter;
-        public static Asset<Texture2D> VanillaIcon;
+        public static Asset<Texture2D> ConfigButton;
+        public static Asset<Texture2D> FilterButton;
+        public static Asset<Texture2D> TerrariaIcon;
+        public static Asset<Texture2D> tModLoaderIcon;
+
+        public static Asset<Texture2D> Hitbox;
 
         // This bool automatically initializes all specified assets
         public static bool Initialized { get; set; }

@@ -93,4 +93,38 @@ v10:
 Current features:
 - Player colors and formatting
 - Links in chat
-- Timestamps
+
+Autocomplete:
+- Initially create a list once on world load of all "CommandEntry" entries in the game. This is a struct from IChatCommand and ModCommand that includes: 
+  - Icon [Texture2D] (terraria: tree icon, tmodloader: tmodicon). shows name of mod on hover
+  - Name [string]. (the command name, e.g. "/help")
+  - Description [string] (shown on hover)
+- Fuzzy search to find closest matches to the input text will create a blue highlight ghost text that will be shown in the input box.
+- Pressing enter will always send the current message, including the blue highlight ghost text. 
+(This may be hard, since we have to artificially append the ghost text to the end of the input box before sending it.)
+- Pressing tab will autocomplete the ghost text into the input box, replacing the current text.
+- Pressing up and down arrows will cycle through the autocomplete suggestions, updating the current text. But the current text should still be able to be edited freely (dont update the text every tick).
+
+Optional:
+- Dynamically expand width of window based on biggest entry visible.
+- Add filter icon for mod filtering
+- Add filter icon for client, server, commands (ChatCommandId)
+- Copy visual studio autocomplete UI: Window, scrollable, etc.
+
+Steps to develop:
+1. Create a window with sample commands. 
+Sorting: Alphabetically by command name.
+Scrolling: Up and down arrows to navigate through the list.
+MouseHover: Highlight the command entry when hovered with the mouse.
+MouseClick: Enter the command into the input box, replacing the current text.
+Enter: Send the current message, including the ghost text.
+Escape: Remove the ghost text and close the autocomplete window.
+
+2. Fuzzy autocomplete:
+Filter: When Main.chatText is updated, update the list of commands to only include those that match the current input text.
+Ghost text: Create a ghost text that shows the closest match to the current input text.
+Tab: Enter the ghost text into the input box.
+
+3. Config:
+Enable/disable autocomplete.
+Enable/disable draggable autocomplete window.

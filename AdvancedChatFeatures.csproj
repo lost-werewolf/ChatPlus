@@ -14,6 +14,11 @@
 		<Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="UI\Commands\NewFolder1\" />
+	  <Folder Include="UI\Commands\NewFolder\NewFolder\" />
+	</ItemGroup>
+
 	<!-- References -->
 
 </Project>

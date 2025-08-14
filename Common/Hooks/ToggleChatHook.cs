@@ -1,6 +1,5 @@
 ﻿using System;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI;
 using AdvancedChatFeatures.UI.Commands;
 using MonoMod.Cil;
 using Terraria;
@@ -10,6 +9,11 @@ using Terraria.ModLoader;
 
 namespace AdvancedChatFeatures.Common.Hooks
 {
+    /// <summary>
+    /// This system does 2 things, and it does these things only while autocomplete commands system is open
+    /// 1) Skips hotbar from scrolling
+    /// 2) Skips chat lines from scrolling (when pressing up and down arrow keys)
+    /// </summary>
     public class ToggleChatHook : ModSystem
     {
         public override void Load()
@@ -24,10 +28,10 @@ namespace AdvancedChatFeatures.Common.Hooks
 
         public override void PreUpdatePlayers()
         {
-            var sys = ModContent.GetInstance<CommandsSystem>();
+            var sys = ModContent.GetInstance<CommandSystem>();
             if (sys != null)
             {
-                if (sys.ui.CurrentState == sys.commandsListState)
+                if (sys.ui.CurrentState == sys.commandState)
                 {
                     // Prevent scroll wheel from moving the hotbar
                     PlayerInput.ScrollWheelDelta = 0;
@@ -40,7 +44,7 @@ namespace AdvancedChatFeatures.Common.Hooks
         }
 
         /// <summary>
-        /// Skips the text lines offset changing when scrolling up and down
+        /// Skips the text lines offset changing when scrolling up and down arrow keys
         /// if the command window is open
         /// </summary>
         private void ModifyToggleChat(ILContext il)
@@ -62,7 +66,7 @@ namespace AdvancedChatFeatures.Common.Hooks
                 c.Index += 2;
                 c.EmitDelegate<Func<int, int>>(v =>
                 {
-                    var sys = ModContent.GetInstance<CommandsSystem>();
+                    var sys = ModContent.GetInstance<CommandSystem>();
                     return sys?.ui?.CurrentState != null ? 0 : v;
                 });
 
