@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using ReLogic.Localization.IME;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameInput;
@@ -56,7 +54,7 @@ namespace AdvancedChatFeatures.Common.Configs
                 return;
             }
 
-            if (!Conf.C.PlayerIcons)
+            if (!Conf.C.features.PlayerIcons)
             {
                 chatXOffset = 40f;
                 return;
@@ -67,21 +65,20 @@ namespace AdvancedChatFeatures.Common.Configs
 
             // Draw player head icon at top-left of this element
             CalculatedStyle dims = GetDimensions();
-            int count = 2 + (Conf.C.Links ? 1 : 0);
+            int count = 2 + (Conf.C.features.Links ? 1 : 0);
             const int maxSlots = 3; // total possible icon lines
 
             for (int i = 0; i < count; i++)
             {
                 // bottom‑align: skip the top (maxSlots - count) slots
                 float y = 30 * (maxSlots - count + i);
-                Vector2 pos = new(dims.X + 56 - 10f, dims.Y + 18f + y);
-                DrawHelper.DrawPlayerHead(pos, 0.8f);
+                Vector2 pos = new(dims.X + 56 - 15f, dims.Y + 20f + y);
+                DrawHelper.DrawPlayerHead(pos, 0.8f, sb: sb);
             }
         }
-
         private void DrawConfigIfOn(SpriteBatch sb)
         {
-            if (!Conf.C.ConfigIcon)
+            if (!Conf.C.features.ConfigIcon)
                 return;
 
             // Draw settings cog to left of preview box chat
@@ -159,6 +156,8 @@ namespace AdvancedChatFeatures.Common.Configs
             );
         }
 
+        private List<string> playerNames = [];
+
         private void DrawChatMessagePreview(SpriteBatch sb)
         {
             if (Main.LocalPlayer == null)
@@ -170,23 +169,66 @@ namespace AdvancedChatFeatures.Common.Configs
             var dims = GetDimensions();
             int panelH = TextureAssets.TextBack.Height();
             float paddingX = chatXOffset;
-            float paddingY = 10f;
-            Vector2 panelPos = new(dims.X + paddingX, dims.Y + dims.Height - panelH - paddingY);
             float lineHeight = FontAssets.MouseText.Value.MeasureString("M").Y + 4f;
 
-            // Build a list of (prefix, message) pairs up‑front:
+            bool linksEnabled = false;
+
+            if (Item != null)
+            {
+                var type = Item.GetType();
+                var featuresField = type.GetField("features");
+                object featuresObj = featuresField?.GetValue(Item) ?? type.GetProperty("features")?.GetValue(Item);
+
+                if (featuresObj != null)
+                {
+                    var linksField = featuresObj.GetType().GetField("Links");
+                    if (linksField != null && linksField.GetValue(featuresObj) is bool lf)
+                        linksEnabled = lf;
+
+                    var linksProp = featuresObj.GetType().GetProperty("Links");
+                    if (linksProp != null && linksProp.GetValue(featuresObj) is bool lp)
+                        linksEnabled = lp;
+                }
+            }
+
+            float topY = linksEnabled ? -10f : -10f;
+            Vector2 panelPos = new(dims.X + paddingX, dims.Y + dims.Height - panelH + topY);
+
+            // Get first 3 loaded player names (fallback to TestPlayer if null/empty)
+            if (playerNames.Count < 3)
+            {
+                playerNames.Clear();
+                Main.LoadPlayers();
+
+                if (Main.PlayerList.Count >= 3)
+                {
+                    for (int i = 0; i < Math.Min(3, Main.PlayerList.Count); i++)
+                    {
+                        string name = Main.PlayerList[i]?.Name;
+                        if (string.IsNullOrEmpty(name))
+                            name = "PlayerName";
+                        playerNames.Add(name);
+                    }
+                }
+            }
+
+            if (playerNames.Count == 0)
+                playerNames.Add("PlayerName");
+
+            // Build a list of (prefix, message) pairs up-front:
             var chatLines = new List<KeyValuePair<string, string>>
             {
-                new(FormatPrefix(Main.LocalPlayer.name + "1"),      " How are you?"),
-                new(FormatPrefix(Main.LocalPlayer.name + "2"), " Good, thank you!")
+                new(FormatPrefix(playerNames[0]), " How are you?"),
+                new(FormatPrefix(playerNames[Math.Min(1, playerNames.Count-1)]), " Good, thank you!")
             };
 
-            // Add link
-            if (Conf.C.Links)
+            if (Conf.C.features.Links)
+            {
                 chatLines.Add(new KeyValuePair<string, string>(
-                    FormatPrefix(Main.LocalPlayer.name + "3"),
+                    FormatPrefix(playerNames[Math.Min(2, playerNames.Count - 1)]),
                     ""
                 ));
+            }
 
             // Calc total height of all lines
             float totalMsgHeight = chatLines.Count * lineHeight;
@@ -196,10 +238,10 @@ namespace AdvancedChatFeatures.Common.Configs
             for (int i = 0; i < chatLines.Count; i++)
             {
                 var (prefix, msg) = chatLines[i];
-                Vector2 pos = new Vector2(panelPos.X + 2f, startY + i * lineHeight);
+                Vector2 pos = new(panelPos.X + 2f, startY + i * lineHeight);
 
                 // Draw player color
-                Color msgColor = Conf.C.PlayerColors
+                Color msgColor = Conf.C.features.PlayerColors
                     ? ColorHelper.PlayerColors[i % 3]
                     : Color.White;
 
@@ -217,40 +259,88 @@ namespace AdvancedChatFeatures.Common.Configs
                     sb, FontAssets.MouseText.Value, msgSnips, msgPos, 0f, Vector2.Zero, Vector2.One, out _);
 
                 // If this is the link line, underline the URLHelper portion
-                if (i == 2 && Conf.C.Links)
+                if (i == 2 && Conf.C.features.Links)
                 {
                     DrawLinkExample(sb, msgPos);
                 }
             }
         }
 
-        // rewrites the player name to match the format in the config
         private string FormatPrefix(string rawName)
         {
-            // Conf.C.PlayerFormat is either "<PlayerName>" or "PlayerName:"
-            // so replace the placeholder with the actual name
-            if (Conf.C.PlayerFormat == "PlayerName:")
+            string format = null;
+
+            if (Item != null)
             {
-                // Find all instances of < and > and remove them
-                rawName = rawName.Replace("<", "").Replace(">", "");
-                return $"{rawName}:"; // "PlayerName"
+                var type = Item.GetType();
+
+                // Step 1: Get the "features" object
+                object featuresObj = null;
+
+                var featuresField = type.GetField("features");
+                if (featuresField != null)
+                {
+                    featuresObj = featuresField.GetValue(Item);
+                }
+                else
+                {
+                    var featuresProp = type.GetProperty("features");
+                    if (featuresProp != null)
+                        featuresObj = featuresProp.GetValue(Item);
+                }
+
+                // Step 2: Get "PlayerFormat" from featuresObj
+                if (featuresObj != null)
+                {
+                    var fType = featuresObj.GetType();
+
+                    var pfField = fType.GetField("PlayerFormat");
+                    if (pfField != null && pfField.GetValue(featuresObj) is string fs)
+                        format = fs;
+
+                    if (format == null)
+                    {
+                        var pfProp = fType.GetProperty("PlayerFormat");
+                        if (pfProp != null && pfProp.GetValue(featuresObj) is string ps)
+                            format = ps;
+                    }
+                }
             }
-            return $"<{rawName}>"; // "<PlayerName>"
+
+            // Step 3: Fallback to saved config
+            if (string.IsNullOrEmpty(format))
+                format = Conf.C?.features?.PlayerFormat;
+
+            // Step 4: Final fallback
+            if (string.IsNullOrEmpty(format))
+                format = "<PlayerName>";
+
+            // Step 5: Apply format
+            if (format == "PlayerName:")
+            {
+                rawName = rawName.Replace("<", "").Replace(">", "");
+                return $"{rawName}:";
+            }
+
+            return $"<{rawName}>";
         }
 
         private void DrawLinkExample(SpriteBatch sb, Vector2 position)
         {
-            string ex = " https://forums.terraria.org/";
+            string ex = "https://forums.terraria.org/";
             var font = FontAssets.MouseText.Value;
-            float scale = 0.8f;
+            float scale = 0.9f;
 
             // measure scaled text
             Vector2 textSize = font.MeasureString(ex) * scale;
 
+            // modify pos
+            position += new Vector2(10, 0);
+
             // 1) underline in dark blue
             var underlineRect = new Rectangle(
                 (int)position.X,
-                (int)(position.Y + textSize.Y - 6),
+                (int)(position.Y + textSize.Y - 7),
                 (int)textSize.X, 2
             );
             sb.Draw(TextureAssets.MagicPixel.Value, underlineRect, new Color(10, 15, 154));
@@ -261,13 +351,14 @@ namespace AdvancedChatFeatures.Common.Configs
                 font,
                 ex,
                 position,
-                new Color(17, 85, 204),
+                ColorHelper.Blue,
                 0f,
                 Vector2.Zero,
                 new Vector2(scale)
             );
 
             // 4) build hit rectangle & handle click
+            // NOTE: DOESNT WORK! but not a priority to fix
             var hitbox = new Rectangle(
                 (int)position.X,
                 (int)position.Y,
@@ -285,13 +376,7 @@ namespace AdvancedChatFeatures.Common.Configs
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            TooltipFunction = () => GetDynamicTooltip();
-        }
-
-        private string GetDynamicTooltip()
-        {
-            //return "Preview Area";
-            return "";
+            //TooltipFunction = () => "";
         }
     }
 }

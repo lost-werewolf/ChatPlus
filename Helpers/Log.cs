@@ -15,18 +15,14 @@ namespace AdvancedChatFeatures.Helpers
 
         public static void Error(string message)
         {
-            if (Conf.C != null && !Conf.C.ShowDebugMessages)
-            {
-                return;
-            }
+            //if (Conf.C != null && !Conf.C.ShowDebugMessages) return;
 
             LoggerInstance.Error(message);
         }
 
         public static void SlowInfo(string message, int seconds = 1, [CallerFilePath] string callerFilePath = "")
         {
-            if (Conf.C != null && !Conf.C.ShowDebugMessages)
-                return; // Skip logging if the config is set to false
+            //if (Conf.C != null && !Conf.C.ShowDebugMessages) return;
 
             // Extract the class name from the caller's file path.
             string className = Path.GetFileNameWithoutExtension(callerFilePath);
@@ -46,8 +42,7 @@ namespace AdvancedChatFeatures.Helpers
 
         public static void Info(string message, [CallerFilePath] string callerFilePath = "")
         {
-            if (Conf.C != null && !Conf.C.ShowDebugMessages)
-                return; // Skip logging if the config is set to false
+            //if (Conf.C != null && !Conf.C.ShowDebugMessages) return; 
 
             // Extract the class name from the caller's file path.
             string className = Path.GetFileNameWithoutExtension(callerFilePath);

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
@@ -12,11 +12,6 @@
 	<ItemGroup>
 		<PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1" />
 		<Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="UI\Commands\NewFolder1\" />
-	  <Folder Include="UI\Commands\NewFolder\NewFolder\" />
 	</ItemGroup>
 
 	<!-- References -->

@@ -27,6 +27,9 @@ namespace AdvancedChatFeatures.UI.Commands
             {
                 foreach (ModCommand cmd in cmdList.Value)
                 {
+                    // Skip "help" from tmodloader and add it in vanilla instead
+                    if (cmd.Command == "help") continue;
+
                     string name = "/" + cmd.Command;
                     string usage = cmd.Description;
                     Mod mod = cmd.Mod;

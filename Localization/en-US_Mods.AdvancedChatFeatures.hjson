@@ -1,77 +1,130 @@
 Configs: {
 	Config: {
+		DisplayName: Config
+
 		Headers: {
-			Misc: Misc
-			Preview: Chat Preview
-			Features: Features
-			ChatMessageDisplay: Chat Message Display
-			Autocomplete: Autocomplete Header
+			Config: Config
+			Preview: Preview
+		}
+
+		features: {
+			Label: Features
+			Tooltip: ""
+		}
+
+		autocompleteConfig: {
+			Label: Autocomplete
+			Tooltip: ""
+		}
+
+		chatMessageDisplay: {
+			Label: Chat Display
+			Tooltip: ""
 		}
 
 		ChatBoxPreviewElement: {
-			Tooltip: ""
 			Label: Chat Box Preview Element
+			Tooltip: ""
 		}
 
-		ChatMessageShowTime: {
-			Tooltip: The time a chat message is shown
-			Label: Chat Message Show Time
+		emojisConfig: {
+			Label: Emojis
+			Tooltip: ""
 		}
+	}
 
-		ShowCount: {
-			Tooltip: The total number of chat messages that shows when opening the chat
-			Label: Show Count
-		}
-
-		DisplayName: Config
+	Features: {
+		Tooltip: ""
 
 		ConfigIcon: {
 			Label: Config Icon
-			Tooltip: ""
+			Tooltip: Shows an icon next to the chat to quickly open the config when the chat is open
 		}
 
 		PlayerIcons: {
 			Label: Player Icons
-			Tooltip: ""
+			Tooltip: Shows a player icon for every player chat message
 		}
 
 		PlayerColors: {
 			Label: Player Colors
-			Tooltip: ""
+			Tooltip: Sets a color for every player chat message
 		}
 
 		PlayerFormat: {
 			Label: Player Format
-			Tooltip: ""
+			Tooltip: Changes the prefix formatting for every player chat message
 		}
 
 		Links: {
 			Label: Links
+			Tooltip: Creates a clickable hyperlink if a valid link is sent in the chat
+		}
+	}
+
+	AutocompleteConfig: {
+		Tooltip: ""
+
+		EnableAutocomplete: {
+			Label: Enable Autocomplete
+			Tooltip: '''
+			Shows a autocomplete window when '/' is entered into the chat
+			Use arrow keys to navigate
+			Press tab to complete
+			Press enter to send
+			'''
+		}
+
+		CommandsVisible: {
+			Label: Commands Visible
+			Tooltip: "Set the maximum number of commands visible in the window"
+		}
+
+		ShowUsagePanel: {
+			Label: Show Usage Window
+			Tooltip: "Shows a window above with a description of the commands"
+		}
+
+		ShowHoverTooltips: {
+			Label: Show Hover Tooltips
+			Tooltip: "Shows tooltip when hovering over mod icons and commands"
+		}
+
+		ShowGhostText: {
+			Label: Show Ghost Text
+			Tooltip: 
+			'''
+			Shows autocomplete with a blue ghost text
+			Press tab to complete
+			(Experimental feature)
+			'''
+		}
+
+		DraggableWindow: {
+			Label: Draggable Window
+			Tooltip: "Make the command window draggable"
+		}
+	}
+
+	ChatMessageDisplay: {
+		Tooltip: ""
+
+		ChatsVisible: {
+			Label: Chats Visible
 			Tooltip: ""
 		}
 
-		ShowDebugMessages: {
-			Label: Show Debug Messages
+		ChatMessageShowTime: {
+			Label: Chat Message Show Time
 			Tooltip: ""
 		}
+	}
 
-		AutoCompleteCommands: {
-			Label: Auto Complete Commands
-			Tooltip: ""
-		}
+	EmojisConfig: {
+		Tooltip: ""
 
 		Emojis: {
 			Label: Emojis
-			Tooltip: ""
-		}
-
-		ShowTooltips: {
-			Label: Show Tooltips
-			Tooltip: ""
-		}
-
-		ItemsVisible: {
-			Label: Items Visible
 			Tooltip: ""
 		}
 	}

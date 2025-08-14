@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.Localization;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
@@ -30,8 +31,11 @@ namespace AdvancedChatFeatures.Common.Configs
             {
                 Value = !Value;
 
-                Conf.C.ConfigIcon = Value;
+                Conf.C.features.ConfigIcon = Value;
             };
+
+            //TooltipFunction = () => Language.GetTextValue(
+                //"Mods.AdvancedChatFeatures.Configs.Config.Features.ConfigIcon.Tooltip");
         }
 
         public override void OnInitialize()
@@ -49,7 +53,8 @@ namespace AdvancedChatFeatures.Common.Configs
 
         private void DrawConfigIcon(SpriteBatch sb)
         {
-            DrawHelper.DrawProperScale(sb, element: this, tex: Ass.ConfigButton.Value, scale: 0.75f, x: 6 + 150, y: 4);
+            if (Value)
+                DrawHelper.DrawProperScale(sb, element: this, tex: Ass.ConfigButton.Value, scale: 0.75f, x: 6 + 150, y: 4);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)
@@ -101,15 +106,6 @@ namespace AdvancedChatFeatures.Common.Configs
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
-            // If you want the tooltip to reflect changes in real-time, 
-            // update the TooltipFunction (or an internal field used by GetTooltip/TooltipFunction) here:
-            TooltipFunction = () => GetDynamicTooltip();
-        }
-
-        private string GetDynamicTooltip()
-        {
-            return "";
         }
     }
 }

@@ -1,18 +1,27 @@
-﻿using AdvancedChatFeatures.Helpers;
+﻿using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.UI.Commands.Elements;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader;
 
 namespace AdvancedChatFeatures.UI.Commands
 {
-    public class TooltipPanel : UIPanel
+    public class TooltipPanel : DraggablePanel
     {
         public UIText text;
+        public int width;
         public TooltipPanel(int width)
         {
-            Width.Set(width, 0);
-            Height.Set(30, 0);
+            this.width = width;
+            ResetDimensions();
+
+            // Position
+            int itemCount = Conf.C == null ? 10 : Conf.C.autocompleteConfig.CommandsVisible;
+            Top.Set(-30 * itemCount - 30 - 6, 0);
+            Left.Set(80, 0);
+            VAlign = 1f;
 
             text = new("", 0.9f, false)
             {
@@ -22,20 +31,17 @@ namespace AdvancedChatFeatures.UI.Commands
 
         public override void Update(GameTime gameTime)
         {
-            // Set index
-            var sys = ModContent.GetInstance<CommandSystem>();
-            CommandPanel commandPanel = sys.commandState.commandPanel;
-
-            VAlign = 1f;
-            BackgroundColor = ColorHelper.DarkBlue * 0.8f;
-            Left.Set(80, 0);
-            Height.Set(60, 0);
-            Top.Set(-30 * commandPanel.itemCount -30 -6, 0);
-
-            text.VAlign = 0f;
-            text.HAlign = 0f;
-
             base.Update(gameTime);
+        }
+
+        public void ResetDimensions()
+        {
+            // Size
+            Width.Set(220, 0);
+            Height.Set(60, 0);
+
+            //Style
+            BackgroundColor = ColorHelper.DarkBlue * 0.8f;
         }
 
         public override void Draw(SpriteBatch spriteBatch)

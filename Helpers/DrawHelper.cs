@@ -13,11 +13,26 @@ namespace AdvancedChatFeatures.Helpers
 {
     public static class DrawHelper
     {
-        public static void DrawPlayerHead(Vector2 position, float scale = 0.9f)
+        public static void DrawPlayerHead(Vector2 position, float scale = 0.9f, SpriteBatch sb=null)
         {
+            if (Main.gameMenu)
+            {
+                if (sb != null && Ass.GuideHead != null && Ass.GuideHead.Value != null)
+                {
+                    position += new Vector2(-10, -10);
+                    sb.Draw(Ass.GuideHead.Value, position, Color.White);
+                }
+                return;
+            }
+
             if (Main.LocalPlayer == null)
             {
                 Log.Error("Oof no local player in DrawHelper");
+                return;
+            }
+            if (Main.Camera == null)
+            {
+                Log.Error("Oof no camera in DrawHelper");
                 return;
             }
 
@@ -97,20 +112,12 @@ namespace AdvancedChatFeatures.Helpers
                 sb, FontAssets.MouseText.Value, text, vector.X, vector.Y, new Color(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor), Color.Black, Vector2.Zero);
         }
 
-        public static void DrawCurrentlyHighlightedCommandElement(SpriteBatch sb, CalculatedStyle dims)
+        public static void DrawRectangle(SpriteBatch sb, Vector2 size, Vector2 pos, Color color)
         {
-            Texture2D pixel = TextureAssets.MagicPixel.Value;
-            Rectangle r = new((int)dims.X, (int)dims.Y, (int)dims.Width, (int)dims.Height);
-
-            // fill (slightly brighter blue, semi-transparent)
-            sb.Draw(pixel, r, new Color(70, 120, 220, 140));
-
-            // white border
-            const int b = 2;
-            sb.Draw(pixel, new Rectangle(r.X, r.Y, r.Width, b), Color.White);                 // top
-            sb.Draw(pixel, new Rectangle(r.X, r.Bottom - b, r.Width, b), Color.White);        // bottom
-            sb.Draw(pixel, new Rectangle(r.X, r.Y, b, r.Height), Color.White);                // left
-            sb.Draw(pixel, new Rectangle(r.Right - b, r.Y, b, r.Height), Color.White);        // right
+            sb.Draw(
+                texture: TextureAssets.MagicPixel.Value,
+                destinationRectangle: new Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y),
+                color: color);
         }
     }
 }

@@ -128,3 +128,16 @@ Tab: Enter the ghost text into the input box.
 3. Config:
 Enable/disable autocomplete.
 Enable/disable draggable autocomplete window.
+
+Config v2:
+- Items visible (3-20)
+- Show tooltips
+- Show hover tooltips
+- 
+- Scroll speed
+
+Preview images on steam workshop later:
+1. Autocomplete commands!
+2. Send links in chat!
+3. Customize chat style! (show colors and player icons)
+4. Send emojis!

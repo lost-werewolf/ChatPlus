@@ -1,4 +1,3 @@
-using AdvancedChatFeatures.Common.Hooks;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -31,7 +30,7 @@ namespace AdvancedChatFeatures.Common.Configs
             {
                 Value = !Value;
 
-                Conf.C.PlayerIcons = Value;
+                Conf.C.features.PlayerIcons = Value;
             };
         }
 
@@ -43,9 +42,11 @@ namespace AdvancedChatFeatures.Common.Configs
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            DrawPlayerIcon(sb);
             DrawToggleTexture(sb);
             DrawOnOffText(sb);
+
+            if (Value)
+                DrawPlayerIcon(sb);
         }
 
         private void DrawPlayerIcon(SpriteBatch sb)
@@ -55,7 +56,7 @@ namespace AdvancedChatFeatures.Common.Configs
             int yOffset = 14;
             Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
 
-            DrawHelper.DrawPlayerHead(drawPosition);
+            DrawHelper.DrawPlayerHead(drawPosition, sb: sb);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)
@@ -107,15 +108,6 @@ namespace AdvancedChatFeatures.Common.Configs
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
-            // If you want the tooltip to reflect changes in real-time, 
-            // update the TooltipFunction (or an internal field used by GetTooltip/TooltipFunction) here:
-            TooltipFunction = () => GetDynamicTooltip();
-        }
-
-        private string GetDynamicTooltip()
-        {
-            return "";
         }
     }
 }

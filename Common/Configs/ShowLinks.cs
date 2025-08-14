@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.Localization;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
@@ -30,8 +31,11 @@ namespace AdvancedChatFeatures.Common.Configs
             {
                 Value = !Value;
 
-                Conf.C.Links = Value;
+                Conf.C.features.Links = Value;
             };
+
+            //TooltipFunction = () => Language.GetTextValue(
+                //"Mods.AdvancedChatFeatures.Configs.Config.Features.Links.Tooltip");
         }
 
         public override void OnInitialize()
@@ -69,7 +73,7 @@ namespace AdvancedChatFeatures.Common.Configs
             Vector2 textPos = new(pos.X + 8 + xOffset, pos.Y + textSize.Y / 2 - 9);
             ChatManager.DrawColorCodedStringWithShadow(
                 sb,
-                FontAssets.ItemStack.Value,
+                FontAssets.MouseText.Value,
                 ex,
                 textPos,
                 new Color(17, 85, 204),
@@ -128,15 +132,6 @@ namespace AdvancedChatFeatures.Common.Configs
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
-            // If you want the tooltip to reflect changes in real-time, 
-            // update the TooltipFunction (or an internal field used by GetTooltip/TooltipFunction) here:
-            TooltipFunction = () => GetDynamicTooltip();
-        }
-
-        private string GetDynamicTooltip()
-        {
-            return "";
         }
     }
 }

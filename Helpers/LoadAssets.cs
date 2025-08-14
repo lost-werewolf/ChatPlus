@@ -17,6 +17,7 @@ namespace AdvancedChatFeatures.Helpers
         public static Asset<Texture2D> tModLoaderIcon;
 
         public static Asset<Texture2D> Hitbox;
+        public static Asset<Texture2D> GuideHead;
 
         // This bool automatically initializes all specified assets
         public static bool Initialized { get; set; }

@@ -1,15 +1,16 @@
-﻿using AdvancedChatFeatures.Helpers;
+﻿using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
-using Microsoft.Xna.Framework;
 using Terraria.ModLoader.UI;
 
-namespace AdvancedChatFeatures.UI.Commands
+namespace AdvancedChatFeatures.UI.Commands.Elements
 {
-    internal class ModIcon(Asset<Texture2D> texture, Mod mod = null) : UIImage(texture: texture)
+    internal class ModIconImage(Asset<Texture2D> texture, Mod mod = null) : UIImage(texture: texture)
     {
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -51,7 +52,7 @@ namespace AdvancedChatFeatures.UI.Commands
                 Utils.DrawBorderString(spriteBatch, mod.DisplayName[..2], target.Center.ToVector2(), Color.White, 1, 0.5f, 0.4f);
             }
 
-            if (IsMouseHovering && !string.IsNullOrEmpty(mod.Name))
+            if (Conf.C.autocompleteConfig.ShowHoverTooltips && IsMouseHovering && !string.IsNullOrEmpty(mod.Name))
             {
                 UICommon.TooltipMouseText(mod.Name);
             }

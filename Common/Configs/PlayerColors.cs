@@ -31,7 +31,7 @@ namespace AdvancedChatFeatures.Common.Configs
             {
                 Value = !Value;
 
-                Conf.C.PlayerColors = Value;
+                Conf.C.features.PlayerColors = Value;
             };
         }
 
@@ -52,27 +52,55 @@ namespace AdvancedChatFeatures.Common.Configs
         {
             if (Main.LocalPlayer == null)
             {
-                Log.Error("oop player color no local player");
+                Log.Error("DrawPlayerColors: no local player");
                 return;
             }
 
-            string PlayerNameText = $"{Main.LocalPlayer.name}";
-            CalculatedStyle dims = this.GetDimensions();
-            Vector2 pos = dims.Position();
-            Vector2 textSize = FontAssets.MouseText.Value.MeasureString(PlayerNameText);
-            int xOffset = 150;
+            // Name fallback
+            string name = string.IsNullOrEmpty(Main.LocalPlayer.name) ? "PlayerName" : Main.LocalPlayer.name;
 
-            // Draw text
-            Vector2 textPos = new(pos.X + 8 + xOffset, pos.Y + textSize.Y / 2 - 6);
+            // Respect formatting from config
+            // Get current live PlayerFormat from UI binding if available
+            //string format = "<PlayerName>";
+
+            //var fieldInfo = Item?.GetType().GetField("PlayerFormat");
+
+            //object currentValue = null;
+
+            //if (fieldInfo != null)
+            //{
+            //    currentValue = fieldInfo.GetValue(Item);
+            //}
+
+            //if (currentValue is string s)
+            //    format = s;
+
+            //string displayName = format == "PlayerName:" ? $"{name}:" : $"<{name}>";
+            string displayName = name;
+
+            // Respect color toggle from config
+            Color drawColor = (Conf.C?.features?.PlayerColors ?? false) ? ColorHelper.PlayerColors[0] : Color.White;
+
+            // Layout
+            CalculatedStyle dims = GetDimensions();
+            Vector2 scale = new(0.8f);
+            Vector2 textSize = ChatManager.GetStringSize(FontAssets.ItemStack.Value, displayName, scale);
+
+            // Use measured height to vertically center
+            Vector2 textPos = new(
+                dims.X + 8 + 150f, // keep 150px offset if you want fixed X position
+                dims.Y + (dims.Height - textSize.Y) * 0.5f + 2
+            );
+
             ChatManager.DrawColorCodedStringWithShadow(
                 sb,
-                FontAssets.ItemStack.Value,
-                PlayerNameText,
+                FontAssets.MouseText.Value,
+                displayName,
                 textPos,
-                ColorHelper.PlayerColors[0],
+                drawColor,
                 0f,
                 Vector2.Zero,
-                baseScale: new Vector2(0.8f)
+                scale
             );
         }
 
@@ -125,15 +153,6 @@ namespace AdvancedChatFeatures.Common.Configs
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
-            // If you want the tooltip to reflect changes in real-time, 
-            // update the TooltipFunction (or an internal field used by GetTooltip/TooltipFunction) here:
-            TooltipFunction = () => GetDynamicTooltip();
-        }
-
-        private string GetDynamicTooltip()
-        {
-            return "";
         }
     }
 }

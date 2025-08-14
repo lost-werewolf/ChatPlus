@@ -18,7 +18,14 @@ namespace AdvancedChatFeatures.UI.Commands
             base.OnModLoad();
         }
 
-        public override void OnWorldLoad()
+        public override void Load()
+        {
+            ui = new UserInterface();
+            commandState = new CommandState();
+            ui.SetState(null); // start hidden
+        }
+
+        public override void Unload()
         {
             ui = new UserInterface();
             commandState = new CommandState();
@@ -27,14 +34,12 @@ namespace AdvancedChatFeatures.UI.Commands
 
         public override void OnWorldUnload()
         {
-            ui?.SetState(null);
-            ui = null;
-            commandState = null;
+            base.OnWorldUnload();
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            if (!Conf.C.AutoCompleteCommands)
+            if (!Conf.C.autocompleteConfig.EnableAutocomplete)
                 return;
 
             string text = Main.chatText ?? string.Empty;
@@ -46,8 +51,9 @@ namespace AdvancedChatFeatures.UI.Commands
                 if (ui.CurrentState != commandState)
                 {
                     ui.SetState(commandState);
-                    commandState.commandPanel.PopulateCommandPanel(selectFirst: false);
-                    commandState.commandPanel.currentIndex = -1;
+                    commandState.commandPanel.PopulateCommandPanel(selectFirst: true);
+                    commandState.commandPanel.ResetDimensions();
+                    commandState.tooltipPanel.ResetDimensions();
                 }
 
                 ui.Update(gameTime);

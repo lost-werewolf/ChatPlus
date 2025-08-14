@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.Localization;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
@@ -12,7 +13,7 @@ namespace AdvancedChatFeatures.Common.Configs
 {
     /// <summary>
     /// Reference:
-    /// <see cref="Terraria.ModLoader.Config.UI.StringOptionElement"/> 
+    /// <see cref="StringOptionElement"/> 
     /// And Starlight River CustomConfigElement
     /// https://github.com/ProjectStarlight/StarlightRiver/blob/master/Content/GUI/Config/AbilityUIReposition.cs#L10
     /// </summary>
@@ -22,12 +23,17 @@ namespace AdvancedChatFeatures.Common.Configs
         public override void OnBind()
         {
             base.OnBind();
+            TextDisplayFunction = () => "Player Format";
             // options = ["<PlayerName>", "PlayerName:"];
+
+            //TooltipFunction = () => Language.GetTextValue(
+                //"Mods.AdvancedChatFeatures.Configs.Config.Features.PlayerFormat.Tooltip");
         }
 
         public override void OnInitialize()
         {
             base.OnInitialize();
+            TextDisplayFunction = () => "Player Format";
             Height.Set(80, 0);
             Recalculate();
         }
@@ -35,68 +41,58 @@ namespace AdvancedChatFeatures.Common.Configs
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            // DrawPlayerFormat(sb);
+            DrawPlayerFormat(sb);
         }
 
         private void DrawPlayerFormat(SpriteBatch sb)
         {
             if (Main.LocalPlayer == null)
             {
-                Log.Error("oop player format no local player");
+                Log.Error("DrawPlayerFormat: no local player");
                 return;
             }
 
-            string PlayerNameText = $"{Main.LocalPlayer.name}";
-            CalculatedStyle dims = this.GetDimensions();
-            Vector2 pos = dims.Position();
-            Vector2 textSize = FontAssets.MouseText.Value.MeasureString(PlayerNameText);
-            int xOffset = 150;
+            // Name fallback
+            string name = string.IsNullOrEmpty(Main.LocalPlayer.name) ? "PlayerName" : Main.LocalPlayer.name;
 
-            // Set the format!
-            if (Conf.C.PlayerFormat == "PlayerName:")
-            {
-                PlayerNameText = PlayerNameText.Replace("<", "").Replace(">", "");
-            }
+            // Respect formatting from config
+            string format = getValue != null
+    ? getValue() // bound getter from FormatStringOptionElement
+    : (string)MemberInfo.GetValue(Item) ?? "<PlayerName>";
+            string preview = format == "PlayerName:" ? $"{name}:" : $"<{name}>";
 
-            // Draw text
-            Vector2 textPos = new(pos.X + 8 + xOffset, pos.Y + textSize.Y / 2 - 6);
+            // Respect color toggle from config
+            //Color drawColor = Conf.C?.features?.PlayerColors ?? false ? ColorHelper.PlayerColors[0] : Color.White;
+            Color drawColor = Color.White;
+
+            // Layout (match PlayerColors)
+            CalculatedStyle dims = GetDimensions();
+            Vector2 scale = new(0.8f);
+            Vector2 size = ChatManager.GetStringSize(FontAssets.ItemStack.Value, preview, scale);
+
+            Vector2 pos = new(
+                dims.X + 8 + 150f, // fixed X offset
+                dims.Y + (dims.Height - size.Y) * 0.5f + 2
+            );
+
             ChatManager.DrawColorCodedStringWithShadow(
                 sb,
-                FontAssets.ItemStack.Value,
-                PlayerNameText,
-                textPos,
-                Color.Orange,
+                FontAssets.MouseText.Value,
+                preview,
+                pos,
+                drawColor,
                 0f,
                 Vector2.Zero,
-                baseScale: new Vector2(0.8f)
+                scale
             );
         }
 
-
         // Called every frame while the in-game config UI is open
-        // public override void Update(GameTime gameTime)
-        // {
-        //     base.Update(gameTime);
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
 
-        //     // If you want the tooltip to reflect changes in real-time, 
-        //     // update the TooltipFunction (or an internal field used by GetTooltip/TooltipFunction) here:
-        //     TooltipFunction = () => GetDynamicTooltip();
-        // }
-
-        // private string GetDynamicTooltip()
-        // {
-        //     // For example, check some global property:
-        //     DebugSystem debugSystem = ModContent.GetInstance<DebugSystem>();
-        //     int count = debugSystem.state.debugPanel.currentWeapons.Count;
-
-        //     if (count > 3)
-        //     {
-        //         return "triple trouble";
-        //     }
-        //     else
-        //     {
-        //         return "single trouble";
-        //     }
-        // }
+            //TextDisplayFunction = () => "Player Format";
+        }
     }
 }

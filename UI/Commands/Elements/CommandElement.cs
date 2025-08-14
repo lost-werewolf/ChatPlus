@@ -1,4 +1,6 @@
-﻿using AdvancedChatFeatures.Helpers;
+﻿using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.UI.Commands.Elements;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -17,7 +19,7 @@ namespace AdvancedChatFeatures.UI.Commands
     public class CommandElement : UIElement
     {
         // UI
-        private ModIcon modIconImage;
+        private ModIconImage modIconImage;
 
         // Variables
         public Command Command;
@@ -82,7 +84,7 @@ namespace AdvancedChatFeatures.UI.Commands
                 DrawSlices(sb, this);
                 DrawFill(sb, this);
             }
-            if (IsMouseHovering && !string.IsNullOrEmpty(Command.Usage))
+            if (Conf.C.autocompleteConfig.ShowHoverTooltips && IsMouseHovering && !string.IsNullOrEmpty(Command.Usage))
             {
                 UICommon.TooltipMouseText(Command.Usage);
             }

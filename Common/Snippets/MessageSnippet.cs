@@ -41,7 +41,14 @@ namespace AdvancedChatFeatures.Common.Snippets
                 // Optionally, you can choose a different color if the mouse is hovering.
                 // Here we check if Main.MouseScreen is within lastDrawRect.
                 bool isHovered = lastDrawRect.Contains(Main.MouseScreen.ToPoint());
-                return isHovered ? new Color(7, 55, 99) : new Color(17, 85, 204);
+                if (isHovered)
+                {
+                    return ColorHelper.BlueHover;
+                }
+                else
+                {
+                    return ColorHelper.Blue;
+                }
             }
             return _wrappedSnippet.GetVisibleColor();
         }

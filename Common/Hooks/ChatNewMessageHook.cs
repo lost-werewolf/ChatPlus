@@ -48,7 +48,7 @@ namespace AdvancedChatFeatures.Common.Hooks
 
                 // Set time left
                 var timeLeftField = typeof(ChatMessageContainer).GetField("_timeLeft", BindingFlags.NonPublic | BindingFlags.Instance);
-                timeLeftField?.SetValue(msg, Conf.C.ChatMessageShowTime * 60);
+                timeLeftField?.SetValue(msg, Conf.C.chatMessageDisplay.ChatMessageShowTime * 60);
 
                 // Wrap snippets in CustomSnippet to add custom behavior
                 ProcessSnippets(parsedList);
@@ -86,7 +86,7 @@ namespace AdvancedChatFeatures.Common.Hooks
                 nameSnippet.Color = nameColor;
 
                 // Optional format change “<Bob>” → “Bob:”
-                if (Conf.C.PlayerFormat == "PlayerName:")
+                if (Conf.C.features.PlayerFormat == "PlayerName:")
                     nameSnippet.Text = $"{playerName}:";
 
                 // -------- 3. Only wrap the *message* if the name == me ----------
