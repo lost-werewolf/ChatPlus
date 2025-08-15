@@ -66,6 +66,8 @@ namespace AdvancedChatFeatures.UI.Emojis
         {
             Emojis.Clear();
 
+            Log.Info("Initializing emojis... (1/3)");
+
             foreach (string file in Mod.GetFileNames())
             {
                 if (!file.StartsWith("Assets/Emojis/", StringComparison.OrdinalIgnoreCase))
@@ -93,14 +95,14 @@ namespace AdvancedChatFeatures.UI.Emojis
 
                 bool registered = EmojiTagHandler.RegisterEmoji(displayName, texturePath);
 
-                // Also register all synonyms (if present) to the same texture
+                // Also register all synonyms to the same texture
                 if (EmojiMap.TryGetValue(codepoint, out var synonyms))
                 {
                     foreach (var syn in synonyms)
                         EmojiTagHandler.RegisterEmoji(syn, texturePath);
                 }
+                Log.Info("Initializing emojis... (1/3)");
 
-                // Track for UI panel
                 Emojis.Add(new Emoji
                 {
                     FilePath = texturePath,
@@ -112,7 +114,7 @@ namespace AdvancedChatFeatures.UI.Emojis
             // Sort alphabetically by display name
             Emojis.Sort((a, b) => string.Compare(a.DisplayName, b.DisplayName, StringComparison.OrdinalIgnoreCase));
 
-            Log.Info($"Indexed {Emojis.Count} emojis.");
+            Log.Info($"Initializing emojis... (3/3). Indexed {Emojis.Count} emojis.");
         }
     }
 }

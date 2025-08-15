@@ -60,18 +60,16 @@ namespace AdvancedChatFeatures.UI.Emojis
                 return;
 
             string text = Main.chatText ?? string.Empty;
-            // Open when starting an emoji token, ":" as the first char
-            bool startsWithColon = text.Length > 0 && text[0] == ':';
+            bool startsWithEmoji = text.StartsWith("[e", System.StringComparison.OrdinalIgnoreCase) ||
+                       text.StartsWith("[emoji", System.StringComparison.OrdinalIgnoreCase);
 
-            if (startsWithColon && Main.drawingPlayerChat)
+            if (startsWithEmoji && Main.drawingPlayerChat)
             {
-                // Only switch state when it actually changes
                 if (ui.CurrentState != emojiState)
                 {
                     ui.SetState(emojiState);
                     emojiState.emojiPanel.PopulateEmojiPanel();
                 }
-
                 ui.Update(gameTime);
             }
             else
