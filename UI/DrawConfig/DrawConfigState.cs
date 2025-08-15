@@ -1,5 +1,4 @@
 ﻿using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI.DrawConfig;
 using Terraria.UI;
 
 namespace AdvancedChatFeatures.UI.DrawConfig

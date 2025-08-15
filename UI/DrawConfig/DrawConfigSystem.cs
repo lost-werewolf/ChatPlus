@@ -31,7 +31,7 @@ namespace AdvancedChatFeatures.UI.DrawConfig
         public override void UpdateUI(GameTime gameTime)
         {
             // Only update when chat is open and the setting is enabled
-            if (!Conf.C.features.ConfigIcon) return;
+            if (!Conf.C.styleConfig.ShowConfigButton) return;
             if (ui?.CurrentState == null) return;
             if (!Main.drawingPlayerChat) return;
 
@@ -48,7 +48,7 @@ namespace AdvancedChatFeatures.UI.DrawConfig
                     () =>
                     {
                         if (ui?.CurrentState != null &&
-                            Common.Configs.Conf.C.features.ConfigIcon &&
+                            Conf.C.styleConfig.ShowConfigButton &&
                             Main.drawingPlayerChat)
                         {
                             ui.Draw(Main.spriteBatch, new GameTime());

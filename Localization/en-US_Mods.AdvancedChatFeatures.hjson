@@ -7,18 +7,18 @@ Configs: {
 			Preview: Preview
 		}
 
-		features: {
+		featureConfig: {
 			Label: Features
 			Tooltip: ""
 		}
 
-		autocompleteConfig: {
-			Label: Autocomplete
+		featureStyleConfig: {
+			Label: Feature Style
 			Tooltip: ""
 		}
 
-		chatMessageDisplay: {
-			Label: Chat Display
+		styleConfig: {
+			Label: Style
 			Tooltip: ""
 		}
 
@@ -26,128 +26,116 @@ Configs: {
 			Label: Chat Box Preview Element
 			Tooltip: ""
 		}
-
-		emojisConfig: {
-			Label: Emojis
-			Tooltip: ""
-		}
 	}
 
 	Features: {
-		Tooltip: ""
-
-		ConfigIcon: {
-			Label: Config Icon
-			Tooltip: Shows an icon next to the chat to quickly open the config when the chat is open
-		}
-
-		PlayerIcons: {
-			Label: Player Icons
-			Tooltip: Shows a player icon for every player chat message
-		}
-
-		PlayerColors: {
-			Label: Player Colors
-			Tooltip: Sets a color for every player chat message
-		}
-
-		PlayerFormat: {
-			Label: Player Format
-			Tooltip: Changes the prefix formatting for every player chat message
-		}
-
-		Links: {
-			Label: Links
-			Tooltip: Creates a clickable hyperlink if a valid link is sent in the chat
-		}
-	}
-
-	AutocompleteConfig: {
-		Tooltip: ""
-
-		EnableAutocomplete: {
-			Label: Enable Autocomplete
+		EnableCommands: {
+			Label: Enable Commands
 			Tooltip:
 				'''
-				Shows a autocomplete window when '/' is entered into the chat
-				Use arrow keys to navigate
-				Press tab to complete
-				Press enter to send
+				Shows an autocomplete window for chat commands.
+				Type / to open
 				'''
-		}
-
-		CommandsVisible: {
-			Label: Commands Visible
-			Tooltip: Set the maximum number of commands visible in the window
-		}
-
-		ShowUsagePanel: {
-			Label: Show Usage Window
-			Tooltip: Shows a window above with a description of the commands
-		}
-
-		ShowHoverTooltips: {
-			Label: Show Hover Tooltips
-			Tooltip: Shows tooltip when hovering over mod icons and commands
-		}
-
-		ShowGhostText: {
-			Label: Show Ghost Text
-			Tooltip:
-				'''
-				Shows autocomplete with a blue ghost text
-				Press tab to complete
-				(Experimental feature)
-				'''
-		}
-
-		DraggableWindow: {
-			Label: Draggable Window
-			Tooltip: Make the command window draggable
-		}
-	}
-
-	ChatMessageDisplay: {
-		Tooltip: ""
-
-		ChatsVisible: {
-			Label: Chats Visible
-			Tooltip: ""
-		}
-
-		ChatMessageShowTime: {
-			Label: Chat Message Show Time
-			Tooltip: ""
-		}
-	}
-
-	EmojisConfig: {
-		Tooltip: ""
-
-		Emojis: {
-			Label: Emojis
-			Tooltip: ""
 		}
 
 		EnableEmojis: {
 			Label: Enable Emojis
-			Tooltip: ""
+			Tooltip:
+				'''
+				Shows an autocomplete window for emojis.
+				Type [e to open
+				'''
 		}
 
-		EmojisVisible: {
-			Label: Emojis Visible
-			Tooltip: ""
+		EnableGlyphs: {
+			Label: Enable Glyphs
+			Tooltip:
+				'''
+				Shows an autocomplete window for glyphs.
+				Type [g to open
+				'''
 		}
 
-		ShowUsagePanel: {
-			Label: Show Usage Panel
-			Tooltip: ""
+		EnableItemBrowser: {
+			Label: Enable Item Browser
+			Tooltip:
+				'''
+				Shows an autocomplete window for items.
+				Type [i to open
+				'''
+		}
+
+		EnableColorPicker: {
+			Label: Enable Color Picker
+			Tooltip:
+				'''
+				Shows an autocomplete window for changing the color of your message.
+				Type [c to open
+				'''
+		}
+
+		Tooltip: ""
+	}
+
+	StyleConfig: {
+		Tooltip: ""
+
+		ShowConfigButton: {
+			Label: Show Config Button
+			Tooltip: Shows an icon when the chat is open to quickly access the config
+		}
+
+		ShowPlayerIcons: {
+			Label: Show Player Icons
+			Tooltip: Shows a player icon next to each chat message from a player.
+		}
+
+		ShowPlayerFormat: {
+			Label: Player Format
+			Tooltip: Changes the prefix formatting for every player chat message
+		}
+
+		ShowPlayerColors: {
+			Label: Show Player Colors
+			Tooltip: Assigns a color to every player.
+		}
+
+		ShowModIcons: {
+			Label: Show Mod Icons
+			Tooltip: Shows a mod icon next to a message sent by a mod
+		}
+
+		ShowLinks: {
+			Label: Show Links
+			Tooltip: Makes links clickable in chat
+		}
+	}
+
+	FeatureStyleConfig: {
+		Tooltip: ""
+
+		ItemsPerWindow: {
+			Label: Items Per Window
+			Tooltip: Adjust the number of items that can be shown in the window at the same time
+		}
+
+		ShowDescriptionPanel: {
+			Label: Show Description Panel
+			Tooltip: Shows a description of the currently selected item
+		}
+
+		MakeWindowDraggable: {
+			Label: Make Window Draggable
+			Tooltip:
+				'''
+				On: Drag the feature window by clicking anywhere on the window and dragging the window
+				Off: The feature window appears above the chat
+				'''
 		}
 	}
 }
 
 Keybinds: {
-	"Open Command Toggle.DisplayName": Open  Command  Toggle
-	"Open Command Window.DisplayName": Open  Command  Window
-	"Open Emoji Window.DisplayName": Open  Emoji  Window
+	"Open Command Window.DisplayName": Open Command Window
+	"Open Emoji Window.DisplayName": Open Emoji Window
 }

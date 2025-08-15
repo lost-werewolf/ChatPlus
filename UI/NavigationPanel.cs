@@ -2,15 +2,10 @@ using System;
 using System.Collections.Generic;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI.Commands;
-using AdvancedChatFeatures.UI.Emojis;
-using AdvancedChatFeatures.UI.Glyphs;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace AdvancedChatFeatures.UI
@@ -18,16 +13,19 @@ namespace AdvancedChatFeatures.UI
     /// <summary>
     /// A panel that can be navigated on with arrow keys
     /// </summary>
-    public abstract class NavigationPanel : DraggablePanel
+    public abstract class NavigationPanel<TData> : DraggablePanel
     {
         // Elements
         public readonly UIScrollbar scrollbar;
         protected UIList list;
         protected readonly List<NavigationElement> items = [];
 
+        // Force populate
+        protected abstract IEnumerable<TData> GetSource(); // The source of data to populate the panel with
+        protected abstract NavigationElement BuildElement(TData data); // The method to create a new element from the data
+
         // Navigation
         protected int currentIndex = 0; // first item
-        protected int itemCount;
 
         // Holding keys
         private double repeatTimer;
@@ -36,7 +34,7 @@ namespace AdvancedChatFeatures.UI
         public NavigationPanel()
         {
             // Set width
-            Width.Set(220, 0);
+            Width.Set(320, 0);
 
             // Set position just above the chat
             VAlign = 1f;
@@ -69,6 +67,9 @@ namespace AdvancedChatFeatures.UI
 
             Append(list);
             Append(scrollbar);
+
+            // Populate the panel with items
+            PopulatePanel();
         }
 
         public override void LeftClick(UIMouseEvent evt)
@@ -80,17 +81,39 @@ namespace AdvancedChatFeatures.UI
             {
                 e.SetSelected(false);
             }
-
-            var sys = ModContent.GetInstance<CommandSystem>();
-            if (sys.ui.CurrentState != null)
-            {
-                sys.commandState.commandPanel.resetGhostText();
-            }
         }
 
-        public override void Draw(SpriteBatch sb)
+        protected void PopulatePanel()
         {
-            base.Draw(sb);
+            items.Clear();
+            list.Clear();
+
+            // Add all elements
+            var source = GetSource();
+            List<NavigationElement> fastList = []; 
+            if (source != null)
+            {
+                foreach (TData data in source)
+                {
+                    var element = BuildElement(data);
+                    if (element == null) continue;
+
+                    items.Add(element);
+                    fastList.Add(element);
+                }
+                // AddRange is much faster than adding one by one
+                list.AddRange(fastList);
+            }
+
+            // Reset index to top item
+            SetSelectedIndex(0);
+        }
+
+        public void SetHeight()
+        {
+            // Set height
+            Height.Set(Conf.C.featureStyleConfig.ItemsPerWindow * 30, 0);
+            list.Height.Set(Conf.C.featureStyleConfig.ItemsPerWindow * 30, 0);
         }
 
         public virtual void SetSelectedIndex(int index)
@@ -111,16 +134,18 @@ namespace AdvancedChatFeatures.UI
             current.SetSelected(true);
 
             // update view position
+            int itemsVisibleCount = Conf.C.featureStyleConfig.ItemsPerWindow;
+
             float view = list.ViewPosition;
             int topIndex = (int)(view / 30);
-            int bottomIndex = topIndex + itemCount - 1;
+            int bottomIndex = topIndex + itemsVisibleCount - 1;
 
             if (currentIndex < topIndex)
                 view = currentIndex * 30;
             else if (currentIndex > bottomIndex)
-                view = (currentIndex - itemCount + 1) * 30;
+                view = (currentIndex - itemsVisibleCount + 1) * 30;
 
-            float max = Math.Max(0f, items.Count * 30 - itemCount * 30);
+            float max = Math.Max(0f, items.Count * 30 - itemsVisibleCount * 30);
             if (view < 0) view = 0;
             if (view > max) view = max;
             list.ViewPosition = view;
@@ -131,6 +156,10 @@ namespace AdvancedChatFeatures.UI
         public override void Update(GameTime gt)
         {
             base.Update(gt);
+
+            Top.Set(-38, 0);
+
+            SetHeight();
 
             // Tap key
             if (JustPressed(Keys.Up))
@@ -146,7 +175,7 @@ namespace AdvancedChatFeatures.UI
                 repeatTimer = 0.35;
             }
 
-            // Hold key
+            // Hold key to repeat navigation
             double dt = gt.ElapsedGameTime.TotalSeconds;
             if (Main.keyState.IsKeyDown(heldKey))
             {
@@ -159,60 +188,5 @@ namespace AdvancedChatFeatures.UI
                 }
             }
         }
-
-        #region Sizing
-
-        public void SetCommandPanelHeight()
-        {
-            if (this is not CommandPanel)
-            {
-                Log.Error("this is not commandpanel!");
-                return;
-            }
-
-            // Update height
-            itemCount = Conf.C == null ? 10 : Conf.C.autocompleteConfig.CommandsVisible;
-            Height.Set(30 * itemCount, 0);
-            list.Height.Set(30 * itemCount, 0);
-
-            var sys = ModContent.GetInstance<CommandSystem>();
-            if (sys?.commandState?.commandUsagePanel != null)
-            {
-                sys.commandState.commandUsagePanel.UpdateTopPosition();
-            }
-        }
-
-        public void SetEmojiPanelHeight()
-        {
-            if (this is not EmojiPanel)
-            {
-                Log.Error("this is not emojipanel!");
-                return;
-            }
-
-            // Update height
-            itemCount = Conf.C == null ? 10 : Conf.C.emojisConfig.EmojisVisible;
-            Height.Set(30 * itemCount, 0);
-            list.Height.Set(30 * itemCount, 0);
-
-            var sys = ModContent.GetInstance<EmojiSystem>();
-            if (sys?.emojiState?.emojiUsagePanel != null)
-            {
-                sys.emojiState.emojiUsagePanel.UpdateTopPosition();
-            }
-        }
-
-        public void SetGlyphPanelHeight()
-        {
-            // Called from GlyphPanel only
-            itemCount = Conf.C == null ? 10 : Conf.C.autocompleteConfig.CommandsVisible;
-            Height.Set(30 * itemCount, 0);
-            list.Height.Set(30 * itemCount, 0);
-
-            var sys = ModContent.GetInstance<GlyphSystem>();
-            sys?.glyphState?.glyphUsagePanel?.UpdateTopPosition();
-        }
-
-        #endregion
     }
 }

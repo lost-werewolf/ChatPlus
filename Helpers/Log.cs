@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using AdvancedChatFeatures.Common.Configs;
 using log4net;
 using Terraria.ModLoader;
 
@@ -40,7 +39,7 @@ namespace AdvancedChatFeatures.Helpers
             }
         }
 
-        public static void Info(string message, [CallerFilePath] string callerFilePath = "")
+        public static void Info(string message, bool printCallerInMessage=true,[CallerFilePath] string callerFilePath = "")
         {
             //if (Conf.C != null && !Conf.C.ShowDebugMessages) return; 
 
@@ -51,7 +50,24 @@ namespace AdvancedChatFeatures.Helpers
                 return; // Skip logging if the mod is unloading or null
 
             // Prepend the class name to the log message.
-            instance.Logger.Info($"[{className}] {message}");
+            if (printCallerInMessage)
+                instance.Logger.Info($"[{className}] {message}");
+            else
+                instance.Logger.Info(message);
+        }
+
+        public static void Warn(string message, [CallerFilePath] string callerFilePath = "")
+        {
+            //if (Conf.C != null && !Conf.C.ShowDebugMessages) return; 
+
+            // Extract the class name from the caller's file path.
+            string className = Path.GetFileNameWithoutExtension(callerFilePath);
+            var instance = ModContent.GetInstance<AdvancedChatFeatures>();
+            if (instance == null || instance.Logger == null)
+                return; // Skip logging if the mod is unloading or null
+
+            // Prepend the class name to the log message.
+            instance.Logger.Warn($"[{className}] {message}");
         }
     }
 }

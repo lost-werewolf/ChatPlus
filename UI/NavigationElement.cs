@@ -1,10 +1,7 @@
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI.Commands;
-using AdvancedChatFeatures.UI.Emojis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace AdvancedChatFeatures.UI

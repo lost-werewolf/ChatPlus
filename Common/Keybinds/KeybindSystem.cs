@@ -1,5 +1,5 @@
-﻿using AdvancedChatFeatures.UI.Commands;
-using AdvancedChatFeatures.UI.Emojis;
+﻿using AdvancedChatFeatures.Commands;
+using AdvancedChatFeatures.Emojis;
 using Microsoft.Xna.Framework.Input;
 using Terraria.GameInput;
 using Terraria.ModLoader;

@@ -1,7 +1,7 @@
 ﻿using System;
+using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
-using AdvancedChatFeatures.UI.Commands;
-using AdvancedChatFeatures.UI.Emojis;
+using AdvancedChatFeatures.Emojis;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -49,15 +49,15 @@ namespace AdvancedChatFeatures.UI
                     float dyMax = Main.screenHeight - thisRect.Bottom;
 
                     // Find the "other" panel (the one we move together with)
-                    var sys = ModContent.GetInstance<CommandSystem>();
+                    //var sys = ModContent.GetInstance<CommandSystem>();
                     UIElement other = null;
-                    if (sys != null)
-                    {
-                        if (this is CommandPanel && sys.commandState?.commandUsagePanel != null)
-                            other = sys.commandState.commandUsagePanel;
-                        else if (this is CommandUsagePanel && sys.commandState?.commandPanel != null)
-                            other = sys.commandState.commandPanel;
-                    }
+                    //if (sys != null)
+                    //{
+                    //    if (this is CommandPanel && sys.commandState?.commandDescriptionPanel != null)
+                    //        other = sys.commandState.commandDescriptionPanel;
+                    //    else if (this is DescriptionPanel && sys.commandState?.commandPanel != null)
+                    //        other = sys.commandState.commandPanel;
+                    //}
 
                     // Intersect constraints so the OTHER panel also stays on-screen
                     if (other != null)
@@ -93,7 +93,7 @@ namespace AdvancedChatFeatures.UI
 
         public override void LeftMouseDown(UIMouseEvent evt)
         {
-            if (!Conf.C.autocompleteConfig.DraggableWindow)
+            if (!Conf.C.featureStyleConfig.MakeWindowDraggable)
                 return;
 
             // If hovering a scrollbar, skip drag
