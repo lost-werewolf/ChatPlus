@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Default;
 using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.UI.Commands

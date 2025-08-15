@@ -1,75 +1,33 @@
-﻿using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI.Commands.Elements;
+using AdvancedChatFeatures.UI.Commands;
+using AdvancedChatFeatures.UI.Emojis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.GameContent;
-using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
-using Terraria.ModLoader.UI;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.UI.Commands
+namespace AdvancedChatFeatures.UI
 {
     /// <summary>
-    /// An element that consists of a name, tooltip, mod icon.
-    /// When hovered and clicked or enter is pressed, sends the command in the chat
+    /// An element that can be navigated in a <see cref="NavigationPanel"/>.
     /// </summary>
-    public class CommandElement : UIElement
+    public class NavigationElement : UIElement
     {
-        // UI
-        private ModIconImage modIconImage;
-
         // Variables
-        public Command Command;
         private bool isSelected;
         public bool SetSelected(bool value) => isSelected = value;
 
-        public CommandElement(Command command)
+        public NavigationElement()
         {
-            Command = command;
-
             Height.Set(30, 0);
             Width.Set(0, 1);
-
-            // Add mod icon
-            modIconImage = new(Ass.TerrariaIcon, command.Mod)
-            {
-                Left = { Pixels = 6 },
-                VAlign = 0.5f,
-                Width = { Pixels = 22 },
-                Height = { Pixels = 22 }
-            };
-            Append(modIconImage);
-
-            // Add command name
-            if (command.Name != null)
-            {
-                UIText cmdText = new(command.Name, textScale: 1, large: false)
-                {
-                    Left = { Pixels = 32 },
-                    VAlign = 0.5f,
-                };
-                Append(cmdText);
-            }
         }
 
-        /// <summary>
-        /// // Clicking the command makes it appear in the chat
-        /// </summary>
         public override void LeftClick(UIMouseEvent evt)
         {
             base.LeftClick(evt);
-
-            // Set index
-            var sys = ModContent.GetInstance<CommandSystem>();
-            CommandPanel commandPanel = sys.commandState.commandPanel;
-            int thisElementsIndex = commandPanel.items.FindIndex(e => e.Command.Name == Command.Name);
-            if (thisElementsIndex >= 0)
-            {
-                commandPanel.SetSelectedIndex(thisElementsIndex);
-            }
+            SetSelected(true);
         }
 
         public override void Update(GameTime gameTime)
@@ -84,19 +42,14 @@ namespace AdvancedChatFeatures.UI.Commands
                 DrawSlices(sb, this);
                 DrawFill(sb, this);
             }
-            if (Conf.C.autocompleteConfig.ShowHoverTooltips && IsMouseHovering && !string.IsNullOrEmpty(Command.Usage))
-            {
-                UICommon.TooltipMouseText(Command.Usage);
-            }
 
             base.Draw(sb);
         }
-
         private static void DrawFill(SpriteBatch sb, UIElement ele)
         {
             CalculatedStyle dims = ele.GetDimensions();
             Texture2D pixel = TextureAssets.MagicPixel.Value;
-            Rectangle r = new((int)dims.X+4, (int)dims.Y+4, (int)dims.Width-8, (int)dims.Height-6);
+            Rectangle r = new((int)dims.X + 4, (int)dims.Y + 4, (int)dims.Width - 8, (int)dims.Height - 6);
 
             // fill (slightly brighter blue, semi-transparent)
             sb.Draw(pixel, r, new Color(70, 120, 220, 140));
@@ -114,12 +67,12 @@ namespace AdvancedChatFeatures.UI.Commands
             Rectangle t = ele.GetDimensions().ToRectangle();
 
             var tex = Ass.Hitbox.Value;
-            int c = 5;                        
+            int c = 5;
             Rectangle sc = new(0, 0, c, c),
                       eh = new(c, 0, 30 - 2 * c, c),
                       ev = new(0, c, c, 30 - 2 * c),
                       ce = new(c, c, 30 - 2 * c, 30 - 2 * c);
-            
+
             Color color = Color.White;
 
             if (fill)
@@ -135,6 +88,5 @@ namespace AdvancedChatFeatures.UI.Commands
             sb.Draw(tex, new Rectangle(t.Right - c, t.Bottom - c, c, c), sc, color, 0, Vector2.Zero, SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally, 0); // BR
             sb.Draw(tex, new Rectangle(t.X, t.Bottom - c, c, c), sc, color, 0, Vector2.Zero, SpriteEffects.FlipVertically, 0); // BL
         }
-
     }
 }

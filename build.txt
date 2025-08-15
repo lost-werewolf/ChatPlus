@@ -1,3 +1,4 @@
 displayName = Advanced Chat Features
 author = Erky
 version = 0.1
+buildIgnore =  \Assets\Workshop*, .vs\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, .git\*, .github\*, LICENSE, .editorconfig, .gitignore, .gitattributes,

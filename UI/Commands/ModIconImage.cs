@@ -8,10 +8,19 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 
-namespace AdvancedChatFeatures.UI.Commands.Elements
+namespace AdvancedChatFeatures.UI.Commands
 {
-    internal class ModIconImage(Asset<Texture2D> texture, Mod mod = null) : UIImage(texture: texture)
+    internal class ModIconImage : UIImage
     {
+        private readonly Asset<Texture2D> asset;
+        private readonly Mod mod;
+
+        public ModIconImage(Asset<Texture2D> texture, Mod mod = null) : base(texture)
+        {
+            asset = texture;
+            this.mod = mod;
+        }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             // Dimensions
@@ -20,11 +29,11 @@ namespace AdvancedChatFeatures.UI.Commands.Elements
             if (mod is null)
             {
                 // Draw default tree icon for vanilla commands or unknown mods
-                Texture2D texVal = texture.Value;
+                Texture2D texVal = this.asset.Value;
                 int widest = texVal.Width > texVal.Height ? texVal.Width : texVal.Height;
-                spriteBatch.Draw(texVal, target.Center.ToVector2(), null, Color.White, 0, texture.Size() / 2f, target.Width / (float)widest, 0, 0);
+                spriteBatch.Draw(texVal, target.Center.ToVector2(), null, Color.White, 0, this.asset.Size() / 2f, target.Width / (float)widest, 0, 0);
 
-                if (IsMouseHovering)
+                if (Conf.C.autocompleteConfig.ShowHoverTooltips && IsMouseHovering)
                 {
                     UICommon.TooltipMouseText("Terraria");
                 }

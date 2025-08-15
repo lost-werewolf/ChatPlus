@@ -5,25 +5,30 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.UI.Commands
+namespace AdvancedChatFeatures.UI.Emojis
 {
     [Autoload(Side = ModSide.Client)]
-    public class CommandSystem : ModSystem
+    public class EmojiSystem : ModSystem
     {
         public UserInterface ui;
-        public CommandState commandState;
+        public EmojiState emojiState;
+
+        public override void OnModLoad()
+        {
+            base.OnModLoad();
+        }
 
         public override void Load()
         {
             ui = new UserInterface();
-            commandState = new CommandState();
+            emojiState = new EmojiState();
             ui.SetState(null); // start hidden
         }
 
         public override void Unload()
         {
             ui = new UserInterface();
-            commandState = new CommandState();
+            emojiState = new EmojiState();
             ui.SetState(null); // start hidden
         }
 
@@ -38,15 +43,16 @@ namespace AdvancedChatFeatures.UI.Commands
                 return;
 
             string text = Main.chatText ?? string.Empty;
-            bool startsWithSlash = text.Length > 0 && text[0] == '/';
+            // Open when starting an emoji token, ":" as the first char
+            bool startsWithColon = text.Length > 0 && text[0] == ':';
 
-            if (startsWithSlash && Main.drawingPlayerChat)
+            if (startsWithColon && Main.drawingPlayerChat)
             {
                 // Only switch state when it actually changes
-                if (ui.CurrentState != commandState)
+                if (ui.CurrentState != emojiState)
                 {
-                    ui.SetState(commandState);
-                    commandState.commandPanel.PopulateCommandPanel();
+                    ui.SetState(emojiState);
+                    emojiState.emojiPanel.PopulateEmojiPanel();
                 }
 
                 ui.Update(gameTime);
@@ -64,7 +70,7 @@ namespace AdvancedChatFeatures.UI.Commands
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: Commands Panel",
+                "AdvancedChatFeatures: Emojis Panel",
                 () =>
                 {
                     if (ui?.CurrentState != null)

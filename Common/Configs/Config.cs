@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.UI.Commands;
 using AdvancedChatFeatures.UI.DrawConfig;
+using AdvancedChatFeatures.UI.Emojis;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
@@ -18,7 +19,7 @@ namespace AdvancedChatFeatures.Common.Configs
 
         [Header("Config")]
 
-        [Expand(true, false)]
+        [Expand(false, false)]
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         public Features features = new();
 
@@ -49,7 +50,18 @@ namespace AdvancedChatFeatures.Common.Configs
         {
             [BackgroundColor(231, 84, 128)] // Rose Pink
             [DefaultValue(true)]
-            public bool Emojis = true;
+            public bool EnableEmojis = true;
+
+            [BackgroundColor(231, 84, 128)] // Rose Pink
+            [Range(3, 20)]
+            [DrawTicks]
+            [Increment(1)]
+            [DefaultValue(10)]
+            public int EmojisVisible = 10;
+
+            [BackgroundColor(231, 84, 128)] // Rose Pink
+            [DefaultValue(true)]
+            public bool ShowUsagePanel = true;
         }
 
         public class Features
@@ -135,14 +147,18 @@ namespace AdvancedChatFeatures.Common.Configs
 
             if (Conf.C == null)
             {
-                Log.Error("Config is null!");
+                Log.Error("Config is null in OnChanged!");
                 return;
             }
-            else
-            {
-                Log.Info("Config changed!");
-            }
 
+            UpdateChatsVisible();
+            UpdateCommandSystem();
+            UpdateEmojiSystem();
+            UpdateDrawConfigSystem();
+        }
+
+        private void UpdateChatsVisible()
+        {
             // Get ChatMonitor
             var chatMonitor = typeof(RemadeChatMonitor);
             var chatMonitorInstance = Main.chatMonitor as RemadeChatMonitor;
@@ -150,58 +166,65 @@ namespace AdvancedChatFeatures.Common.Configs
             // Update the ChatsVisible value.
             var showCountField = chatMonitor.GetField("_showCount", BindingFlags.NonPublic | BindingFlags.Instance);
             showCountField?.SetValue(chatMonitorInstance, (int)Conf.C.chatMessageDisplay.ChatsVisible);
+        }
 
-            // Update the ConfigSystem
-            var drawConfigSystem = ModContent.GetInstance<DrawConfigSystem>();
-            if (drawConfigSystem == null)
+        private void UpdateCommandSystem()
+        {
+            // Update state
+            CommandSystem commandSystem = ModContent.GetInstance<CommandSystem>();
+            CommandState commandState = commandSystem.commandState;
+            if (Conf.C.autocompleteConfig.EnableAutocomplete)
             {
-                Log.Error("DrawConfigSystem null!!");
-                return;
-            }
-
-            if (Conf.C.features.ConfigIcon)
-            {
-                drawConfigSystem.ui?.SetState(drawConfigSystem.drawConfigState);
-            }
-            else
-            {
-                drawConfigSystem.ui?.SetState(null);
-            }
-
-            // Update the CommandSystem
-            var commandSystem = ModContent.GetInstance<CommandSystem>();
-            if (commandSystem == null)
-            {
-                Log.Error("commandSystem null!!");
-                return;
-            }
-
-            if (Conf.C.features.ConfigIcon)
-            {
-                commandSystem.ui?.SetState(commandSystem.commandState);
+                if (commandSystem.ui?.CurrentState != commandState)
+                    commandSystem.ui?.SetState(commandState);
             }
             else
             {
                 commandSystem.ui?.SetState(null);
+                return;
             }
 
-            // Update autocomplete
-            commandSystem.commandState.commandPanel.UpdateItemCount(Conf.C.autocompleteConfig.CommandsVisible);
+            // Update item count
+            commandState.commandPanel.SetCommandPanelHeight();
 
-            if (Conf.C.autocompleteConfig.ShowUsagePanel)
-            {
-                if (!commandSystem.commandState.HasChild(commandSystem.commandState.tooltipPanel))
-                {
-                    commandSystem.commandState.Append(commandSystem.commandState.tooltipPanel);
-                }
-            }
+            // Update usage panel
+            if (Conf.C.autocompleteConfig.ShowUsagePanel && !commandState.HasChild(commandState.commandUsagePanel))
+                commandState.Append(commandState.commandUsagePanel);
+            else if (commandState.HasChild(commandState.commandUsagePanel) && !Conf.C.autocompleteConfig.ShowUsagePanel)
+                commandState.RemoveChild(commandState.commandUsagePanel);
+        }
+
+        private void UpdateEmojiSystem()
+        {
+            // Update state
+            EmojiSystem emojiSystem = ModContent.GetInstance<EmojiSystem>();
+            EmojiState emojiState = emojiSystem.emojiState;
+            if (Conf.C.emojisConfig.EnableEmojis)
+                emojiSystem.ui?.SetState(emojiState);
             else
             {
-                if (commandSystem.commandState.HasChild(commandSystem.commandState.tooltipPanel))
-                {
-                    commandSystem.commandState.RemoveChild(commandSystem.commandState.tooltipPanel);
-                }
+                emojiSystem.ui?.SetState(null);
+                return;
             }
+
+            // Update item count
+            emojiState.emojiPanel.SetEmojiPanelHeight();
+
+            // Update usage panel
+            if (Conf.C.emojisConfig.ShowUsagePanel && !emojiState.HasChild(emojiState.emojiUsagePanel))
+                emojiState.Append(emojiState.emojiUsagePanel);
+            else if (emojiState.HasChild(emojiState.emojiUsagePanel) && !Conf.C.emojisConfig.ShowUsagePanel)
+                emojiState.RemoveChild(emojiState.emojiUsagePanel);
+        }
+
+        private void UpdateDrawConfigSystem()
+        {
+            // Update the ConfigSystem
+            DrawConfigSystem drawConfigSystem = ModContent.GetInstance<DrawConfigSystem>();
+            if (Conf.C.features.ConfigIcon)
+                drawConfigSystem.ui?.SetState(drawConfigSystem.drawConfigState);
+            else
+                drawConfigSystem.ui?.SetState(null);
         }
     }
 
