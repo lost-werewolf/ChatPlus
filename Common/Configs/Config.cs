@@ -10,6 +10,7 @@ using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
+using Terraria.UI;
 
 namespace AdvancedChatFeatures.Common.Configs
 {
@@ -226,6 +227,46 @@ namespace AdvancedChatFeatures.Common.Configs
             else
                 drawConfigSystem.ui?.SetState(null);
         }
+
+        #region Helpers
+
+        public bool ExpandSection(UIElement root, string labelMatch)
+        {
+            foreach (var child in root.Children)
+            {
+                // Search recursively
+                if (ExpandSection(child, labelMatch))
+                    return true;
+
+                var type = child.GetType();
+                if (type.Name == "ObjectElement")
+                {
+                    // Try to read the "Label" field from ConfigElement<T>
+                    var labelField = type.BaseType?.GetField("Label", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                    var labelValue = labelField?.GetValue(child) as string;
+
+                    if (!string.IsNullOrEmpty(labelValue) &&
+                        labelValue.IndexOf(labelMatch, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        // Set private 'expanded' field to true
+                        var expandedField = type.GetField("expanded", BindingFlags.Instance | BindingFlags.NonPublic);
+                        expandedField?.SetValue(child, true);
+
+                        // Also set 'pendingChanges' so Update() will rebuild the list
+                        var pendingField = type.GetField("pendingChanges", BindingFlags.Instance | BindingFlags.NonPublic);
+                        pendingField?.SetValue(child, true);
+
+                        // Force recalculation
+                        child.Recalculate();
+                        Log.Info($"Expanded section: {labelValue}");
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        #endregion
     }
 
     public static class Conf

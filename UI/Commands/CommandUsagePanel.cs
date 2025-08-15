@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Reflection;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -13,7 +15,6 @@ namespace AdvancedChatFeatures.UI.Commands
     public class CommandUsagePanel : DraggablePanel
     {
         private readonly UIText text;
-        private int itemCount;
         public CommandUsagePanel()
         {
             // Size
@@ -24,9 +25,10 @@ namespace AdvancedChatFeatures.UI.Commands
             BackgroundColor = ColorHelper.DarkBlue * 0.8f;
 
             // Position
-            UpdateTopPosition();
-            Left.Set(80, 0);
             VAlign = 1f;
+            Left.Set(80, 0);
+            UpdateTopPosition();
+            ResetText();
 
             text = new("", 0.9f, false)
             {
@@ -38,7 +40,19 @@ namespace AdvancedChatFeatures.UI.Commands
         {
             Conf.C.Open();
 
-            // Expand autocomplete
+            // Expand autocomplete section in config after UI is built
+            Main.QueueMainThreadAction(() =>
+            {
+                var state = Main.InGameUI.CurrentState;
+                if (state is not UIElement root) return;
+
+                Conf.C.ExpandSection(root, "Autocomplete");
+            });
+        }
+
+        public void ResetText()
+        {
+            text?.SetText("List of commands\nPress tab to complete");
         }
 
         public void UpdateText(string rawText)
@@ -69,13 +83,22 @@ namespace AdvancedChatFeatures.UI.Commands
         {
             var sys = ModContent.GetInstance<CommandSystem>();
             var cp = sys?.commandState?.commandPanel;
-            if (cp == null) return;
+            const float gap = 0f;
 
-            const float gap = 0f; 
-            Top.Set(cp.Top.Pixels - cp.Height.Pixels - gap, 0f);
-
-            // keep aligned horizontally with the command panel
-            Left.Set(cp.Left.Pixels, 0f);
+            if (cp != null)
+            {
+                // Place directly above command panel
+                Top.Set(cp.Top.Pixels - Height.Pixels - gap, 0f);
+                Left.Set(cp.Left.Pixels, 0f);
+            }
+            else
+            {
+                // Fallback before panel exists: compute from config
+                int visible = Conf.C == null ? 10 : Conf.C.autocompleteConfig.CommandsVisible;
+                int panelHeight = 30 * visible;
+                Top.Set(-panelHeight - Height.Pixels - gap, 0f);
+                Left.Set(80, 0f);
+            }
 
             Recalculate();
         }

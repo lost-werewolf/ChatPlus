@@ -1,18 +1,18 @@
 ﻿using System;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace AdvancedChatFeatures.UI.Emojis
 {
     public class EmojiUsagePanel : DraggablePanel
     {
         private UIText text;
-        private int itemCount;
         public EmojiUsagePanel()
         {
             // Size
@@ -23,9 +23,9 @@ namespace AdvancedChatFeatures.UI.Emojis
             BackgroundColor = ColorHelper.DarkBlue * 0.8f;
 
             // Position
-            UpdateTopPosition();
-            Left.Set(80, 0);
             VAlign = 1f;
+            Left.Set(80, 0);
+            UpdateTopPosition();
 
             text = new("", 0.9f, false)
             {
@@ -33,10 +33,18 @@ namespace AdvancedChatFeatures.UI.Emojis
             Append(text);
         }
 
-        public void UpdateTopPosition()
+        public override void RightClick(UIMouseEvent evt)
         {
-            itemCount = Conf.C == null ? 10 : Conf.C.autocompleteConfig.CommandsVisible;
-            Top.Set(-30 * itemCount - 30 - 6, 0);
+            Conf.C.Open();
+
+            // Expand autocomplete section in config after UI is built
+            Main.QueueMainThreadAction(() =>
+            {
+                var state = Main.InGameUI.CurrentState;
+                if (state is not UIElement root) return;
+
+                Conf.C.ExpandSection(root, "Emojis");
+            });
         }
 
         public void UpdateText(string rawText)
@@ -61,6 +69,30 @@ namespace AdvancedChatFeatures.UI.Emojis
             }
 
             text.SetText(tooltip);
+        }
+
+        public void UpdateTopPosition()
+        {
+            var sys = ModContent.GetInstance<EmojiSystem>();
+            var cp = sys?.emojiState?.emojiPanel;
+            const float gap = 0f;
+
+            if (cp != null)
+            {
+                // Place directly above emoji panel
+                Top.Set(cp.Top.Pixels - Height.Pixels - gap, 0f);
+                Left.Set(cp.Left.Pixels, 0f);
+            }
+            else
+            {
+                // Fallback before panel exists: compute from config
+                int visible = Conf.C == null ? 10 : Conf.C.emojisConfig.EmojisVisible;
+                int panelHeight = 30 * visible;
+                Top.Set(-panelHeight - Height.Pixels - gap, 0f);
+                Left.Set(80, 0f);
+            }
+
+            Recalculate();
         }
 
         public override void Draw(SpriteBatch spriteBatch)

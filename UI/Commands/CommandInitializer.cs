@@ -8,16 +8,13 @@ using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.UI.Commands
 {
-    public static class CommandInitializer
-    {
-        public static List<Command> Commands { get; private set; } = [];
-    }
-
     internal class CommandInitializerSystem : ModSystem
     {
+        public static List<Command> Commands { get; private set; } = [];
+
         public override void PostSetupContent()
         {
-            CommandInitializer.Commands.Clear();
+            Commands.Clear();
 
             // Load commands from ModCommand
             foreach (var cmdList in CommandLoader.Commands)
@@ -31,7 +28,7 @@ namespace AdvancedChatFeatures.UI.Commands
                     string usage = cmd.Description;
                     Mod mod = cmd.Mod;
 
-                    CommandInitializer.Commands.Add(new Command(name, usage, mod));
+                    Commands.Add(new Command(name, usage, mod));
                     Log.Info("(1) Command loaded: " + name + ", usage: " + cmd.Usage + ", from mod: " + cmd.Mod.Name);
                 }
             }
@@ -44,12 +41,12 @@ namespace AdvancedChatFeatures.UI.Commands
                 string usage = Language.GetTextValue("ChatCommandDescription." + localizationKey); // description, e.g "Send a message to your party members"
                 Texture2D terrariaIcon = Ass.TerrariaIcon.Value;
 
-                CommandInitializer.Commands.Add(new Command(name, usage));
+                Commands.Add(new Command(name, usage));
                 Log.Info("(2) Command loaded: " + name + ", usage: " + usage + ", from ChatManager");
             }
 
             // Sort first by mod name, then command name
-            CommandInitializer.Commands.Sort((a, b) =>
+            Commands.Sort((a, b) =>
             {
                 string am = a.Mod != null
                     ? (a.Mod.DisplayNameClean ?? a.Mod.Name)
@@ -68,7 +65,7 @@ namespace AdvancedChatFeatures.UI.Commands
                 return string.Compare(an, bn, StringComparison.OrdinalIgnoreCase);
             });
 
-            Log.Info("Total commands loaded: " + CommandInitializer.Commands.Count);
+            Log.Info("Total commands loaded: " + Commands.Count);
         }
     }
 }

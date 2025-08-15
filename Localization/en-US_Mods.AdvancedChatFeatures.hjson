@@ -145,3 +145,9 @@ Configs: {
 		}
 	}
 }
+
+Keybinds: {
+	"Open Command Toggle.DisplayName": Open  Command  Toggle
+	"Open Command Window.DisplayName": Open  Command  Window
+	"Open Emoji Window.DisplayName": Open  Emoji  Window
+}

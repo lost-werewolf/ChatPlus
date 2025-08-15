@@ -1,6 +1,7 @@
 ﻿using System;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.UI.Commands;
+using AdvancedChatFeatures.UI.Emojis;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -92,9 +93,15 @@ namespace AdvancedChatFeatures.UI
 
         public override void LeftMouseDown(UIMouseEvent evt)
         {
-            if (!Conf.C.autocompleteConfig.DraggableWindow) return;
+            if (!Conf.C.autocompleteConfig.DraggableWindow)
+                return;
 
-            // start dragging
+            // If hovering a scrollbar, skip drag
+            var emojiSys = ModContent.GetInstance<EmojiSystem>();
+            if (emojiSys?.emojiState?.emojiPanel?.scrollbar?.IsMouseHovering == true)
+                return;
+
+            // Start dragging
             mouseDownPos = evt.MousePosition;
             base.LeftMouseDown(evt);
             dragging = true;

@@ -15,6 +15,7 @@ namespace AdvancedChatFeatures.UI.Commands
             Append(commandPanel);
 
             commandUsagePanel = new();
+            commandUsagePanel.UpdateTopPosition();
             Append(commandUsagePanel);
         }
 

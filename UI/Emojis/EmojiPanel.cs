@@ -1,4 +1,8 @@
+using System.Collections.Generic;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.UI;
 
 namespace AdvancedChatFeatures.UI.Emojis
 {
@@ -6,6 +10,7 @@ namespace AdvancedChatFeatures.UI.Emojis
     {
         public EmojiPanel()
         {
+            Width.Set(320, 0);
             SetEmojiPanelHeight();
             PopulateEmojiPanel();
         }
@@ -15,12 +20,21 @@ namespace AdvancedChatFeatures.UI.Emojis
             items.Clear();
             list.Clear();
 
-            foreach (var emoji in EmojiInitializer.Emojis)
+            Log.Info($"start");
+
+            var elements = new List<UIElement>(EmojiInitializer.Emojis.Count);
+
+            foreach (Emoji emoji in EmojiInitializer.Emojis)
             {
                 EmojiElement element = new(emoji);
                 items.Add(element);
                 list.Add(element);
+                //elements.Add(new EmojiElement(emoji));
             }
+
+            //list.AddRange(elements);
+
+            Log.Info($"end");
 
             SetSelectedIndex(0);
         }

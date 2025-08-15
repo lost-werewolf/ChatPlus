@@ -1,9 +1,8 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.GameContent;
+using Terraria.GameContent.UI.Elements;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
-using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.UI.Emojis
 {
@@ -11,39 +10,38 @@ namespace AdvancedChatFeatures.UI.Emojis
     {
         public Emoji Emoji;
 
+        private UIText text;
+        private EmojiIconImage image;
+
         public EmojiElement(Emoji emoji)
         {
             Emoji = emoji;
+            image = new(emoji.FilePath);
+            text = new(emoji.DisplayName)
+            {
+                Left = { Pixels = 32 }
+            };
+
+            Append(image);
+            Append(text);
         }
 
         public override void LeftClick(UIMouseEvent evt)
         {
             base.LeftClick(evt);
-            Main.chatText = Emoji.Tag; // Paste emoji tag into chat
+            Main.chatText = Emoji.FilePath; // Paste emoji tag into chat
         }
 
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
 
-            var dims = GetDimensions();
-            Vector2 pos = dims.Position();
+            text.VAlign = 0.5f;
 
-            // Render the emoji by drawing its tag via ChatManager
-            string render = Emoji.Tag + " " + Emoji.Name;
-            float scale = 0.9f;
-            ChatManager.DrawColorCodedStringWithShadow(
-                sb,
-                FontAssets.MouseText.Value,
-                render,
-                pos + new Vector2(6, 6),
-                Color.White,
-                0f,
-                Vector2.Zero,
-                new Vector2(scale),
-                -1f,
-                scale
-            );
+            if (IsMouseHovering && !string.IsNullOrEmpty(Emoji.Tag))
+            {
+                UICommon.TooltipMouseText(Emoji.DisplayName);
+            }
         }
     }
 }

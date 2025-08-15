@@ -4,6 +4,7 @@ using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.UI.Commands;
 using AdvancedChatFeatures.UI.Emojis;
+using AdvancedChatFeatures.UI.Glyphs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -20,7 +21,7 @@ namespace AdvancedChatFeatures.UI
     public abstract class NavigationPanel : DraggablePanel
     {
         // Elements
-        private readonly UIScrollbar scrollbar;
+        public readonly UIScrollbar scrollbar;
         protected UIList list;
         protected readonly List<NavigationElement> items = [];
 
@@ -199,6 +200,17 @@ namespace AdvancedChatFeatures.UI
             {
                 sys.emojiState.emojiUsagePanel.UpdateTopPosition();
             }
+        }
+
+        public void SetGlyphPanelHeight()
+        {
+            // Called from GlyphPanel only
+            itemCount = Conf.C == null ? 10 : Conf.C.autocompleteConfig.CommandsVisible;
+            Height.Set(30 * itemCount, 0);
+            list.Height.Set(30 * itemCount, 0);
+
+            var sys = ModContent.GetInstance<GlyphSystem>();
+            sys?.glyphState?.glyphUsagePanel?.UpdateTopPosition();
         }
 
         #endregion

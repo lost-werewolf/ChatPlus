@@ -1,4 +1,6 @@
 using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.UI.Commands;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI;
 
@@ -16,6 +18,7 @@ namespace AdvancedChatFeatures.UI.Emojis
             Append(emojiPanel);
 
             emojiUsagePanel = new();
+            emojiUsagePanel.UpdateTopPosition();
             Append(emojiUsagePanel);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.UI.Commands;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -35,6 +36,22 @@ namespace AdvancedChatFeatures.UI.Emojis
         public override void OnWorldUnload()
         {
             base.OnWorldUnload();
+        }
+
+        public void ToggleState()
+        {
+            if (ui.CurrentState != emojiState)
+            {
+                Main.drawingPlayerChat = true; // force open chat
+                Main.chatText = ":"; // start with slash
+                ui.SetState(emojiState);
+                emojiState.emojiPanel.PopulateEmojiPanel();
+            }
+            else
+            {
+                if (ui.CurrentState != null)
+                    ui.SetState(null);
+            }
         }
 
         public override void UpdateUI(GameTime gameTime)

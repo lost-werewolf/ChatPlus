@@ -14,6 +14,10 @@
 		<Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Assets\Emojis\" />
+	</ItemGroup>
+
 	<!-- References -->
 
 </Project>

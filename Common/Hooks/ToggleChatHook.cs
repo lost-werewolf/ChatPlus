@@ -1,6 +1,7 @@
 ﻿using System;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.UI.Commands;
+using Microsoft.Xna.Framework.Input;
 using MonoMod.Cil;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
@@ -67,6 +68,14 @@ namespace AdvancedChatFeatures.Common.Hooks
                 c.EmitDelegate<Func<int, int>>(v =>
                 {
                     var sys = ModContent.GetInstance<CommandSystem>();
+
+                    bool enterReleased = Main.keyState.IsKeyDown(Keys.Enter) && !Main.oldKeyState.IsKeyDown(Keys.Enter);
+                    if (enterReleased)
+                    {
+                        //Log.Info("Chat closing — Enter released");
+                        Main.chatText += sys.commandState.commandPanel.getGhostText();
+                        sys.commandState.commandPanel.resetGhostText();
+                    }
                     return sys?.ui?.CurrentState != null ? 0 : v;
                 });
 

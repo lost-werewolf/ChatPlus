@@ -15,6 +15,7 @@ namespace AdvancedChatFeatures.UI.Commands
     {
         // Variables
         private string ghostText = "";
+        public string getGhostText() => ghostText;
         public string resetGhostText() => ghostText = "";
         private string lastChatText = string.Empty;
 
@@ -32,7 +33,7 @@ namespace AdvancedChatFeatures.UI.Commands
             list.Clear();
 
             // Add all items
-            foreach (Command cmd in CommandInitializer.Commands)
+            foreach (Command cmd in CommandInitializerSystem.Commands)
             {
                 CommandElement element = new(cmd);
                 items.Add(element);
@@ -41,6 +42,9 @@ namespace AdvancedChatFeatures.UI.Commands
 
             // Reset everything
             SetSelectedIndex(0);
+
+            var sys = ModContent.GetInstance<CommandSystem>();
+            //sys.commandState.commandUsagePanel.UpdateText("List of commands\nPress tab to complete");
         }
 
         public override void Draw(SpriteBatch sb)
@@ -88,7 +92,7 @@ namespace AdvancedChatFeatures.UI.Commands
                 string selected = current.Command.Name ?? string.Empty;
 
                 if (!string.IsNullOrEmpty(baseText) &&
-                    selected.StartsWith(baseText, StringComparison.OrdinalIgnoreCase))
+                    selected.Contains(baseText, StringComparison.OrdinalIgnoreCase))
                 {
                     ghostText = selected.Substring(baseText.Length);
                 }
@@ -104,9 +108,8 @@ namespace AdvancedChatFeatures.UI.Commands
             else
             {
                 // Ghost OFF: only write to chat when navigating with Up/Down (not during filtering)
-                if ((Main.keyState.IsKeyDown(Keys.Up) || Main.keyState.IsKeyDown(Keys.Down)))
+                if (Main.keyState.IsKeyDown(Keys.Up) || Main.keyState.IsKeyDown(Keys.Down))
                 {
-                    // Optional: only while user is still on the command token (no args)
                     string chat = Main.chatText ?? string.Empty;
                     if (chat.StartsWith("/") && chat.IndexOf(' ') < 0)
                         Main.chatText = current.Command.Name ?? string.Empty;
@@ -150,7 +153,7 @@ namespace AdvancedChatFeatures.UI.Commands
             items.Clear();
             list.Clear();
 
-            foreach (var cmd in CommandInitializer.Commands)
+            foreach (var cmd in CommandInitializerSystem.Commands)
             {
                 string nameNoSlash = cmd.Name.TrimStart('/');
                 if (typed.Length == 0 || nameNoSlash.StartsWith(typed, StringComparison.OrdinalIgnoreCase))

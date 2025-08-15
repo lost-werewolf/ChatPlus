@@ -3,6 +3,7 @@ using AdvancedChatFeatures.Common.Configs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Config;
 using Terraria.UI;
 
 namespace AdvancedChatFeatures.UI.Commands
@@ -30,6 +31,23 @@ namespace AdvancedChatFeatures.UI.Commands
         public override void OnWorldUnload()
         {
             base.OnWorldUnload();
+        }
+
+        public void ToggleState()
+        {
+            if (ui.CurrentState != commandState)
+            {
+                Main.drawingPlayerChat = true; // force open chat
+                Main.chatText = "/"; // start with slash
+                ui.SetState(commandState);
+                commandState.commandPanel.PopulateCommandPanel();
+                commandState.commandUsagePanel?.ResetText();
+            }
+            else
+            {
+                if (ui.CurrentState != null)
+                    ui.SetState(null);
+            }
         }
 
         public override void UpdateUI(GameTime gameTime)
