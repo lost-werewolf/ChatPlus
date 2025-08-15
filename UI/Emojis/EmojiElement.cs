@@ -31,7 +31,6 @@ namespace AdvancedChatFeatures.UI.Emojis
         {
             base.LeftClick(evt);
 
-
             // Insert tag into chat
             string tag = Emoji.Tag ?? "";
             if (string.IsNullOrEmpty(tag)) return;

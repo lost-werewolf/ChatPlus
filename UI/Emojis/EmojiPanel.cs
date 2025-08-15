@@ -1,15 +1,20 @@
+using System;
 using System.Collections.Generic;
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI.Glyphs;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
-using Terraria.UI;
 
 namespace AdvancedChatFeatures.UI.Emojis
 {
     public class EmojiPanel : NavigationPanel
     {
+        private string _lastChatText = string.Empty;
+
+        // For Tab key repeat
+        private double repeatTimer;
+        private Keys heldKey = Keys.None;
+
         public EmojiPanel()
         {
             Width.Set(320, 0);
@@ -22,21 +27,15 @@ namespace AdvancedChatFeatures.UI.Emojis
             items.Clear();
             list.Clear();
 
-            Log.Info($"start");
-
-            var elements = new List<UIElement>(EmojiInitializer.Emojis.Count);
-
-            foreach (Emoji emoji in EmojiInitializer.Emojis)
+            List<EmojiElement> elements = [];
+            foreach (var emoji in EmojiInitializer.Emojis)
             {
-                EmojiElement element = new(emoji);
+                var element = new EmojiElement(emoji);
                 items.Add(element);
-                list.Add(element);
-                //elements.Add(new EmojiElement(emoji));
+                //list.Add(element);
+                elements.Add(element);
             }
-
-            //list.AddRange(elements);
-
-            Log.Info($"end");
+            list.AddRange(elements);
 
             SetSelectedIndex(0);
         }
@@ -44,27 +43,22 @@ namespace AdvancedChatFeatures.UI.Emojis
         public override void SetSelectedIndex(int index)
         {
             base.SetSelectedIndex(index);
+            // No ghost text & do not write into chat while navigating with arrows
         }
-
-        // Holding keys
-        private double repeatTimer;
-        private Keys heldKey = Keys.None;
 
         public override void Update(GameTime gt)
         {
             base.Update(gt);
 
-            if (JustPressed(Keys.Tab) || Main.keyState.IsKeyDown(Keys.Tab))
+            // Handle Tab once per frame
+            if (JustPressed(Keys.Tab))
+            {
+                HandleTabKeyPressed();
+                repeatTimer = 0.55;
+                heldKey = Keys.Tab;
+            }
 
-                // Tap key
-                if (JustPressed(Keys.Tab))
-                {
-                    HandleTabKeyPressed();
-                    repeatTimer = 0.55;
-                    heldKey = Keys.Tab;
-                }
-
-            // Hold key
+            // Key-hold repeat for Tab
             double dt = gt.ElapsedGameTime.TotalSeconds;
             if (Main.keyState.IsKeyDown(heldKey))
             {
@@ -72,9 +66,112 @@ namespace AdvancedChatFeatures.UI.Emojis
                 if (repeatTimer <= 0)
                 {
                     repeatTimer += 0.06; // repeat speed
-                    if (Main.keyState.IsKeyDown(Keys.Tab)) HandleTabKeyPressed();
+                    if (Main.keyState.IsKeyDown(Keys.Tab))
+                        HandleTabKeyPressed();
                 }
             }
+            else
+            {
+                heldKey = Keys.None;
+            }
+
+            // Re-filter whenever chat text changes (covers holding Backspace)
+            string text = Main.chatText ?? string.Empty;
+            if (!string.Equals(text, _lastChatText, StringComparison.Ordinal))
+            {
+                _lastChatText = text;
+
+                // Skip filtering while arrow keys are held (navigation updates selection)
+                bool navigating = Main.keyState.IsKeyDown(Keys.Up) || Main.keyState.IsKeyDown(Keys.Down) || Main.keyState.IsKeyDown(Keys.Tab);
+                if (!navigating)
+                    ApplyFilter();
+            }
+        }
+
+        private static string GetEmojiQueryFromChat(string chat)
+        {
+            if (string.IsNullOrEmpty(chat)) return string.Empty;
+
+            // If user is typing an emoji token starting with ':', take what follows the last ':'.
+            // This lets ":sm" filter for "smile", and "hello :sm" also work on the last token.
+            int lastColon = chat.LastIndexOf(':');
+            if (lastColon >= 0)
+                return chat[(lastColon + 1)..]; // text after the last ':'
+
+            // Otherwise, no explicit token – return empty to show all
+            return string.Empty;
+        }
+
+        private void ApplyFilter()
+        {
+            string chat = Main.chatText ?? string.Empty;
+            string query = GetEmojiQueryFromChat(chat);
+            string q = query.Trim();
+            bool hasQuery = q.Length > 0;
+
+            items.Clear();
+            list.Clear();
+
+            if (!hasQuery)
+            {
+                // No query: show all
+                List<EmojiElement> elements = [];
+                foreach (var emoji in EmojiInitializer.Emojis)
+                {
+                    var element = new EmojiElement(emoji);
+                    items.Add(element);
+                    //list.Add(element);
+                    elements.Add(element);
+                }
+                list.AddRange(elements);
+
+                if (items.Count > 0) SetSelectedIndex(0);
+                return;
+            }
+
+            // Normalize query for matching against DisplayName and Tag (without colons)
+            string qLower = q.ToLowerInvariant();
+
+            // 1) Prefix matches first
+            foreach (var emoji in EmojiInitializer.Emojis)
+            {
+                string name = emoji.DisplayName ?? "";
+                string nameLower = name.ToLowerInvariant();
+                string tagNameLower = (emoji.Tag ?? "").Trim(':').ToLowerInvariant();
+
+                List<EmojiElement> elements = [];
+
+                if (nameLower.StartsWith(qLower) || tagNameLower.StartsWith(qLower))
+                {
+                    var e = new EmojiElement(emoji);
+                    items.Add(e);
+                    //list.Add(e);
+                    elements.Add(e);
+                }
+                list.AddRange(elements);
+            }
+
+            // 2) Contains matches next (exclude already added)
+            foreach (var emoji in EmojiInitializer.Emojis)
+            {
+                if (items.Any(x => ((EmojiElement)x).Emoji == emoji)) continue;
+
+                string name = emoji.DisplayName ?? "";
+                string nameLower = name.ToLowerInvariant();
+                string tagNameLower = (emoji.Tag ?? "").Trim(':').ToLowerInvariant();
+
+                if (nameLower.Contains(qLower) || tagNameLower.Contains(qLower))
+                {
+                    var e = new EmojiElement(emoji);
+                    items.Add(e);
+                    list.Add(e);
+                }
+            }
+
+            if (items.Count > 0)
+                SetSelectedIndex(0);
+            else
+                currentIndex = 0;
         }
 
         private void HandleTabKeyPressed()
@@ -84,9 +181,9 @@ namespace AdvancedChatFeatures.UI.Emojis
                 var current = (EmojiElement)items[currentIndex];
 
                 if (Main.chatText.Length <= 3)
-                    Main.chatText = current.Emoji.Tag; // "[e:0]"
+                    Main.chatText = current.Emoji.Tag; // "[g:0]"
                 else
-                    Main.chatText += current.Emoji.Tag; // "[e:0]"
+                    Main.chatText += current.Emoji.Tag; // "[g:0]"
             }
         }
     }

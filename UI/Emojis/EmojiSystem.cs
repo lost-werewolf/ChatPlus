@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.UI.Commands;
 using Microsoft.Xna.Framework;
@@ -60,14 +61,14 @@ namespace AdvancedChatFeatures.UI.Emojis
                 return;
 
             string text = Main.chatText ?? string.Empty;
-            bool startsWithEmoji = text.StartsWith("[e", System.StringComparison.OrdinalIgnoreCase) ||
-                       text.StartsWith("[emoji", System.StringComparison.OrdinalIgnoreCase);
+            bool typingEmoji = IsTypingEmojiTag(text);
 
-            if (startsWithEmoji && Main.drawingPlayerChat)
+            if (typingEmoji && Main.drawingPlayerChat)
             {
                 if (ui.CurrentState != emojiState)
                 {
                     ui.SetState(emojiState);
+                    // populate only when opening to avoid perf hits
                     emojiState.emojiPanel.PopulateEmojiPanel();
                 }
                 ui.Update(gameTime);
@@ -77,6 +78,27 @@ namespace AdvancedChatFeatures.UI.Emojis
                 if (ui.CurrentState != null)
                     ui.SetState(null);
             }
+        }
+
+        // Opens when the *last* '[' begins an emoji tag and there's no closing ']'
+        private static bool IsTypingEmojiTag(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return false;
+
+            int i = text.LastIndexOf('[');
+            if (i < 0)
+                return false;
+
+            // Substring from last '[' to end
+            string tail = text.Substring(i);
+            // If there's a closing bracket after it, tag is complete -> don't open
+            if (tail.IndexOf(']') >= 0)
+                return false;
+
+            // Case-insensitive check for "[e" or "[emoji"
+            return tail.StartsWith("[e", StringComparison.OrdinalIgnoreCase)
+                || tail.StartsWith("[emoji", StringComparison.OrdinalIgnoreCase);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

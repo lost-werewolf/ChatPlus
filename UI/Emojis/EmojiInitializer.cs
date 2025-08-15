@@ -66,7 +66,7 @@ namespace AdvancedChatFeatures.UI.Emojis
         {
             Emojis.Clear();
 
-            Log.Info("Initializing emojis... (1/3)");
+            Log.Info("[start] Initializing emojis...");
 
             foreach (string file in Mod.GetFileNames())
             {
@@ -79,7 +79,7 @@ namespace AdvancedChatFeatures.UI.Emojis
 
                 // Accept rawimg/png/xnb
                 string ext = file[(dot + 1)..].ToLowerInvariant();
-                if (ext != "rawimg" && ext != "png" && ext != "xnb")
+                if (ext != "rawimg")
                     continue;
 
                 string noExt = file[..dot];
@@ -101,7 +101,6 @@ namespace AdvancedChatFeatures.UI.Emojis
                     foreach (var syn in synonyms)
                         EmojiTagHandler.RegisterEmoji(syn, texturePath);
                 }
-                Log.Info("Initializing emojis... (1/3)");
 
                 Emojis.Add(new Emoji
                 {
@@ -114,7 +113,7 @@ namespace AdvancedChatFeatures.UI.Emojis
             // Sort alphabetically by display name
             Emojis.Sort((a, b) => string.Compare(a.DisplayName, b.DisplayName, StringComparison.OrdinalIgnoreCase));
 
-            Log.Info($"Initializing emojis... (3/3). Indexed {Emojis.Count} emojis.");
+            Log.Info($"[end] Initializing emojis Indexed {Emojis.Count} emojis.");
         }
     }
 }
