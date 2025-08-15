@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 using AdvancedChatFeatures.Helpers;
-using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
@@ -14,20 +14,9 @@ namespace AdvancedChatFeatures.UI.Emojis
         public static List<Emoji> Emojis { get; private set; } = new();
         public static Dictionary<string, List<string>> EmojiMap { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
 
-        private static bool registered;
         public override void Load()
         {
-            // Register tag handler once
-            if (!registered)
-            {
-                ChatManager.Register<EmojiTagHandler>(["e", "emoji"]);
-                registered = true;
-            }
-            EmojiTagHandler.ClearRegistry();
-        }
-
-        public override void PostSetupContent()
-        {
+            ChatManager.Register<EmojiTagHandler>(["e", "emoji"]);
             InitializeEmojiMap();
             InitializeEmojis();
         }
@@ -64,7 +53,7 @@ namespace AdvancedChatFeatures.UI.Emojis
                         EmojiMap[kv.Key] = list;
                 }
 
-                Log.Info($"[EmojiInitializer] Loaded {EmojiMap.Count} emoji entries from emojibase.raw.json");
+                Log.Info($"Loaded {EmojiMap.Count} emoji entries from emojibase.raw.json");
             }
             catch (Exception ex)
             {
@@ -76,7 +65,6 @@ namespace AdvancedChatFeatures.UI.Emojis
         private void InitializeEmojis()
         {
             Emojis.Clear();
-            string modName = Mod.Name;
 
             foreach (string file in Mod.GetFileNames())
             {
@@ -87,23 +75,37 @@ namespace AdvancedChatFeatures.UI.Emojis
                 if (dot < 0)
                     continue;
 
+                // Accept rawimg/png/xnb
                 string ext = file[(dot + 1)..].ToLowerInvariant();
-                if (ext != "rawimg")
+                if (ext != "rawimg" && ext != "png" && ext != "xnb")
                     continue;
 
-                string noExt = file[..dot]; // without extension
-                string codepoint = noExt["Assets/Emojis/".Length..]; // e.g. "1F469-1F3FB-200D-1F9AF"
+                string noExt = file[..dot];
+                string codepoint = Path.GetFileNameWithoutExtension(file);
 
-                // Find display name from EmojiMap, fall back to codepoint
+                // Resolve display name from map, fallback to codepoint
                 string displayName = codepoint;
                 if (EmojiMap.TryGetValue(codepoint, out var tags) && tags.Count > 0)
-                    displayName = tags[0]; // take first tag as the name
+                    displayName = tags[0];
 
+                // ModContent asset path must include mod name prefix and omit extension
+                string texturePath = $"{Mod.Name}/{noExt}";
+
+                bool registered = EmojiTagHandler.RegisterEmoji(displayName, texturePath);
+
+                // Also register all synonyms (if present) to the same texture
+                if (EmojiMap.TryGetValue(codepoint, out var synonyms))
+                {
+                    foreach (var syn in synonyms)
+                        EmojiTagHandler.RegisterEmoji(syn, texturePath);
+                }
+
+                // Track for UI panel
                 Emojis.Add(new Emoji
                 {
-                    FilePath = $"{modName}/{noExt}",
+                    FilePath = texturePath,
                     DisplayName = displayName,
-                    Tag = EmojiTagHandler.GenerateTag(displayName)
+                    Tag = EmojiTagHandler.GenerateTag(displayName) // [e:displayName]
                 });
             }
 

@@ -78,8 +78,11 @@ namespace AdvancedChatFeatures.UI.Emojis
         {
             // 'text' is the key after the colon in [e:key]
             var key = text?.Trim();
+
+            Main.NewText(Registry.Count);
+
             if (string.IsNullOrEmpty(key) || !Registry.TryGetValue(key, out var asset))
-                return new TextSnippet($":{text}:"); // fallback as plain text
+                return new TextSnippet($":{text}"); // fallback as plain text
 
             // 20px “em square” baseline; scales with chat text scale
             return new EmojiSnippet(asset, basePx: 20f)

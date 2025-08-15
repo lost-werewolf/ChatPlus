@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.UI.Glyphs;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.UI;
 
@@ -44,9 +46,48 @@ namespace AdvancedChatFeatures.UI.Emojis
             base.SetSelectedIndex(index);
         }
 
+        // Holding keys
+        private double repeatTimer;
+        private Keys heldKey = Keys.None;
+
         public override void Update(GameTime gt)
         {
             base.Update(gt);
+
+            if (JustPressed(Keys.Tab) || Main.keyState.IsKeyDown(Keys.Tab))
+
+                // Tap key
+                if (JustPressed(Keys.Tab))
+                {
+                    HandleTabKeyPressed();
+                    repeatTimer = 0.55;
+                    heldKey = Keys.Tab;
+                }
+
+            // Hold key
+            double dt = gt.ElapsedGameTime.TotalSeconds;
+            if (Main.keyState.IsKeyDown(heldKey))
+            {
+                repeatTimer -= dt;
+                if (repeatTimer <= 0)
+                {
+                    repeatTimer += 0.06; // repeat speed
+                    if (Main.keyState.IsKeyDown(Keys.Tab)) HandleTabKeyPressed();
+                }
+            }
+        }
+
+        private void HandleTabKeyPressed()
+        {
+            if (items.Count > 0 && currentIndex >= 0 && currentIndex <= items.Count)
+            {
+                var current = (EmojiElement)items[currentIndex];
+
+                if (Main.chatText.Length <= 3)
+                    Main.chatText = current.Emoji.Tag; // "[e:0]"
+                else
+                    Main.chatText += current.Emoji.Tag; // "[e:0]"
+            }
         }
     }
 }
