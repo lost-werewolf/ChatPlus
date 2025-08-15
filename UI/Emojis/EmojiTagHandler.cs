@@ -1,111 +1,94 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using ReLogic.Graphics;
+using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.UI.Emojis
 {
-    public class EmojiTagHandler : ITagHandler
+    // Use in text as: [e:key] or [emoji:key]
+    public sealed class EmojiTagHandler : ITagHandler
     {
-        private const string DefaultModName = "AdvancedChatFeatures";
-
-        public static float EmojiScale = 1f;
-
-        // Tiny cache so we don't request the same texture repeatedly
-        private static readonly Dictionary<string, Texture2D> cache = new();
-
-        private static string ResolvePath(string key)
+        private class EmojiSnippet : TextSnippet
         {
-            if (string.IsNullOrWhiteSpace(key))
-                return null;
+            private readonly Asset<Texture2D> _asset;
+            private readonly float _basePx;
 
-            string k = key.Trim();
-
-            // Remove common extensions if present
-            int dot = k.LastIndexOf('.');
-            if (dot >= 0 && dot > k.LastIndexOf('/'))
+            public EmojiSnippet(Asset<Texture2D> asset, float basePx)
             {
-                string ext = k.Substring(dot + 1).ToLowerInvariant();
-                if (ext == "png" || ext == "rawimg" || ext == "xnb")
-                    k = k.Substring(0, dot);
-            }
-
-            // If key already looks fully qualified, use it verbatim
-            // e.g., "AdvancedChatFeatures/Assets/Emojis/face_smile"
-            if (k.Contains('/'))
-            {
-                // Allow "Assets/Emojis/face" too; prefix mod name if missing
-                if (!k.StartsWith(DefaultModName + "/", StringComparison.OrdinalIgnoreCase) &&
-                    k.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase))
-                {
-                    return DefaultModName + "/" + k;
-                }
-                return k;
-            }
-
-            // Short form: just the emoji name
-            // -> "AdvancedChatFeatures/Assets/Emojis/{name}"
-            return $"{DefaultModName}/Assets/Emojis/{k}";
-        }
-
-        private static bool TryGetTexture(string path, out Texture2D texture)
-        {
-            if (cache.TryGetValue(path, out texture))
-                return true;
-
-            if (!ModContent.HasAsset(path))
-                return false;
-
-            Asset<Texture2D> asset = ModContent.Request<Texture2D>(path, AssetRequestMode.ImmediateLoad);
-            texture = asset.Value;
-            cache[path] = texture;
-            return true;
-        }
-
-        private sealed class EmojiSnippet : TextSnippet
-        {
-            private readonly Texture2D texture;
-            private readonly float scale;
-
-            public EmojiSnippet(Texture2D texture, float scale)
-            {
-                this.texture = texture;
-                this.scale = scale;
+                _asset = asset;
+                _basePx = basePx;
                 Color = Color.White;
+                DeleteWhole = true;
             }
 
             public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch spriteBatch, Vector2 position = default, Color color = default, float scale = 1f)
             {
-                float finalScale = this.scale * scale;
-                if (!justCheckingString && color != Color.Black)
-                {
-                    spriteBatch.Draw(texture, position, null, color, 0f, Vector2.Zero, finalScale, SpriteEffects.None, 0f);
-                }
+                Main.NewText("ab");
+                float px = _basePx * scale * EmojiScale;
+                size = new Vector2(px, px);
 
-                size = new Vector2(texture.Width, texture.Height) * finalScale;
+                if (justCheckingString || color == Color.Black)
+                    return true;
+
+                var tex = _asset?.Value;
+                if (tex == null || tex.Width == 0 || tex.Height == 0)
+                    return true;
+
+                float s = px / Math.Max(tex.Width, tex.Height);
+                spriteBatch.Draw(tex, position, null, color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
                 return true;
             }
 
-            public override float GetStringLength(DynamicSpriteFont font) => texture.Width * scale;
+            public override float GetStringLength(DynamicSpriteFont font)
+            {
+                return _basePx * EmojiScale;
+            }
+        }
+
+        public static float EmojiScale = 1f;
+
+        private static readonly Dictionary<string, Asset<Texture2D>> Registry = new(StringComparer.OrdinalIgnoreCase);
+
+        public static void ClearRegistry()
+        {
+            Registry.Clear();
+        }
+
+        public static bool RegisterEmoji(string key, string texturePath)
+        {
+            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(texturePath))
+                return false;
+
+            if (!ModContent.RequestIfExists<Texture2D>(texturePath, out var asset, AssetRequestMode.ImmediateLoad))
+            {
+                Log.Error($"EmojiTagHandler: texture not found '{texturePath}' for key '{key}'");
+                return false;
+            }
+
+            Registry[key] = asset;
+            return true;
         }
 
         TextSnippet ITagHandler.Parse(string text, Color baseColor, string options)
         {
-            string path = ResolvePath(text);
-            if (path == null || !TryGetTexture(path, out var tex))
-                return new TextSnippet(text); // fall back to literal text if not found
+            // 'text' is the key after the colon in [e:key]
+            var key = text?.Trim();
+            if (string.IsNullOrEmpty(key) || !Registry.TryGetValue(key, out var asset))
+                return new TextSnippet($":{text}:"); // fallback as plain text
 
-            return new EmojiSnippet(tex, EmojiScale)
+            // 20px “em square” baseline; scales with chat text scale
+            return new EmojiSnippet(asset, basePx: 20f)
             {
-                DeleteWhole = true,
-                Text = $"[emoji:{text}]"
+                Text = $"[e:{key}]",
+                Color = Color.White
             };
         }
 
-        public static string GenerateTag(string key) => $"[emoji:{key}]";
+        public static string GenerateTag(string key) => $"[e:{key}]";
     }
 }

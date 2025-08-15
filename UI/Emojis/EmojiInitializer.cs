@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Text.Json;
 using AdvancedChatFeatures.Helpers;
-using Terraria;
+using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
+using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.UI.Emojis
 {
@@ -13,6 +13,18 @@ namespace AdvancedChatFeatures.UI.Emojis
     {
         public static List<Emoji> Emojis { get; private set; } = new();
         public static Dictionary<string, List<string>> EmojiMap { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
+
+        private static bool registered;
+        public override void Load()
+        {
+            // Register tag handler once
+            if (!registered)
+            {
+                ChatManager.Register<EmojiTagHandler>(["e", "emoji"]);
+                registered = true;
+            }
+            EmojiTagHandler.ClearRegistry();
+        }
 
         public override void PostSetupContent()
         {
@@ -64,7 +76,6 @@ namespace AdvancedChatFeatures.UI.Emojis
         private void InitializeEmojis()
         {
             Emojis.Clear();
-            int total = 0;
             string modName = Mod.Name;
 
             foreach (string file in Mod.GetFileNames())
@@ -92,16 +103,14 @@ namespace AdvancedChatFeatures.UI.Emojis
                 {
                     FilePath = $"{modName}/{noExt}",
                     DisplayName = displayName,
-                    Tag = $":{displayName}:"
+                    Tag = EmojiTagHandler.GenerateTag(displayName)
                 });
-
-                total++;
             }
 
             // Sort alphabetically by display name
             Emojis.Sort((a, b) => string.Compare(a.DisplayName, b.DisplayName, StringComparison.OrdinalIgnoreCase));
 
-            Log.Info($"Indexed {total} emojis (sorted).");
+            Log.Info($"Indexed {Emojis.Count} emojis.");
         }
     }
 }

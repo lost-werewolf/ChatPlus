@@ -17,9 +17,10 @@ namespace AdvancedChatFeatures.UI.Emojis
         {
             Emoji = emoji;
             image = new(emoji.FilePath);
-            text = new(emoji.DisplayName)
+            text = new(emoji.DisplayName, 1.0f, false)
             {
-                Left = { Pixels = 32 }
+                Left = { Pixels = 32 },
+                VAlign = 0.5f,
             };
 
             Append(image);
@@ -29,18 +30,29 @@ namespace AdvancedChatFeatures.UI.Emojis
         public override void LeftClick(UIMouseEvent evt)
         {
             base.LeftClick(evt);
-            Main.chatText = Emoji.FilePath; // Paste emoji tag into chat
+
+
+            // Insert tag into chat
+            string tag = Emoji.Tag ?? "";
+            if (string.IsNullOrEmpty(tag)) return;
+
+            string chat = Main.chatText ?? string.Empty;
+            int colon = chat.LastIndexOf(':');
+            if (colon >= 0)
+                Main.chatText = chat[..colon] + tag + " ";
+            else
+                Main.chatText = chat + tag + " ";
         }
 
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
 
-            text.VAlign = 0.5f;
+            text.VAlign = 0.45f;
 
             if (IsMouseHovering && !string.IsNullOrEmpty(Emoji.Tag))
             {
-                UICommon.TooltipMouseText(Emoji.DisplayName);
+                UICommon.TooltipMouseText(Emoji.Tag);
             }
         }
     }

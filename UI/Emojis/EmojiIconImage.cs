@@ -19,11 +19,12 @@ namespace AdvancedChatFeatures.UI.Emojis
             this.filePath = filePath;
             Width.Set(24, 0);
             Height.Set(24, 0);
+            Top.Set(4, 0);
+            Left.Set(4, 0);
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Top.Set(4, 0);
-            Left.Set(4, 0);
+            Top.Set(2, 0);
 
             if (!requested)
             {
