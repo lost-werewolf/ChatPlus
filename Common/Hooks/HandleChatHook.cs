@@ -1,4 +1,5 @@
 ﻿using System;
+using AdvancedChatFeatures.Common.Configs;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
 using Terraria;
@@ -54,12 +55,24 @@ namespace AdvancedChatFeatures.Common.Hooks
         private void DoUpdate_HandleChat(On_Main.orig_DoUpdate_HandleChat orig)
         {
             orig();
+
+            if (!Conf.C.featureConfig.EnableBetterChatNavigation)
+                return;
+
             if (!Main.drawingPlayerChat) { caretPos = 0; selectAll = false; }
             else if (caretPos > Main.chatText.Length) caretPos = Main.chatText.Length;
         }
 
         private string GetInputText(On_Main.orig_GetInputText orig, string oldString, bool allowMultiLine = false)
         {
+            if (!Main.drawingPlayerChat)
+            {
+                return orig(oldString, allowMultiLine);
+            }
+
+            if (!Conf.C.featureConfig.EnableBetterChatNavigation)
+                return orig(oldString, allowMultiLine);
+
             Main.inputTextEnter = false;
             Main.instance.HandleIME();
 
@@ -199,14 +212,21 @@ namespace AdvancedChatFeatures.Common.Hooks
                 _leftArrowHoldFrames++;
                 if (_leftArrowHoldFrames == 1 || (_leftArrowHoldFrames > 35 && _leftArrowHoldFrames % 2 == 0))
                 {
-                    if (caretPos > 0)
+                    var sel = GetSelection();
+                    if (sel != null && !shift)
+                    {
+                        // Collapse selection → move caret to start
+                        caretPos = sel.Value.start;
+                        selectionAnchor = -1;
+                    }
+                    else if (caretPos > 0)
                     {
                         int oldCaret = caretPos;
                         caretPos = ctrl ? MoveCaretWordLeft(caretPos, Main.chatText) : caretPos - 1;
 
                         if (shift)
                         {
-                            if (selectionAnchor == -1) selectionAnchor = oldCaret; // anchor stays at starting point
+                            if (selectionAnchor == -1) selectionAnchor = oldCaret;
                         }
                         else selectionAnchor = -1;
                     }
@@ -219,14 +239,21 @@ namespace AdvancedChatFeatures.Common.Hooks
                 _rightArrowHoldFrames++;
                 if (_rightArrowHoldFrames == 1 || (_rightArrowHoldFrames > 35 && _rightArrowHoldFrames % 2 == 0))
                 {
-                    if (caretPos < Main.chatText.Length)
+                    var sel = GetSelection();
+                    if (sel != null && !shift)
+                    {
+                        // Collapse selection → move caret to end
+                        caretPos = sel.Value.end;
+                        selectionAnchor = -1;
+                    }
+                    else if (caretPos < Main.chatText.Length)
                     {
                         int oldCaret = caretPos;
                         caretPos = ctrl ? MoveCaretWordRight(caretPos, Main.chatText) : caretPos + 1;
 
                         if (shift)
                         {
-                            if (selectionAnchor == -1) selectionAnchor = oldCaret; // anchor stays fixed
+                            if (selectionAnchor == -1) selectionAnchor = oldCaret;
                         }
                         else selectionAnchor = -1;
                     }

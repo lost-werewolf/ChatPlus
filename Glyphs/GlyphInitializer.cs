@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.UI.Glyphs
+namespace AdvancedChatFeatures.Glyphs
 {
     internal class GlyphInitializer : ModSystem
     {

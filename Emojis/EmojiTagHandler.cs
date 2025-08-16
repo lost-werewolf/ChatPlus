@@ -67,7 +67,8 @@ namespace AdvancedChatFeatures.Emojis
             var key = text?.Trim();
 
             if (string.IsNullOrEmpty(key) || !Registry.TryGetValue(key, out var asset))
-                return new TextSnippet($"{text}"); // fallback as plain text
+                //return new TextSnippet($"{text}"); // fallback as plain text
+                return new TextSnippet(""); // remove input if user entered non-existant emoji
 
             return new EmojiSnippet(asset, basePx: 20f)
             {

@@ -1,8 +1,8 @@
 ﻿using System;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Emojis;
+using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI.Glyphs;
 using MonoMod.Cil;
 using Terraria;
 using Terraria.GameContent.UI.Chat;

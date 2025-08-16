@@ -105,13 +105,13 @@ namespace AdvancedChatFeatures.Emojis
                 Emojis.Add(new Emoji
                 {
                     FilePath = texturePath,
-                    DisplayName = displayName,
+                    Description = displayName,
                     Tag = EmojiTagHandler.GenerateTag(displayName) // [e:displayName]
                 });
             }
 
             // Sort alphabetically by display name
-            Emojis.Sort((a, b) => string.Compare(a.DisplayName, b.DisplayName, StringComparison.OrdinalIgnoreCase));
+            Emojis.Sort((a, b) => string.Compare(a.Description, b.Description, StringComparison.OrdinalIgnoreCase));
 
             Log.Info($"[end] Indexed {Emojis.Count} emojis.");
         }

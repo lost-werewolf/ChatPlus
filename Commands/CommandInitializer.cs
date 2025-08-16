@@ -12,7 +12,7 @@ namespace AdvancedChatFeatures.Commands
     {
         public static List<Command> Commands { get; private set; } = [];
 
-        public override void PostSetupContent()
+        public override void Load()
         {
             Commands.Clear();
 

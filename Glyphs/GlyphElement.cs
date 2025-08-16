@@ -1,14 +1,15 @@
+using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.UI.Glyphs
+namespace AdvancedChatFeatures.Glyphs
 {
-    public class GlyphElement : NavigationElement
+    public class GlyphElement : NavigationElement<Glyph>
     {
         public Glyph Glyph;
-        public GlyphElement(Glyph glyph)
+        public GlyphElement(Glyph glyph) : base(glyph)
         {
             Glyph = glyph;
             Height.Set(30, 0);
@@ -28,7 +29,7 @@ namespace AdvancedChatFeatures.UI.Glyphs
                 sb,
                 FontAssets.MouseText.Value,
                 tag,
-                pos + new Vector2(0, 0),
+                pos + new Vector2(3, 2),
                 Color.White,
                 0f,
                 Vector2.Zero,

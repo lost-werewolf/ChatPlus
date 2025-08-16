@@ -1,18 +1,19 @@
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
+using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.Emojis
 {
-    public class EmojiElement : NavigationElement
+    public class EmojiElement : NavigationElement<Emoji>
     {
         public Emoji Emoji;
 
         private UIText text;
         private EmojiIconImage image;
-
-        public EmojiElement(Emoji emoji)
+        public EmojiElement(Emoji emoji) : base(emoji)
         {
             Emoji = emoji;
             image = new(emoji.FilePath);
@@ -23,7 +24,7 @@ namespace AdvancedChatFeatures.Emojis
             };
 
             Append(image);
-            Append(text);
+            //Append(text);
         }
 
         public override void LeftClick(UIMouseEvent evt)
@@ -34,6 +35,23 @@ namespace AdvancedChatFeatures.Emojis
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
+
+            if (text != null) RemoveChild(text);
+
+            var dims = GetDimensions();
+            Vector2 pos = dims.Position();
+
+            var nameSnips = new[] { new TextSnippet(Emoji.Tag.ToString()) { Color = Color.White, CheckForHover = false } };
+            ChatManager.DrawColorCodedStringWithShadow(
+                sb,
+                FontAssets.MouseText.Value,
+                nameSnips,
+                pos + new Vector2(32, 3),
+                0f,
+                Vector2.Zero,
+                new Vector2(1.0f),
+                out _
+            );
 
             text.VAlign = 0.45f;
         }

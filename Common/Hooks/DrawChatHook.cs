@@ -27,8 +27,8 @@ namespace AdvancedChatFeatures.Common.Hooks
         {
             if (!Conf.C.featureConfig.EnableBetterChatNavigation)
             {
-                //orig(self); 
-                //return;
+                orig(self);
+                return;
             }
             
             if (Main.drawingPlayerChat)
@@ -115,7 +115,7 @@ namespace AdvancedChatFeatures.Common.Hooks
             // Draw thick caret
             if (HandleChatHook.GetSelection() == null && Main.instance.textBlinkerState == 1)
             {
-                int caretX = 88 + (int)beforeSize.X;
+                int caretX = 88 + (int)beforeSize.X + 1;
                 int caretY = Main.screenHeight - height;
 
                 if (pos == 0)

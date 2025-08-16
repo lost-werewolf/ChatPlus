@@ -182,6 +182,29 @@ namespace AdvancedChatFeatures.Common.Configs
                 emojiState.RemoveChild(emojiState.emojiDescriptionPanel);
         }
 
+        private void UpdateGlyphSystem()
+        {
+            // Update state
+            CommandSystem commandSystem = ModContent.GetInstance<CommandSystem>();
+            CommandState commandState = commandSystem.commandState;
+            if (Conf.C.featureConfig.EnableCommands)
+            {
+                if (commandSystem.ui?.CurrentState != commandState)
+                    commandSystem.ui?.SetState(commandState);
+            }
+            else
+            {
+                commandSystem.ui?.SetState(null);
+                return;
+            }
+
+            // Update usage panel
+            if (Conf.C.featureStyleConfig.ShowDescriptionPanel && !commandState.HasChild(commandState.commandDescriptionPanel))
+                commandState.Append(commandState.commandDescriptionPanel);
+            else if (commandState.HasChild(commandState.commandDescriptionPanel) && !Conf.C.featureStyleConfig.ShowDescriptionPanel)
+                commandState.RemoveChild(commandState.commandDescriptionPanel);
+        }
+
         private void UpdateDrawConfigSystem()
         {
             // Update the ConfigSystem

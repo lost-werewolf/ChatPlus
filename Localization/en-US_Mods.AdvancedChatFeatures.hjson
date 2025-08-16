@@ -75,6 +75,19 @@ Configs: {
 		}
 
 		Tooltip: ""
+
+		EnableBetterChatNavigation: {
+			Label: Enable Better Input Handling
+			Tooltip:
+				'''
+				Fast shortcuts to improve chat navigation:
+				←/→ to move cursor
+				Shift + ←/→ to select characters
+				Ctrl + C to copy
+				Ctrl + V to paste
+				Ctrl + Shift + ←/→ to select words
+				'''
+		}
 	}
 
 	StyleConfig: {

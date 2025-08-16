@@ -13,8 +13,11 @@ namespace AdvancedChatFeatures.Commands
         protected override IEnumerable<Command> GetSource()
             => CommandInitializer.Commands;
 
-        protected override NavigationElement BuildElement(Command data)
+        protected override NavigationElement<Command> BuildElement(Command data)
             => new CommandElement(data);
+
+        protected override string GetDescription(Command data)
+            => data.Description;
 
         public override void Draw(SpriteBatch sb)
         {
@@ -33,6 +36,9 @@ namespace AdvancedChatFeatures.Commands
 
         public override void Update(GameTime gt)
         {
+            if (items.Count == 0)
+            PopulatePanel();
+
             base.Update(gt);
         }
     }

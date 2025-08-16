@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
@@ -18,11 +18,12 @@ namespace AdvancedChatFeatures.UI
         // Elements
         public readonly UIScrollbar scrollbar;
         protected UIList list;
-        protected readonly List<NavigationElement> items = [];
+        protected readonly List<NavigationElement<TData>> items = [];
 
         // Force populate
         protected abstract IEnumerable<TData> GetSource(); // The source of data to populate the panel with
-        protected abstract NavigationElement BuildElement(TData data); // The method to create a new element from the data
+        protected abstract NavigationElement<TData> BuildElement(TData data); // The method to create a new element from the data
+        protected abstract string GetDescription(TData data);
 
         // Navigation
         protected int currentIndex = 0; // first item
@@ -77,7 +78,7 @@ namespace AdvancedChatFeatures.UI
             base.LeftClick(evt);
 
             // Deselect all
-            foreach (NavigationElement e in items)
+            foreach (var e in items)
             {
                 e.SetSelected(false);
             }
@@ -90,7 +91,7 @@ namespace AdvancedChatFeatures.UI
 
             // Add all elements
             var source = GetSource();
-            List<NavigationElement> fastList = []; 
+            List<UIElement> fastList = []; 
             if (source != null)
             {
                 foreach (TData data in source)
@@ -125,7 +126,7 @@ namespace AdvancedChatFeatures.UI
             if (index < 0) index = items.Count - 1;
             else if (index >= items.Count) index = 0;
 
-            // set all to false
+            // deselect all
             for (int i = 0; i < items.Count; i++)
                 items[i].SetSelected(false);
 
@@ -150,6 +151,14 @@ namespace AdvancedChatFeatures.UI
             if (view < 0) view = 0;
             if (view > max) view = max;
             list.ViewPosition = view;
+
+            //🔹update description
+            if (ConnectedPanel is DescriptionPanel<TData> desc)
+            {
+                var element = items[currentIndex] as NavigationElement<TData>;
+                if (element != null)
+                    desc.SetTextWithLinebreak(GetDescription(element.Data));
+            }
         }
 
         protected bool JustPressed(Keys key) => Main.keyState.IsKeyDown(key) && Main.oldKeyState.IsKeyUp(key);
@@ -157,8 +166,6 @@ namespace AdvancedChatFeatures.UI
         public override void Update(GameTime gt)
         {
             base.Update(gt);
-
-            Main.NewText(items.Count);
 
             Top.Set(-38, 0);
 

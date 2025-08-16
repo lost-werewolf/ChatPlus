@@ -160,6 +160,7 @@ namespace AdvancedChatFeatures.Common.Configs
             {
                 Main.drawingPlayerChat = true;
                 PlayerInput.WritingText = true;
+                Main.instance.HandleIME();
             }
 
             var dims = GetDimensions();

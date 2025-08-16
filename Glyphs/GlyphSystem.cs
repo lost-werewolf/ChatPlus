@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using AdvancedChatFeatures.Common.Configs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.UI.Glyphs
+namespace AdvancedChatFeatures.Glyphs
 {
     [Autoload(Side = ModSide.Client)]
     public class GlyphSystem : ModSystem

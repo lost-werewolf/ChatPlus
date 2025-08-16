@@ -14,7 +14,7 @@ namespace AdvancedChatFeatures.UI
         private readonly UIText text;
         private NavigationPanel<TData> owner;
 
-        public DescriptionPanel(NavigationPanel<TData> owner, string initialText)
+        public DescriptionPanel(string initialText)
         {
             // Size
             Width.Set(320, 0);
@@ -26,7 +26,6 @@ namespace AdvancedChatFeatures.UI
             // Position
             VAlign = 1f;
             Left.Set(80, 0);
-            ResetText();
 
             text = new(initialText, 0.9f, false);
             Append(text);
@@ -47,12 +46,7 @@ namespace AdvancedChatFeatures.UI
             });
         }
 
-        public void ResetText()
-        {
-            text?.SetText("List of commands\nPress tab to complete");
-        }
-
-        public void UpdateText(string rawText)
+        public void SetTextWithLinebreak(string rawText)
         {
             float scale = 0.9f;
             string tooltip = rawText;
@@ -78,7 +72,12 @@ namespace AdvancedChatFeatures.UI
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            //base.Draw(spriteBatch);
+
+            //Top.Set(Main.screenHeight - Conf.C.featureStyleConfig.ItemsPerWindow * 30, 0);
+
+            Top.Set(-Conf.C.featureStyleConfig.ItemsPerWindow * 30 - 40, 0);
+
+            base.Draw(spriteBatch);
         }
     }
 }

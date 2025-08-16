@@ -9,22 +9,28 @@ namespace AdvancedChatFeatures.UI
     /// <summary>
     /// An element that can be navigated in a <see cref="NavigationPanel"/>.
     /// </summary>
-    public class NavigationElement : UIElement
+    public abstract class NavigationElement<TData> : UIElement
     {
         // Variables
         private bool isSelected;
         public bool SetSelected(bool value) => isSelected = value;
 
-        public NavigationElement()
+        // Properties
+        public TData Data { get; }
+
+        protected NavigationElement(TData data)
         {
             Height.Set(30, 0);
             Width.Set(0, 1);
+            Data = data;
         }
 
         public override void LeftClick(UIMouseEvent evt)
         {
             base.LeftClick(evt);
             SetSelected(true);
+
+
         }
 
         public override void Update(GameTime gameTime)

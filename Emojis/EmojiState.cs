@@ -15,8 +15,11 @@ namespace AdvancedChatFeatures.Emojis
             emojiPanel = new();
             Append(emojiPanel);
 
-            emojiDescriptionPanel = new(owner: emojiPanel, "List of emojis");
+            emojiDescriptionPanel = new("List of emojis");
             Append(emojiDescriptionPanel);
+
+            emojiPanel.ConnectedPanel = emojiDescriptionPanel;
+            emojiDescriptionPanel.ConnectedPanel = emojiPanel;
         }
 
         public override void Draw(SpriteBatch spriteBatch)

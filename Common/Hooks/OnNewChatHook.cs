@@ -1,11 +1,6 @@
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using AdvancedChatFeatures.Common.Configs;
-using AdvancedChatFeatures.Common.Snippets;
 using AdvancedChatFeatures.Helpers;
-using Microsoft.Xna.Framework;
-using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
@@ -30,6 +25,9 @@ namespace AdvancedChatFeatures.Common.Hooks
         private void OnNewChat(On_RemadeChatMonitor.orig_AddNewMessage orig, RemadeChatMonitor self, string text, Color color, int widthLimitInPixels)
         {
             orig(self, text, color, widthLimitInPixels);
+
+            string modName = ModIconSnippet.GetModName();
+            Log.Info("modname(1): " + modName);
 
             var parsedSnippets = ChatManager.ParseMessage(text, color).ToArray();
             if (parsedSnippets.Length < 2)
@@ -63,12 +61,15 @@ namespace AdvancedChatFeatures.Common.Hooks
                 var container = self._messages[0];
                 container._parsedText[0] = parsedSnippets;
             }
-            
+
             // Mod icons
             if (Conf.C.styleConfig.ShowModIcons)
             {
+                string modName2 = ModIconSnippet.GetModName();
+                Log.Info("modname2: " + modName + ", "+ text);
+
                 // Insert mod icon snippet at start
-                var modIconSnippet = new ModIconSnippet(playerName);
+                var modIconSnippet = new ModIconSnippet(modName);
                 var list = parsedSnippets.ToList();
                 list.Insert(0, modIconSnippet);
                 parsedSnippets = list.ToArray();

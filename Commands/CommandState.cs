@@ -13,8 +13,11 @@ namespace AdvancedChatFeatures.Commands
             commandPanel = new();
             Append(commandPanel);
 
-            commandDescriptionPanel = new(owner: commandPanel, "List of commands");
+            commandDescriptionPanel = new("List of commands");
             Append(commandDescriptionPanel);
+
+            commandPanel.ConnectedPanel = commandDescriptionPanel;
+            commandDescriptionPanel.ConnectedPanel = commandPanel;
         }
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader.UI;
 using Terraria.UI;
 
 namespace AdvancedChatFeatures.Commands
@@ -14,13 +13,13 @@ namespace AdvancedChatFeatures.Commands
     /// <summary>
     /// Represents a chat command element in the UI.
     /// </summary>
-    public class CommandElement : NavigationElement
+    public class CommandElement : NavigationElement<Command>
     {
         public Command Command;
         private ModIconImage modIconImage;
         private UIText cmdText;
 
-        public CommandElement(Command command)
+        public CommandElement(Command command) : base(command)
         {
             Command = command;
 

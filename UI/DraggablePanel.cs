@@ -2,7 +2,7 @@
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Emojis;
-using AdvancedChatFeatures.UI.Glyphs;
+using AdvancedChatFeatures.Glyphs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -19,6 +19,11 @@ namespace AdvancedChatFeatures.UI
         private const float DragThreshold = 3f; // very low threshold for dragging
         private Vector2 mouseDownPos;
 
+        /// <summary>
+        /// If set, this panel will drag together with this one.
+        /// </summary>
+        public DraggablePanel ConnectedPanel { get; set; }
+
         public override void Update(GameTime gameTime)
         {
             if (IsMouseHovering)
@@ -29,64 +34,38 @@ namespace AdvancedChatFeatures.UI
                 float dragDistance = Vector2.Distance(new Vector2(Main.mouseX, Main.mouseY), mouseDownPos);
                 if (dragDistance > DragThreshold)
                 {
-                    // Current screen-space rects (before moving)
+                    // Current rect
                     var thisRect = GetDimensions().ToRectangle();
-
                     float oldX = Left.Pixels;
-                    float oldY = Top.Pixels;
 
-                    // Target based on mouse
+                    // Only allow X dragging
                     float targetX = Main.mouseX - dragOffset.X;
-                    float targetY = Main.mouseY - dragOffset.Y;
-
-                    // Raw deltas (in pixels)
                     float rawDx = targetX - oldX;
-                    float rawDy = targetY - oldY;
 
-                    // Allowed movement so THIS panel stays on-screen
                     float dxMin = -thisRect.Left;
                     float dxMax = Main.screenWidth - thisRect.Right;
-                    float dyMin = -thisRect.Top;
-                    float dyMax = Main.screenHeight - thisRect.Bottom;
 
-                    // Find the "other" panel (the one we move together with)
-                    //var sys = ModContent.GetInstance<CommandSystem>();
-                    UIElement other = null;
-                    //if (sys != null)
-                    //{
-                    //    if (this is CommandPanel && sys.commandState?.commandDescriptionPanel != null)
-                    //        other = sys.commandState.commandDescriptionPanel;
-                    //    else if (this is DescriptionPanel && sys.commandState?.commandPanel != null)
-                    //        other = sys.commandState.commandPanel;
-                    //}
-
-                    // Intersect constraints so the OTHER panel also stays on-screen
-                    if (other != null)
+                    // If there’s a connected panel, constrain so it stays onscreen too
+                    if (ConnectedPanel != null)
                     {
-                        var oRect = other.GetDimensions().ToRectangle();
-                        dxMin = Math.Max(dxMin, -oRect.Left);
-                        dxMax = Math.Min(dxMax, Main.screenWidth - oRect.Right);
-                        dyMin = Math.Max(dyMin, -oRect.Top);
-                        dyMax = Math.Min(dyMax, Main.screenHeight - oRect.Bottom);
+                        var otherRect = ConnectedPanel.GetDimensions().ToRectangle();
+                        dxMin = Math.Max(dxMin, -otherRect.Left);
+                        dxMax = Math.Min(dxMax, Main.screenWidth - otherRect.Right);
                     }
 
-                    // Clamp deltas so both panels remain fully within bounds
+                    // Clamp X delta
                     float dx = MathHelper.Clamp(rawDx, dxMin, dxMax);
-                    float dy = MathHelper.Clamp(rawDy, dyMin, dyMax);
 
                     // Apply to this panel
                     float newX = oldX + dx;
-                    float newY = oldY + dy;
                     Left.Set(newX, 0f);
-                    Top.Set(newY, 0f);
                     Recalculate();
 
-                    // Apply the same clamped delta to the paired panel (if any)
-                    if (other != null)
+                    // Apply to connected panel
+                    if (ConnectedPanel != null)
                     {
-                        other.Left.Set(other.Left.Pixels + dx, 0f);
-                        other.Top.Set(other.Top.Pixels + dy, 0f);
-                        other.Recalculate();
+                        ConnectedPanel.Left.Set(ConnectedPanel.Left.Pixels + dx, 0f);
+                        ConnectedPanel.Recalculate();
                     }
                 }
             }
@@ -106,6 +85,9 @@ namespace AdvancedChatFeatures.UI
                 return;
 
             if (cmdSys?.commandState?.commandPanel?.scrollbar?.IsMouseHovering == true)
+                return;
+
+            if (glyphSys?.glyphState?.glyphPanel?.scrollbar?.IsMouseHovering == true)
                 return;
 
             // Start dragging
