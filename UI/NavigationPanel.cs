@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using System.Linq;
 using AdvancedChatFeatures.ColorWindow;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Common.Hooks;
+using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AdvancedChatFeatures.UI
 {
@@ -105,27 +105,76 @@ namespace AdvancedChatFeatures.UI
             items.Clear();
             list.Clear();
 
-            // Add all elements
             var source = GetSource();
-            List<UIElement> fastList = []; 
+            List<UIElement> fastList = new();
+
+            string query = BuildFilterQuery(Main.chatText ?? string.Empty);
+
             if (source != null)
             {
                 foreach (TData data in source)
                 {
+                    // If query is empty → show all
+                    if (!string.IsNullOrWhiteSpace(query))
+                    {
+                        string desc = GetDescription(data) ?? string.Empty;
+                        string tag = GetFullTag(data) ?? string.Empty;
+                        IEnumerable<string> synonyms = (data is Emoji e) ? e.Synonyms : Array.Empty<string>();
+
+                        bool match = desc.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                                     tag.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                                     synonyms.Any(s => s.Contains(query, StringComparison.OrdinalIgnoreCase));
+
+                        if (!match)
+                            continue;
+                    }
+
                     var element = BuildElement(data);
-                    if (element == null) continue;
+                    if (element == null)
+                        continue;
 
                     items.Add(element);
                     fastList.Add(element);
                 }
-                // AddRange is much faster than adding one by one
-                list.AddRange(fastList);
+
+                if (fastList.Count > 0)
+                    list.AddRange(fastList);
             }
 
-            // Reset index to top item
+            // Reset selection
             if (items.Count > 0)
                 SetSelectedIndex(0);
+            else
+                currentIndex = -1;
         }
+
+        private static string BuildFilterQuery(string text)
+        {
+            text = text.Trim();
+
+            // Command-style: "/spawn me" -> "spawn"
+            if (text.StartsWith("/"))
+            {
+                int space = text.IndexOf(' ');
+                return (space > 1 ? text.Substring(1, space - 1) : text.Substring(1)).Trim();
+            }
+
+            // Tag-style: "hello [e:sm" -> "sm"
+            int lb = text.LastIndexOf('[');
+            if (lb >= 0)
+            {
+                string inside = text.Substring(lb + 1); // e.g. "e:sm"
+                int colon = inside.IndexOf(':');
+                if (colon >= 0)
+                    return inside.Substring(colon + 1).Trim();
+
+                return inside.Trim();
+            }
+
+            // Fallback: whole text
+            return text;
+        }
+
 
         public void SetHeight()
         {
@@ -173,7 +222,12 @@ namespace AdvancedChatFeatures.UI
             {
                 var element = items[currentIndex];
                 if (element != null)
-                    desc.SetTextWithLinebreak(GetDescription(element.Data));
+                {
+                    if (element.Data is Emoji emoji && emoji.Synonyms.Count > 0)
+                        desc.SetTextWithLinebreak(string.Join(", ", emoji.Synonyms));
+                    else
+                        desc.SetTextWithLinebreak(GetDescription(element.Data));
+                }
 
                 // set color text if description panel is connected to a color panel
                 if (desc.ConnectedPanel.GetType() == typeof(ColorPanel))
@@ -199,7 +253,22 @@ namespace AdvancedChatFeatures.UI
 
         private void FilterSearch()
         {
+            foreach (Keys key in Enum.GetValues(typeof(Keys)))
+            {
+                if (!JustPressed(key))
+                    continue;
 
+                // skip navigation / control keys
+                if (key == Keys.Up || key == Keys.Down || key == Keys.Left || key == Keys.Right ||
+                    key == Keys.PageUp || key == Keys.PageDown || key == Keys.Home || key == Keys.End ||
+                    key == Keys.Tab || key == Keys.Escape || key == Keys.Enter ||
+                    key == Keys.LeftShift || key == Keys.RightShift ||
+                    key == Keys.LeftControl || key == Keys.RightControl ||
+                    key == Keys.LeftAlt || key == Keys.RightAlt)
+                    return;
+
+                PopulatePanel();
+            }
         }
 
         private void HandleTabComplete()
@@ -219,18 +288,15 @@ namespace AdvancedChatFeatures.UI
             string tag = GetFullTag(current.Data);
             if (string.IsNullOrEmpty(tag)) return;
 
-            string resultingText = Main.chatText;
-
             if (Main.chatText.StartsWith('[') && !Main.chatText.Contains(']'))
-            {
-                Main.chatText = tag; // first tag
-            }
+                Main.chatText = tag;
             else
-            {
                 Main.chatText += tag;
-            }
 
             HandleChatHook.SetCaretPos(Main.chatText.Length);
+
+            // 🔹 reset filter so next emoji search starts fresh
+            PopulatePanel();
         }
 
         private void HandleNavigationKeys(GameTime gt)

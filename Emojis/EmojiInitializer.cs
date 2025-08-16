@@ -66,54 +66,53 @@ namespace AdvancedChatFeatures.Emojis
         {
             Emojis.Clear();
 
+            int indexedCount = 0;
+            int skippedCount = 0;
+
             Log.Info("[start] Initializing emojis...");
 
             foreach (string file in Mod.GetFileNames())
             {
-                if (!file.StartsWith("Assets/Emojis/", StringComparison.OrdinalIgnoreCase))
+                if (!file.StartsWith("Assets/EmojiBase/", StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 int dot = file.LastIndexOf('.');
                 if (dot < 0)
                     continue;
 
-                // Accept rawimg/png/xnb
                 string ext = file[(dot + 1)..].ToLowerInvariant();
                 if (ext != "rawimg")
                     continue;
 
                 string noExt = file[..dot];
-                string codepoint = Path.GetFileNameWithoutExtension(file);
+                string key = Path.GetFileNameWithoutExtension(file);
 
-                // Resolve display name from map, fallback to codepoint
-                string displayName = codepoint;
-                if (EmojiMap.TryGetValue(codepoint, out var tags) && tags.Count > 0)
-                    displayName = tags[0];
+                if (!EmojiMap.TryGetValue(key, out var tags) || tags.Count == 0)
+                {
+                    skippedCount++;
+                    continue;
+                }
 
-                // ModContent asset path must include mod name prefix and omit extension
+                string displayName = tags[0];
                 string texturePath = $"{Mod.Name}/{noExt}";
 
-                bool registered = EmojiTagHandler.RegisterEmoji(displayName, texturePath);
-
-                // Also register all synonyms to the same texture
-                if (EmojiMap.TryGetValue(codepoint, out var synonyms))
-                {
-                    foreach (var syn in synonyms)
-                        EmojiTagHandler.RegisterEmoji(syn, texturePath);
-                }
+                EmojiTagHandler.RegisterEmoji(displayName, texturePath);
+                for (int i = 1; i < tags.Count; i++)
+                    EmojiTagHandler.RegisterEmoji(tags[i], texturePath);
 
                 Emojis.Add(new Emoji
                 {
                     FilePath = texturePath,
                     Description = displayName,
-                    Tag = EmojiTagHandler.GenerateTag(displayName) // [e:displayName]
+                    Tag = EmojiTagHandler.GenerateTag(displayName),
+                    Synonyms = new List<string>(tags)
                 });
+
+                indexedCount++;
             }
 
-            // Sort alphabetically by display name
             Emojis.Sort((a, b) => string.Compare(a.Description, b.Description, StringComparison.OrdinalIgnoreCase));
-
-            Log.Info($"[end] Indexed {Emojis.Count} emojis.");
+            Log.Info($"[end] Indexed {indexedCount} emojis, skipped {skippedCount} files without a JSON mapping");
         }
     }
 }

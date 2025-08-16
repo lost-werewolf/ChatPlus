@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace AdvancedChatFeatures.Emojis
 {
     /// <summary>
@@ -6,5 +8,6 @@ namespace AdvancedChatFeatures.Emojis
     /// <param name="FilePath">e.g "/AdvancedChatFeatures/Assets/Emojis/12345.png"</param> 
     /// <param name="Description"> e.g "happy_face"</param>
     /// <param name="Tag">e.g "[e:happy_face]</param>
-    public readonly record struct Emoji(string FilePath, string Description, string Tag);
+    /// <param name="Synonyms"> A single emoji can have multiple search synonyms </param>
+    public readonly record struct Emoji(string FilePath, string Description, string Tag, List<string> Synonyms);
 }

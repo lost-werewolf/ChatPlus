@@ -1,5 +1,4 @@
 ﻿using System;
-using AdvancedChatFeatures.ColorWindow;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework.Graphics;
@@ -59,7 +58,7 @@ namespace AdvancedChatFeatures.UI
             if (scaledWidth > Width.Pixels)
             {
                 // Estimate the max number of characters that fit
-                int maxChars = (int)(Width.Pixels / scale / textSize.X * tooltip.Length);
+                int maxChars = (int)(Width.Pixels / scale / textSize.X * tooltip.Length) - 2;
                 int breakIndex = tooltip.LastIndexOf(' ', Math.Min(tooltip.Length - 1, maxChars));
                 if (breakIndex > 0)
                 {
@@ -73,8 +72,6 @@ namespace AdvancedChatFeatures.UI
         public override void Draw(SpriteBatch spriteBatch)
         {
             int pad = 2;
-
-            
 
             Top.Set(-Conf.C.featureStyleConfig.ItemsPerWindow * 30 - 38 - pad, 0);
 

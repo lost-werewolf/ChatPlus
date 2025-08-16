@@ -70,10 +70,11 @@ namespace AdvancedChatFeatures.Emojis
             var key = text?.Trim();
 
             if (string.IsNullOrEmpty(key) || !Registry.TryGetValue(key, out var asset))
-                return new TextSnippet($"[e:{text}]"); // fallback as plain text
+                //return new TextSnippet($"[e:{text}]"); // fallback as plain text
                 //return new TextSnippet(""); // remove input if user entered non-existant emoji
+                return new TextSnippet(text); // remove input if user entered non-existant emoji
 
-            return new EmojiSnippet(asset, basePx: 20f)
+                return new EmojiSnippet(asset, basePx: 20f)
             {
                 Text = $"[e:{key}]",
                 Color = Color.White
