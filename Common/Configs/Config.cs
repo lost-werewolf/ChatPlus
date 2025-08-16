@@ -50,6 +50,11 @@ namespace AdvancedChatFeatures.Common.Configs
             [DefaultValue(true)]
             public bool EnableCommands = true;
 
+            [CustomModConfigItem(typeof(EnableColorPicker))]
+            [BackgroundColor(255, 192, 8)] // Golden Yellow
+            [DefaultValue(true)]
+            public bool EnableColorPicker = true;
+
             [CustomModConfigItem(typeof(EnableEmojis))]
             [BackgroundColor(255, 192, 8)] // Golden Yellow
             [DefaultValue(true)]
@@ -64,11 +69,6 @@ namespace AdvancedChatFeatures.Common.Configs
             [BackgroundColor(255, 192, 8)] // Golden Yellow
             [DefaultValue(true)]
             public bool EnableItemBrowser = true;
-
-            [CustomModConfigItem(typeof(EnableColorPicker))]
-            [BackgroundColor(255, 192, 8)] // Golden Yellow
-            [DefaultValue(true)]
-            public bool EnableColorPicker = true;
         }
 
         public class FeatureStyleConfig

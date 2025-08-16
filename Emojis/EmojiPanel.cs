@@ -15,6 +15,9 @@ namespace AdvancedChatFeatures.Emojis
         protected override string GetDescription(Emoji data)
             => data.Description;
 
+        protected override string GetFullTag(Emoji data)
+            => data.Tag;
+
         public override void Update(GameTime gt)
         {
             if (items.Count == 0)

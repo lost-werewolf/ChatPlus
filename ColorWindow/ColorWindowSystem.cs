@@ -1,46 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.Emojis
+namespace AdvancedChatFeatures.ColorWindow
 {
     [Autoload(Side = ModSide.Client)]
-    public class EmojiSystem : ModSystem
+    public class ColorWindowSystem : ModSystem
     {
         public UserInterface ui;
-        public EmojiState emojiState;
-
-        public override void OnModLoad()
-        {
-            base.OnModLoad();
-        }
+        public ColorWindowState colorWindowState;
 
         public override void Load()
         {
             ui = new UserInterface();
-            emojiState = new EmojiState();
-            ui.SetState(null); // start hidden
+            colorWindowState = new ColorWindowState();
+            ui.SetState(null);
         }
 
         public override void Unload()
         {
             ui = new UserInterface();
-            emojiState = new EmojiState();
-            ui.SetState(null); // start hidden
-        }
-
-        public override void OnWorldUnload()
-        {
-            base.OnWorldUnload();
+            colorWindowState = new ColorWindowState();
+            ui.SetState(null);
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHelper.ToggleForPrefixExclusive(ui, emojiState, gameTime, "[e");
+            StateHelper.ToggleForPrefixExclusive(ui, colorWindowState, gameTime, "[c");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -49,7 +38,7 @@ namespace AdvancedChatFeatures.Emojis
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: Emojis Panel",
+                "AdvancedChatFeatures: Colors Panel",
                 () =>
                 {
                     if (ui?.CurrentState != null)

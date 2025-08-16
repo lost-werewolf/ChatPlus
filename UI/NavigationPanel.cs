@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using AdvancedChatFeatures.ColorWindow;
+using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Common.Hooks;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AdvancedChatFeatures.UI
 {
@@ -24,6 +29,7 @@ namespace AdvancedChatFeatures.UI
         protected abstract IEnumerable<TData> GetSource(); // The source of data to populate the panel with
         protected abstract NavigationElement<TData> BuildElement(TData data); // The method to create a new element from the data
         protected abstract string GetDescription(TData data);
+        protected abstract string GetFullTag(TData data);
 
         // Navigation
         protected int currentIndex = 0; // first item
@@ -77,11 +83,21 @@ namespace AdvancedChatFeatures.UI
         {
             base.LeftClick(evt);
 
-            // Deselect all
-            foreach (var e in items)
+            // Which element was clicked?
+            for (int i = 0; i < items.Count; i++)
             {
-                e.SetSelected(false);
+                if (items[i].IsMouseHovering)
+                {
+                    SetSelectedIndex(i); // updates currentIndex + selection + description panel
+                    return;
+                }
             }
+
+            // If none matched, clear all selection
+            foreach (var e in items)
+                e.SetSelected(false);
+
+            currentIndex = -1;
         }
 
         protected void PopulatePanel()
@@ -152,15 +168,20 @@ namespace AdvancedChatFeatures.UI
             if (view > max) view = max;
             list.ViewPosition = view;
 
-            //🔹update description
+            //🔹update description panel
             if (ConnectedPanel is DescriptionPanel<TData> desc)
             {
-                var element = items[currentIndex] as NavigationElement<TData>;
+                var element = items[currentIndex];
                 if (element != null)
                     desc.SetTextWithLinebreak(GetDescription(element.Data));
+
+                // set color text if description panel is connected to a color panel
+                if (desc.ConnectedPanel.GetType() == typeof(ColorPanel))
+                {
+                    desc.GetText()._color = ColorWindowElement.HexToColor(GetFullTag(current.Data));
+                }
             }
         }
-
         protected bool JustPressed(Keys key) => Main.keyState.IsKeyDown(key) && Main.oldKeyState.IsKeyUp(key);
 
         public override void Update(GameTime gt)
@@ -168,9 +189,52 @@ namespace AdvancedChatFeatures.UI
             base.Update(gt);
 
             Top.Set(-38, 0);
-
             SetHeight();
 
+            FilterSearch();
+
+            HandleNavigationKeys(gt);
+            HandleTabComplete();
+        }
+
+        private void FilterSearch()
+        {
+
+        }
+
+        private void HandleTabComplete()
+        {
+            if (this is CommandPanel)
+                return;
+
+            if (!JustPressed(Keys.Tab))
+                return;
+
+            if (items.Count == 0)
+                return;
+
+            var current = items[currentIndex];
+            if (current == null) return;
+
+            string tag = GetFullTag(current.Data);
+            if (string.IsNullOrEmpty(tag)) return;
+
+            string resultingText = Main.chatText;
+
+            if (Main.chatText.StartsWith('[') && !Main.chatText.Contains(']'))
+            {
+                Main.chatText = tag; // first tag
+            }
+            else
+            {
+                Main.chatText += tag;
+            }
+
+            HandleChatHook.SetCaretPos(Main.chatText.Length);
+        }
+
+        private void HandleNavigationKeys(GameTime gt)
+        {
             // Tap key
             if (JustPressed(Keys.Up))
             {

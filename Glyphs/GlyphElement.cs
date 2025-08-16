@@ -23,7 +23,7 @@ namespace AdvancedChatFeatures.Glyphs
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
 
-            // Render name
+            // Render glyph
             string tag = Glyph.Tag;
             ChatManager.DrawColorCodedStringWithShadow(
                 sb,
@@ -38,11 +38,12 @@ namespace AdvancedChatFeatures.Glyphs
                 1.0f
             );
 
-            var nameSnips = new[] { new TextSnippet(Glyph.Tag.ToString()) { Color = Color.White, CheckForHover = false } };
+            // Render raw tag in text form
+            var glyphSnippet = new[] { new TextSnippet(Glyph.Tag.ToString()) { Color = Color.White, CheckForHover = false } };
             ChatManager.DrawColorCodedStringWithShadow(
                 sb,
                 FontAssets.MouseText.Value,
-                nameSnips,
+                glyphSnippet,
                 pos + new Vector2(32, 3),
                 0f,
                 Vector2.Zero,

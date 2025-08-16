@@ -1,11 +1,8 @@
 using System;
 using AdvancedChatFeatures.Common.Hooks;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
-using Terraria.UI;
 
 namespace AdvancedChatFeatures.Helpers
 {
@@ -50,71 +47,6 @@ namespace AdvancedChatFeatures.Helpers
             PlayerHeadFlipHook.shouldFlipHeadDraw = false;
         }
 
-        /// <summary>
-        /// Draws a texture at the proper scale to fit within the given UI element.
-        /// /// </summary>
-        public static void DrawProperScale(SpriteBatch spriteBatch, UIElement element, Texture2D tex, float scale = 1.0f, float opacity = 1.0f, bool active = false, int x = 0, int y = 0)
-        {
-            // Get the UI element's dimensions
-            CalculatedStyle dims = element.GetDimensions();
-
-            // Compute a scale that makes it fit within the UI element
-            float scaleX = dims.Width / tex.Width;
-            float scaleY = dims.Height / tex.Height;
-            float drawScale = Math.Min(scaleX, scaleY) * scale;
-
-            // Top-left anchor: just place it at dims.X, dims.Y
-            Vector2 drawPosition = new Vector2(dims.X + x, dims.Y + y);
-
-            float actualOpacity = opacity;
-            if (active)
-            {
-                actualOpacity = 1f;
-            }
-
-            // Draw the texture anchored at top-left with the chosen scale
-            spriteBatch.Draw(
-                tex,
-                drawPosition,
-                null,
-                Color.White * actualOpacity,
-                0f,
-                Vector2.Zero,
-                drawScale,
-                SpriteEffects.None,
-                0f
-            );
-        }
-
-        private static void DrawRectangle(SpriteBatch sb, Vector2 size, Vector2 pos, Color color)
-        {
-            sb.Draw(
-                texture: TextureAssets.MagicPixel.Value,
-                destinationRectangle: new Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y),
-                color: color);
-        }
-        public static void DrawGhostText(SpriteBatch sb, string ghostText)
-        {
-            if (string.IsNullOrEmpty(ghostText)) return;
-
-            // Stop blinking
-            Main.instance.textBlinkerState = 0;
-            Main.instance.textBlinkerCount = 0;
-
-            Vector2 chatOriginUi = new(80f, Main.screenHeight - 32f);
-            Vector2 typedSizeUi = FontAssets.MouseText.Value.MeasureString(Main.chatText ?? "");
-            Vector2 ghostSizeUi = FontAssets.MouseText.Value.MeasureString(ghostText);
-            Vector2 posUi = chatOriginUi + new Vector2(typedSizeUi.X + 12, 3f);
-            Vector2 bgSizeUi = new(ghostSizeUi.X + 4f, ghostSizeUi.Y + 4f - 12);
-
-            posUi += new Vector2(-3, 1);
-
-            // Draw background
-            DrawHelper.DrawRectangle(sb, bgSizeUi, posUi, ColorHelper.Blue * 0.5f);
-
-            // Draw ghost text
-            Utils.DrawBorderString(sb, ghostText, posUi, Color.White);
-        }
         public static void DrawSmallModIcon(SpriteBatch sb, Mod mod, Vector2 pos, int size = 16)
         {
             Texture2D tex = null;

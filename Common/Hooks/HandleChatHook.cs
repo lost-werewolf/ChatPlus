@@ -65,6 +65,8 @@ namespace AdvancedChatFeatures.Common.Hooks
 
         private string GetInputText(On_Main.orig_GetInputText orig, string oldString, bool allowMultiLine = false)
         {
+            //return orig(oldString, allowMultiLine);
+
             if (!Main.drawingPlayerChat)
             {
                 return orig(oldString, allowMultiLine);
@@ -87,10 +89,6 @@ namespace AdvancedChatFeatures.Common.Hooks
 
             // Clamp caret
             caretPos = Math.Clamp(caretPos, 0, Main.chatText.Length);
-
-            // Restore handling
-            Main.oldInputText = Main.inputText;
-            Main.inputText = Keyboard.GetState();
 
             return Main.chatText;
         }
@@ -189,15 +187,30 @@ namespace AdvancedChatFeatures.Common.Hooks
                 var sel = GetSelection();
                 if (sel != null)
                 {
-                    Main.chatText = Main.chatText.Remove(sel.Value.start, sel.Value.end - sel.Value.start)
-                                                 .Insert(sel.Value.start, typed);
-                    caretPos = sel.Value.start + typed.Length;
+                    int start = Math.Clamp(sel.Value.start, 0, Main.chatText.Length);
+                    int end = Math.Clamp(sel.Value.end, 0, Main.chatText.Length);
+
+                    if (end > start)
+                    {
+                        Main.chatText = Main.chatText.Remove(start, end - start)
+                                                     .Insert(start, typed);
+                        caretPos = start + typed.Length;
+                    }
+                    else
+                    {
+                        // nothing valid selected → just insert
+                        Main.chatText = Main.chatText.Insert(caretPos, typed);
+                        caretPos += typed.Length;
+                    }
+
                     selectionAnchor = -1;
                 }
                 else
                 {
+                    // No selection → insert at caret
                     Main.chatText = Main.chatText.Insert(caretPos, typed);
                     caretPos += typed.Length;
+                    selectionAnchor = -1;
                 }
             }
         }

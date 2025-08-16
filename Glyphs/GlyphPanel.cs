@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework;
 
@@ -15,6 +14,9 @@ namespace AdvancedChatFeatures.Glyphs
 
         protected override string GetDescription(Glyph data)
             => data.Description;
+
+        protected override string GetFullTag(Glyph data)
+            => data.Tag;
 
         public override void Update(GameTime gt)
         {

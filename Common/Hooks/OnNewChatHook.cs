@@ -26,15 +26,14 @@ namespace AdvancedChatFeatures.Common.Hooks
         {
             orig(self, text, color, widthLimitInPixels);
 
-            string modName = ModIconSnippet.GetModName();
-            Log.Info("modname(1): " + modName);
-
             var parsedSnippets = ChatManager.ParseMessage(text, color).ToArray();
             if (parsedSnippets.Length < 2)
                 return;
 
             string rawName = parsedSnippets[0].Text;
             string playerName = PlayerFormatHelper.Strip(rawName);
+            
+
 
             // Player format
             if (!string.IsNullOrEmpty(Conf.C.styleConfig.ShowPlayerFormat))
@@ -65,11 +64,11 @@ namespace AdvancedChatFeatures.Common.Hooks
             // Mod icons
             if (Conf.C.styleConfig.ShowModIcons)
             {
-                string modName2 = ModIconSnippet.GetModName();
-                Log.Info("modname2: " + modName + ", "+ text);
+                //string modName = ModIconSnippet.GetModName();
+                //Log.Info(parsedSnippets[1].Text.Trim() + ", mod: " + modName, printCallerInMessage: false);
 
                 // Insert mod icon snippet at start
-                var modIconSnippet = new ModIconSnippet(modName);
+                var modIconSnippet = new ModIconSnippet("modName");
                 var list = parsedSnippets.ToList();
                 list.Insert(0, modIconSnippet);
                 parsedSnippets = list.ToArray();

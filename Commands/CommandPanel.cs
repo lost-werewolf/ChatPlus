@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
+using AdvancedChatFeatures.Common.Hooks;
+using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 
 namespace AdvancedChatFeatures.Commands
@@ -18,6 +22,9 @@ namespace AdvancedChatFeatures.Commands
 
         protected override string GetDescription(Command data)
             => data.Description;
+
+        protected override string GetFullTag(Command data)
+            => data.Name;
 
         public override void Draw(SpriteBatch sb)
         {
@@ -37,9 +44,28 @@ namespace AdvancedChatFeatures.Commands
         public override void Update(GameTime gt)
         {
             if (items.Count == 0)
-            PopulatePanel();
+                PopulatePanel();
+
+            AutocompleteCommandOnTab();
 
             base.Update(gt);
+        }
+
+        private void AutocompleteCommandOnTab()
+        {
+            if (!JustPressed(Keys.Tab))
+                return;
+
+            if (items.Count == 0)
+                return;
+
+            var current = items[currentIndex];
+            if (current == null) return;
+
+            string insert = GetFullTag(current.Data);
+            Main.chatText = insert;
+
+            HandleChatHook.SetCaretPos(Main.chatText.Length);
         }
     }
 }

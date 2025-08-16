@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -33,43 +34,9 @@ namespace AdvancedChatFeatures.Commands
             base.OnWorldUnload();
         }
 
-        public void ToggleState()
-        {
-            if (ui.CurrentState != commandState)
-            {
-                Main.drawingPlayerChat = true; // force open chat
-                Main.chatText = "/"; // start with slash
-                ui.SetState(commandState);
-            }
-            else
-            {
-                if (ui.CurrentState != null)
-                    ui.SetState(null);
-            }
-        }
-
         public override void UpdateUI(GameTime gameTime)
         {
-            if (Main.gameMenu == false && Main.InGameUI.CurrentState is UIModConfig)
-                return;
-
-            string text = Main.chatText ?? string.Empty;
-            bool startsWithSlash = text.Length > 0 && text[0] == '/';
-
-            if (startsWithSlash && Main.drawingPlayerChat)
-            {
-                if (ui.CurrentState != commandState)
-                {
-                    ui.SetState(commandState);
-                }
-
-                ui.Update(gameTime);
-            }
-            else
-            {
-                if (ui.CurrentState != null)
-                    ui.SetState(null);
-            }
+            StateHelper.ToggleForPrefixExclusive(ui, commandState, gameTime, "/");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

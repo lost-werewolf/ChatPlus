@@ -1,4 +1,5 @@
 ﻿using System;
+using AdvancedChatFeatures.ColorWindow;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,7 +13,7 @@ namespace AdvancedChatFeatures.UI
     public class DescriptionPanel<TData> : DraggablePanel
     {
         private readonly UIText text;
-        private NavigationPanel<TData> owner;
+        public UIText GetText() => text;
 
         public DescriptionPanel(string initialText)
         {
@@ -29,7 +30,6 @@ namespace AdvancedChatFeatures.UI
 
             text = new(initialText, 0.9f, false);
             Append(text);
-            this.owner = owner;
         }
 
         public override void RightClick(UIMouseEvent evt)
@@ -72,10 +72,11 @@ namespace AdvancedChatFeatures.UI
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            int pad = 2;
 
-            //Top.Set(Main.screenHeight - Conf.C.featureStyleConfig.ItemsPerWindow * 30, 0);
+            
 
-            Top.Set(-Conf.C.featureStyleConfig.ItemsPerWindow * 30 - 40, 0);
+            Top.Set(-Conf.C.featureStyleConfig.ItemsPerWindow * 30 - 38 - pad, 0);
 
             base.Draw(spriteBatch);
         }

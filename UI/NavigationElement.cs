@@ -29,8 +29,6 @@ namespace AdvancedChatFeatures.UI
         {
             base.LeftClick(evt);
             SetSelected(true);
-
-
         }
 
         public override void Update(GameTime gameTime)

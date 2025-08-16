@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -28,22 +29,7 @@ namespace AdvancedChatFeatures.Glyphs
 
         public override void UpdateUI(GameTime gameTime)
         {
-            string text = Main.chatText ?? string.Empty;
-            bool startsWithGlyph = text.StartsWith("[g", System.StringComparison.OrdinalIgnoreCase);
-
-            if (startsWithGlyph && Main.drawingPlayerChat)
-            {
-                if (ui.CurrentState != glyphState)
-                {
-                    ui.SetState(glyphState);
-                }
-                ui.Update(gameTime);
-            }
-            else
-            {
-                if (ui.CurrentState != null)
-                    ui.SetState(null);
-            }
+            StateHelper.ToggleForPrefixExclusive(ui, glyphState, gameTime, "[g");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -52,7 +38,7 @@ namespace AdvancedChatFeatures.Glyphs
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: Glyphs Panel",
+                "AdvancedChatFeatures: GlyphSystem",
                 () =>
                 {
                     if (ui?.CurrentState != null)

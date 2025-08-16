@@ -1,8 +1,10 @@
 ﻿using System;
+using AdvancedChatFeatures.ColorWindow;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Glyphs;
+using AdvancedChatFeatures.ItemWindow;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -80,6 +82,8 @@ namespace AdvancedChatFeatures.UI
             var emojiSys = ModContent.GetInstance<EmojiSystem>();
             var cmdSys = ModContent.GetInstance<CommandSystem>();
             var glyphSys = ModContent.GetInstance<GlyphSystem>();
+            var itemSys = ModContent.GetInstance<ItemWindowSystem>();
+            var colorSys = ModContent.GetInstance<ColorWindowSystem>();
 
             if (emojiSys?.emojiState?.emojiPanel?.scrollbar?.IsMouseHovering == true)
                 return;
@@ -87,7 +91,10 @@ namespace AdvancedChatFeatures.UI
             if (cmdSys?.commandState?.commandPanel?.scrollbar?.IsMouseHovering == true)
                 return;
 
-            if (glyphSys?.glyphState?.glyphPanel?.scrollbar?.IsMouseHovering == true)
+            if (itemSys?.itemWindowState?.itemPanel?.scrollbar?.IsMouseHovering == true)
+                return;
+
+            if (colorSys?.colorWindowState?.colorPanel?.scrollbar?.IsMouseHovering == true)
                 return;
 
             // Start dragging

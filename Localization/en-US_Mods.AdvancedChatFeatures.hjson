@@ -151,4 +151,7 @@ Configs: {
 Keybinds: {
 	"Open Command Window.DisplayName": Open Command Window
 	"Open Emoji Window.DisplayName": Open Emoji Window
+	"Open Glyph Window.DisplayName": Open Glyph  Window
+	"Open Item Window.DisplayName": Open Item  Window
+	"Open Color Window.DisplayName": Open Color  Window
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
 using Terraria;
@@ -50,6 +51,11 @@ namespace AdvancedChatFeatures.Common.Hooks
                 DrawSelectionRectangle(height);
                 DrawInputText(height);
             }
+            else
+            {
+                // Do not force writing mode when chat is closed
+                PlayerInput.WritingText = false;
+            }
 
             Main.chatMonitor.DrawChat(Main.drawingPlayerChat); // draws chat monitor
         }
@@ -67,68 +73,69 @@ namespace AdvancedChatFeatures.Common.Hooks
             var sel = HandleChatHook.GetSelection();
             if (sel == null) return;
 
-            int start = Math.Clamp(sel.Value.start, 0, Main.chatText.Length);
-            int end = Math.Clamp(sel.Value.end, 0, Main.chatText.Length);
-
+            string text = Main.chatText ?? "";
+            int start = Math.Clamp(sel.Value.start, 0, text.Length);
+            int end = Math.Clamp(sel.Value.end, 0, text.Length);
             if (start >= end) return;
 
-            string pre = Main.chatText.Substring(0, start);
-            string mid = Main.chatText.Substring(start, end - start);
+            // Measure pre and mid with ChatManager so tags get proper collapsed width
+            Vector2 preSize = MeasureSnippets(text.Substring(0, start));
+            Vector2 midSize = MeasureSnippets(text.Substring(start, end - start));
 
-            Vector2 preSize = FontAssets.MouseText.Value.MeasureString(pre);
-            Vector2 midSize = FontAssets.MouseText.Value.MeasureString(mid);
-
-            Rectangle selRect = new Rectangle(
-                x: 88 + (int)preSize.X,
+            var rect = new Rectangle(
+                x: 88 + (int)Math.Floor(preSize.X),
                 y: Main.screenHeight - height,
                 width: (int)Math.Ceiling(midSize.X),
                 height: 20
             );
 
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, selRect, ColorHelper.Blue * 0.5f);
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, ColorHelper.Blue * 0.5f);
         }
-
         private void DrawInputText(int height)
         {
             string text = Main.chatText ?? "";
-            int pos = Math.Clamp(HandleChatHook.GetCaretPos(), 0, text.Length);
+            int rawPos = Math.Clamp(HandleChatHook.GetCaretPos(), 0, text.Length);
 
-            // Parse the full message into snippets
-            TextSnippet[] snippets = ChatManager.ParseMessage(text, Color.White).ToArray();
+            // Snap caret if it’s inside a completed tag so visuals match collapsed glyphs
+            int pos = SnapCaretInsideClosedTag(text, rawPos);
 
-            // Measure size up to the caret
-            string beforeCaret = text.Substring(0, pos);
-            Vector2 beforeSize = FontAssets.MouseText.Value.MeasureString(beforeCaret);
-
-            // Draw input text
+            // Draw the whole line (this respects tags/glyphs)
+            var fullSnips = ChatManager.ParseMessage(text, Color.White).ToArray();
             ChatManager.DrawColorCodedStringWithShadow(
-                Main.spriteBatch,
-                FontAssets.MouseText.Value,
-                snippets,
-                new Vector2(88f, Main.screenHeight - height),
-                0f,
-                Vector2.Zero,
-                Vector2.One,
-                out _
+                Main.spriteBatch, FontAssets.MouseText.Value,
+                fullSnips, new Vector2(88f, Main.screenHeight - height),
+                0f, Vector2.Zero, Vector2.One, out _
             );
 
-            // Draw thick caret
+            // Measure up to (possibly snapped) caret using parsed snippets too
+            Vector2 beforeSize = MeasureSnippets(text.Substring(0, pos));
+
+            // Blinked caret only when no selection
             if (HandleChatHook.GetSelection() == null && Main.instance.textBlinkerState == 1)
             {
-                int caretX = 88 + (int)beforeSize.X + 1;
+                int caretX = 88 + (int)beforeSize.X;
                 int caretY = Main.screenHeight - height;
-
-                if (pos == 0)
-                {
-                    // draw "|" directly at caret position
-                    Utils.DrawBorderStringFourWay(Main.spriteBatch, FontAssets.MouseText.Value, "|", caretX, caretY, Color.White, Color.Black, Vector2.Zero);
-                }
-                else
-                {
-                    // Draw thin ugly caret
-                    Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(caretX, caretY + 2, 1, height: 17), Color.White);
-                }
+                // Thin caret (1px) like Terraria
+                Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value,
+                    new Rectangle(caretX, caretY + 2, 1, 17), Color.White);
             }
+        }
+
+        private static int SnapCaretInsideClosedTag(string text, int pos)
+        {
+            // If caret sits inside a closed [ ... ] tag, snap it to the tag's end.
+            foreach (Match m in Regex.Matches(text ?? "", @"\[[^\]]+\]"))
+            {
+                int s = m.Index, e = s + m.Length;
+                if (pos > s && pos <= e) return e;
+            }
+            return pos;
+        }
+
+        private static Vector2 MeasureSnippets(string s)
+        {
+            var snips = ChatManager.ParseMessage(s ?? "", Color.White).ToArray();
+            return ChatManager.GetStringSize(FontAssets.MouseText.Value, snips, Vector2.One);
         }
     }
 }

@@ -54,7 +54,20 @@ namespace AdvancedChatFeatures.Common.Configs.StyleConfigs
         private void DrawConfigIcon(SpriteBatch sb)
         {
             //if (Value)
-                DrawHelper.DrawProperScale(sb, element: this, tex: Ass.ConfigButton.Value, scale: 0.75f, x: 6 + 150, y: 4);
+            //DrawHelper.DrawProperScale(sb, element: this, tex: Ass.ConfigButton.Value, scale: 0.75f, x: 6 + 150, y: 4);
+
+            var dims = GetDimensions();
+
+            Texture2D configButton = Ass.ConfigButton.Value;
+
+            Rectangle pos = new(
+                (int) dims.X + 156,
+                (int)dims.Y + 4,
+                (int) (configButton.Width * 0.75f),
+                (int) (configButton.Height * 0.75f)
+                );
+
+            sb.Draw(configButton, pos, Color.White);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)

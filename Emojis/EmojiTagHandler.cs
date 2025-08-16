@@ -25,6 +25,9 @@ namespace AdvancedChatFeatures.Emojis
                 DeleteWhole = true;
             }
 
+            /// <summary>
+            /// Actually draws the emoji here
+            /// </summary>
             public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch spriteBatch, Vector2 position = default, Color color = default, float scale = 1f)
             {
                 float px = baseSize * scale;
@@ -67,8 +70,8 @@ namespace AdvancedChatFeatures.Emojis
             var key = text?.Trim();
 
             if (string.IsNullOrEmpty(key) || !Registry.TryGetValue(key, out var asset))
-                //return new TextSnippet($"{text}"); // fallback as plain text
-                return new TextSnippet(""); // remove input if user entered non-existant emoji
+                return new TextSnippet($"[e:{text}]"); // fallback as plain text
+                //return new TextSnippet(""); // remove input if user entered non-existant emoji
 
             return new EmojiSnippet(asset, basePx: 20f)
             {
