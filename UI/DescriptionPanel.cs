@@ -1,6 +1,7 @@
 ﻿using System;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.UploadWindow;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -29,6 +30,16 @@ namespace AdvancedChatFeatures.UI
 
             text = new(initialText, 0.9f, false);
             Append(text);
+        }
+
+        public override void LeftClick(UIMouseEvent evt)
+        {
+            if (ConnectedPanel.GetType() == typeof(UploadPanel))
+            {
+
+            }
+
+            base.LeftClick(evt);
         }
 
         public override void RightClick(UIMouseEvent evt)

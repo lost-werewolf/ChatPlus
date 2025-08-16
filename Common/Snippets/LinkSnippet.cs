@@ -38,10 +38,10 @@ namespace AdvancedChatFeatures.Common.Snippets
 
         public override Color GetVisibleColor()
         {
-            // Always use a link Entry for link snippets.
+            // Always use a link color for link snippets.
             if (LinkHelper.IsWholeLink(text))
             {
-                // Optionally, you can choose a different Entry if the mouse is hovering.
+                // Optionally, you can choose a different color if the mouse is hovering.
                 // Here we check if Main.MouseScreen is within lastDrawRect.
                 bool isHovered = lastDrawRect.Contains(Main.MouseScreen.ToPoint());
                 if (isHovered)

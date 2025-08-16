@@ -145,6 +145,16 @@ Configs: {
 				Off: The feature window appears above the chat
 				'''
 		}
+
+		ShowAutocomplete: {
+			Label: Show Autocomplete
+			Tooltip: ""
+		}
+
+		ShowAutocompleteText: {
+			Label: Show Autocomplete Text
+			Tooltip: ""
+		}
 	}
 }
 

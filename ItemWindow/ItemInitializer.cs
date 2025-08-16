@@ -1,4 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
+using AdvancedChatFeatures.Helpers;
+using Terraria;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace AdvancedChatFeatures.ItemWindow
@@ -11,28 +15,41 @@ namespace AdvancedChatFeatures.ItemWindow
         {
             Items.Clear();
 
-            // Iterate vanilla items; modded items can be added if desired
-            for (int type = 1; type < ItemLoader.ItemCount; type++)
+            for (int i = 1; i < ItemLoader.ItemCount; i++)
             {
                 try
                 {
-                    var item = new Terraria.Item();
-                    item.SetDefaults(type);
+                    Terraria.Item item = new Terraria.Item();
+                    item.SetDefaults(i);
 
                     // Skip unobtainable or placeholder
                     if (item == null || string.IsNullOrWhiteSpace(item.Name))
                         continue;
 
                     string name = item.Name;
-                    string tag = $"[i:{type}]"; // chat tag shows icon
-                    string tooltip = item.ToolTip?.ToString() ?? string.Empty;
+                    string tag = $"[i:{i}]"; // chat tag shows icon
+                    string noSpacesName = new(name.Where(char.IsLetterOrDigit).ToArray());
+                    string tooltip = "";
+                    if (item.ToolTip._text != null)
+                    {
+                        int newlineIndex = tooltip.IndexOf('\n');
+                        if (newlineIndex >= 0)
+                        {
+                            tooltip = tooltip.Substring(0, newlineIndex);
+                        }
+                    }
 
-                    Items.Add(new Item(tag, name, tooltip));
+                    Items.Add(new Item(
+                        ID: i,
+                        Tag: tag,
+                        NoSpacesName: noSpacesName,
+                        DisplayName: name,
+                        Tooltip: tooltip));
                 }
                 catch { /* ignore bad item types */ }
             }
 
-            Items.Sort((a, b) => string.Compare(a.Name, b.Name, System.StringComparison.OrdinalIgnoreCase));
+            Items.Sort((a, b) => string.Compare(a.DisplayName, b.DisplayName, System.StringComparison.OrdinalIgnoreCase));
         }
     }
 }

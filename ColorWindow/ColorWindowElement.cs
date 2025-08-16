@@ -8,11 +8,11 @@ namespace AdvancedChatFeatures.ColorWindow
 {
     public class ColorWindowElement : NavigationElement<Color>
     {
-        public Color Entry;
+        public Color color;
 
         public ColorWindowElement(Color color) : base(color)
         {
-            this.Entry = color;
+            this.color = color;
             Height.Set(30, 0);
             Width.Set(0, 1);
         }
@@ -23,7 +23,7 @@ namespace AdvancedChatFeatures.ColorWindow
 
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
-            string tag = Entry.Tag;
+            string tag = color.Tag;
 
             // Render preview square
             Rectangle previewColorPos = new Rectangle(

@@ -31,7 +31,7 @@ namespace AdvancedChatFeatures.Common.Hooks
                 orig(self);
                 return;
             }
-            
+
             if (Main.drawingPlayerChat)
             {
                 PlayerInput.WritingText = true;

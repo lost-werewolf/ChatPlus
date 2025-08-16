@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework;
+using Terraria;
 
 namespace AdvancedChatFeatures.Emojis
 {

@@ -6,8 +6,11 @@ using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Common.Hooks;
 using AdvancedChatFeatures.Emojis;
+using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.ItemWindow;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -119,12 +122,17 @@ namespace AdvancedChatFeatures.UI
                     {
                         string desc = GetDescription(data) ?? string.Empty;
                         string tag = GetFullTag(data) ?? string.Empty;
+
+                        // Filter emojis
                         IEnumerable<string> synonyms = (data is Emoji e) ? e.Synonyms : Array.Empty<string>();
 
-                        bool match = desc.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                                     tag.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                                     synonyms.Any(s => s.Contains(query, StringComparison.OrdinalIgnoreCase));
+                        // Filter items
+                        string name = (data is ItemWindow.Item item) ? item.DisplayName ?? "" : "";
 
+                        bool match = desc.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                            tag.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                            name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                            synonyms.Any(s => s.Contains(query, StringComparison.OrdinalIgnoreCase));
                         if (!match)
                             continue;
                     }
@@ -152,18 +160,16 @@ namespace AdvancedChatFeatures.UI
         {
             text = text.Trim();
 
-            // Command-style: "/spawn me" -> "spawn"
             if (text.StartsWith("/"))
             {
                 int space = text.IndexOf(' ');
                 return (space > 1 ? text.Substring(1, space - 1) : text.Substring(1)).Trim();
             }
 
-            // Tag-style: "hello [e:sm" -> "sm"
             int lb = text.LastIndexOf('[');
             if (lb >= 0)
             {
-                string inside = text.Substring(lb + 1); // e.g. "e:sm"
+                string inside = text.Substring(lb + 1);
                 int colon = inside.IndexOf(':');
                 if (colon >= 0)
                     return inside.Substring(colon + 1).Trim();
@@ -171,10 +177,8 @@ namespace AdvancedChatFeatures.UI
                 return inside.Trim();
             }
 
-            // Fallback: whole text
             return text;
         }
-
 
         public void SetHeight()
         {
@@ -267,6 +271,8 @@ namespace AdvancedChatFeatures.UI
                     key == Keys.LeftAlt || key == Keys.RightAlt)
                     return;
 
+                //Main.NewText("key: " + key);
+
                 PopulatePanel();
             }
         }
@@ -288,15 +294,41 @@ namespace AdvancedChatFeatures.UI
             string tag = GetFullTag(current.Data);
             if (string.IsNullOrEmpty(tag)) return;
 
-            if (Main.chatText.StartsWith('[') && !Main.chatText.Contains(']'))
+            if (!Main.chatText.Contains(']'))
+            {
                 Main.chatText = tag;
+            }
             else
-                Main.chatText += tag;
+            {
+                int lb = Main.chatText.LastIndexOf("[e:");
+                if (lb >= 0)
+                {
+                    int rb = Main.chatText.IndexOf(']', lb);
+                    if (rb == -1) // only if it's unfinished
+                    {
+                        // Replace unfinished with the chosen tag
+                        string before = Main.chatText.Substring(0, lb);
+                        Main.chatText = before + tag;
+                    }
+                    else
+                    {
+                        // If it was already closed, just append
+                        Main.chatText += tag;
+                    }
+                }
+                else
+                {
+                    // No [e: found at all → append
+                    Main.chatText += tag;
+                }
+            }
 
             HandleChatHook.SetCaretPos(Main.chatText.Length);
 
             // 🔹 reset filter so next emoji search starts fresh
+            Main.chatText += " ";
             PopulatePanel();
+            ghostText = "";
         }
 
         private void HandleNavigationKeys(GameTime gt)
@@ -306,13 +338,22 @@ namespace AdvancedChatFeatures.UI
             {
                 SetSelectedIndex(currentIndex - 1);
                 heldKey = Keys.Up;
+
                 repeatTimer = 0.35;
+                if (this is ItemPanel)
+                {
+                    repeatTimer = 0.1;
+                }
             }
             else if (JustPressed(Keys.Down))
             {
                 SetSelectedIndex(currentIndex + 1);
                 heldKey = Keys.Down;
                 repeatTimer = 0.35;
+                if (this is ItemPanel)
+                {
+                    repeatTimer = 0.25;
+                }
             }
 
             // Hold key to repeat navigation
@@ -322,9 +363,40 @@ namespace AdvancedChatFeatures.UI
                 repeatTimer -= dt;
                 if (repeatTimer <= 0)
                 {
-                    repeatTimer += 0.06; // repeat speed
+                    if (this is ItemPanel)
+                        repeatTimer += 0.03;
+                    else
+                        repeatTimer += 0.06;
+
                     if (Main.keyState.IsKeyDown(Keys.Up)) SetSelectedIndex(currentIndex - 1);
                     else if (Main.keyState.IsKeyDown(Keys.Down)) SetSelectedIndex(currentIndex + 1);
+                }
+            }
+        }
+
+        private string ghostText = "";
+
+        public override void Draw(SpriteBatch sb)
+        {
+            base.Draw(sb);
+
+            if (!Conf.C.featureStyleConfig.ShowAutocompleteText)
+                return;
+
+            if (items.Count > 0 && currentIndex >= 0)
+            {
+                // pick the current suggestion
+                if (this is EmojiPanel)
+                {
+                    ghostText = GetDescription(items[currentIndex].Data);
+                    if (!string.IsNullOrEmpty(ghostText))
+                        DrawHelper.DrawGhostText(sb, ghostText);
+                }
+                else if (this is GlyphPanel)
+                {
+                    //var suggestion = GetFullTag(items[currentIndex].Data);
+                    //if (!string.IsNullOrEmpty(suggestion))
+                    //    DrawHelper.DrawGhostText(sb, suggestion);
                 }
             }
         }

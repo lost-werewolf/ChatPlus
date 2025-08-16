@@ -78,7 +78,7 @@ namespace AdvancedChatFeatures.Common.Configs.StyleConfigs
             //string displayName = format == "PlayerName:" ? $"{name}:" : $"<{name}>";
             string displayName = name;
 
-            // Respect Entry toggle from config
+            // Respect color toggle from config
             Color drawColor = Conf.C?.styleConfig?.ShowPlayerColors ?? false ? ColorHelper.PlayerColors[0] : Color.White;
 
             // Layout

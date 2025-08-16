@@ -41,14 +41,14 @@ namespace AdvancedChatFeatures.Common.Configs
 
         public class Features
         {
-            [BackgroundColor(255, 192, 8)] // Golden Yellow
-            [DefaultValue(true)]
-            public bool EnableBetterChatNavigation = true;
-
             [CustomModConfigItem(typeof(EnableCommands))]
             [BackgroundColor(255, 192, 8)] // Golden Yellow
             [DefaultValue(true)]
             public bool EnableCommands = true;
+
+            [BackgroundColor(255, 192, 8)] // Golden Yellow
+            [DefaultValue(true)]
+            public bool EnableBetterChatNavigation = true;
 
             [CustomModConfigItem(typeof(EnableColorPicker))]
             [BackgroundColor(255, 192, 8)] // Golden Yellow
@@ -83,6 +83,10 @@ namespace AdvancedChatFeatures.Common.Configs
             [BackgroundColor(231, 84, 128)] // Rose Pink
             [DefaultValue(true)]
             public bool ShowDescriptionPanel = true;
+
+            [BackgroundColor(231, 84, 128)] // Rose Pink
+            [DefaultValue(false)]
+            public bool ShowAutocompleteText = false;
 
             [BackgroundColor(231, 84, 128)] // Rose Pink
             [DefaultValue(true)]

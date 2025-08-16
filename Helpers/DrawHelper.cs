@@ -2,6 +2,7 @@ using System;
 using AdvancedChatFeatures.Common.Hooks;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 
 namespace AdvancedChatFeatures.Helpers
@@ -104,6 +105,39 @@ namespace AdvancedChatFeatures.Helpers
                 SpriteEffects.None,
                 0f
             );
+        }
+        public static void DrawGhostText(SpriteBatch sb, string ghostText)
+        {
+            if (string.IsNullOrEmpty(ghostText)) return;
+
+            // Remove blinking
+            Main.instance.textBlinkerState = 0;
+            Main.instance.textBlinkerCount = 0;
+
+            Vector2 chatOriginUi = new(80f, Main.screenHeight - 32f);
+            Vector2 typedSizeUi = FontAssets.MouseText.Value.MeasureString(Main.chatText ?? "");
+            Vector2 ghostSizeUi = FontAssets.MouseText.Value.MeasureString(ghostText);
+            Vector2 posUi = chatOriginUi + new Vector2(typedSizeUi.X + 12, 3f);
+            Vector2 bgSizeUi = new(ghostSizeUi.X + 4f, ghostSizeUi.Y + 4f - 10);
+
+            posUi += new Vector2(-4, -4);
+
+            // Draw background
+            DrawHelper.DrawRectangle(sb, bgSizeUi, posUi, ColorHelper.Blue * 0.5f);
+
+            // Draw ghost text
+            Utils.DrawBorderString(sb, ghostText, posUi, Color.White);
+        }
+
+        /// <summary>
+        /// ...Isn't it obvious?
+        /// </summary>
+        public static void DrawRectangle(SpriteBatch sb, Vector2 size, Vector2 pos, Color color)
+        {
+            sb.Draw(
+                texture: TextureAssets.MagicPixel.Value,
+                destinationRectangle: new Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y),
+                color: color);
         }
 
         /// <summary>
