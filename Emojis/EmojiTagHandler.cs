@@ -80,9 +80,10 @@ namespace AdvancedChatFeatures.Emojis
             };
         }
 
-        public static string GenerateTag(string key) => $"[e:{key}]";
 
         #region Helpers
+        public static string GenerateTag(string key) => $"[e:{key}]";
+
         public static bool IsTypingEmojiTag(string text)
         {
             int i = text.LastIndexOf('[');

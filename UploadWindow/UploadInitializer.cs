@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -11,7 +13,7 @@ namespace AdvancedChatFeatures.UploadWindow
     [Autoload(Side = ModSide.Client)]
     internal class UploadInitializer : ModSystem
     {
-        public static List<Upload> Uploads { get; private set; } = new();
+        public static List<Upload> Uploads { get; private set; } = [];
         private static bool _handlerRegistered;
 
         public override void Load()
@@ -33,26 +35,47 @@ namespace AdvancedChatFeatures.UploadWindow
         {
             Uploads = new List<Upload>();
 
-            // Scan a user folder for PNGs (customize as needed)
             string folder = Path.Combine(Main.SavePath, "AdvancedChatFeatures", "Uploads");
             Directory.CreateDirectory(folder);
 
-            foreach (var file in Directory.EnumerateFiles(folder, "*.png", SearchOption.TopDirectoryOnly))
+            // Collect all supported image files
+            var exts = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".png", ".jpg", ".jpeg" };
+            var files = Directory.EnumerateFiles(folder, "*.*", SearchOption.TopDirectoryOnly)
+                                 .Where(f => exts.Contains(Path.GetExtension(f)));
+
+            Main.QueueMainThreadAction(() =>
             {
-                try
+                foreach (var file in files)
                 {
-                    string key = Path.GetFileNameWithoutExtension(file);
-                    using var fs = File.OpenRead(file);
-                    Texture2D tex = Texture2D.FromStream(Main.instance.GraphicsDevice, fs);
-                    if (UploadTagHandler.Register(key, tex))
+                    try
                     {
-                        Uploads.Add(new Upload(UploadTagHandler.Tag(key), key, file, $"{key}.png"));
-                        Log.Info($"Found: {key}");
+                        string key = Path.GetFileNameWithoutExtension(file);
+                        using var fs = File.OpenRead(file);
+                        Texture2D tex = Texture2D.FromStream(Main.instance.GraphicsDevice, fs);
+
+                        if (UploadTagHandler.Register(key, tex))
+                        {
+                            Uploads.Add(new Upload(
+                                Tag: UploadTagHandler.Tag(key),
+                                FileName: Path.GetFileName(file),
+                                FullFilePath: file,
+                                Image: tex
+                            ));
+                            Log.Info($"Found: {file}");
+                        }
+                    }
+                    catch
+                    {
+                        // ignore broken files
                     }
                 }
-                catch { /* ignore bad files */ }
-            }
-            Log.Info($"[end] Found {Uploads.Count} uploads");
+
+                Log.Info($"[end] Found {Uploads.Count} uploads");
+            });
+
+            int fileCountInFolder = Directory.GetFiles(folder).Length;
+
+            Log.Info($"[end] Found ({Uploads.Count}/{fileCountInFolder}) uploads");
         }
     }
 }

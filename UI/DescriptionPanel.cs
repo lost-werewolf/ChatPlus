@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.UploadWindow;
 using Microsoft.Xna.Framework.Graphics;
@@ -36,7 +38,22 @@ namespace AdvancedChatFeatures.UI
         {
             if (ConnectedPanel.GetType() == typeof(UploadPanel))
             {
+                string fullFilePath = FileUploadHelper.OpenFileDialog();
+                string fileName = Path.GetFileName(fullFilePath);
+                string tag = UploadTagHandler.Tag(fileName);
+                Texture2D tex = FileUploadHelper.ReadAndCreateTextureFromPath(fullFilePath);
+                UploadInitializer.Uploads.Add(new Upload(
+                    Tag: tag,
+                    FileName: fileName,
+                    FullFilePath: fullFilePath,
+                    Image: tex
+                ));
 
+                // Copy image to our folder
+                string folder = Path.Combine(Main.SavePath, "AdvancedChatFeatures", "Uploads");
+                Directory.CreateDirectory(folder);
+                string dest = Path.Combine(folder, fileName);
+                File.Copy(fullFilePath, dest, overwrite: true);
             }
 
             base.LeftClick(evt);
@@ -62,6 +79,7 @@ namespace AdvancedChatFeatures.UI
             string tooltip = rawText;
 
             // Measure the text size
+            if (FontAssets.MouseText == null) return;
             Vector2 textSize = FontAssets.MouseText.Value.MeasureString(tooltip);
             float scaledWidth = textSize.X * scale / Main.UIScale;
 

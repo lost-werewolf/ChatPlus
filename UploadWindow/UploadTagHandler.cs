@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.ModLoader;
@@ -32,6 +33,7 @@ namespace AdvancedChatFeatures.UploadWindow
                 var tex = _texture;
                 if (tex == null) return true;
                 float s = px / Math.Max(tex.Width, tex.Height);
+                Log.Info("a");
                 spriteBatch.Draw(tex, position, null, color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
                 return true;
             }
