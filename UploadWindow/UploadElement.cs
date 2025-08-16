@@ -1,3 +1,4 @@
+using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,7 +21,7 @@ namespace AdvancedChatFeatures.UploadWindow
 
         public override void Draw(SpriteBatch sb)
         {
-            Height.Set(30*8, 0);
+            Height.Set(30*4, 0);
             base.Draw(sb);
             var dims = GetDimensions();
 
@@ -29,8 +30,6 @@ namespace AdvancedChatFeatures.UploadWindow
 
             Texture2D tex = Data.Image;
 
-            Main.NewText(UploadInitializer.Uploads.Count);
-
             if (tex != null)
             {
                 Rectangle target = dims.ToRectangle();
@@ -38,15 +37,8 @@ namespace AdvancedChatFeatures.UploadWindow
             }
 
             // Draw file name
-            string text = $"{Element.Tag} {Element.Tag}";
-            ChatManager.DrawColorCodedStringWithShadow(
-                sb, 
-                FontAssets.MouseText.Value, 
-                text, 
-                dims.Position() + new Microsoft.Xna.Framework.Vector2(32, 4), 
-                Microsoft.Xna.Framework.Color.White, 0f, 
-                Microsoft.Xna.Framework.Vector2.Zero,
-                Microsoft.Xna.Framework.Vector2.One);
+            var imgName = new[] { new TextSnippet(Data.FileName) { Color = Color.White, CheckForHover = false } };
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, imgName, dims.Position(), 0f, Vector2.Zero, Vector2.One, out _);
         }
     }
 }

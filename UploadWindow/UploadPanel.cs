@@ -17,8 +17,6 @@ namespace AdvancedChatFeatures.UploadWindow
             if (items.Count == 0)
                 PopulatePanel();
 
-            Main.NewText(items.Count);
-
             base.Update(gt);
         }
     }

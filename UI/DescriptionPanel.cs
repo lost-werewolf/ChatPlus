@@ -54,6 +54,12 @@ namespace AdvancedChatFeatures.UI
                 Directory.CreateDirectory(folder);
                 string dest = Path.Combine(folder, fileName);
                 File.Copy(fullFilePath, dest, overwrite: true);
+
+                // Refresh the panel
+                if (this is UploadPanel a)
+                {
+
+                }
             }
 
             base.LeftClick(evt);

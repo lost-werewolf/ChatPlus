@@ -205,40 +205,29 @@ namespace AdvancedChatFeatures.UI
             current.SetSelected(true);
 
             // update view position
-            int itemsVisibleCount = Conf.C.featureStyleConfig.ItemsPerWindow;
+            list.Recalculate();
+            float viewportH = list.GetInnerDimensions().Height;
+            float pad = list.ListPadding;
+
+            // distance from top to the selected item
+            float yTop = 0f;
+            for (int i = 0; i < currentIndex; i++)
+                yTop += items[i].GetOuterDimensions().Height + pad;
+
+            float itemH = items[currentIndex].GetOuterDimensions().Height;
+            float yBottom = yTop + itemH;
 
             float view = list.ViewPosition;
-            int topIndex = (int)(view / 30);
-            int bottomIndex = topIndex + itemsVisibleCount - 1;
+            if (yTop < view) view = yTop;
+            else if (yBottom > view + viewportH) view = yBottom - viewportH;
 
-            if (currentIndex < topIndex)
-                view = currentIndex * 30;
-            else if (currentIndex > bottomIndex)
-                view = (currentIndex - itemsVisibleCount + 1) * 30;
+            // total content height for clamping
+            float totalH = 0f;
+            for (int i = 0; i < items.Count; i++)
+                totalH += items[i].GetOuterDimensions().Height + pad;
 
-            float max = Math.Max(0f, items.Count * 30 - itemsVisibleCount * 30);
-            if (view < 0) view = 0;
-            if (view > max) view = max;
-            list.ViewPosition = view;
-
-            //🔹update description panel
-            if (ConnectedPanel is DescriptionPanel<TData> desc)
-            {
-                var element = items[currentIndex];
-                if (element != null)
-                {
-                    if (element.Data is Emoji emoji && emoji.Synonyms.Count > 0)
-                        desc.SetTextWithLinebreak(string.Join(", ", emoji.Synonyms));
-                    else
-                        desc.SetTextWithLinebreak(GetDescription(element.Data));
-                }
-
-                // set color text if description panel is connected to a color panel
-                if (desc.ConnectedPanel.GetType() == typeof(ColorPanel))
-                {
-                    desc.GetText()._color = ColorWindowElement.HexToColor(GetFullTag(current.Data));
-                }
-            }
+            float maxView = Math.Max(0f, totalH - viewportH);
+            list.ViewPosition = MathHelper.Clamp(view, 0f, maxView);
         }
         protected bool JustPressed(Keys key) => Main.keyState.IsKeyDown(key) && Main.oldKeyState.IsKeyUp(key);
 

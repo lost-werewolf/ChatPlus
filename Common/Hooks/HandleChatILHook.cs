@@ -1,8 +1,11 @@
 ﻿using System;
+using AdvancedChatFeatures.ColorWindow;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.ItemWindow;
+using AdvancedChatFeatures.UploadWindow;
 using MonoMod.Cil;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
@@ -54,10 +57,15 @@ namespace AdvancedChatFeatures.Common.Hooks
                     var cmd = ModContent.GetInstance<CommandSystem>();
                     var emo = ModContent.GetInstance<EmojiSystem>();
                     var gly = ModContent.GetInstance<GlyphSystem>();
+                    var upload = ModContent.GetInstance<UploadSystem>();
+                    var c = ModContent.GetInstance<ColorWindowSystem>();
+                    var it = ModContent.GetInstance<ItemWindowSystem>();
 
                     if (cmd?.ui?.CurrentState != null ||
                         emo?.ui?.CurrentState != null ||
-                        gly?.ui?.CurrentState != null)
+                        gly?.ui?.CurrentState != null ||
+                        upload?.ui?.CurrentState != null ||
+                        it?.ui?.CurrentState != null)
                         return 0;
 
                     return v;
