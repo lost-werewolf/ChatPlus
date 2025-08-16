@@ -2,6 +2,7 @@
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Emojis;
+using AdvancedChatFeatures.UI.Glyphs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -98,7 +99,13 @@ namespace AdvancedChatFeatures.UI
 
             // If hovering a scrollbar, skip drag
             var emojiSys = ModContent.GetInstance<EmojiSystem>();
+            var cmdSys = ModContent.GetInstance<CommandSystem>();
+            var glyphSys = ModContent.GetInstance<GlyphSystem>();
+
             if (emojiSys?.emojiState?.emojiPanel?.scrollbar?.IsMouseHovering == true)
+                return;
+
+            if (cmdSys?.commandState?.commandPanel?.scrollbar?.IsMouseHovering == true)
                 return;
 
             // Start dragging

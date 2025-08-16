@@ -1,4 +1,5 @@
 ﻿using AdvancedChatFeatures.Common.Configs;
+using AdvancedChatFeatures.Common.Hooks;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework;
@@ -49,6 +50,10 @@ namespace AdvancedChatFeatures.Commands
             base.LeftClick(evt);
 
             Main.chatText = Command.Name; // Replace chat text with the command name
+
+            // Set caret pos to last pos
+            int chatLength = Main.chatText.Length;
+            HandleChatHook.SetCaretPos(chatLength);
         }
 
         public override void Update(GameTime gameTime)

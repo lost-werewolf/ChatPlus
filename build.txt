@@ -1,4 +1,5 @@
-displayName = Advanced Chat Features
+displayName = Chat+
+side = client
 author = Erky
 version = 0.1
 include = Assets\Emojis\*

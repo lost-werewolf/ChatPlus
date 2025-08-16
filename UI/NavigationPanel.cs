@@ -106,7 +106,8 @@ namespace AdvancedChatFeatures.UI
             }
 
             // Reset index to top item
-            SetSelectedIndex(0);
+            if (items.Count > 0)
+                SetSelectedIndex(0);
         }
 
         public void SetHeight()
@@ -156,6 +157,8 @@ namespace AdvancedChatFeatures.UI
         public override void Update(GameTime gt)
         {
             base.Update(gt);
+
+            Main.NewText(items.Count);
 
             Top.Set(-38, 0);
 

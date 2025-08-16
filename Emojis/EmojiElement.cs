@@ -16,7 +16,7 @@ namespace AdvancedChatFeatures.Emojis
         {
             Emoji = emoji;
             image = new(emoji.FilePath);
-            text = new(emoji.DisplayName, 1.0f, false)
+            text = new(emoji.Tag, 1.0f, false)
             {
                 Left = { Pixels = 32 },
                 VAlign = 0.45f,

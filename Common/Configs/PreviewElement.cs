@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using AdvancedChatFeatures.Helpers;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.GameContent.UI.Chat;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config.UI;
@@ -88,6 +83,7 @@ namespace AdvancedChatFeatures.Common.Configs
                 ("Player", "Message2", false, false),
                 ("Player", "Message3", false, false),
             };
+
             if (enableLinks) rows.Add(("Player", "https://forums.terraria.org/", false, true));
             if (showModIcon) rows.Add((null, "Example Mod Message", true, false));
 
@@ -96,7 +92,6 @@ namespace AdvancedChatFeatures.Common.Configs
             int chatBoxH = TextureAssets.TextBack.Height();
             float topPad = 14f, gapToBox = 8f, bottomPad = 12f;
             float needed = topPad + rows.Count * lineH + gapToBox + chatBoxH + bottomPad;
-            //if (MinHeight.Pixels < needed) MinHeight = new StyleDimension(needed, 0);
 
             // left anchor; give a little extra room if showing player icons
             float left = dims.X + 40f + (showIcons ? 4f : 4f);
@@ -107,13 +102,12 @@ namespace AdvancedChatFeatures.Common.Configs
                 var row = rows[i];
                 Vector2 rowPos = new(left, y);
 
-                // (A) Mod icon row: no player name, no head icon
+                // Draw mod icon
                 if (row.isModIcon)
                 {
-                    // Pick a small icon to display; try tModLoader, otherwise draw Terraria icon via helper
                     Mod mod = null;
                     ModLoader.TryGetMod("ModLoader", out mod);
-                    DrawHelper.DrawSmallModIcon(sb, mod, new Vector2(left - 32f, rowPos.Y - 2f), 26);
+                    DrawHelper.DrawSmallModIcon(sb, mod, new Vector2(left - 28f, rowPos.Y - 0f), 24);
                     var msgSnips = ChatManager.ParseMessage(row.message, Color.Yellow).ToArray();
                     ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, msgSnips, rowPos, 0f, Vector2.Zero, Vector2.One, out _);
                     y += lineH;

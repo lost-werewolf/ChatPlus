@@ -41,6 +41,10 @@ namespace AdvancedChatFeatures.Common.Configs
 
         public class Features
         {
+            [BackgroundColor(255, 192, 8)] // Golden Yellow
+            [DefaultValue(true)]
+            public bool EnableBetterChatNavigation = true;
+
             [CustomModConfigItem(typeof(EnableCommands))]
             [BackgroundColor(255, 192, 8)] // Golden Yellow
             [DefaultValue(true)]

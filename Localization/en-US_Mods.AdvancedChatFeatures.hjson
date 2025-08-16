@@ -30,7 +30,7 @@ Configs: {
 
 	Features: {
 		EnableCommands: {
-			Label: Enable Commands
+			Label: Enable Autocomplete Commands
 			Tooltip:
 				'''
 				Shows an autocomplete window for chat commands.
