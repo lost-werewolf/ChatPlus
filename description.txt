@@ -1,9 +1,11 @@
-﻿Chat+
-Chat+ is a mod that improves the chat quality of life by introducing new features and improving the existing chat system. 
-Features:
-1. Autocomplete chat commands and tags
-2. Upload and send your own images
-3. Emoji support
-4. 
+﻿Chat+ 
+Chat+ makes Terraria's chat smoother, smarter and more fun with emojis, images, links, text editing shortcuts and more!
 
-For the full list of features, please read the Steam Workshop page.
+Features:
+    Emoji Support: Access thousands of emojis directly in chat, powered by Emojibase.
+    Image Support: Upload and send your own images!
+    Link Support: Links you type in chat become clickable.
+    Autocomplete Commands: Type "/" into chat to autocomplete commands. Press Tab to insert the selected command.
+    Autocomplete Tags: Type any tag to open autocomplete window. See the wiki for all tags supported.
+    Text Editing Shortcuts: Use common text-editing shortcuts like Ctrl+C, Ctrl+V, and more directly in chat.
+

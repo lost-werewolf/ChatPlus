@@ -1,8 +1,18 @@
+using System;
+using AdvancedChatFeatures.Colors;
+using AdvancedChatFeatures.Commands;
+using AdvancedChatFeatures.Common.Hooks;
+using AdvancedChatFeatures.Emojis;
+using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.ItemWindow;
+using AdvancedChatFeatures.Uploads;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.UI;
+using Item = AdvancedChatFeatures.ItemWindow.Item;
 
 namespace AdvancedChatFeatures.UI
 {
@@ -28,6 +38,59 @@ namespace AdvancedChatFeatures.UI
         public override void LeftClick(UIMouseEvent evt)
         {
             base.LeftClick(evt);
+
+            //Main.NewText(Data);
+
+            string tag = "";
+            if (Data is Command command) tag = command.Name;
+            else if (Data is ColorItem color) tag = color.Tag;
+            else if (Data is Emoji emoji) tag = emoji.Tag;
+            else if (Data is Glyph glyph) tag = glyph.Tag;
+            else if (Data is Item item) tag = item.Tag;
+            else if (Data is Upload upload) tag = upload.Tag;
+
+            if (this is CommandPanel)
+            {
+                Main.chatText = tag;
+                HandleChatHook.SetCaretPos(Main.chatText.Length);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(tag))
+                return;
+
+            string text = Main.chatText ?? string.Empty;
+
+            // Determine prefix and filtering logic
+            string prefix = this switch
+            {
+                ColorPanel => "[c",
+                EmojiPanel => "[e",
+                GlyphPanel => "[g",
+                ItemPanel => "[i",
+                UploadPanel => "[u",
+                _ => "[e"
+            };
+
+            int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
+            if (start < 0)
+            {
+                // no prefix -> just append
+                Main.chatText += tag;
+                HandleChatHook.SetCaretPos(Main.chatText.Length);
+                return;
+            }
+
+            // find end of unfinished segment (whitespace or ] or end of string)
+            int end = text.IndexOfAny(new[] { ' ', '\t', '\n', '\r', ']' }, start);
+            if (end < 0) end = text.Length;
+
+            // replace segment
+            string before = text[..start];
+            string after = text[end..];
+            Main.chatText = before + tag + after;
+
+            HandleChatHook.SetCaretPos(before.Length + tag.Length);
         }
 
         public override void Update(GameTime gameTime)

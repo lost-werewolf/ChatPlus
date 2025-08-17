@@ -85,10 +85,10 @@ namespace AdvancedChatFeatures.UI
             var uploadSys = ModContent.GetInstance<UploadSystem>();
 
             if (cmdSys.commandState.commandPanel.scrollbar.IsMouseHovering
-            || colorSys.colorState.IsMouseHovering
-            || emojiSys.emojiState.IsMouseHovering
-            || glyphSys.glyphState.IsMouseHovering
-            || itemSys.itemWindowState.IsMouseHovering
+            || colorSys.colorState.colorPanel.scrollbar.IsMouseHovering
+            || emojiSys.emojiState.emojiPanel.scrollbar.IsMouseHovering
+            || glyphSys.glyphState.glyphPanel.scrollbar.IsMouseHovering
+            || itemSys.itemWindowState.itemPanel.scrollbar.IsMouseHovering
             || uploadSys.state.panel.scrollbar.IsMouseHovering)
                 return;
 

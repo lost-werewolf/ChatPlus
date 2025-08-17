@@ -12,9 +12,11 @@ using AdvancedChatFeatures.ItemWindow;
 using AdvancedChatFeatures.Uploads;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Stubble.Core.Classes;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AdvancedChatFeatures.UI
 {
@@ -40,6 +42,7 @@ namespace AdvancedChatFeatures.UI
         // Holding keys
         private double repeatTimer;
         private Keys heldKey = Keys.None;
+        protected bool JustPressed(Keys key) => Main.keyState.IsKeyDown(key) && Main.oldKeyState.IsKeyUp(key);
 
         public NavigationPanel()
         {
@@ -94,11 +97,6 @@ namespace AdvancedChatFeatures.UI
                     return;
                 }
             }
-
-            //foreach (var e in items)
-            //e.SetSelected(false);
-
-            Main.chatText += GetTag(items[currentIndex].Data);
         }
 
         public void PopulatePanel()
@@ -115,6 +113,8 @@ namespace AdvancedChatFeatures.UI
                 var element = BuildElement(data);
                 if (element == null) continue;
 
+                if (!MatchesFilter(data)) continue;
+
                 items.Add(element);
                 fastList.Add(element);
             }
@@ -123,6 +123,75 @@ namespace AdvancedChatFeatures.UI
             if (items.Count > 0) SetSelectedIndex(0);
             else currentIndex = -1;
         }
+
+        #region Filter
+        private bool MatchesFilter(TData data)
+        {
+            string tag = GetTag(data) ?? string.Empty;
+            string text = Main.chatText ?? string.Empty;
+            if (text.Length == 0) return true;
+
+            // Panel -> prefix (no virtuals, no globals)
+            string prefix =
+                this is CommandPanel ? "/" :
+                this is ColorPanel ? "[c" :
+                this is EmojiPanel ? "[e" :
+                this is GlyphPanel ? "[g" :
+                this is ItemPanel ? "[i" :
+                this is UploadPanel ? "[u" : string.Empty;
+
+            if (prefix.Length == 0)
+                return tag.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
+
+            char[] _stopChars = [' ', '\t', '\n', '\r', ']'];
+
+            // Commands: /query (from last '/')
+            if (prefix == "/")
+            {
+                int s = text.LastIndexOf('/');
+                if (s < 0 || s + 1 >= text.Length) return true;
+
+                int e = text.IndexOfAny(_stopChars, s + 1); if (e < 0) e = text.Length;
+                string q = text.Substring(s + 1, e - (s + 1)).Trim();
+                if (q.Length == 0) return true;
+                return tag.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+
+            // Bracketed tags: [x:query or [x/query (use last prefix only)
+            int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
+            if (start < 0)
+                return tag.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0; // fallback
+
+            int qStart = start + prefix.Length;
+            if (qStart < text.Length && (text[qStart] == ':' || text[qStart] == '/')) qStart++;
+            if (qStart >= text.Length) return true;
+
+            int qEnd = text.IndexOfAny(_stopChars, qStart); if (qEnd < 0) qEnd = text.Length;
+            string query = text.Substring(qStart, qEnd - qStart).Trim();
+            if (query.Length == 0) return true;
+
+            return tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+        #endregion
+
+        public override void Update(GameTime gt)
+        {
+            base.Update(gt);
+
+            // Sizing and position
+            if (Conf.C != null)
+            {
+                Top.Set(-38, 0);
+                Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
+                list.Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
+            }
+
+            HandleKeyPressed();
+            HandleNavigationKeys(gt);
+            HandleTabKeyPressed();
+        }
+
+        #region Navigation
 
         public void SetSelectedIndex(int index)
         {
@@ -140,6 +209,7 @@ namespace AdvancedChatFeatures.UI
             currentIndex = index;
             var current = items[currentIndex];
             current.SetSelected(true);
+            string tag = GetTag(current.Data);
 
             // update view position
             list.Recalculate();
@@ -190,24 +260,17 @@ namespace AdvancedChatFeatures.UI
                 // Set color text if description panel is connected to a color panel
                 if (desc.ConnectedPanel.GetType() == typeof(ColorPanel))
                 {
-                    desc.GetText()._color = ColorElement.HexToColor(GetTag(current.Data));
+                    desc.GetText()._color = ColorElement.HexToColor(tag);
                 }
             }
-        }
-        protected bool JustPressed(Keys key) => Main.keyState.IsKeyDown(key) && Main.oldKeyState.IsKeyUp(key);
 
-        public override void Update(GameTime gt)
-        {
-            base.Update(gt);
-
-            // Sizing and position
-            Top.Set(-38, 0);
-            Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
-            list.Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
-
-            HandleKeyPressed();
-            HandleNavigationKeys(gt);
-            HandleTabKeyPressed();
+            // Force chat text if a command
+            // TODO: Uncomment this but allows up and down arrow keys and backspace and searching still
+            if (this is CommandPanel)
+            {
+                //Main.chatText = tag;
+                //HandleChatHook.SetCaretPos(Main.chatText.Length);
+            }
         }
 
         private void HandleKeyPressed()
@@ -265,7 +328,7 @@ namespace AdvancedChatFeatures.UI
             }
 
             // find end of unfinished segment (whitespace or ] or end of string)
-            int end = text.IndexOfAny(new[] { ' ', '\t', '\n', '\r', ']' }, start);
+            int end = text.IndexOfAny([' ', '\t', '\n', '\r', ']'], start);
             if (end < 0) end = text.Length;
 
             // replace segment
@@ -283,22 +346,13 @@ namespace AdvancedChatFeatures.UI
             {
                 SetSelectedIndex(currentIndex - 1);
                 heldKey = Keys.Up;
-
                 repeatTimer = 0.35;
-                if (this is ItemPanel)
-                {
-                    repeatTimer = 0.1;
-                }
             }
             else if (JustPressed(Keys.Down))
             {
                 SetSelectedIndex(currentIndex + 1);
                 heldKey = Keys.Down;
                 repeatTimer = 0.35;
-                if (this is ItemPanel)
-                {
-                    repeatTimer = 0.25;
-                }
             }
 
             // Hold key to repeat navigation
@@ -308,15 +362,13 @@ namespace AdvancedChatFeatures.UI
                 repeatTimer -= dt;
                 if (repeatTimer <= 0)
                 {
-                    if (this is ItemPanel)
-                        repeatTimer += 0.03;
-                    else
-                        repeatTimer += 0.06;
+                    repeatTimer += 0.06;
 
                     if (Main.keyState.IsKeyDown(Keys.Up)) SetSelectedIndex(currentIndex - 1);
                     else if (Main.keyState.IsKeyDown(Keys.Down)) SetSelectedIndex(currentIndex + 1);
                 }
             }
         }
+        #endregion
     }
 }

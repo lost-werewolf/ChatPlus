@@ -8,7 +8,14 @@ public static class StateHandler
 {
     public static void OpenStateIfPrefixMatches(GameTime gameTime, UserInterface ui, UIState state, string prefix)
     {
-        if (!Main.drawingPlayerChat) return;
+        if (!Main.drawingPlayerChat)
+        {
+            if (ui.CurrentState != null)
+            {
+                ui.SetState(null);
+            }
+            return;
+        }
 
         string text = Main.chatText ?? "";
 

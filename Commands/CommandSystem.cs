@@ -35,7 +35,13 @@ namespace AdvancedChatFeatures.Commands
         public override void UpdateUI(GameTime gameTime)
         {
             if (!Main.drawingPlayerChat)
+            {
+                if (ui.CurrentState != null)
+                {
+                    ui.SetState(null);
+                }
                 return;
+            }
 
             char prefix = '/';
 
