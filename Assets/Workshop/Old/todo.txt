@@ -159,3 +159,8 @@ Cleanup:
 - Sync player icons to multiplayer
 - Sync player colors to multiplayer and allow choosing your own
 
+Steam Workshop Preview:
+1. Emojis, Links, Images! (showing 3 chat messages of each feature)
+2. Autocomplete commands and tags! (opening command and tag window)
+3. Keyboard shortcuts and text editing! (showing text editing)
+

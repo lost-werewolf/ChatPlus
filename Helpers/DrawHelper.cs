@@ -9,45 +9,6 @@ namespace AdvancedChatFeatures.Helpers
 {
     public static class DrawHelper
     {
-        public static void DrawPlayerHead(Vector2 pos, Color color, float scale = 0.9f, SpriteBatch sb = null)
-        {
-            if (Main.gameMenu)
-            {
-                if (sb != null && Ass.GuideHead != null && Ass.GuideHead.Value != null)
-                {
-                    pos += new Vector2(-10, -10);
-                    sb.Draw(Ass.GuideHead.Value, pos, Color.White);
-                }
-                return;
-            }
-
-            if (Main.LocalPlayer == null)
-            {
-                Log.Error("Oof no local player in DrawHelper");
-                return;
-            }
-            if (Main.Camera == null)
-            {
-                Log.Error("Oof no camera in DrawHelper");
-                return;
-            }
-
-            // Setup
-            Player player = Main.LocalPlayer; // change later
-            PlayerHeadFlipHook.shouldFlipHeadDraw = player.direction == -1;
-
-            // Call draw
-            Main.MapPlayerRenderer.DrawPlayerHead(
-                camera: Main.Camera,
-                drawPlayer: player,
-                position: pos,
-                alpha: 0.5f,
-                scale: scale,
-                color
-            );
-            PlayerHeadFlipHook.shouldFlipHeadDraw = false;
-        }
-
         public static void DrawSmallModIcon(SpriteBatch sb, Mod mod, Vector2 pos, int size = 16)
         {
             Texture2D tex = null;
@@ -82,6 +43,23 @@ namespace AdvancedChatFeatures.Helpers
                 initialsPos += new Vector2(0, 5);
                 Utils.DrawBorderString(sb, initials, initialsPos, Color.White, scale: 1.0f, 0.5f, 0.5f);
             }
+        }
+        public static void DrawTextAtMouse(SpriteBatch sb, string text)
+        {
+            // This method is used for drawing tooltips in main menu
+            // Inspired by UICharacterCreation::Draw()
+            float x = FontAssets.MouseText.Value.MeasureString(text).X;
+            Vector2 vector = new Vector2(Main.mouseX, Main.mouseY) + new Vector2(16f);
+            if (vector.Y > (float)(Main.screenHeight - 15))
+            {
+                vector.Y = Main.screenHeight - 15;
+            }
+            if (vector.X > (float)Main.screenWidth - x + 40)
+            {
+                vector.X = Main.screenWidth - 460;
+            }
+            Utils.DrawBorderStringFourWay(
+                sb, FontAssets.MouseText.Value, text, vector.X, vector.Y, new Color(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor), Color.Black, Vector2.Zero);
         }
 
         public static void DrawTextureScaledToFit(SpriteBatch sb, Texture2D tex, Rectangle target)

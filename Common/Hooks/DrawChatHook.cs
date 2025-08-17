@@ -26,7 +26,7 @@ namespace AdvancedChatFeatures.Common.Hooks
 
         private void DrawPlayerChat(On_Main.orig_DrawPlayerChat orig, Main self)
         {
-            if (!Conf.C.featureConfig.EnableBetterChatNavigation)
+            if (!Conf.C.featuresConfig.EnableTextEditingShortcuts)
             {
                 orig(self);
                 return;

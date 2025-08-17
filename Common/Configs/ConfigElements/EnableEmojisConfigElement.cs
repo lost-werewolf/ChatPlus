@@ -1,20 +1,23 @@
+using System.Diagnostics;
+using System.Reflection.Emit;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.Localization;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Configs.FeatureConfigs
+namespace AdvancedChatFeatures.Common.Configs.ConfigElements
 {
     /// <summary>
     /// Reference:
     /// <see cref="BooleanElement"/> 
     /// </summary>
-    public class EnableGlyphs : ConfigElement<bool>
+    public class EnableEmojisConfigElement : ConfigElement<bool>
     {
         private Asset<Texture2D> _toggleTexture = Asset<Texture2D>.Empty;
 
@@ -30,8 +33,11 @@ namespace AdvancedChatFeatures.Common.Configs.FeatureConfigs
             {
                 Value = !Value;
 
-                Conf.C.featureConfig.EnableGlyphs = Value;
+                Conf.C.featuresConfig.EnableEmojis = Value;
             };
+
+            //TooltipFunction = () => Language.GetTextValue(
+                //"Mods.AdvancedChatFeatures.Configs.Config.Features.EnableEmojis.Tooltip");
         }
 
         public override void OnInitialize()
@@ -45,23 +51,17 @@ namespace AdvancedChatFeatures.Common.Configs.FeatureConfigs
             DrawToggleTexture(sb);
             DrawOnOffText(sb);
 
-            if (Value)
-                DrawModIcon(sb);
+            DrawExampleEmoji(sb);
         }
 
-        private void DrawModIcon(SpriteBatch sb)
+        private void DrawExampleEmoji(SpriteBatch sb)
         {
-            CalculatedStyle dims = GetDimensions();
-            int xOffset = 16 + 150;
-            int yOffset = 14;
-            Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
-
-            //DrawHelper.DrawPlayerHead(drawPosition, sb: sb);
+            
         }
 
         private void DrawToggleTexture(SpriteBatch sb)
         {
-            // Draw toggle texture
+            // Draw toggle uploadedTexture
             Rectangle sourceRectangle = new Rectangle(
                 Value ? (_toggleTexture.Width() - 2) / 2 + 2 : 0,
                 0,
@@ -72,7 +72,7 @@ namespace AdvancedChatFeatures.Common.Configs.FeatureConfigs
             // Get the dimensions of the parent element
             CalculatedStyle dimensions = GetDimensions();
 
-            // Calculate the position to draw the toggle texture
+            // Calculate the position to draw the toggle uploadedTexture
             sb.Draw(
                 _toggleTexture.Value,
                 new Vector2(

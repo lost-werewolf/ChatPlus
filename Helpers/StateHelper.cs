@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -7,34 +8,39 @@ namespace AdvancedChatFeatures.Helpers
 {
     public static class StateHelper
     {
-        private static readonly HashSet<UserInterface> _all = new();
-        private static UserInterface _active;
+        private static readonly HashSet<UserInterface> all = new();
+        private static UserInterface active;
+
+        public static bool AnyActive()
+        {
+            return active != null && active.CurrentState != null;
+        }
 
         public static void Register(UserInterface ui)
         {
-            if (ui != null) _all.Add(ui);
+            if (ui != null) all.Add(ui);
         }
 
         public static void Unregister(UserInterface ui)
         {
             if (ui == null) return;
-            _all.Remove(ui);
-            if (_active == ui) _active = null;
+            all.Remove(ui);
+            if (active == ui) active = null;
         }
 
-        public static bool IsActive(UserInterface ui) => _active == ui;
+        public static bool IsActive(UserInterface ui) => active == ui;
 
         public static void Close(UserInterface ui)
         {
             if (ui?.CurrentState != null) ui.SetState(null);
-            if (_active == ui) _active = null;
+            if (active == ui) active = null;
         }
 
         public static void CloseAll()
         {
-            foreach (var ui in _all)
+            foreach (var ui in all)
                 ui?.SetState(null);
-            _active = null;
+            active = null;
         }
 
         public static void OpenExclusive(UserInterface ui, UIState state)
@@ -42,12 +48,12 @@ namespace AdvancedChatFeatures.Helpers
             if (ui == null || state == null) return;
 
             // Close everyone else first
-            foreach (var other in _all)
+            foreach (var other in all)
                 if (other != null && other != ui && other.CurrentState != null)
                     other.SetState(null);
 
             // Now open this one
-            _active = ui;
+            active = ui;
             if (ui.CurrentState != state)
                 ui.SetState(state);
         }
@@ -56,7 +62,6 @@ namespace AdvancedChatFeatures.Helpers
         {
             if (ui == null || target == null) return;
 
-            // Don’t run this in main menu.
             if (Main.gameMenu) { Close(ui); return; }
 
             string text = Main.chatText ?? string.Empty;
@@ -69,7 +74,6 @@ namespace AdvancedChatFeatures.Helpers
             }
             else
             {
-                // Close this UI even if it's not the currently active one.
                 Close(ui);
             }
         }

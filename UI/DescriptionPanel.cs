@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
 using AdvancedChatFeatures.Common.Configs;
-using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.ImageWindow;
+using AdvancedChatFeatures.Uploads;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -17,7 +16,7 @@ namespace AdvancedChatFeatures.UI
         private readonly UIText text;
         public UIText GetText() => text;
 
-        public DescriptionPanel(string initialText)
+        public DescriptionPanel(string initialText = null, bool centerText=false)
         {
             // Size
             Width.Set(320, 0);
@@ -30,36 +29,43 @@ namespace AdvancedChatFeatures.UI
             VAlign = 1f;
             Left.Set(80, 0);
 
-            text = new(initialText, 0.9f, false);
+            // Text
+            text = new(initialText ?? string.Empty, 0.9f, false)
+            {
+                HAlign = 0.5f
+            };
+
+            if (centerText)
+            {
+                text.HAlign = 0.5f;
+                text.VAlign = 0.5f;
+            }
+
             Append(text);
         }
 
         public override void LeftClick(UIMouseEvent evt)
         {
-            if (ConnectedPanel.GetType() == typeof(ImagePanel))
+            if (typeof(TData) == typeof(Upload))
             {
                 string fullFilePath = FileUploadHelper.OpenFileDialog();
-                string fileName = Path.GetFileName(fullFilePath);
-                string tag = ImageTagHandler.Tag(fileName);
-                Texture2D tex = FileUploadHelper.ReadAndCreateTextureFromPath(fullFilePath);
-                ImageInitializer.Uploads.Add(new Image(
-                    Tag: tag,
-                    FileName: fileName,
-                    FullFilePath: fullFilePath,
-                    Texture: tex
-                ));
+                if (fullFilePath == null) return;
 
-                // Copy image to our folder
+                string fileName = Path.GetFileName(fullFilePath);
+                string tag = UploadTagHandler.GenerateTag(fileName);
+                Texture2D texture = FileUploadHelper.CreateTextureFromPath(fullFilePath);
+
+                UploadInitializer.Uploads.Add(new Upload(tag, fileName, fullFilePath, texture));
+                //UploadInitializer.AddNewUpload(new Upload(tag, fileName, fullFilePath, texture));
+
+                Log.Info(UploadInitializer.Uploads.Count.ToString());
+
                 string folder = Path.Combine(Main.SavePath, "AdvancedChatFeatures", "Uploads");
                 Directory.CreateDirectory(folder);
-                string dest = Path.Combine(folder, fileName);
-                File.Copy(fullFilePath, dest, overwrite: true);
+                File.Copy(fullFilePath, Path.Combine(folder, fileName), true);
 
-                // Refresh the panel
-                if (this is ImagePanel a)
-                {
-
-                }
+                if (this is UploadPanel up)
+                    up.PopulatePanel();
             }
 
             base.LeftClick(evt);
@@ -75,7 +81,7 @@ namespace AdvancedChatFeatures.UI
                 var state = Main.InGameUI.CurrentState;
                 if (state is not UIElement root) return;
 
-                Conf.C.ExpandSection(root, "Style");
+                Conf.C.ExpandSection(root, nameof(Conf.C.autocompleteWindowConfig));
             });
         }
 
@@ -108,7 +114,7 @@ namespace AdvancedChatFeatures.UI
         {
             int pad = 2;
 
-            Top.Set(-Conf.C.featureStyleConfig.ItemsPerWindow * 30 - 38 - pad, 0);
+            Top.Set(-Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30 - 38 - pad, 0);
 
             base.Draw(spriteBatch);
         }

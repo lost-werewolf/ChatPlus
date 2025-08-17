@@ -3,7 +3,7 @@ using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
 
-namespace AdvancedChatFeatures.Common.Commands
+namespace AdvancedChatFeatures.Common.ModCommands
 {
     public class ChatClearCommand : ModCommand
     {

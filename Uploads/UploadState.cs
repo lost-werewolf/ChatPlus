@@ -1,21 +1,20 @@
-using AdvancedChatFeatures.ImageWindow;
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.ImageWindow
+namespace AdvancedChatFeatures.Uploads
 {
-    public class ImageState : UIState
+    public class UploadState : UIState
     {
-        public ImagePanel panel;
-        public DescriptionPanel<Image> desc;
+        public UploadPanel panel;
+        public DescriptionPanel<Upload> desc;
 
-        public ImageState()
+        public UploadState()
         {
             panel = new();
             Append(panel);
 
-            desc = new("Upload images\nClick here to upload a file");
+            desc = new("Upload images\nClick here to upload an image");
             Append(desc);
 
             panel.ConnectedPanel = desc;

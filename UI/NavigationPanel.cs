@@ -9,6 +9,7 @@ using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.ItemWindow;
+using AdvancedChatFeatures.Uploads;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -33,6 +34,7 @@ namespace AdvancedChatFeatures.UI
         protected abstract NavigationElement<TData> BuildElement(TData data); // The method to create a new element from the data
         protected abstract string GetDescription(TData data);
         protected abstract string GetFullTag(TData data);
+        protected virtual string Prefix => ""; // override in subclasses
 
         // Navigation
         protected int currentIndex = 0; // first item
@@ -103,88 +105,61 @@ namespace AdvancedChatFeatures.UI
             currentIndex = -1;
         }
 
-        protected void PopulatePanel()
+        public void PopulatePanel()
         {
             items.Clear();
             list.Clear();
 
             var source = GetSource();
-            List<UIElement> fastList = new();
+            if (source == null) return;
 
-            string query = BuildFilterQuery(Main.chatText ?? string.Empty);
+            string query = ExtractQuery(Main.chatText ?? string.Empty);
+            bool doFilter = !string.IsNullOrWhiteSpace(query);
 
-            if (source != null)
+            // Stable two buckets
+            List<NavigationElement<TData>> exact = new();
+            List<NavigationElement<TData>> partial = new();
+
+            foreach (var data in source)
             {
-                foreach (TData data in source)
-                {
-                    // If query is empty → show all
-                    if (!string.IsNullOrWhiteSpace(query))
-                    {
-                        string desc = GetDescription(data) ?? string.Empty;
-                        string tag = GetFullTag(data) ?? string.Empty;
+                if (doFilter && !MatchesFilter(data, query))
+                    continue;
 
-                        // Filter emojis
-                        IEnumerable<string> synonyms = (data is Emoji e) ? e.Synonyms : Array.Empty<string>();
+                var element = BuildElement(data);
+                if (element == null) continue;
 
-                        // Filter items
-                        string name = (data is ItemWindow.Item item) ? item.DisplayName ?? "" : "";
+                string tag = GetFullTag(data) ?? string.Empty;
+                string desc = GetDescription(data) ?? string.Empty;
 
-                        bool match = desc.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                            tag.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                            name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                            synonyms.Any(s => s.Contains(query, StringComparison.OrdinalIgnoreCase));
-                        if (!match)
-                            continue;
-                    }
+                bool isExact = (!string.IsNullOrEmpty(query)) &&
+                               (tag.Equals(query, StringComparison.OrdinalIgnoreCase) ||
+                                desc.Equals(query, StringComparison.OrdinalIgnoreCase));
 
-                    var element = BuildElement(data);
-                    if (element == null)
-                        continue;
-
-                    items.Add(element);
-                    fastList.Add(element);
-                }
-
-                if (fastList.Count > 0)
-                    list.AddRange(fastList);
+                (isExact ? exact : partial).Add(element);
             }
 
-            // Reset selection
-            if (items.Count > 0)
-                SetSelectedIndex(0);
-            else
-                currentIndex = -1;
+            // Exact first, then partial; preserve original order within each bucket
+            if (exact.Count > 0) { items.AddRange(exact); list.AddRange(exact); }
+            if (partial.Count > 0) { items.AddRange(partial); list.AddRange(partial); }
+
+            if (items.Count > 0) SetSelectedIndex(0);
+            else currentIndex = -1;
         }
 
-        private static string BuildFilterQuery(string text)
+        protected virtual bool MatchesFilter(TData data, string query)
         {
-            text = text.Trim();
-
-            if (text.StartsWith("/"))
-            {
-                int space = text.IndexOf(' ');
-                return (space > 1 ? text.Substring(1, space - 1) : text.Substring(1)).Trim();
-            }
-
-            int lb = text.LastIndexOf('[');
-            if (lb >= 0)
-            {
-                string inside = text.Substring(lb + 1);
-                int colon = inside.IndexOf(':');
-                if (colon >= 0)
-                    return inside.Substring(colon + 1).Trim();
-
-                return inside.Trim();
-            }
-
-            return text;
+            if (string.IsNullOrWhiteSpace(query)) return true;
+            string tag = GetFullTag(data) ?? string.Empty;
+            string desc = GetDescription(data) ?? string.Empty;
+            return tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
+                || desc.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         public void SetHeight()
         {
             // Set height
-            Height.Set(Conf.C.featureStyleConfig.ItemsPerWindow * 30, 0);
-            list.Height.Set(Conf.C.featureStyleConfig.ItemsPerWindow * 30, 0);
+            Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
+            list.Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
         }
 
         public virtual void SetSelectedIndex(int index)
@@ -228,6 +203,34 @@ namespace AdvancedChatFeatures.UI
 
             float maxView = Math.Max(0f, totalH - viewportH);
             list.ViewPosition = MathHelper.Clamp(view, 0f, maxView);
+
+            // 🔹 Update description panel
+            if (ConnectedPanel is DescriptionPanel<TData> desc)
+            {
+                if (typeof(TData) == typeof(Upload))
+                {
+                    return;
+                }
+
+                var element = items[currentIndex];
+                if (element != null)
+                {
+                    if (element.Data is Emoji emoji && emoji.Synonyms.Count > 0)
+                    {
+                        desc.SetTextWithLinebreak(string.Join(", ", emoji.Synonyms));
+                    }
+                    else
+                    {
+                        desc.SetTextWithLinebreak(GetDescription(element.Data));
+                    }
+                }
+
+                // Set color text if description panel is connected to a color panel
+                if (desc.ConnectedPanel.GetType() == typeof(ColorPanel))
+                {
+                    desc.GetText()._color = ColorWindowElement.HexToColor(GetFullTag(current.Data));
+                }
+            }
         }
         protected bool JustPressed(Keys key) => Main.keyState.IsKeyDown(key) && Main.oldKeyState.IsKeyUp(key);
 
@@ -243,6 +246,49 @@ namespace AdvancedChatFeatures.UI
             HandleNavigationKeys(gt);
             HandleTabComplete();
         }
+
+        protected virtual string ExtractQuery(string text)
+        {
+            text ??= string.Empty;
+
+            // Commands: "/foo" -> "foo"
+            if (Prefix == "/")
+            {
+                if (!text.StartsWith("/")) return string.Empty;
+                int space = text.IndexOf(' ');
+                return (space >= 0 ? text.Substring(1, space - 1) : text.Substring(1)).Trim();
+            }
+
+            // Emojis: "…;smil" -> "smil"  (last semicolon to next whitespace/end)
+            if (Prefix == ";")
+            {
+                int start = text.LastIndexOf(';');
+                if (start < 0 || start == text.Length - 1) return string.Empty;
+
+                int end = text.IndexOfAny(new[] { ' ', '\t', '\n', '\r' }, start + 1);
+                string span = end > start ? text.Substring(start + 1, (end - start - 1)) : text.Substring(start + 1);
+                return span.Trim().Trim('"');
+            }
+
+            // Bracketed tags: "[i", "[g", "[c", "[u" etc.
+            if (!string.IsNullOrEmpty(Prefix) && Prefix.StartsWith("["))
+            {
+                int start = text.LastIndexOf(Prefix, StringComparison.OrdinalIgnoreCase);
+                if (start < 0) return string.Empty;
+
+                int after = start + Prefix.Length;
+                // Optional colon after the prefix, e.g. "[i:..."
+                if (after < text.Length && text[after] == ':') after++;
+
+                // Until closing ']' or end
+                int rb = text.IndexOf(']', after);
+                string span = rb > after ? text.Substring(after, rb - after) : text.Substring(after);
+                return span.Trim().Trim('"');
+            }
+
+            return string.Empty;
+        }
+
 
         private void FilterSearch()
         {
@@ -268,56 +314,65 @@ namespace AdvancedChatFeatures.UI
 
         private void HandleTabComplete()
         {
-            if (this is CommandPanel)
-                return;
-
-            if (!JustPressed(Keys.Tab))
-                return;
-
-            if (items.Count == 0)
-                return;
+            if (!JustPressed(Keys.Tab)) return;
+            if (items.Count == 0) return;
 
             var current = items[currentIndex];
             if (current == null) return;
 
-            string tag = GetFullTag(current.Data);
-            if (string.IsNullOrEmpty(tag)) return;
+            string insert = GetFullTag(current.Data);
+            if (string.IsNullOrEmpty(insert)) return;
 
-            if (!Main.chatText.Contains(']'))
+            string text = Main.chatText ?? string.Empty;
+
+            // Commands: replace "/foo" (until first space) with "/realcmd "
+            if (Prefix == "/")
             {
-                Main.chatText = tag;
-            }
-            else
-            {
-                int lb = Main.chatText.LastIndexOf("[e:");
-                if (lb >= 0)
-                {
-                    int rb = Main.chatText.IndexOf(']', lb);
-                    if (rb == -1) // only if it's unfinished
-                    {
-                        // Replace unfinished with the chosen tag
-                        string before = Main.chatText.Substring(0, lb);
-                        Main.chatText = before + tag;
-                    }
-                    else
-                    {
-                        // If it was already closed, just append
-                        Main.chatText += tag;
-                    }
-                }
-                else
-                {
-                    // No [e: found at all → append
-                    Main.chatText += tag;
-                }
+                if (!text.StartsWith("/")) { Main.chatText += insert + " "; HandleChatHook.SetCaretPos(Main.chatText.Length); return; }
+                int space = text.IndexOf(' ');
+                int end = space >= 0 ? space : text.Length;
+                Main.chatText = insert + " " + (space >= 0 ? text.Substring(space + 1) : string.Empty);
+                HandleChatHook.SetCaretPos(insert.Length + 1);
+                return;
             }
 
+            // Emojis: replace the word that starts at the last ';' up to next whitespace/end
+            if (Prefix == ";")
+            {
+                int start = text.LastIndexOf(';');
+                if (start < 0) { Main.chatText += insert; HandleChatHook.SetCaretPos(Main.chatText.Length); return; }
+
+                int end = text.IndexOfAny(new[] { ' ', '\t', '\n', '\r' }, start + 1);
+                string before = text.Substring(0, start);
+                string after = (end >= 0 ? text.Substring(end) : string.Empty);
+                Main.chatText = before + insert + after;
+                HandleChatHook.SetCaretPos((before + insert).Length);
+                return;
+            }
+
+            // Bracketed tags like "[i", "[g", "[c", "[u]"
+            if (!string.IsNullOrEmpty(Prefix) && Prefix.StartsWith("["))
+            {
+                int start = text.LastIndexOf(Prefix, StringComparison.OrdinalIgnoreCase);
+                if (start < 0) { Main.chatText += insert; HandleChatHook.SetCaretPos(Main.chatText.Length); return; }
+
+                int after = start + Prefix.Length;
+                if (after < text.Length && text[after] == ':') after++;
+
+                int rb = text.IndexOf(']', after);
+                int end = (rb >= 0 ? rb + 1 : text.Length);
+
+                string before = text.Substring(0, start);
+                string afterText = (end < text.Length ? text.Substring(end) : string.Empty);
+
+                Main.chatText = before + insert + afterText;
+                HandleChatHook.SetCaretPos((before + insert).Length);
+                return;
+            }
+
+            // Fallback
+            Main.chatText += insert;
             HandleChatHook.SetCaretPos(Main.chatText.Length);
-
-            // 🔹 reset filter so next emoji search starts fresh
-            Main.chatText += " ";
-            PopulatePanel();
-            ghostText = "";
         }
 
         private void HandleNavigationKeys(GameTime gt)
@@ -359,33 +414,6 @@ namespace AdvancedChatFeatures.UI
 
                     if (Main.keyState.IsKeyDown(Keys.Up)) SetSelectedIndex(currentIndex - 1);
                     else if (Main.keyState.IsKeyDown(Keys.Down)) SetSelectedIndex(currentIndex + 1);
-                }
-            }
-        }
-
-        private string ghostText = "";
-
-        public override void Draw(SpriteBatch sb)
-        {
-            base.Draw(sb);
-
-            if (!Conf.C.featureStyleConfig.ShowAutocompleteText)
-                return;
-
-            if (items.Count > 0 && currentIndex >= 0)
-            {
-                // pick the current suggestion
-                if (this is EmojiPanel)
-                {
-                    ghostText = GetDescription(items[currentIndex].Data);
-                    if (!string.IsNullOrEmpty(ghostText))
-                        DrawHelper.DrawGhostText(sb, ghostText);
-                }
-                else if (this is GlyphPanel)
-                {
-                    //var suggestion = GetFullTag(items[currentIndex].Data);
-                    //if (!string.IsNullOrEmpty(suggestion))
-                    //    DrawHelper.DrawGhostText(sb, suggestion);
                 }
             }
         }

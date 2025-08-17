@@ -18,6 +18,8 @@ namespace AdvancedChatFeatures.ColorWindow
         protected override string GetFullTag(Color data)
             => data.Tag;
 
+        protected override string Prefix => "[c";
+
         public override void Update(GameTime gt)
         {
             if (items.Count == 0)

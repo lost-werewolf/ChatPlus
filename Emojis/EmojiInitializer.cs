@@ -69,7 +69,7 @@ namespace AdvancedChatFeatures.Emojis
             int indexedCount = 0;
             int skippedCount = 0;
 
-            Log.Info("[utart] Initializing emojis...");
+            Log.Info("[start] Initializing emojis...");
 
             foreach (string file in Mod.GetFileNames())
             {
@@ -98,13 +98,15 @@ namespace AdvancedChatFeatures.Emojis
 
                 EmojiTagHandler.RegisterEmoji(displayName, texturePath);
                 for (int i = 1; i < tags.Count; i++)
+                {
                     EmojiTagHandler.RegisterEmoji(tags[i], texturePath);
+                }
 
                 Emojis.Add(new Emoji
                 {
                     FilePath = texturePath,
                     Description = displayName,
-                    Tag = EmojiTagHandler.GenerateTag(displayName),
+                    Tag = EmojiTagHandler.GenerateEmojiTag(displayName),
                     Synonyms = new List<string>(tags)
                 });
 

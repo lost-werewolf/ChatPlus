@@ -1,22 +1,20 @@
-using System.Reflection.Emit;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.Localization;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Configs.FeatureConfigs
+namespace AdvancedChatFeatures.Common.Configs.ConfigElements
 {
     /// <summary>
     /// Reference:
     /// <see cref="BooleanElement"/> 
     /// </summary>
-    public class ShowLinksElement : ConfigElement<bool>
+    public class AutocompleteCommandsConfigElement : ConfigElement<bool>
     {
         private Asset<Texture2D> _toggleTexture = Asset<Texture2D>.Empty;
 
@@ -32,11 +30,8 @@ namespace AdvancedChatFeatures.Common.Configs.FeatureConfigs
             {
                 Value = !Value;
 
-                Conf.C.styleConfig.ShowLinks = Value;
+                Conf.C.featuresConfig.AutocompleteCommands = Value;
             };
-
-            //TooltipFunction = () => Language.GetTextValue(
-                //"Mods.AdvancedChatFeatures.Configs.Config.Features.ShowLinks.Tooltip");
         }
 
         public override void OnInitialize()
@@ -47,44 +42,25 @@ namespace AdvancedChatFeatures.Common.Configs.FeatureConfigs
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            DrawLinkExample(sb);
             DrawToggleTexture(sb);
             DrawOnOffText(sb);
+
+            DrawCommandExample(sb);
         }
 
-        private void DrawLinkExample(SpriteBatch sb)
+        private void DrawCommandExample(SpriteBatch sb)
         {
-            string ex = "https://forums.terraria.org/";
             CalculatedStyle dims = GetDimensions();
-            Vector2 pos = dims.Position();
+            int xOffset = 16 + 150;
+            int yOffset = 14;
+            Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
 
-            // 1. Draw underline
-            Vector2 textSize = FontAssets.MouseText.Value.MeasureString(ex);
-            int xOffset = 150;
-            float x = pos.X + 8 + xOffset;
-            float y = pos.Y + textSize.Y - 8;
-            float scale = 0.72f;
-            float w = scale * textSize.X+20;
-            Rectangle underlineRect = new Rectangle((int)x, (int)y, (int)w, 2);
-            sb.Draw(TextureAssets.MagicPixel.Value, underlineRect, ColorHelper.BlueUnderline);
-
-            // 2. Draw text in blue
-            Vector2 textPos = new(pos.X + 8 + xOffset, pos.Y + textSize.Y / 2 - 9);
-            ChatManager.DrawColorCodedStringWithShadow(
-                sb,
-                FontAssets.MouseText.Value,
-                ex,
-                textPos,
-                new Color(17, 85, 204),
-                0f,
-                Vector2.Zero,
-                baseScale: new Vector2(0.8f)
-            );
+            //DrawHelper.DrawPlayerHead(drawPosition, sb: sb);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)
         {
-            // Draw toggle texture
+            // Draw toggle uploadedTexture
             Rectangle sourceRectangle = new Rectangle(
                 Value ? (_toggleTexture.Width() - 2) / 2 + 2 : 0,
                 0,
@@ -95,7 +71,7 @@ namespace AdvancedChatFeatures.Common.Configs.FeatureConfigs
             // Get the dimensions of the parent element
             CalculatedStyle dimensions = GetDimensions();
 
-            // Calculate the position to draw the toggle texture
+            // Calculate the position to draw the toggle uploadedTexture
             sb.Draw(
                 _toggleTexture.Value,
                 new Vector2(

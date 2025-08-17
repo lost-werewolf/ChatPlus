@@ -1,56 +1,62 @@
 ﻿[h1] Chat+ [/h1]
-Chat+ is a mod that improves the chat quality of life by introducing new features and improving the existing chat system. For the full list of features, please read below.
+Chat+ makes Terraria's chat smoother, smarter and more fun with emojis, images, links, text editing shortcuts and more!
 
-[h2] New Tags [/h2] 
-All tags now have autocomplete functionality. See the [url=https://terraria.wiki.gg/wiki/Chat#Tags] wiki [/url] for the full list of tags.
-There are also new tags, which can be opened by typing [ folowed by the tag name, for example [code][e[/code] will open up the emoji window.
-
-[table equalcells=1]
-    [tr]
-        [th]Tag[/th]
-        [th]Usage[/th]
-        [th]Example[/th]
-    [/tr]
-    [tr]
-        [td][code][e][/code][/td]
-        [td]Insert emojis[/td]
-        [td][code][e:thumbs_up][/code] → 👍[/td]
-    [/tr]
-    [tr]
-        [td][code][u][/code][/td]
-        [td]Upload images/GIFs[/td]
-        [td][code][u:your_image|size=600][/code] → (image shown with size 600px width)[/td]
-    [/tr]
-[/table]
-
-[h2] New Features [/h2] 
+[h1] Features [/h1] 
 [list]
-[*] [b]Links[/b]: You can now send links in the chat and click on them to open them in your browser.
-[*] [b]Autocomplete commands[/b]: You can now autocomplete commands in the chat by typing [td][code]/[/code][/td]
-[*] [b]Chat icons[/b]: Enable or disable player and mod icons in the chat.
-[*] [b]Chat formatting[/b]: Change the color and formatting of player names in the chat.
+[*] [b]Emoji Support[/b]: Access thousands of emojis directly in chat, powered by [url=https://emojibase.dev/emojis?] Emojibase [/url].
+[*] [b]Image Support[/b]: Upload and send your own images!
+[*] [b]Link Support[/b]: Links you type in chat become clickable.
+[*] [b]Autocomplete Commands[/b]: Type [code] "/" [/code] into chat to autocomplete commands. Press Tab to insert the selected command.
+[*] [b]Autocomplete Tags[/b]: Type any tag to open autocomplete window. See the [url=https://terraria.wiki.gg/wiki/Chat#Tags] wiki [/url] for all tags supported.
+[*] [b]Text Editing Shortcuts[/b]: Use common text-editing shortcuts like Ctrl+C, Ctrl+V, and more directly in chat.
+
 [/list]
 
-[h2] Improved Chat [/h2] 
-You can now use shortcuts and select text using shortcuts.
+[h2] New Tag: Emojis [/h2] 
+Enter [code] : [/code] into chat to insert emojis. Press Tab to insert the selected emoji.
+
+[h2] New Tag: Upload Images [/h2] 
+Enter [code] @ [/code] into chat to upload your images. Press Tab to insert the selected image.
+
+[h2] Text Editing Shortcuts [/h2] 
+You can now use common text editing keyboard shortcuts directly in the chat input for a smoother experience.
+
 [table equalcells=1]
     [tr]
         [th]Shortcut[/th]
-        [th][/th]
+        [th]Action[/th]
     [/tr]
     [tr]
-        [td][code]Ctrl+X[/code]/[code]Ctrl+C[/code]/[code]Ctrl+V[/code][/td]
-        [td]Cut/copy/paste</td>
+        [td][code]← / →[/code][/td]
+        [td]Move cursor left/right[/td]
     [/tr]
     [tr]
-        [td][code](Ctrl)+Shift+←/→[/code][/td]
-        [td]Select words/characters</td>
+        [td][code]Shift+← / →[/code][/td]
+        [td]Select characters[/td]
+    [/tr]
+    [tr]
+        [td][code]Ctrl+Shift+← / →[/code][/td]
+        [td]Select words[/td]
+    [/tr]
+    [tr]
+        [td][code]Ctrl+X[/code][/td]
+        [td]Cut[/td]
+    [/tr]
+    [tr]
+        [td][code]Ctrl+C[/code][/td]
+        [td]Copy[/td]
+    [/tr]
+    [tr]
+        [td][code]Ctrl+V[/code][/td]
+        [td]Paste[/td]
     [/tr]
 [/table]
+
+Compatible with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3448785552] Chitter-Chatter [/url] and [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3429640606&searchtext=chat] BetterChatBox [/url].
 
 [h2] Support me! [/h2]
 [list]
 [*] Source code hosted at: [url=https://github.com/emyhrberg/AdvancedChatFeatures] GitHub [/url]
 [*] Got questions or suggestions? Join us at: [url=https://discord.gg/JWbYUktRPV] Discord [/url]
-[*] Wish to support my mod development? You can do so at  [url=https://ko-fi.com/erkyy] Ko-Fi [/url]
+[*] Wish to support my mod development? You can do so at [url=https://ko-fi.com/erkyy] Ko-Fi [/url]
 [/list]

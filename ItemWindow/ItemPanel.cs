@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.UI;
+using AdvancedChatFeatures.Uploads;
 using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace AdvancedChatFeatures.ItemWindow
@@ -15,8 +17,15 @@ namespace AdvancedChatFeatures.ItemWindow
         protected override IEnumerable<Item> GetSource() =>
             ItemInitializer.Items.OrderBy(i => i.ID);
 
+        protected override string Prefix => "[i";
+
         protected override string GetDescription(Item data)
-            => $"{data.DisplayName}\n{data.Tooltip}";
+        {
+            //if (data.Tooltip == "")
+                //return "no tt!";
+
+            return $"{data.DisplayName}\n{data.Tooltip}";
+        }
 
         protected override string GetFullTag(Item data)
             => data.Tag;

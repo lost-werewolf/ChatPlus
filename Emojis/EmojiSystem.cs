@@ -40,7 +40,7 @@ namespace AdvancedChatFeatures.Emojis
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHelper.ToggleForPrefixExclusive(ui, emojiState, gameTime, "[e");
+            StateHelper.ToggleForPrefixExclusive(ui, emojiState, gameTime, ";");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

@@ -1,4 +1,6 @@
+using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.UI;
+using AdvancedChatFeatures.Uploads;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
@@ -35,6 +37,7 @@ namespace AdvancedChatFeatures.Emojis
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
+
 
             if (text != null) RemoveChild(text);
 

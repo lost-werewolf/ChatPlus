@@ -14,7 +14,7 @@ namespace AdvancedChatFeatures.ItemWindow
             itemPanel = new();
             Append(itemPanel);
 
-            itemDescPanel = new("List of items");
+            itemDescPanel = new();
             Append(itemDescPanel);
 
             itemPanel.ConnectedPanel = itemDescPanel;

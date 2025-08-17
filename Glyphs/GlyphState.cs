@@ -15,7 +15,7 @@ namespace AdvancedChatFeatures.Glyphs
             glyphPanel = new();
             Append(glyphPanel);
 
-            glyphDescPanel = new("List of glyphs");
+            glyphDescPanel = new(centerText: true);
             Append(glyphDescPanel);
 
             glyphPanel.ConnectedPanel = glyphDescPanel;

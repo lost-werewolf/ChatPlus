@@ -14,7 +14,7 @@ namespace AdvancedChatFeatures.ColorWindow
             colorPanel = new();
             Append(colorPanel);
 
-            colorDescPanel = new("List of colors");
+            colorDescPanel = new();
             Append(colorDescPanel);
 
             colorPanel.ConnectedPanel = colorDescPanel;

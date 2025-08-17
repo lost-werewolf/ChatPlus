@@ -3,11 +3,9 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using AdvancedChatFeatures.Commands;
-using AdvancedChatFeatures.Common.Configs.FeatureConfigs;
-using AdvancedChatFeatures.Common.Configs.StyleConfigs;
+using AdvancedChatFeatures.Common.Configs.ConfigElements;
 using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI.DrawConfig;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
@@ -22,56 +20,45 @@ namespace AdvancedChatFeatures.Common.Configs
 
         [Expand(false, false)]
         [BackgroundColor(255, 192, 8)] // Golden Yellow
-        public Features featureConfig = new();
+        public Features featuresConfig = new();
 
         [BackgroundColor(231, 84, 128)] // Rose Pink
         [Expand(false, false)]
-        public FeatureStyleConfig featureStyleConfig = new();
-
-        [Expand(false, false)]
-        [BackgroundColor(192, 54, 64)] // Calamity Red
-        public StyleConfig styleConfig = new();
-
-        [Header("Preview")]
-
-        [JsonIgnore]
-        [ShowDespiteJsonIgnore]
-        [CustomModConfigItem(typeof(PreviewElement))]
-        public int ChatBoxPreviewElement; // int is just a placeholder, it doesnt matter
+        public AutocompleteWindowConfig autocompleteWindowConfig = new();
 
         public class Features
         {
-            [CustomModConfigItem(typeof(EnableCommands))]
+            [CustomModConfigItem(typeof(AutocompleteTagsConfigElement))]
             [BackgroundColor(255, 192, 8)] // Golden Yellow
             [DefaultValue(true)]
-            public bool EnableCommands = true;
+            public bool AutocompleteTags = true;
 
+            [CustomModConfigItem(typeof(AutocompleteCommandsConfigElement))]
             [BackgroundColor(255, 192, 8)] // Golden Yellow
             [DefaultValue(true)]
-            public bool EnableBetterChatNavigation = true;
+            public bool AutocompleteCommands = true;
 
-            [CustomModConfigItem(typeof(EnableColorPicker))]
             [BackgroundColor(255, 192, 8)] // Golden Yellow
-            [DefaultValue(true)]
-            public bool EnableColorPicker = true;
-
-            [CustomModConfigItem(typeof(EnableEmojis))]
-            [BackgroundColor(255, 192, 8)] // Golden Yellow
+            [CustomModConfigItem(typeof(EnableEmojisConfigElement))]
             [DefaultValue(true)]
             public bool EnableEmojis = true;
 
-            [CustomModConfigItem(typeof(EnableGlyphs))]
             [BackgroundColor(255, 192, 8)] // Golden Yellow
+            [CustomModConfigItem(typeof(EnableUploadImagesConfigElement))]
             [DefaultValue(true)]
-            public bool EnableGlyphs = true;
+            public bool EnableUploadImages = true;
 
-            [CustomModConfigItem(typeof(EnableItemBrowser))]
+            [BackgroundColor(255, 192, 8)] // Golden Yellow
+            [CustomModConfigItem(typeof(EnableLinksConfigElement))]
+            [DefaultValue(true)]
+            public bool EnableLinks = true;
+
             [BackgroundColor(255, 192, 8)] // Golden Yellow
             [DefaultValue(true)]
-            public bool EnableItemBrowser = true;
+            public bool EnableTextEditingShortcuts = true;
         }
 
-        public class FeatureStyleConfig
+        public class AutocompleteWindowConfig
         {
             [BackgroundColor(231, 84, 128)] // Rose Pink
             [Range(3, 20)]
@@ -79,55 +66,7 @@ namespace AdvancedChatFeatures.Common.Configs
             [Increment(1)]
             [DefaultValue(10)]
             public int ItemsPerWindow = 10;
-
-            [BackgroundColor(231, 84, 128)] // Rose Pink
-            [DefaultValue(true)]
-            public bool ShowDescriptionPanel = true;
-
-            [BackgroundColor(231, 84, 128)] // Rose Pink
-            [DefaultValue(false)]
-            public bool ShowAutocompleteText = false;
-
-            [BackgroundColor(231, 84, 128)] // Rose Pink
-            [DefaultValue(true)]
-            public bool MakeWindowDraggable = true;
         }
-
-        public class StyleConfig
-        {
-            [BackgroundColor(192, 54, 64)] // Calamity Red
-            [CustomModConfigItem(typeof(ShowConfigButtonElement))]
-            [DefaultValue(true)]
-            public bool ShowConfigButton = true;
-
-            [BackgroundColor(192, 54, 64)] // Calamity Red
-            [CustomModConfigItem(typeof(ShowPlayerIconElement))]
-            [DefaultValue(true)]
-            public bool ShowPlayerIcons = true;
-
-            [BackgroundColor(192, 54, 64)] // Calamity Red
-            [CustomModConfigItem(typeof(ShowModIconElement))]
-            [DefaultValue(true)]
-            public bool ShowModIcons = true;
-
-            [BackgroundColor(192, 54, 64)] // Calamity Red
-            [CustomModConfigItem(typeof(ShowLinksElement))]
-            [DefaultValue(true)]
-            public bool ShowLinks = true;
-
-            [BackgroundColor(192, 54, 64)] // Calamity Red
-            [CustomModConfigItem(typeof(ShowPlayerColorsElement))]
-            [DefaultValue(true)]
-            public bool ShowPlayerColors = true;
-
-            [BackgroundColor(192, 54, 64)] // Calamity Red
-            [CustomModConfigItem(typeof(ShowPlayerFormatElement))]
-            [DrawTicks]
-            [OptionStrings(["<PlayerName>", "PlayerName:", "(PlayerName)"])]
-            [DefaultValue("<PlayerName>")]
-            public string ShowPlayerFormat = "<PlayerName>";
-        }
-        
         public override void OnChanged()
         {
             base.OnChanged();
@@ -140,7 +79,6 @@ namespace AdvancedChatFeatures.Common.Configs
 
             UpdateCommandSystem();
             UpdateEmojiSystem();
-            UpdateDrawConfigSystem();
         }
 
         private void UpdateCommandSystem()
@@ -148,7 +86,7 @@ namespace AdvancedChatFeatures.Common.Configs
             // Update state
             CommandSystem commandSystem = ModContent.GetInstance<CommandSystem>();
             CommandState commandState = commandSystem.commandState;
-            if (Conf.C.featureConfig.EnableCommands)
+            if (Conf.C.featuresConfig.AutocompleteCommands)
             {
                 if (commandSystem.ui?.CurrentState != commandState)
                     commandSystem.ui?.SetState(commandState);
@@ -158,12 +96,6 @@ namespace AdvancedChatFeatures.Common.Configs
                 commandSystem.ui?.SetState(null);
                 return;
             }
-
-            // Update usage panel
-            if (Conf.C.featureStyleConfig.ShowDescriptionPanel && !commandState.HasChild(commandState.commandDescriptionPanel))
-                commandState.Append(commandState.commandDescriptionPanel);
-            else if (commandState.HasChild(commandState.commandDescriptionPanel) && !Conf.C.featureStyleConfig.ShowDescriptionPanel)
-                commandState.RemoveChild(commandState.commandDescriptionPanel);
         }
 
         private void UpdateEmojiSystem()
@@ -171,19 +103,13 @@ namespace AdvancedChatFeatures.Common.Configs
             // Update state
             EmojiSystem emojiSystem = ModContent.GetInstance<EmojiSystem>();
             EmojiState emojiState = emojiSystem.emojiState;
-            if (Conf.C.featureConfig.EnableEmojis)
+            if (Conf.C.featuresConfig.EnableEmojis)
                 emojiSystem.ui?.SetState(emojiState);
             else
             {
                 emojiSystem.ui?.SetState(null);
                 return;
             }
-
-            // Update usage panel
-            if (Conf.C.featureStyleConfig.ShowDescriptionPanel && !emojiState.HasChild(emojiState.emojiDescriptionPanel))
-                emojiState.Append(emojiState.emojiDescriptionPanel);
-            else if (emojiState.HasChild(emojiState.emojiDescriptionPanel) && !Conf.C.featureStyleConfig.ShowDescriptionPanel)
-                emojiState.RemoveChild(emojiState.emojiDescriptionPanel);
         }
 
         private void UpdateGlyphSystem()
@@ -191,7 +117,7 @@ namespace AdvancedChatFeatures.Common.Configs
             // Update state
             CommandSystem commandSystem = ModContent.GetInstance<CommandSystem>();
             CommandState commandState = commandSystem.commandState;
-            if (Conf.C.featureConfig.EnableCommands)
+            if (Conf.C.featuresConfig.AutocompleteCommands)
             {
                 if (commandSystem.ui?.CurrentState != commandState)
                     commandSystem.ui?.SetState(commandState);
@@ -201,22 +127,6 @@ namespace AdvancedChatFeatures.Common.Configs
                 commandSystem.ui?.SetState(null);
                 return;
             }
-
-            // Update usage panel
-            if (Conf.C.featureStyleConfig.ShowDescriptionPanel && !commandState.HasChild(commandState.commandDescriptionPanel))
-                commandState.Append(commandState.commandDescriptionPanel);
-            else if (commandState.HasChild(commandState.commandDescriptionPanel) && !Conf.C.featureStyleConfig.ShowDescriptionPanel)
-                commandState.RemoveChild(commandState.commandDescriptionPanel);
-        }
-
-        private void UpdateDrawConfigSystem()
-        {
-            // Update the ConfigSystem
-            DrawConfigSystem drawConfigSystem = ModContent.GetInstance<DrawConfigSystem>();
-            if (Conf.C.styleConfig.ShowConfigButton)
-                drawConfigSystem.ui?.SetState(drawConfigSystem.drawConfigState);
-            else
-                drawConfigSystem.ui?.SetState(null);
         }
 
         #region Helpers

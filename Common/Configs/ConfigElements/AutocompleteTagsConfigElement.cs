@@ -4,18 +4,17 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.Localization;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Configs.StyleConfigs
+namespace AdvancedChatFeatures.Common.Configs.ConfigElements
 {
     /// <summary>
     /// Reference:
     /// <see cref="BooleanElement"/> 
     /// </summary>
-    public class ShowConfigButtonElement : ConfigElement<bool>
+    public class AutocompleteTagsConfigElement : ConfigElement<bool>
     {
         private Asset<Texture2D> _toggleTexture = Asset<Texture2D>.Empty;
 
@@ -31,11 +30,8 @@ namespace AdvancedChatFeatures.Common.Configs.StyleConfigs
             {
                 Value = !Value;
 
-                Conf.C.styleConfig.ShowConfigButton = Value;
+                Conf.C.featuresConfig.AutocompleteTags = Value;
             };
-
-            //TooltipFunction = () => Language.GetTextValue(
-                //"Mods.AdvancedChatFeatures.Configs.Config.Features.ShowConfigButtonElement.Tooltip");
         }
 
         public override void OnInitialize()
@@ -46,33 +42,25 @@ namespace AdvancedChatFeatures.Common.Configs.StyleConfigs
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            DrawConfigIcon(sb);
             DrawToggleTexture(sb);
             DrawOnOffText(sb);
+
+            DrawTagExample(sb);
         }
 
-        private void DrawConfigIcon(SpriteBatch sb)
+        private void DrawTagExample(SpriteBatch sb)
         {
-            //if (Value)
-            //DrawHelper.DrawProperScale(sb, element: this, tex: Ass.ConfigButton.Value, scale: 0.75f, x: 6 + 150, y: 4);
+            CalculatedStyle dims = GetDimensions();
+            int xOffset = 16 + 150;
+            int yOffset = 14;
+            Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
 
-            var dims = GetDimensions();
-
-            Texture2D configButton = Ass.ConfigButton.Value;
-
-            Rectangle pos = new(
-                (int) dims.X + 156,
-                (int)dims.Y + 4,
-                (int) (configButton.Width * 0.75f),
-                (int) (configButton.Height * 0.75f)
-                );
-
-            sb.Draw(configButton, pos, Color.White);
+            //DrawHelper.DrawPlayerHead(drawPosition, sb: sb);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)
         {
-            // Draw toggle texture
+            // Draw toggle uploadedTexture
             Rectangle sourceRectangle = new Rectangle(
                 Value ? (_toggleTexture.Width() - 2) / 2 + 2 : 0,
                 0,
@@ -83,7 +71,7 @@ namespace AdvancedChatFeatures.Common.Configs.StyleConfigs
             // Get the dimensions of the parent element
             CalculatedStyle dimensions = GetDimensions();
 
-            // Calculate the position to draw the toggle texture
+            // Calculate the position to draw the toggle uploadedTexture
             sb.Draw(
                 _toggleTexture.Value,
                 new Vector2(

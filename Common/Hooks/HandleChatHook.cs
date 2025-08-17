@@ -56,7 +56,7 @@ namespace AdvancedChatFeatures.Common.Hooks
         {
             orig();
 
-            if (!Conf.C.featureConfig.EnableBetterChatNavigation)
+            if (!Conf.C.featuresConfig.EnableTextEditingShortcuts)
                 return;
 
             if (!Main.drawingPlayerChat) { caretPos = 0; selectAll = false; }
@@ -72,7 +72,7 @@ namespace AdvancedChatFeatures.Common.Hooks
                 return orig(oldString, allowMultiLine);
             }
 
-            if (!Conf.C.featureConfig.EnableBetterChatNavigation)
+            if (!Conf.C.featuresConfig.EnableTextEditingShortcuts)
                 return orig(oldString, allowMultiLine);
 
             Main.inputTextEnter = false;

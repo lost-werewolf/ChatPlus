@@ -15,7 +15,7 @@ namespace AdvancedChatFeatures.Emojis
             emojiPanel = new();
             Append(emojiPanel);
 
-            emojiDescriptionPanel = new("List of emojis");
+            emojiDescriptionPanel = new();
             Append(emojiDescriptionPanel);
 
             emojiPanel.ConnectedPanel = emojiDescriptionPanel;

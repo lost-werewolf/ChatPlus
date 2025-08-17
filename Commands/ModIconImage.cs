@@ -1,6 +1,7 @@
 ﻿using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
@@ -23,9 +24,11 @@ namespace AdvancedChatFeatures.Commands
 
             DrawHelper.DrawSmallModIcon(sb, mod, target, size: 26);
 
-            if (IsMouseHovering && !string.IsNullOrEmpty(mod.Name))
+            if (IsMouseHovering && mod != null && !string.IsNullOrEmpty(mod.Name))
             {
-                UICommon.TooltipMouseText(mod.Name);
+                //UICommon.TooltipMouseText(mod.Name);
+                //Main.hoverItemName = mod.Name;
+                DrawHelper.DrawTextAtMouse(sb, mod.Name);
             }
         }
     }

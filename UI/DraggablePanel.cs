@@ -75,9 +75,6 @@ namespace AdvancedChatFeatures.UI
 
         public override void LeftMouseDown(UIMouseEvent evt)
         {
-            if (!Conf.C.featureStyleConfig.MakeWindowDraggable)
-                return;
-
             // If hovering a scrollbar, skip drag
             var emojiSys = ModContent.GetInstance<EmojiSystem>();
             var cmdSys = ModContent.GetInstance<CommandSystem>();

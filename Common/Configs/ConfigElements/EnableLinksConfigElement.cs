@@ -1,21 +1,23 @@
+using System.Diagnostics;
+using System.Reflection.Emit;
 using AdvancedChatFeatures.Helpers;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.Localization;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Configs.StyleConfigs
+namespace AdvancedChatFeatures.Common.Configs.ConfigElements
 {
     /// <summary>
     /// Reference:
     /// <see cref="BooleanElement"/> 
     /// </summary>
-    public class ShowPlayerColorsElement : ConfigElement<bool>
+    public class EnableLinksConfigElement : ConfigElement<bool>
     {
         private Asset<Texture2D> _toggleTexture = Asset<Texture2D>.Empty;
 
@@ -31,8 +33,11 @@ namespace AdvancedChatFeatures.Common.Configs.StyleConfigs
             {
                 Value = !Value;
 
-                Conf.C.styleConfig.ShowPlayerColors = Value;
+                Conf.C.featuresConfig.EnableLinks = Value;
             };
+
+            //TooltipFunction = () => Language.GetTextValue(
+                //"Mods.AdvancedChatFeatures.Configs.Config.Features.EnableEmojis.Tooltip");
         }
 
         public override void OnInitialize()
@@ -43,70 +48,57 @@ namespace AdvancedChatFeatures.Common.Configs.StyleConfigs
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            DrawPlayerColors(sb);
             DrawToggleTexture(sb);
             DrawOnOffText(sb);
+
+            DrawExampleLink(sb);
         }
 
-        private void DrawPlayerColors(SpriteBatch sb)
+        private void DrawExampleLink(SpriteBatch sb)
         {
-            if (Main.LocalPlayer == null)
-            {
-                Log.Error("DrawPlayerColors: no local player");
-                return;
-            }
-
-            // Name fallback
-            string name = string.IsNullOrEmpty(Main.LocalPlayer.name) ? "PlayerName" : Main.LocalPlayer.name;
-
-            // Respect formatting from config
-            // Get current live ShowPlayerFormat from UI binding if available
-            //string format = "<PlayerName>";
-
-            //var fieldInfo = Item?.GetType().GetField("ShowPlayerFormat");
-
-            //object currentValue = null;
-
-            //if (fieldInfo != null)
-            //{
-            //    currentValue = fieldInfo.GetValue(Item);
-            //}
-
-            //if (currentValue is string s)
-            //    format = s;
-
-            //string displayName = format == "PlayerName:" ? $"{name}:" : $"<{name}>";
-            string displayName = name;
-
-            // Respect color toggle from config
-            Color drawColor = Conf.C?.styleConfig?.ShowPlayerColors ?? false ? ColorHelper.PlayerColors[0] : Color.White;
-
-            // Layout
+            string exampleLink = "https://forums.terraria.org/";
             CalculatedStyle dims = GetDimensions();
-            Vector2 scale = new(0.8f);
-            Vector2 textSize = ChatManager.GetStringSize(FontAssets.ItemStack.Value, displayName, scale);
+            Vector2 pos = dims.Position();
 
-            // Use measured height to vertically center
-            Vector2 textPos = new(
-                dims.X + 8 + 150f, // keep 150px offset if you want fixed X position
-                dims.Y + (dims.Height - textSize.Y) * 0.5f + 2
-            );
+            // 1. Draw underline
+            Vector2 textSize = FontAssets.MouseText.Value.MeasureString(exampleLink);
+            int xOffset = 150;
+            float x = pos.X + 8 + xOffset;
+            float y = pos.Y + textSize.Y - 8;
+            float scale = 0.72f;
+            float w = scale * textSize.X+20;
+            Rectangle underlineRect = new Rectangle((int)x, (int)y, (int)w, 2);
+            sb.Draw(TextureAssets.MagicPixel.Value, underlineRect, ColorHelper.BlueUnderline);
 
+            // 2. Draw text in blue
+            Vector2 textPos = new(pos.X + 8 + xOffset, pos.Y + textSize.Y / 2 - 9);
             ChatManager.DrawColorCodedStringWithShadow(
                 sb,
                 FontAssets.MouseText.Value,
-                displayName,
+                exampleLink,
                 textPos,
-                drawColor,
+                new Color(17, 85, 204),
                 0f,
                 Vector2.Zero,
-                scale
+                baseScale: new Vector2(0.8f)
             );
+
+            // 3. If clicked, open the link
+            if (Main.MouseScreen.Between(textPos, textPos + new Vector2(w, textSize.Y)) && 
+                Main.mouseLeft && Main.mouseLeftRelease)
+            {
+                // Open the link in the default browser
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = exampleLink,
+                    UseShellExecute = true
+                });
+            }
         }
 
         private void DrawToggleTexture(SpriteBatch sb)
         {
-            // Draw toggle texture
+            // Draw toggle uploadedTexture
             Rectangle sourceRectangle = new Rectangle(
                 Value ? (_toggleTexture.Width() - 2) / 2 + 2 : 0,
                 0,
@@ -117,7 +109,7 @@ namespace AdvancedChatFeatures.Common.Configs.StyleConfigs
             // Get the dimensions of the parent element
             CalculatedStyle dimensions = GetDimensions();
 
-            // Calculate the position to draw the toggle texture
+            // Calculate the position to draw the toggle uploadedTexture
             sb.Draw(
                 _toggleTexture.Value,
                 new Vector2(

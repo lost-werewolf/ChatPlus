@@ -26,6 +26,7 @@ namespace AdvancedChatFeatures.Commands
         protected override string GetFullTag(Command data)
             => data.Name;
 
+
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
@@ -46,9 +47,9 @@ namespace AdvancedChatFeatures.Commands
             if (items.Count == 0)
                 PopulatePanel();
 
-            AutocompleteCommandOnTab();
-
             base.Update(gt);
+
+            AutocompleteCommandOnTab();
         }
 
         private void AutocompleteCommandOnTab()
@@ -66,6 +67,23 @@ namespace AdvancedChatFeatures.Commands
             Main.chatText = insert;
 
             HandleChatHook.SetCaretPos(Main.chatText.Length);
+        }
+
+        protected override string ExtractQuery(string text)
+        {
+            text = text ?? string.Empty;
+            if (!text.StartsWith("/")) return string.Empty;
+
+            int space = text.IndexOf(' ');
+            string cmd = (space > 1 ? text.Substring(1, space - 1) : text.Substring(1)).Trim();
+            return cmd;
+        }
+
+        protected override bool MatchesFilter(Command data, string query)
+        {
+            if (string.IsNullOrWhiteSpace(query)) return true;
+            string name = (data.Name ?? string.Empty).TrimStart('/');
+            return name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }

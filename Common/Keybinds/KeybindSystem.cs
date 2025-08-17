@@ -4,10 +4,12 @@ using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.ItemWindow;
-using AdvancedChatFeatures.ImageWindow;
+using AdvancedChatFeatures.Uploads;
 using Microsoft.Xna.Framework.Input;
+using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace AdvancedChatFeatures.Common.Keybinds
 {
@@ -18,7 +20,7 @@ namespace AdvancedChatFeatures.Common.Keybinds
         public static ModKeybind OpenGlyphKeybind;
         public static ModKeybind OpenItemWindowKeybind;
         public static ModKeybind OpenColorWindowKeybind;
-        public static ModKeybind OpenImageWindowKeybind;
+        public static ModKeybind OpenUploadWindow;
 
         public override void Load()
         {
@@ -27,7 +29,7 @@ namespace AdvancedChatFeatures.Common.Keybinds
             OpenGlyphKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Glyph Window", Keys.G);
             OpenItemWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Item Window", Keys.I);
             OpenColorWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Color Window", Keys.O);
-            OpenImageWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Upload Window", Keys.U);
+            OpenUploadWindow = KeybindLoader.RegisterKeybind(Mod, "Open Upload Window", Keys.U);
         }
     }
 
@@ -35,47 +37,44 @@ namespace AdvancedChatFeatures.Common.Keybinds
     {
         public override void ProcessTriggers(TriggersSet t)
         {
-            if (KeybindSystem.OpenCommandKeybind.JustPressed)
+            void Toggle<TSystem, TState>(ModKeybind keybind, TSystem sys, UserInterface ui, TState state)
+                where TSystem : ModSystem
+                where TState : UIState
             {
-                var sys = ModContent.GetInstance<CommandSystem>();
-                if (StateHelper.IsActive(sys.ui)) StateHelper.Close(sys.ui);
-                else StateHelper.OpenExclusive(sys.ui, sys.commandState);
+                if (!keybind.JustPressed) return;
+
+                // Ensure chat is open
+                if (!Main.drawingPlayerChat)
+                {
+                    Main.drawingPlayerChat = true;
+                    Main.chatRelease = false;
+                    Main.chatText = string.Empty; // optional: start fresh
+                }
+
+                // Toggle state
+                if (StateHelper.IsActive(ui))
+                    StateHelper.Close(ui);
+                else
+                    StateHelper.OpenExclusive(ui, state);
             }
 
-            if (KeybindSystem.OpenColorWindowKeybind.JustPressed)
-            {
-                var sys = ModContent.GetInstance<ColorWindowSystem>();
-                if (StateHelper.IsActive(sys.ui)) StateHelper.Close(sys.ui);
-                else StateHelper.OpenExclusive(sys.ui, sys.colorWindowState);
-            }
+            Toggle(KeybindSystem.OpenCommandKeybind, ModContent.GetInstance<CommandSystem>(),
+                ModContent.GetInstance<CommandSystem>().ui, ModContent.GetInstance<CommandSystem>().commandState);
 
-            if (KeybindSystem.OpenEmojiKeybind.JustPressed)
-            {
-                var sys = ModContent.GetInstance<EmojiSystem>();
-                if (StateHelper.IsActive(sys.ui)) StateHelper.Close(sys.ui);
-                else StateHelper.OpenExclusive(sys.ui, sys.emojiState);
-            }
+            Toggle(KeybindSystem.OpenColorWindowKeybind, ModContent.GetInstance<ColorWindowSystem>(),
+                ModContent.GetInstance<ColorWindowSystem>().ui, ModContent.GetInstance<ColorWindowSystem>().colorWindowState);
 
-            if (KeybindSystem.OpenGlyphKeybind.JustPressed)
-            {
-                var sys = ModContent.GetInstance<GlyphSystem>(); // <-- not EmojiSystem
-                if (StateHelper.IsActive(sys.ui)) StateHelper.Close(sys.ui);
-                else StateHelper.OpenExclusive(sys.ui, sys.glyphState);
-            }
+            Toggle(KeybindSystem.OpenEmojiKeybind, ModContent.GetInstance<EmojiSystem>(),
+                ModContent.GetInstance<EmojiSystem>().ui, ModContent.GetInstance<EmojiSystem>().emojiState);
 
-            if (KeybindSystem.OpenItemWindowKeybind.JustPressed)
-            {
-                var sys = ModContent.GetInstance<ItemWindowSystem>();
-                if (StateHelper.IsActive(sys.ui)) StateHelper.Close(sys.ui);
-                else StateHelper.OpenExclusive(sys.ui, sys.itemWindowState);
-            }
+            Toggle(KeybindSystem.OpenGlyphKeybind, ModContent.GetInstance<GlyphSystem>(),
+                ModContent.GetInstance<GlyphSystem>().ui, ModContent.GetInstance<GlyphSystem>().glyphState);
 
-            if (KeybindSystem.OpenImageWindowKeybind.JustPressed)
-            {
-                var sys = ModContent.GetInstance<ImageSystem>();
-                if (StateHelper.IsActive(sys.ui)) StateHelper.Close(sys.ui);
-                else StateHelper.OpenExclusive(sys.ui, sys.state);
-            }
+            Toggle(KeybindSystem.OpenItemWindowKeybind, ModContent.GetInstance<ItemWindowSystem>(),
+                ModContent.GetInstance<ItemWindowSystem>().ui, ModContent.GetInstance<ItemWindowSystem>().itemWindowState);
+
+            Toggle(KeybindSystem.OpenUploadWindow, ModContent.GetInstance<UploadSystem>(),
+                ModContent.GetInstance<UploadSystem>().ui, ModContent.GetInstance<UploadSystem>().state);
         }
     }
 }

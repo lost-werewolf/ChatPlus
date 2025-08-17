@@ -1,40 +1,49 @@
+Keybinds: {
+	"Open Command Window.DisplayName": Open  Command  Window
+	"Open Emoji Window.DisplayName": Open  Emoji  Window
+	"Open Glyph Window.DisplayName": Open  Glyph  Window
+	"Open Item Window.DisplayName": Open  Item  Window
+	"Open Color Window.DisplayName": Open  Color  Window
+	"Open Upload Window.DisplayName": Open  Upload  Window
+}
+
 Configs: {
 	Config: {
 		DisplayName: Config
+		Headers.Config: Config Header
 
-		Headers: {
-			Config: Config
-			Preview: Preview
-		}
-
-		featureConfig: {
+		featuresConfig: {
 			Label: Features
 			Tooltip: ""
 		}
 
-		featureStyleConfig: {
+		autocompleteWindowConfig: {
 			Label: Autocomplete Window
-			Tooltip: ""
-		}
-
-		styleConfig: {
-			Label: Style
-			Tooltip: ""
-		}
-
-		ChatBoxPreviewElement: {
-			Label: Chat Box Preview Element
 			Tooltip: ""
 		}
 	}
 
 	Features: {
-		EnableCommands: {
-			Label: Enable Autocomplete Commands
+		Tooltip: ""
+
+		AutocompleteTags: {
+			Label: Autocomplete Tags
 			Tooltip:
 				'''
-				Shows an autocomplete window for chat commands.
-				Type / to open
+				Allows for autocompletion of the following tags:
+				[c for colors
+				[g for glyphs
+				[i for items
+				'''
+		}
+
+		AutocompleteCommands: {
+			Label: Autocomplete Commands
+			Tooltip:
+				'''
+				Allows for autocompletion of chat commands. 
+				Type / into chat to see all commands
+				Type Tab to select current command to chat input
 				'''
 		}
 
@@ -42,119 +51,46 @@ Configs: {
 			Label: Enable Emojis
 			Tooltip:
 				'''
-				Shows an autocomplete window for emojis.
-				Type [e to open
+				Allows for inserting emojis:
+				; for emojis
 				'''
 		}
 
-		EnableGlyphs: {
-			Label: Enable Glyphs
+		EnableUploadImages: {
+			Label: Enable Upload Images
 			Tooltip:
 				'''
-				Shows an autocomplete window for glyphs.
-				Type [g to open
+				Allows for uploading images:
+				@ for uploading images
 				'''
 		}
 
-		EnableItemBrowser: {
-			Label: Enable Item Browser
-			Tooltip:
-				'''
-				Shows an autocomplete window for items.
-				Type [i to open
-				'''
+		EnableLinks: {
+			Label: Enable Links
+			Tooltip: Links you type in chat become clickable.
 		}
 
-		EnableColorPicker: {
-			Label: Enable Color Picker
+		EnableTextEditingShortcuts: {
+			Label: Enable Text Editing Shortcuts
 			Tooltip:
 				'''
-				Shows an autocomplete window for changing the color of your message.
-				Type [c to open
-				'''
-		}
-
-		Tooltip: ""
-
-		EnableBetterChatNavigation: {
-			Label: Enable Shortcuts And Text Selection
-			Tooltip:
-				'''
-				(Ctrl)+Shift+←/→ to select (words)/characters
-				Ctrl+X/C/V to cut/copy/paste
+				Modifies the chat box in various ways, including these shortcuts:
+				← / → : Move cursor left/right
+				Shift+← / → : Select characters
+				Ctrl+Shift+← / → : Select words
+				Ctrl+X : Cut
+				Ctrl+C : Copy
+				Ctrl+V : Paste
 				'''
 		}
 	}
 
-	StyleConfig: {
-		Tooltip: ""
-
-		ShowConfigButton: {
-			Label: Show Config Button
-			Tooltip: Shows an icon when the chat is open to quickly access the config
-		}
-
-		ShowPlayerIcons: {
-			Label: Show Player Icons
-			Tooltip: Shows a player icon next to each chat message from a player.
-		}
-
-		ShowPlayerFormat: {
-			Label: Player Format
-			Tooltip: Changes the prefix formatting for every player chat message
-		}
-
-		ShowPlayerColors: {
-			Label: Show Player Colors
-			Tooltip: Assigns a color to every player.
-		}
-
-		ShowModIcons: {
-			Label: Show Mod Icons
-			Tooltip: Shows a mod icon next to a message sent by a mod
-		}
-
-		ShowLinks: {
-			Label: Show Links
-			Tooltip: Makes links clickable in chat
-		}
-	}
-
-	FeatureStyleConfig: {
+	AutocompleteWindowConfig: {
 		Tooltip: ""
 
 		ItemsPerWindow: {
 			Label: Items Per Window
-			Tooltip: Adjust the number of items that can be shown in the window at the same time
-		}
-
-		ShowDescriptionPanel: {
-			Label: Show Description Panel
-			Tooltip: Shows a description of the currently selected item
-		}
-
-		MakeWindowDraggable: {
-			Label: Make Window Draggable
-			Tooltip: ""
-		}
-
-		ShowAutocomplete: {
-			Label: Show Autocomplete
-			Tooltip: ""
-		}
-
-		ShowAutocompleteText: {
-			Label: Show Autocomplete Text
 			Tooltip: ""
 		}
 	}
-}
-
-Keybinds: {
-	"Open Command Window.DisplayName": Open Command Window
-	"Open Emoji Window.DisplayName": Open Emoji Window
-	"Open Glyph Window.DisplayName": Open Glyph  Window
-	"Open Item Window.DisplayName": Open Item  Window
-	"Open Color Window.DisplayName": Open Color  Window
-	"Open Upload Window.DisplayName": Open  Upload  Window
 }

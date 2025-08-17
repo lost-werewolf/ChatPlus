@@ -16,6 +16,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Assets\Emojis\" />
+	  <Folder Include="Localization\NewFolder\" />
 	</ItemGroup>
 
 	<!-- References -->
