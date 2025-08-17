@@ -27,24 +27,14 @@ namespace AdvancedChatFeatures.ItemWindow
                         continue;
 
                     string name = item.Name;
-                    string tag = $"[i:{i}]"; // chat tag shows icon
-                    string noSpacesName = new(name.Where(char.IsLetterOrDigit).ToArray());
-                    string tooltip = "";
-                    if (item.ToolTip._text != null)
-                    {
-                        int newlineIndex = tooltip.IndexOf('\n');
-                        if (newlineIndex >= 0)
-                        {
-                            tooltip = tooltip.Substring(0, newlineIndex);
-                        }
-                    }
+                    string prefix = "[i";
+                    string tag = $"{prefix}:{i}]"; // chat tag shows icon
 
                     Items.Add(new Item(
                         ID: i,
                         Tag: tag,
-                        NoSpacesName: noSpacesName,
-                        DisplayName: name,
-                        Tooltip: tooltip));
+                        DisplayName: name
+                    ));
                 }
                 catch { /* ignore bad item types */ }
             }

@@ -4,12 +4,12 @@ using Terraria.UI;
 
 namespace AdvancedChatFeatures.ItemWindow
 {
-    public class ItemWindowState : UIState
+    public class ItemState : NavigationState<Item>
     {
         public ItemPanel itemPanel;
         public DescriptionPanel<Item> itemDescPanel;
 
-        public ItemWindowState()
+        public ItemState()
         {
             itemPanel = new();
             Append(itemPanel);

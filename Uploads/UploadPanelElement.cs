@@ -43,7 +43,7 @@ namespace AdvancedChatFeatures.Uploads
             }
 
             // Draw file name
-            var imgName = new[] { new TextSnippet(Data.FileName) };
+            var imgName = new[] { new TextSnippet(Data.Tag) };
             pos += new Vector2(30, 5);
             ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, imgName, pos, 0f, Vector2.Zero, Vector2.One, out _);
         }

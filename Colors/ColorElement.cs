@@ -4,13 +4,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.ColorWindow
+namespace AdvancedChatFeatures.Colors
 {
-    public class ColorWindowElement : NavigationElement<Color>
+    public class ColorElement : NavigationElement<ColorItem>
     {
-        public Color color;
+        public ColorItem color;
 
-        public ColorWindowElement(Color color) : base(color)
+        public ColorElement(ColorItem color) : base(color)
         {
             this.color = color;
             Height.Set(30, 0);
@@ -27,8 +27,8 @@ namespace AdvancedChatFeatures.ColorWindow
 
             // Render preview square
             Rectangle previewColorPos = new Rectangle(
-                (int)dims.X+2,
-                (int)dims.Y+2,
+                (int)dims.X + 2,
+                (int)dims.Y + 2,
                 width: 25,
                 height: 25
             );
@@ -41,7 +41,7 @@ namespace AdvancedChatFeatures.ColorWindow
                 sb,
                 FontAssets.MouseText.Value,
                 glyphSnippet,
-                pos += new Microsoft.Xna.Framework.Vector2(32,4),
+                pos += new Microsoft.Xna.Framework.Vector2(32, 4),
                 0f,
                 Vector2.Zero,
                 new Vector2(1.0f),
@@ -61,18 +61,6 @@ namespace AdvancedChatFeatures.ColorWindow
                 return new Microsoft.Xna.Framework.Color(r, g, b, 255);
             }
             return new Microsoft.Xna.Framework.Color(0, 0, 0) * 0f;
-        }
-
-        private static Microsoft.Xna.Framework.Color HexTagToColor(string hex)
-        {
-            if (hex.Length == 6) // RRGGBB
-            {
-                byte r = Convert.ToByte(hex[..2], 16);
-                byte g = Convert.ToByte(hex.Substring(2, 2), 16);
-                byte b = Convert.ToByte(hex.Substring(4, 2), 16);
-                return new Microsoft.Xna.Framework.Color(r, g, b, 255);
-            }
-            return new Microsoft.Xna.Framework.Color(0,0,0)*0f;
         }
     }
 }

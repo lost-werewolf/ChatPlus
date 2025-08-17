@@ -1,12 +1,12 @@
 ﻿using System;
-using AdvancedChatFeatures.ColorWindow;
+using AdvancedChatFeatures.Colors;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.ItemWindow;
+using AdvancedChatFeatures.UI;
 using AdvancedChatFeatures.Uploads;
-using Microsoft.Xna.Framework.Input;
 using MonoMod.Cil;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
@@ -46,7 +46,8 @@ namespace AdvancedChatFeatures.Common.Hooks
                         i => i.MatchCallvirt(typeof(IChatMonitor), nameof(IChatMonitor.Offset))))
                 {
                     cursor.Index += 2;
-                    cursor.EmitDelegate<Func<int, int>>(v => StateHelper.AnyActive() ? 0 : v);
+
+                    cursor.EmitDelegate<Func<int, int>>(v => IsAnyStateActive() ? 0 : v);
                 }
                 else
                 {
@@ -60,6 +61,23 @@ namespace AdvancedChatFeatures.Common.Hooks
                 Log.Error($"HandleChatILHook failed: {ex}");
                 MonoModHooks.DumpIL(Mod, il);
             }
+        }
+
+        public static bool IsAnyStateActive()
+        {
+            var cmdSys = ModContent.GetInstance<CommandSystem>();
+            var colorSys = ModContent.GetInstance<ColorSystem>();
+            var emojiSys = ModContent.GetInstance<EmojiSystem>();
+            var glyphSys = ModContent.GetInstance<GlyphSystem>();
+            var itemSys = ModContent.GetInstance<ItemSystem>();
+            var uploadSys = ModContent.GetInstance<UploadSystem>();
+
+            if (cmdSys.ui != null || colorSys.ui != null || emojiSys.ui != null || glyphSys.ui != null || itemSys.ui != null || uploadSys.ui != null)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

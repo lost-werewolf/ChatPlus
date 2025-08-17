@@ -49,6 +49,7 @@ namespace AdvancedChatFeatures.Emojis
                 return new TextSnippet(key);
             }
         }
+        public static string GetPrefixTag() => "[e";
         public static string GenerateEmojiTag(string key) => $"[e:{key}]";
     }
 }

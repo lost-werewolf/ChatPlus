@@ -39,6 +39,7 @@ namespace AdvancedChatFeatures.UI
         {
             if (isSelected)
             {
+                // Draw selection rectangle
                 DrawSlices(sb, this);
                 DrawFill(sb, this);
             }

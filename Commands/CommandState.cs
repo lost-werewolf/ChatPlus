@@ -3,7 +3,7 @@ using Terraria.UI;
 
 namespace AdvancedChatFeatures.Commands
 {
-    public class CommandState : UIState
+    public class CommandState : NavigationState<Command>
     {
         public CommandPanel commandPanel;
         public DescriptionPanel<Command> commandDescriptionPanel;

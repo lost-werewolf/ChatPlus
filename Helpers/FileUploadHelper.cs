@@ -74,7 +74,7 @@ public static class FileUploadHelper
             Log.Error($"Failed to open file dialog: {NFD_GetError()}");
             return null;
         }
-        Log.Info($"Selected file: {outPath}");
+        // Log.Info($"Selected file: {outPath}");
         return outPath;
     }
 }

@@ -1,4 +1,4 @@
-﻿using AdvancedChatFeatures.ColorWindow;
+﻿using AdvancedChatFeatures.Colors;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Glyphs;
@@ -37,44 +37,31 @@ namespace AdvancedChatFeatures.Common.Keybinds
     {
         public override void ProcessTriggers(TriggersSet t)
         {
-            void Toggle<TSystem, TState>(ModKeybind keybind, TSystem sys, UserInterface ui, TState state)
-                where TSystem : ModSystem
-                where TState : UIState
+            void OpenSystem<TSystem>(ModKeybind keybind, TSystem sys, string prefix) where TSystem : ModSystem
             {
-                if (!keybind.JustPressed) return;
+                if (!keybind.JustPressed)
+                    return;
 
-                // Ensure chat is open
-                if (!Main.drawingPlayerChat)
-                {
-                    Main.drawingPlayerChat = true;
-                    Main.chatRelease = false;
-                    Main.chatText = string.Empty; // optional: start fresh
-                }
+                // If chat is open, keybind is ignored
+                if (Main.drawingPlayerChat)
+                    return;
 
-                // Toggle state
-                if (StateHelper.IsActive(ui))
-                    StateHelper.Close(ui);
-                else
-                    StateHelper.OpenExclusive(ui, state);
+                // Force open chat and input
+                Main.drawingPlayerChat = true;
+                PlayerInput.WritingText = true;
+                Main.chatRelease = false;
+
+                // Add the system prefix.
+                // The system will handle opening the state by checking for the prefix.
+                Main.chatText = prefix;
             }
 
-            Toggle(KeybindSystem.OpenCommandKeybind, ModContent.GetInstance<CommandSystem>(),
-                ModContent.GetInstance<CommandSystem>().ui, ModContent.GetInstance<CommandSystem>().commandState);
-
-            Toggle(KeybindSystem.OpenColorWindowKeybind, ModContent.GetInstance<ColorWindowSystem>(),
-                ModContent.GetInstance<ColorWindowSystem>().ui, ModContent.GetInstance<ColorWindowSystem>().colorWindowState);
-
-            Toggle(KeybindSystem.OpenEmojiKeybind, ModContent.GetInstance<EmojiSystem>(),
-                ModContent.GetInstance<EmojiSystem>().ui, ModContent.GetInstance<EmojiSystem>().emojiState);
-
-            Toggle(KeybindSystem.OpenGlyphKeybind, ModContent.GetInstance<GlyphSystem>(),
-                ModContent.GetInstance<GlyphSystem>().ui, ModContent.GetInstance<GlyphSystem>().glyphState);
-
-            Toggle(KeybindSystem.OpenItemWindowKeybind, ModContent.GetInstance<ItemWindowSystem>(),
-                ModContent.GetInstance<ItemWindowSystem>().ui, ModContent.GetInstance<ItemWindowSystem>().itemWindowState);
-
-            Toggle(KeybindSystem.OpenUploadWindow, ModContent.GetInstance<UploadSystem>(),
-                ModContent.GetInstance<UploadSystem>().ui, ModContent.GetInstance<UploadSystem>().state);
+            OpenSystem(KeybindSystem.OpenCommandKeybind, ModContent.GetInstance<CommandSystem>(), "/");
+            OpenSystem(KeybindSystem.OpenEmojiKeybind, ModContent.GetInstance<EmojiSystem>(), "[e");
+            OpenSystem(KeybindSystem.OpenGlyphKeybind, ModContent.GetInstance<GlyphSystem>(), "[g");
+            OpenSystem(KeybindSystem.OpenItemWindowKeybind, ModContent.GetInstance<ItemSystem>(), "[i");
+            OpenSystem(KeybindSystem.OpenColorWindowKeybind, ModContent.GetInstance<ColorSystem>(), "[c");
+            OpenSystem(KeybindSystem.OpenUploadWindow, ModContent.GetInstance<UploadSystem>(), "[u");
         }
     }
 }

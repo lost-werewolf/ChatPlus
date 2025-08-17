@@ -1,4 +1,4 @@
-Todo:
+﻿Todo:
 - Cursor change to pointing index thingy
 - Color blue only on link
 - Hover tooltip
@@ -164,3 +164,17 @@ Steam Workshop Preview:
 2. Autocomplete commands and tags! (opening command and tag window)
 3. Keyboard shortcuts and text editing! (showing text editing)
 
+2025-08-17
+----------------------------------------------------------------
+Refactor State Handling, Filtering, Tab:
+
+Todo:
+✅ Up down arrow keys - navigate through items
+✅ Prefix checking - open or close states
+✅ Tab input - add tag to chat input
+2. Key input - filter items
+
+Future:
+4. Left click - select item and add tag to chat input
+5. Escape input - close the active panel
+----------------------------------------------------------------

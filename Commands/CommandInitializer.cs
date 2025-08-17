@@ -14,7 +14,7 @@ namespace AdvancedChatFeatures.Commands
 
         // Do NOT use Load to initialize commands.
         // Use a hook where other mods have had a chance to load their commands
-        public override void OnWorldLoad()
+        public override void PostSetupContent()
         {
             Commands.Clear();
             InitializeCommands();

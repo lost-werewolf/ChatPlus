@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -40,7 +41,7 @@ namespace AdvancedChatFeatures.Emojis
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHelper.ToggleForPrefixExclusive(ui, emojiState, gameTime, ";");
+            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, emojiState, "[e");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

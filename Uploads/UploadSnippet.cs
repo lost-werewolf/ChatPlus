@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;               // Vector2, ColorItem
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.Uploads
@@ -12,26 +11,35 @@ namespace AdvancedChatFeatures.Uploads
 
         public UploadSnippet(Texture2D texture, float targetHeight = 20f)
         {
-            this.uploadedTexture = texture;
+            uploadedTexture = texture;
             this.targetHeight = targetHeight;
         }
 
-        public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch spriteBatch, Vector2 position = default, Color color = default, float scale = 1f)
+        public override bool UniqueDraw(
+            bool justCheckingString,
+            out Vector2 size,
+            SpriteBatch spriteBatch,
+            Vector2 position = default,
+            Color color = default,
+            float scale = 1f)
         {
             float h = targetHeight * scale;
+
             if (uploadedTexture == null)
             {
                 size = new Vector2(0f, h);
                 return true;
             }
 
-            float s = h / Math.Max(uploadedTexture.Width, uploadedTexture.Height);
+            float texMax = System.Math.Max(uploadedTexture.Width, uploadedTexture.Height);
+            float s = h / texMax;
             float w = uploadedTexture.Width * s;
             size = new Vector2(w, h);
 
             if (justCheckingString) return true;
 
-            spriteBatch.Draw(uploadedTexture, position, null, color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
+            // Use the snippet’s color (set to White in handler) so images aren’t tinted.
+            spriteBatch.Draw(uploadedTexture, position, null, this.Color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
             return true;
         }
     }

@@ -1,4 +1,3 @@
-using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;

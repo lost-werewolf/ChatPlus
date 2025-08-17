@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.Uploads;
@@ -7,6 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
+using Terraria.Graphics.Effects;
+using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace AdvancedChatFeatures.UI
@@ -16,14 +20,14 @@ namespace AdvancedChatFeatures.UI
         private readonly UIText text;
         public UIText GetText() => text;
 
-        public DescriptionPanel(string initialText = null, bool centerText=false)
+        public DescriptionPanel(string initialText = null, bool centerText = false)
         {
             // Size
             Width.Set(320, 0);
             Height.Set(60, 0);
 
             // Style
-            BackgroundColor = ColorHelper.DarkBlue * 0.8f;
+            BackgroundColor = ColorHelper.DarkBlue * 1.0f;
 
             // Position
             VAlign = 1f;
@@ -46,43 +50,87 @@ namespace AdvancedChatFeatures.UI
 
         public override void LeftClick(UIMouseEvent evt)
         {
-            if (typeof(TData) == typeof(Upload))
+            UploadImage();
+        }
+        private void UploadImage()
+        {
+            if (typeof(TData) != typeof(Upload))
+                return;
+
+            string fullFilePath = FileUploadHelper.OpenFileDialog();
+            if (string.IsNullOrEmpty(fullFilePath))
+                return;
+
+            try
             {
-                string fullFilePath = FileUploadHelper.OpenFileDialog();
-                if (fullFilePath == null) return;
-
                 string fileName = Path.GetFileName(fullFilePath);
-                string tag = UploadTagHandler.GenerateTag(fileName);
-                Texture2D texture = FileUploadHelper.CreateTextureFromPath(fullFilePath);
+                string key = Path.GetFileNameWithoutExtension(fileName);
 
-                UploadInitializer.Uploads.Add(new Upload(tag, fileName, fullFilePath, texture));
-                //UploadInitializer.AddNewUpload(new Upload(tag, fileName, fullFilePath, texture));
-
-                Log.Info(UploadInitializer.Uploads.Count.ToString());
-
+                // 1) Persist a copy into the mod's uploads folder FIRST
                 string folder = Path.Combine(Main.SavePath, "AdvancedChatFeatures", "Uploads");
                 Directory.CreateDirectory(folder);
-                File.Copy(fullFilePath, Path.Combine(folder, fileName), true);
+                string dest = Path.Combine(folder, fileName);
 
-                if (this is UploadPanel up)
+                // If user picked a file inside the same folder with same name, this is harmless
+                File.Copy(fullFilePath, dest, true);
+
+                // 2) Load texture from the DESTINATION (ensures file exists before we read & register)
+                Texture2D texture;
+                using (var fs = File.OpenRead(dest))
+                    texture = Texture2D.FromStream(Main.instance.GraphicsDevice, fs);
+
+                if (texture == null)
+                {
+                    Main.NewText("Failed to load image.", Color.Red);
+                    return;
+                }
+
+                // 3) Register tag & add/replace in memory
+                UploadTagHandler.Register(key, texture);
+                string tag = UploadTagHandler.GenerateTag(key);
+
+                UploadInitializer.AddNewUpload(
+                    new Upload(
+                        Tag: tag,
+                        FileName: fileName,
+                        FullFilePath: dest,
+                        Texture: texture
+                    )
+                );
+
+                // 4) Refresh UI now (no re-init; no async)
+                if (ConnectedPanel is UploadPanel up)
                     up.PopulatePanel();
-            }
 
-            base.LeftClick(evt);
+                Main.NewText($"Added {fileName} as {tag}", Color.LightGreen);
+            }
+            catch (Exception ex)
+            {
+                Main.NewText("Upload failed: " + ex.Message, Color.Red);
+                Log.Error("Upload failed: " + ex);
+            }
         }
 
         public override void RightClick(UIMouseEvent evt)
         {
-            Conf.C.Open();
+            OpenUploadsFolder();
+        }
 
-            // Expand autocomplete section in config after UI is built
-            Main.QueueMainThreadAction(() =>
+        private void OpenUploadsFolder()
+        {
+            try
             {
-                var state = Main.InGameUI.CurrentState;
-                if (state is not UIElement root) return;
-
-                Conf.C.ExpandSection(root, nameof(Conf.C.autocompleteWindowConfig));
-            });
+                string folder = Path.Combine(Main.SavePath, "AdvancedChatFeatures", "Uploads");
+                Process.Start(new ProcessStartInfo($@"{folder}")
+                {
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Main.NewText("Error opening folder: " + ex.Message, Color.Red);
+                Log.Error("Error opening client log: " + ex.Message);
+            }
         }
 
         public void SetTextWithLinebreak(string rawText)

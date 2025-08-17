@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.ColorWindow
+namespace AdvancedChatFeatures.Colors
 {
     internal class ColorInitializer : ModSystem
     {
-        public static List<Color> Colors { get; private set; } = [];
+        public static List<ColorItem> Colors { get; private set; } = [];
 
         public override void PostSetupContent()
         {
@@ -17,7 +17,7 @@ namespace AdvancedChatFeatures.ColorWindow
             {
                 // e.g. [c/32FF82:Your text]
                 string tagPrefix = $"[c/{hex.TrimStart('#')}:";
-                Colors.Add(new Color(tagPrefix, hex, name, description));
+                Colors.Add(new ColorItem(tagPrefix, hex, name, description));
             }
 
             // Status message colors

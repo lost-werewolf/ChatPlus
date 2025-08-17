@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 
 namespace AdvancedChatFeatures.Commands
@@ -36,7 +34,26 @@ namespace AdvancedChatFeatures.Commands
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHelper.ToggleForPrefixExclusive(ui, commandState, gameTime, "/");
+            if (!Main.drawingPlayerChat)
+                return;
+
+            char prefix = '/';
+
+            if (Main.chatText.StartsWith(prefix))
+            {
+                if (ui.CurrentState != commandState)
+                {
+                    ui.SetState(commandState);
+                }
+                ui.Update(gameTime);
+            }
+            else
+            {
+                if (ui.CurrentState == commandState)
+                {
+                    ui.SetState(null);
+                }
+            }
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

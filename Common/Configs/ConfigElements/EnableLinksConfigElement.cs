@@ -28,7 +28,7 @@ namespace AdvancedChatFeatures.Common.Configs.ConfigElements
 
             _toggleTexture = Main.Assets.Request<Texture2D>("Images/UI/Settings_Toggle");
 
-            // Toggle the value when clicked
+            // OpenSystem the value when clicked
             OnLeftClick += delegate
             {
                 Value = !Value;

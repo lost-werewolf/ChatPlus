@@ -76,57 +76,6 @@ namespace AdvancedChatFeatures.Common.Configs
                 Log.Error("Config is null in OnChanged!");
                 return;
             }
-
-            UpdateCommandSystem();
-            UpdateEmojiSystem();
-        }
-
-        private void UpdateCommandSystem()
-        {
-            // Update state
-            CommandSystem commandSystem = ModContent.GetInstance<CommandSystem>();
-            CommandState commandState = commandSystem.commandState;
-            if (Conf.C.featuresConfig.AutocompleteCommands)
-            {
-                if (commandSystem.ui?.CurrentState != commandState)
-                    commandSystem.ui?.SetState(commandState);
-            }
-            else
-            {
-                commandSystem.ui?.SetState(null);
-                return;
-            }
-        }
-
-        private void UpdateEmojiSystem()
-        {
-            // Update state
-            EmojiSystem emojiSystem = ModContent.GetInstance<EmojiSystem>();
-            EmojiState emojiState = emojiSystem.emojiState;
-            if (Conf.C.featuresConfig.EnableEmojis)
-                emojiSystem.ui?.SetState(emojiState);
-            else
-            {
-                emojiSystem.ui?.SetState(null);
-                return;
-            }
-        }
-
-        private void UpdateGlyphSystem()
-        {
-            // Update state
-            CommandSystem commandSystem = ModContent.GetInstance<CommandSystem>();
-            CommandState commandState = commandSystem.commandState;
-            if (Conf.C.featuresConfig.AutocompleteCommands)
-            {
-                if (commandSystem.ui?.CurrentState != commandState)
-                    commandSystem.ui?.SetState(commandState);
-            }
-            else
-            {
-                commandSystem.ui?.SetState(null);
-                return;
-            }
         }
 
         #region Helpers

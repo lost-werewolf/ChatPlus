@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,22 +28,21 @@ namespace AdvancedChatFeatures.Uploads
             UploadTagHandler.Clear();
         }
 
-        public void AddNewUpload(Upload upload)
+        public static void AddNewUpload(Upload upload)
         {
-            if (!Uploads.Contains(upload))
-            {
-                Uploads.Add(upload);
-            }
+            int idx = Uploads.FindIndex(u =>
+                !string.IsNullOrEmpty(u.Tag) &&
+                string.Equals(u.Tag, upload.Tag, StringComparison.OrdinalIgnoreCase));
+
+            if (idx >= 0)
+                Uploads[idx] = upload;  // replace in place (refresh)
             else
-            {
-                Log.Info("Duplicate detected; file not added");
-            }
+                Uploads.Add(upload);
         }
 
-        private void InitializeUploadedTextures()
-        {
-            Uploads.Clear();
 
+        public static void InitializeUploadedTextures()
+        {
             string folder = Path.Combine(Main.SavePath, "AdvancedChatFeatures", "Uploads");
             Directory.CreateDirectory(folder);
 
@@ -53,8 +52,14 @@ namespace AdvancedChatFeatures.Uploads
                                  .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
                                  .ToList();
 
+            // Load on the main thread (for GraphicsDevice)
             Main.QueueMainThreadAction(() =>
             {
+                var fresh = new List<Upload>(files.Count);
+
+                // Reset the tag registry so removed files are truly gone
+                UploadTagHandler.Clear();
+
                 foreach (var file in files)
                 {
                     try
@@ -65,25 +70,27 @@ namespace AdvancedChatFeatures.Uploads
 
                         if (UploadTagHandler.Register(key, texture))
                         {
-                            AddNewUpload(new Upload(
+                            fresh.Add(new Upload(
                                 Tag: UploadTagHandler.GenerateTag(key),
                                 FileName: Path.GetFileName(file),
                                 FullFilePath: file,
                                 Texture: texture
                             ));
-                            Log.Info($"({Uploads.Count}) Initialized file {Path.GetFileName(file)}");
                         }
                     }
                     catch
                     {
-                        Log.Info($"({Uploads.Count}) Failed to read file {Path.GetFileName(file)}");
+                        // ignore broken files
                     }
                 }
+
+                // 🔹 Swap atomically so UI reflects current disk state (adds + deletions)
+                Uploads.Clear();
+                Uploads.AddRange(fresh);
 
                 int fileCountInFolder = Directory.GetFiles(folder).Length;
                 Log.Info($"[end] Found ({Uploads.Count}/{fileCountInFolder}) uploads");
             });
         }
-
     }
 }

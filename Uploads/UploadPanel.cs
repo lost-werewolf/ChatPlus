@@ -10,8 +10,7 @@ namespace AdvancedChatFeatures.Uploads
         protected override NavigationElement<Upload> BuildElement(Upload data) => new UploadElement(data);
         protected override IEnumerable<Upload> GetSource() => UploadInitializer.Uploads;
         protected override string GetDescription(Upload data) => data.FileName;
-        protected override string GetFullTag(Upload data) => data.Tag;
-        protected override string Prefix => "@";
+        protected override string GetTag(Upload data) => data.Tag;
 
         public override void Update(GameTime gt)
         {

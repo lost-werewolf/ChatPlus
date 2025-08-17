@@ -29,7 +29,7 @@ namespace AdvancedChatFeatures.Glyphs
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHelper.ToggleForPrefixExclusive(ui, glyphState, gameTime, "[g");
+            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, glyphState, "[g");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

@@ -1,10 +1,9 @@
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria.UI;
 
 namespace AdvancedChatFeatures.Emojis
 {
-    public class EmojiState : UIState
+    public class EmojiState : NavigationState<Emoji>
     {
         public EmojiPanel emojiPanel;
         public DescriptionPanel<Emoji> emojiDescriptionPanel;

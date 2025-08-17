@@ -1,10 +1,11 @@
 ﻿using System;
-using AdvancedChatFeatures.ColorWindow;
+using AdvancedChatFeatures.Colors;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.ItemWindow;
+using AdvancedChatFeatures.Uploads;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -75,23 +76,20 @@ namespace AdvancedChatFeatures.UI
 
         public override void LeftMouseDown(UIMouseEvent evt)
         {
-            // If hovering a scrollbar, skip drag
-            var emojiSys = ModContent.GetInstance<EmojiSystem>();
+            // If hovering any UIScrollbar, skip drag
             var cmdSys = ModContent.GetInstance<CommandSystem>();
+            var colorSys = ModContent.GetInstance<ColorSystem>();
+            var emojiSys = ModContent.GetInstance<EmojiSystem>();
             var glyphSys = ModContent.GetInstance<GlyphSystem>();
-            var itemSys = ModContent.GetInstance<ItemWindowSystem>();
-            var colorSys = ModContent.GetInstance<ColorWindowSystem>();
+            var itemSys = ModContent.GetInstance<ItemSystem>();
+            var uploadSys = ModContent.GetInstance<UploadSystem>();
 
-            if (emojiSys?.emojiState?.emojiPanel?.scrollbar?.IsMouseHovering == true)
-                return;
-
-            if (cmdSys?.commandState?.commandPanel?.scrollbar?.IsMouseHovering == true)
-                return;
-
-            if (itemSys?.itemWindowState?.itemPanel?.scrollbar?.IsMouseHovering == true)
-                return;
-
-            if (colorSys?.colorWindowState?.colorPanel?.scrollbar?.IsMouseHovering == true)
+            if (cmdSys.commandState.commandPanel.scrollbar.IsMouseHovering
+            || colorSys.colorState.IsMouseHovering
+            || emojiSys.emojiState.IsMouseHovering
+            || glyphSys.glyphState.IsMouseHovering
+            || itemSys.itemWindowState.IsMouseHovering
+            || uploadSys.state.panel.scrollbar.IsMouseHovering)
                 return;
 
             // Start dragging

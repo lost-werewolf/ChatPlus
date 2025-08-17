@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -8,28 +10,28 @@ using Terraria.UI;
 namespace AdvancedChatFeatures.ItemWindow
 {
     [Autoload(Side = ModSide.Client)]
-    public class ItemWindowSystem : ModSystem
+    public class ItemSystem : ModSystem
     {
         public UserInterface ui;
-        public ItemWindowState itemWindowState;
+        public ItemState itemWindowState;
 
         public override void Load()
         {
             ui = new UserInterface();
-            itemWindowState = new ItemWindowState();
+            itemWindowState = new ItemState();
             ui.SetState(null);
         }
 
         public override void Unload()
         {
             ui = new UserInterface();
-            itemWindowState = new ItemWindowState();
+            itemWindowState = new ItemState();
             ui.SetState(null);
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHelper.ToggleForPrefixExclusive(ui, itemWindowState, gameTime, "[i");
+            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, itemWindowState, "[i");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

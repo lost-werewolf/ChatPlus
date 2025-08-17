@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.ItemWindow;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -29,7 +30,7 @@ namespace AdvancedChatFeatures.Uploads
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHelper.ToggleForPrefixExclusive(ui, state, gameTime, "@");
+            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, state, "[u");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

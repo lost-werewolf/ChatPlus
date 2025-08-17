@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using AdvancedChatFeatures.ColorWindow;
+using System.Formats.Asn1;
+using AdvancedChatFeatures.Colors;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Common.Hooks;
@@ -11,7 +11,6 @@ using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.ItemWindow;
 using AdvancedChatFeatures.Uploads;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -33,8 +32,7 @@ namespace AdvancedChatFeatures.UI
         protected abstract IEnumerable<TData> GetSource(); // The source of data to populate the panel with
         protected abstract NavigationElement<TData> BuildElement(TData data); // The method to create a new element from the data
         protected abstract string GetDescription(TData data);
-        protected abstract string GetFullTag(TData data);
-        protected virtual string Prefix => ""; // override in subclasses
+        protected abstract string GetTag(TData data);
 
         // Navigation
         protected int currentIndex = 0; // first item
@@ -88,21 +86,19 @@ namespace AdvancedChatFeatures.UI
         {
             base.LeftClick(evt);
 
-            // Which element was clicked?
             for (int i = 0; i < items.Count; i++)
             {
                 if (items[i].IsMouseHovering)
                 {
-                    SetSelectedIndex(i); // updates currentIndex + selection + description panel
+                    SetSelectedIndex(i);
                     return;
                 }
             }
 
-            // If none matched, clear all selection
-            foreach (var e in items)
-                e.SetSelected(false);
+            //foreach (var e in items)
+            //e.SetSelected(false);
 
-            currentIndex = -1;
+            Main.chatText += GetTag(items[currentIndex].Data);
         }
 
         public void PopulatePanel()
@@ -113,56 +109,22 @@ namespace AdvancedChatFeatures.UI
             var source = GetSource();
             if (source == null) return;
 
-            string query = ExtractQuery(Main.chatText ?? string.Empty);
-            bool doFilter = !string.IsNullOrWhiteSpace(query);
-
-            // Stable two buckets
-            List<NavigationElement<TData>> exact = new();
-            List<NavigationElement<TData>> partial = new();
-
+            List<UIElement> fastList = [];
             foreach (var data in source)
             {
-                if (doFilter && !MatchesFilter(data, query))
-                    continue;
-
                 var element = BuildElement(data);
                 if (element == null) continue;
 
-                string tag = GetFullTag(data) ?? string.Empty;
-                string desc = GetDescription(data) ?? string.Empty;
-
-                bool isExact = (!string.IsNullOrEmpty(query)) &&
-                               (tag.Equals(query, StringComparison.OrdinalIgnoreCase) ||
-                                desc.Equals(query, StringComparison.OrdinalIgnoreCase));
-
-                (isExact ? exact : partial).Add(element);
+                items.Add(element);
+                fastList.Add(element);
             }
-
-            // Exact first, then partial; preserve original order within each bucket
-            if (exact.Count > 0) { items.AddRange(exact); list.AddRange(exact); }
-            if (partial.Count > 0) { items.AddRange(partial); list.AddRange(partial); }
+            list.AddRange(fastList);
 
             if (items.Count > 0) SetSelectedIndex(0);
             else currentIndex = -1;
         }
 
-        protected virtual bool MatchesFilter(TData data, string query)
-        {
-            if (string.IsNullOrWhiteSpace(query)) return true;
-            string tag = GetFullTag(data) ?? string.Empty;
-            string desc = GetDescription(data) ?? string.Empty;
-            return tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
-                || desc.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
-        }
-
-        public void SetHeight()
-        {
-            // Set height
-            Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
-            list.Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
-        }
-
-        public virtual void SetSelectedIndex(int index)
+        public void SetSelectedIndex(int index)
         {
             if (items.Count == 0) return;
 
@@ -196,7 +158,6 @@ namespace AdvancedChatFeatures.UI
             if (yTop < view) view = yTop;
             else if (yBottom > view + viewportH) view = yBottom - viewportH;
 
-            // total content height for clamping
             float totalH = 0f;
             for (int i = 0; i < items.Count; i++)
                 totalH += items[i].GetOuterDimensions().Height + pad;
@@ -207,6 +168,7 @@ namespace AdvancedChatFeatures.UI
             // 🔹 Update description panel
             if (ConnectedPanel is DescriptionPanel<TData> desc)
             {
+                // Skip updating upload description panel
                 if (typeof(TData) == typeof(Upload))
                 {
                     return;
@@ -228,7 +190,7 @@ namespace AdvancedChatFeatures.UI
                 // Set color text if description panel is connected to a color panel
                 if (desc.ConnectedPanel.GetType() == typeof(ColorPanel))
                 {
-                    desc.GetText()._color = ColorWindowElement.HexToColor(GetFullTag(current.Data));
+                    desc.GetText()._color = ColorElement.HexToColor(GetTag(current.Data));
                 }
             }
         }
@@ -238,73 +200,24 @@ namespace AdvancedChatFeatures.UI
         {
             base.Update(gt);
 
+            // Sizing and position
             Top.Set(-38, 0);
-            SetHeight();
+            Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
+            list.Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
 
-            FilterSearch();
-
+            HandleKeyPressed();
             HandleNavigationKeys(gt);
-            HandleTabComplete();
+            HandleTabKeyPressed();
         }
 
-        protected virtual string ExtractQuery(string text)
-        {
-            text ??= string.Empty;
-
-            // Commands: "/foo" -> "foo"
-            if (Prefix == "/")
-            {
-                if (!text.StartsWith("/")) return string.Empty;
-                int space = text.IndexOf(' ');
-                return (space >= 0 ? text.Substring(1, space - 1) : text.Substring(1)).Trim();
-            }
-
-            // Emojis: "…;smil" -> "smil"  (last semicolon to next whitespace/end)
-            if (Prefix == ";")
-            {
-                int start = text.LastIndexOf(';');
-                if (start < 0 || start == text.Length - 1) return string.Empty;
-
-                int end = text.IndexOfAny(new[] { ' ', '\t', '\n', '\r' }, start + 1);
-                string span = end > start ? text.Substring(start + 1, (end - start - 1)) : text.Substring(start + 1);
-                return span.Trim().Trim('"');
-            }
-
-            // Bracketed tags: "[i", "[g", "[c", "[u" etc.
-            if (!string.IsNullOrEmpty(Prefix) && Prefix.StartsWith("["))
-            {
-                int start = text.LastIndexOf(Prefix, StringComparison.OrdinalIgnoreCase);
-                if (start < 0) return string.Empty;
-
-                int after = start + Prefix.Length;
-                // Optional colon after the prefix, e.g. "[i:..."
-                if (after < text.Length && text[after] == ':') after++;
-
-                // Until closing ']' or end
-                int rb = text.IndexOf(']', after);
-                string span = rb > after ? text.Substring(after, rb - after) : text.Substring(after);
-                return span.Trim().Trim('"');
-            }
-
-            return string.Empty;
-        }
-
-
-        private void FilterSearch()
+        private void HandleKeyPressed()
         {
             foreach (Keys key in Enum.GetValues(typeof(Keys)))
             {
                 if (!JustPressed(key))
                     continue;
 
-                // skip navigation / control keys
-                if (key == Keys.Up || key == Keys.Down || key == Keys.Left || key == Keys.Right ||
-                    key == Keys.PageUp || key == Keys.PageDown || key == Keys.Home || key == Keys.End ||
-                    key == Keys.Tab || key == Keys.Escape || key == Keys.Enter ||
-                    key == Keys.LeftShift || key == Keys.RightShift ||
-                    key == Keys.LeftControl || key == Keys.RightControl ||
-                    key == Keys.LeftAlt || key == Keys.RightAlt)
-                    return;
+                if (key == Keys.Tab || key == Keys.Up || key == Keys.Down) return;
 
                 //Main.NewText("key: " + key);
 
@@ -312,67 +225,55 @@ namespace AdvancedChatFeatures.UI
             }
         }
 
-        private void HandleTabComplete()
+        private void HandleTabKeyPressed()
         {
-            if (!JustPressed(Keys.Tab)) return;
-            if (items.Count == 0) return;
+            if (!JustPressed(Keys.Tab) || items.Count == 0 || currentIndex < 0)
+                return;
 
-            var current = items[currentIndex];
-            if (current == null) return;
+            string tag = GetTag(items[currentIndex].Data);
 
-            string insert = GetFullTag(current.Data);
-            if (string.IsNullOrEmpty(insert)) return;
+            if (this is CommandPanel)
+            {
+                Main.chatText = tag;
+                HandleChatHook.SetCaretPos(Main.chatText.Length);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(tag))
+                return;
 
             string text = Main.chatText ?? string.Empty;
 
-            // Commands: replace "/foo" (until first space) with "/realcmd "
-            if (Prefix == "/")
+            // Determine prefix and filtering logic
+            string prefix = this switch
             {
-                if (!text.StartsWith("/")) { Main.chatText += insert + " "; HandleChatHook.SetCaretPos(Main.chatText.Length); return; }
-                int space = text.IndexOf(' ');
-                int end = space >= 0 ? space : text.Length;
-                Main.chatText = insert + " " + (space >= 0 ? text.Substring(space + 1) : string.Empty);
-                HandleChatHook.SetCaretPos(insert.Length + 1);
+                ColorPanel => "[c",
+                EmojiPanel => "[e",
+                GlyphPanel => "[g",
+                ItemPanel => "[i",
+                UploadPanel => "[u",
+                _ => "[e"
+            };
+
+            int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
+            if (start < 0)
+            {
+                // no prefix -> just append
+                Main.chatText += tag;
+                HandleChatHook.SetCaretPos(Main.chatText.Length);
                 return;
             }
 
-            // Emojis: replace the word that starts at the last ';' up to next whitespace/end
-            if (Prefix == ";")
-            {
-                int start = text.LastIndexOf(';');
-                if (start < 0) { Main.chatText += insert; HandleChatHook.SetCaretPos(Main.chatText.Length); return; }
+            // find end of unfinished segment (whitespace or ] or end of string)
+            int end = text.IndexOfAny(new[] { ' ', '\t', '\n', '\r', ']' }, start);
+            if (end < 0) end = text.Length;
 
-                int end = text.IndexOfAny(new[] { ' ', '\t', '\n', '\r' }, start + 1);
-                string before = text.Substring(0, start);
-                string after = (end >= 0 ? text.Substring(end) : string.Empty);
-                Main.chatText = before + insert + after;
-                HandleChatHook.SetCaretPos((before + insert).Length);
-                return;
-            }
+            // replace segment
+            string before = text[..start];
+            string after = text[end..];
+            Main.chatText = before + tag + after;
 
-            // Bracketed tags like "[i", "[g", "[c", "[u]"
-            if (!string.IsNullOrEmpty(Prefix) && Prefix.StartsWith("["))
-            {
-                int start = text.LastIndexOf(Prefix, StringComparison.OrdinalIgnoreCase);
-                if (start < 0) { Main.chatText += insert; HandleChatHook.SetCaretPos(Main.chatText.Length); return; }
-
-                int after = start + Prefix.Length;
-                if (after < text.Length && text[after] == ':') after++;
-
-                int rb = text.IndexOf(']', after);
-                int end = (rb >= 0 ? rb + 1 : text.Length);
-
-                string before = text.Substring(0, start);
-                string afterText = (end < text.Length ? text.Substring(end) : string.Empty);
-
-                Main.chatText = before + insert + afterText;
-                HandleChatHook.SetCaretPos((before + insert).Length);
-                return;
-            }
-
-            // Fallback
-            Main.chatText += insert;
-            HandleChatHook.SetCaretPos(Main.chatText.Length);
+            HandleChatHook.SetCaretPos(before.Length + tag.Length);
         }
 
         private void HandleNavigationKeys(GameTime gt)

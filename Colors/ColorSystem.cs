@@ -1,35 +1,36 @@
 ﻿using System.Collections.Generic;
+using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.ColorWindow
+namespace AdvancedChatFeatures.Colors
 {
     [Autoload(Side = ModSide.Client)]
-    public class ColorWindowSystem : ModSystem
+    public class ColorSystem : ModSystem
     {
         public UserInterface ui;
-        public ColorWindowState colorWindowState;
+        public ColorState colorState;
 
         public override void Load()
         {
             ui = new UserInterface();
-            colorWindowState = new ColorWindowState();
+            colorState = new ColorState();
             ui.SetState(null);
         }
 
         public override void Unload()
         {
             ui = new UserInterface();
-            colorWindowState = new ColorWindowState();
+            colorState = new ColorState();
             ui.SetState(null);
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHelper.ToggleForPrefixExclusive(ui, colorWindowState, gameTime, "[c");
+            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, colorState, "[c");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
