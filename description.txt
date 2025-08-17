@@ -1,1 +1,9 @@
-Modify this file with a description of your mod.
+﻿Chat+
+Chat+ is a mod that improves the chat quality of life by introducing new features and improving the existing chat system. 
+Features:
+1. Autocomplete chat commands and tags
+2. Upload and send your own images
+3. Emoji support
+4. 
+
+For the full list of features, please read the Steam Workshop page.

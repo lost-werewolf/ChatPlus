@@ -1,5 +1,6 @@
 using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.ImageWindow;
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -7,12 +8,12 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.UploadWindow
+namespace AdvancedChatFeatures.ImageWindow
 {
-    public class UploadElement : NavigationElement<Upload>
+    public class ImageElement : NavigationElement<Image>
     {
-        public Upload Element;
-        public UploadElement(Upload data) : base(data)
+        public Image Element;
+        public ImageElement(Image data) : base(data)
         {
             Element = data;
             Height.Set(90, 0);
@@ -28,7 +29,7 @@ namespace AdvancedChatFeatures.UploadWindow
             // Draw preview image
             string path = Element.FullFilePath;
 
-            Texture2D tex = Data.Image;
+            Texture2D tex = Data.Texture;
 
             if (tex != null)
             {

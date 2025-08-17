@@ -2,5 +2,4 @@ displayName = Chat+
 side = client
 author = Erky
 version = 0.1
-include = Assets\Emojis\*
-buildIgnore = \Assets\Workshop*, .vs\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, .git\*, .github\*, LICENSE, .editorconfig, .gitignore, .gitattributes,
+buildIgnore = git\*, bin\*

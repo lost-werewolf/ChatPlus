@@ -4,25 +4,25 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.UploadWindow
+namespace AdvancedChatFeatures.ImageWindow
 {
     [Autoload(Side = ModSide.Client)]
-    public class UploadSystem : ModSystem
+    public class ImageSystem : ModSystem
     {
         public UserInterface ui;
-        public UploadState state;
+        public ImageState state;
 
         public override void Load()
         {
             ui = new UserInterface();
-            state = new UploadState();
+            state = new ImageState();
             ui.SetState(null);
         }
 
         public override void Unload()
         {
             ui = new UserInterface();
-            state = new UploadState();
+            state = new ImageState();
             ui.SetState(null);
         }
 

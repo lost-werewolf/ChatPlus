@@ -3,7 +3,7 @@ using System.IO;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UploadWindow;
+using AdvancedChatFeatures.ImageWindow;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -36,17 +36,17 @@ namespace AdvancedChatFeatures.UI
 
         public override void LeftClick(UIMouseEvent evt)
         {
-            if (ConnectedPanel.GetType() == typeof(UploadPanel))
+            if (ConnectedPanel.GetType() == typeof(ImagePanel))
             {
                 string fullFilePath = FileUploadHelper.OpenFileDialog();
                 string fileName = Path.GetFileName(fullFilePath);
-                string tag = UploadTagHandler.Tag(fileName);
+                string tag = ImageTagHandler.Tag(fileName);
                 Texture2D tex = FileUploadHelper.ReadAndCreateTextureFromPath(fullFilePath);
-                UploadInitializer.Uploads.Add(new Upload(
+                ImageInitializer.Uploads.Add(new Image(
                     Tag: tag,
                     FileName: fileName,
                     FullFilePath: fullFilePath,
-                    Image: tex
+                    Texture: tex
                 ));
 
                 // Copy image to our folder
@@ -56,7 +56,7 @@ namespace AdvancedChatFeatures.UI
                 File.Copy(fullFilePath, dest, overwrite: true);
 
                 // Refresh the panel
-                if (this is UploadPanel a)
+                if (this is ImagePanel a)
                 {
 
                 }

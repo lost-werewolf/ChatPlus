@@ -13,7 +13,7 @@ Configs: {
 		}
 
 		featureStyleConfig: {
-			Label: Feature Style
+			Label: Autocomplete Window
 			Tooltip: ""
 		}
 
@@ -77,15 +77,11 @@ Configs: {
 		Tooltip: ""
 
 		EnableBetterChatNavigation: {
-			Label: Enable Better Input Handling
+			Label: Enable Shortcuts And Text Selection
 			Tooltip:
 				'''
-				Fast shortcuts to improve chat navigation:
-				←/→ to move cursor
-				Shift + ←/→ to select characters
-				Ctrl + C to copy
-				Ctrl + V to paste
-				Ctrl + Shift + ←/→ to select words
+				(Ctrl)+Shift+←/→ to select (words)/characters
+				Ctrl+X/C/V to cut/copy/paste
 				'''
 		}
 	}
@@ -139,11 +135,7 @@ Configs: {
 
 		MakeWindowDraggable: {
 			Label: Make Window Draggable
-			Tooltip:
-				'''
-				On: Drag the feature window by clicking anywhere on the window and dragging the window
-				Off: The feature window appears above the chat
-				'''
+			Tooltip: ""
 		}
 
 		ShowAutocomplete: {

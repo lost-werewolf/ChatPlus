@@ -69,7 +69,7 @@ namespace AdvancedChatFeatures.Emojis
             int indexedCount = 0;
             int skippedCount = 0;
 
-            Log.Info("[start] Initializing emojis...");
+            Log.Info("[utart] Initializing emojis...");
 
             foreach (string file in Mod.GetFileNames())
             {

@@ -17,7 +17,7 @@ namespace AdvancedChatFeatures.Common.Snippets
     /// Features:
     /// 1. Detects and styles links in chat messages and opens them in a web browser when clicked.
     /// 2. Draws a player head icon at the start of the link.
-    /// <see cref="OnNewChatHook"/>
+    /// <see cref="NewMessageHook"/>
     /// </summary>
     public class LinkSnippet : TextSnippet
     {

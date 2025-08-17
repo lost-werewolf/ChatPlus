@@ -4,13 +4,12 @@ using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.UploadWindow
+namespace AdvancedChatFeatures.ImageWindow
 {
     // Draws [u:key] where key maps to a user-uploaded texture
-    public sealed class UploadTagHandler : ITagHandler
+    public sealed class ImageTagHandler : ITagHandler
     {
         private class UploadImageSnippet : TextSnippet
         {

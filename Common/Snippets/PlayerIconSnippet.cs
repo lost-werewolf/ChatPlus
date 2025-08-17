@@ -1,5 +1,6 @@
 ﻿using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.UI.Chat;
 
 public class PlayerIconSnippet : TextSnippet

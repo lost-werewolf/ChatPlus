@@ -4,7 +4,7 @@ using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.ItemWindow;
-using AdvancedChatFeatures.UploadWindow;
+using AdvancedChatFeatures.ImageWindow;
 using Microsoft.Xna.Framework.Input;
 using Terraria.GameInput;
 using Terraria.ModLoader;
@@ -18,7 +18,7 @@ namespace AdvancedChatFeatures.Common.Keybinds
         public static ModKeybind OpenGlyphKeybind;
         public static ModKeybind OpenItemWindowKeybind;
         public static ModKeybind OpenColorWindowKeybind;
-        public static ModKeybind OpenUploadWindowKeybind;
+        public static ModKeybind OpenImageWindowKeybind;
 
         public override void Load()
         {
@@ -27,7 +27,7 @@ namespace AdvancedChatFeatures.Common.Keybinds
             OpenGlyphKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Glyph Window", Keys.G);
             OpenItemWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Item Window", Keys.I);
             OpenColorWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Color Window", Keys.O);
-            OpenUploadWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Upload Window", Keys.U);
+            OpenImageWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Upload Window", Keys.U);
         }
     }
 
@@ -70,9 +70,9 @@ namespace AdvancedChatFeatures.Common.Keybinds
                 else StateHelper.OpenExclusive(sys.ui, sys.itemWindowState);
             }
 
-            if (KeybindSystem.OpenUploadWindowKeybind.JustPressed)
+            if (KeybindSystem.OpenImageWindowKeybind.JustPressed)
             {
-                var sys = ModContent.GetInstance<UploadSystem>();
+                var sys = ModContent.GetInstance<ImageSystem>();
                 if (StateHelper.IsActive(sys.ui)) StateHelper.Close(sys.ui);
                 else StateHelper.OpenExclusive(sys.ui, sys.state);
             }

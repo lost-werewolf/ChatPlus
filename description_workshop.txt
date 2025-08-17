@@ -1,1 +1,56 @@
-This description will show up on the steam page, check out https://steamcommunity.com/comment/Guide/formattinghelp.
+﻿[h1] Chat+ [/h1]
+Chat+ is a mod that improves the chat quality of life by introducing new features and improving the existing chat system. For the full list of features, please read below.
+
+[h2] New Tags [/h2] 
+All tags now have autocomplete functionality. See the [url=https://terraria.wiki.gg/wiki/Chat#Tags] wiki [/url] for the full list of tags.
+There are also new tags, which can be opened by typing [ folowed by the tag name, for example [code][e[/code] will open up the emoji window.
+
+[table equalcells=1]
+    [tr]
+        [th]Tag[/th]
+        [th]Usage[/th]
+        [th]Example[/th]
+    [/tr]
+    [tr]
+        [td][code][e][/code][/td]
+        [td]Insert emojis[/td]
+        [td][code][e:thumbs_up][/code] → 👍[/td]
+    [/tr]
+    [tr]
+        [td][code][u][/code][/td]
+        [td]Upload images/GIFs[/td]
+        [td][code][u:your_image|size=600][/code] → (image shown with size 600px width)[/td]
+    [/tr]
+[/table]
+
+[h2] New Features [/h2] 
+[list]
+[*] [b]Links[/b]: You can now send links in the chat and click on them to open them in your browser.
+[*] [b]Autocomplete commands[/b]: You can now autocomplete commands in the chat by typing [td][code]/[/code][/td]
+[*] [b]Chat icons[/b]: Enable or disable player and mod icons in the chat.
+[*] [b]Chat formatting[/b]: Change the color and formatting of player names in the chat.
+[/list]
+
+[h2] Improved Chat [/h2] 
+You can now use shortcuts and select text using shortcuts.
+[table equalcells=1]
+    [tr]
+        [th]Shortcut[/th]
+        [th][/th]
+    [/tr]
+    [tr]
+        [td][code]Ctrl+X[/code]/[code]Ctrl+C[/code]/[code]Ctrl+V[/code][/td]
+        [td]Cut/copy/paste</td>
+    [/tr]
+    [tr]
+        [td][code](Ctrl)+Shift+←/→[/code][/td]
+        [td]Select words/characters</td>
+    [/tr]
+[/table]
+
+[h2] Support me! [/h2]
+[list]
+[*] Source code hosted at: [url=https://github.com/emyhrberg/AdvancedChatFeatures] GitHub [/url]
+[*] Got questions or suggestions? Join us at: [url=https://discord.gg/JWbYUktRPV] Discord [/url]
+[*] Wish to support my mod development? You can do so at  [url=https://ko-fi.com/erkyy] Ko-Fi [/url]
+[/list]

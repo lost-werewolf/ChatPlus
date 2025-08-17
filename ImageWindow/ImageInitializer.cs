@@ -3,24 +3,25 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AdvancedChatFeatures.Helpers;
+using AdvancedChatFeatures.ImageWindow;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.UploadWindow
+namespace AdvancedChatFeatures.ImageWindow
 {
     [Autoload(Side = ModSide.Client)]
-    internal class UploadInitializer : ModSystem
+    internal class ImageInitializer : ModSystem
     {
-        public static List<Upload> Uploads { get; private set; } = [];
+        public static List<Image> Uploads { get; private set; } = [];
         private static bool _handlerRegistered;
 
         public override void Load()
         {
             if (!_handlerRegistered)
             {
-                ChatManager.Register<UploadTagHandler>("u");
+                ChatManager.Register<ImageTagHandler>("u");
                 _handlerRegistered = true;
             }
         }
@@ -28,12 +29,12 @@ namespace AdvancedChatFeatures.UploadWindow
         public override void Unload()
         {
             Uploads = null;
-            UploadTagHandler.Clear();
+            ImageTagHandler.Clear();
         }
 
         public override void PostSetupContent()
         {
-            Uploads = new List<Upload>();
+            Uploads = new List<Image>();
 
             string folder = Path.Combine(Main.SavePath, "AdvancedChatFeatures", "Uploads");
             Directory.CreateDirectory(folder);
@@ -53,13 +54,13 @@ namespace AdvancedChatFeatures.UploadWindow
                         using var fs = File.OpenRead(file);
                         Texture2D tex = Texture2D.FromStream(Main.instance.GraphicsDevice, fs);
 
-                        if (UploadTagHandler.Register(key, tex))
+                        if (ImageTagHandler.Register(key, tex))
                         {
-                            Uploads.Add(new Upload(
-                                Tag: UploadTagHandler.Tag(key),
+                            Uploads.Add(new Image(
+                                Tag: ImageTagHandler.Tag(key),
                                 FileName: Path.GetFileName(file),
                                 FullFilePath: file,
-                                Image: tex
+                                Texture: tex
                             ));
                             Log.Info($"Found: {file}");
                         }

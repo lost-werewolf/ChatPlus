@@ -146,7 +146,7 @@ Todo:
 - Input caret left right arrow keys always working
 - ItemSystem with [i , open up item browser
 - ColorSystem with [c , open up color picker, live color preview?
-- Upload image with [u, open up file upload]
+- Upload image with [s, open up file upload]
 - Animated emojis?!
 - Add mod icons, exactly like player icons
 - Add steam profile icons?
