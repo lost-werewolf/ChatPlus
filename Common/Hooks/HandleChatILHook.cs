@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using AdvancedChatFeatures.Colors;
+using AdvancedChatFeatures.ColorHandler;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Glyphs;
@@ -63,31 +63,31 @@ namespace AdvancedChatFeatures.Common.Hooks
 
                 c.Index = 0;
 
-                if (c.TryGotoNext(
-            i => i.MatchLdsflda(typeof(Main), nameof(Main.keyState)),
-            i => i.MatchLdcI4((int)Keys.Escape),
-            i => i.MatchCall(typeof(KeyboardState), nameof(KeyboardState.IsKeyDown)),
-            i => i.MatchBrfalse(out var skipEscBlock) // capture the original target label
-        ))
-                {
-                    int oldIndex = c.Index;
-                    // oldIndex should be at the *start* of the ESC block (the ldsflda Main.keyState)
-                    if (c.TryGotoNext(i => i.MatchStsfld<Main>(nameof(Main.drawingPlayerChat))))
-                    {
-                        // mark jump target *after* the ESC-close write
-                        c.Index++;
-                        ILLabel afterEscBlock = il.DefineLabel();
-                        c.MarkLabel(afterEscBlock);
+                //        if (c.TryGotoNext(
+                //    i => i.MatchLdsflda(typeof(Main), nameof(Main.keyState)),
+                //    i => i.MatchLdcI4((int)Keys.Escape),
+                //    i => i.MatchCall(typeof(KeyboardState), nameof(KeyboardState.IsKeyDown)),
+                //    i => i.MatchBrfalse(out var skipEscBlock) // capture the original target label
+                //))
+                //        {
+                //            int oldIndex = c.Index;
+                //            // oldIndex should be at the *start* of the ESC block (the ldsflda Main.keyState)
+                //            if (c.TryGotoNext(i => i.MatchStsfld<Main>(nameof(Main.drawingPlayerChat))))
+                //            {
+                //                // mark jump target *after* the ESC-close write
+                //                c.Index++;
+                //                ILLabel afterEscBlock = il.DefineLabel();
+                //                c.MarkLabel(afterEscBlock);
 
-                        // return to the start of the ESC block
-                        c.Index = oldIndex;
+                //                // return to the start of the ESC block
+                //                c.Index = oldIndex;
 
-                        var mi = typeof(HandleChatILHook).GetMethod(nameof(IsAnyStateActive));
+                //                var mi = typeof(HandleChatILHook).GetMethod(nameof(IsAnyStateActive));
 
-                        c.EmitCall(mi);          // push bool result
-                        c.EmitBrtrue(afterEscBlock);
-                    }
-                }
+                //                c.EmitCall(mi);          // push bool result
+                //                c.EmitBrtrue(afterEscBlock);
+                //            }
+                //        }
             }
 
             catch (Exception ex)

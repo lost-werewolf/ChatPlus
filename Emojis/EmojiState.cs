@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AdvancedChatFeatures.Emojis
 {
-    public class EmojiState : NavigationState<Emoji>
+    public class EmojiState : BaseState<Emoji>
     {
         public EmojiPanel emojiPanel;
         public DescriptionPanel<Emoji> emojiDescriptionPanel;

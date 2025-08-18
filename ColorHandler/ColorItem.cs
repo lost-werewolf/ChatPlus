@@ -1,4 +1,4 @@
-namespace AdvancedChatFeatures.Colors
+namespace AdvancedChatFeatures.ColorHandler
 {
     /// <summary>
     /// Represents a color instance displaying information about a color.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Formats.Asn1;
-using AdvancedChatFeatures.Colors;
+using AdvancedChatFeatures.ColorHandler;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Common.Hooks;
@@ -214,8 +214,6 @@ namespace AdvancedChatFeatures.UI
 
         public void SetSelectedIndex(int index)
         {
-            //Main.NewText("1");
-
             if (items.Count == 0) return;
 
             // wrap around
@@ -304,8 +302,6 @@ namespace AdvancedChatFeatures.UI
                     continue;
 
                 if (key == Keys.Tab || key == Keys.Up || key == Keys.Down) return;
-
-                //Main.NewText("key: " + key);
 
                 PopulatePanel();
             }

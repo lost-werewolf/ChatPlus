@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Colors
+namespace AdvancedChatFeatures.ColorHandler
 {
     public class ColorElement : BaseElement<ColorItem>
     {

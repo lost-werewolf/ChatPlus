@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace Uploads;
+namespace AdvancedChatFeatures.Uploads;
 
 public sealed class SpacerSnippet : TextSnippet
 {
@@ -19,7 +19,7 @@ public sealed class SpacerSnippet : TextSnippet
         size = new Vector2(_width * scale, _height * scale); // consumes width, draws nothing
 
         // Debug draw
-        Rectangle r = new((int)pos.X, (int)pos.Y, (int)300,(int) _height);
+        Rectangle r = new((int)pos.X, (int)pos.Y, 300,(int) _height);
         //sb.Draw(TextureAssets.MagicPixel.Value, r, Color.Red);
 
         return true;

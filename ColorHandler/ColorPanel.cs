@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework;
 
-namespace AdvancedChatFeatures.Colors
+namespace AdvancedChatFeatures.ColorHandler
 {
     public class ColorPanel : BasePanel<ColorItem>
     {

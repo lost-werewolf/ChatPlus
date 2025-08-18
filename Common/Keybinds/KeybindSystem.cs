@@ -1,4 +1,4 @@
-﻿using AdvancedChatFeatures.Colors;
+﻿using AdvancedChatFeatures.ColorHandler;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Emojis;
 using AdvancedChatFeatures.Glyphs;

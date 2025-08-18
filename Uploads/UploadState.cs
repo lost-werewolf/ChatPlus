@@ -4,7 +4,7 @@ using Terraria.UI;
 
 namespace AdvancedChatFeatures.Uploads
 {
-    public class UploadState : NavigationState<Upload>
+    public class UploadState : BaseState<Upload>
     {
         public UploadPanel panel;
         public DescriptionPanel<Upload> desc;
@@ -14,7 +14,7 @@ namespace AdvancedChatFeatures.Uploads
             panel = new();
             Append(panel);
 
-            desc = new("Left click to upload an image\nRight click to open image folder");
+            desc = new("Left click to upload an image\nRight click to open image folder\nExample: [u:Your_Image|100] for a 100px image");
             Append(desc);
 
             panel.ConnectedPanel = desc;

@@ -6,17 +6,17 @@ Chat+ makes Terraria's chat smoother, smarter and more fun with emojis, images, 
 [*] [b]Emoji Support[/b]: Access thousands of emojis directly in chat, powered by [url=https://emojibase.dev/emojis?] Emojibase [/url].
 [*] [b]Image Support[/b]: Upload and send your own images!
 [*] [b]Link Support[/b]: Links you type in chat become clickable.
-[*] [b]Autocomplete Commands[/b]: Type [code] "/" [/code] into chat to autocomplete commands. Press Tab to insert the selected command.
+[*] [b]Autocomplete Commands[/b]: Type "/" into chat to autocomplete commands. Press Tab to insert the selected command.
 [*] [b]Autocomplete Tags[/b]: Type any tag to open autocomplete window. See the [url=https://terraria.wiki.gg/wiki/Chat#Tags] wiki [/url] for all tags supported.
 [*] [b]Text Editing Shortcuts[/b]: Use common text-editing shortcuts like Ctrl+C, Ctrl+V, and more directly in chat.
 
 [/list]
 
 [h2] New Tag: Emojis [/h2] 
-Enter [code] : [/code] into chat to insert emojis. Press Tab to insert the selected emoji.
+Type [e into chat to insert emojis. Press Tab to insert the selected emoji.
 
 [h2] New Tag: Upload Images [/h2] 
-Enter [code] @ [/code] into chat to upload your images. Press Tab to insert the selected image.
+Type [u into chat to upload your images. Press Tab to insert the selected image.
 
 [h2] Text Editing Shortcuts [/h2] 
 You can now use common text editing keyboard shortcuts directly in the chat input for a smoother experience.
@@ -27,32 +27,30 @@ You can now use common text editing keyboard shortcuts directly in the chat inpu
         [th]Action[/th]
     [/tr]
     [tr]
-        [td][code]← / →[/code][/td]
+        [td]← / →[/td]
         [td]Move cursor left/right[/td]
     [/tr]
     [tr]
-        [td][code]Shift+← / →[/code][/td]
+        [td]Shift+← / →[/td]
         [td]Select characters[/td]
     [/tr]
     [tr]
-        [td][code]Ctrl+Shift+← / →[/code][/td]
+        [td]Ctrl+Shift+← / →[/td]
         [td]Select words[/td]
     [/tr]
     [tr]
-        [td][code]Ctrl+X[/code][/td]
+        [td]Ctrl+X[/td]
         [td]Cut[/td]
     [/tr]
     [tr]
-        [td][code]Ctrl+C[/code][/td]
+        [td]Ctrl+C[/td]
         [td]Copy[/td]
     [/tr]
     [tr]
-        [td][code]Ctrl+V[/code][/td]
+        [td]Ctrl+V[/td]
         [td]Paste[/td]
     [/tr]
 [/table]
-
-Compatible with [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3448785552] Chitter-Chatter [/url] and [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3429640606&searchtext=chat] BetterChatBox [/url].
 
 [h2] Support me! [/h2]
 [list]

@@ -6,7 +6,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.Colors
+namespace AdvancedChatFeatures.ColorHandler
 {
     [Autoload(Side = ModSide.Client)]
     public class ColorSystem : ModSystem

@@ -102,7 +102,8 @@ namespace AdvancedChatFeatures.UI
                 if (ConnectedPanel is UploadPanel up)
                     up.PopulatePanel();
 
-                Main.NewText($"Added {fileName} as {tag}", Color.LightGreen);
+                Log.Info($"Added {fileName} as {tag}");
+                //Main.NewText($"Added {fileName} as {tag}", Color.LightGreen);
             }
             catch (Exception ex)
             {
@@ -163,6 +164,12 @@ namespace AdvancedChatFeatures.UI
             int pad = 2;
 
             Top.Set(-Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30 - 38 - pad, 0);
+
+            if (ConnectedPanel.GetType() == typeof(UploadPanel))
+            {
+                Height.Set(90, 0);
+                text.SetText("Left click to upload an image\nRight click to open image folder\nModify image size with (u:img|size=100)");
+            }
 
             base.Draw(spriteBatch);
         }

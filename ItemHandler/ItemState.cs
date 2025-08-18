@@ -4,7 +4,7 @@ using Terraria.UI;
 
 namespace AdvancedChatFeatures.ItemWindow
 {
-    public class ItemState : NavigationState<Item>
+    public class ItemState : BaseState<Item>
     {
         public ItemPanel itemPanel;
         public DescriptionPanel<Item> itemDescPanel;

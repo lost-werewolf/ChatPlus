@@ -1,5 +1,5 @@
 ﻿using System;
-using AdvancedChatFeatures.Colors;
+using AdvancedChatFeatures.ColorHandler;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Emojis;
