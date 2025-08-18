@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;               // Vector2, ColorItem
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.Uploads

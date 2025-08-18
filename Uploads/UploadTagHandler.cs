@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using AdvancedChatFeatures.Helpers;
-using Microsoft.Xna.Framework;             
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI.Chat;
 
@@ -22,7 +22,7 @@ namespace AdvancedChatFeatures.Uploads
         public static string GetPrefixTag() => "[u";
         public static string GenerateTag(string key) => $"[u:{key}]";
         public static string GenerateTag(string key, float size) =>
-            $"{GetPrefixTag}:{key}|size={size.ToString("0.##", CultureInfo.InvariantCulture)}]";
+            $"{GetPrefixTag()}:{key}|size={size.ToString("0.##", CultureInfo.InvariantCulture)}]";
 
         public static bool Register(string key, Texture2D texture)
         {
@@ -42,7 +42,6 @@ namespace AdvancedChatFeatures.Uploads
             bool sizeSpecified = false;
 
             ParseInlineKeyAndOptions(ref key, ref size, ref sizeSpecified);
-            ParseOptionsString(options, ref size, ref sizeSpecified);
 
             if (Registry.TryGetValue(key, out var texture))
             {
@@ -52,7 +51,6 @@ namespace AdvancedChatFeatures.Uploads
                 return new UploadSnippet(texture, size)
                 {
                     Text = renderedTag,
-                    Color = Color.White // don�t tint the image
                 };
             }
 
@@ -74,20 +72,10 @@ namespace AdvancedChatFeatures.Uploads
                 TryParseSizeToken(parts[i], ref size, ref sizeSpecified);
         }
 
-        // Accepts options string like "size=64" (from the parser, if provided)
-        private static void ParseOptionsString(string options, ref float size, ref bool sizeSpecified)
-        {
-            if (string.IsNullOrWhiteSpace(options)) return;
-
-            foreach (var token in options.Split(['|', ',', ';', ' '], StringSplitOptions.RemoveEmptyEntries))
-                TryParseSizeToken(token, ref size, ref sizeSpecified);
-        }
-
         private static void TryParseSizeToken(string token, ref float size, ref bool sizeSpecified)
         {
             if (string.IsNullOrWhiteSpace(token)) return;
 
-            // Allow "size=96" or just "96"
             string val = token;
             int eq = token.IndexOf('=');
             if (eq >= 0)
@@ -99,7 +87,8 @@ namespace AdvancedChatFeatures.Uploads
 
             if (float.TryParse(val, NumberStyles.Float, CultureInfo.InvariantCulture, out var v))
             {
-                size = MathHelper.Clamp(v, 8f, 1500f);
+                float max = 100f;
+                size = MathHelper.Clamp(v, 8f, max); 
                 sizeSpecified = true;
             }
         }
