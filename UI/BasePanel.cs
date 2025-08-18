@@ -16,23 +16,19 @@ using Stubble.Core.Classes;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AdvancedChatFeatures.UI
 {
-    /// <summary>
-    /// A panel that can be navigated on with arrow keys
-    /// </summary>
-    public abstract class NavigationPanel<TData> : DraggablePanel
+    public abstract class BasePanel<TData> : DraggablePanel
     {
         // Elements
         public readonly UIScrollbar scrollbar;
         protected UIList list;
-        protected readonly List<NavigationElement<TData>> items = [];
+        public readonly List<BaseElement<TData>> items = [];
 
         // Force populate
         protected abstract IEnumerable<TData> GetSource(); // The source of data to populate the panel with
-        protected abstract NavigationElement<TData> BuildElement(TData data); // The method to create a new element from the data
+        protected abstract BaseElement<TData> BuildElement(TData data); // The method to create a new element from the data
         protected abstract string GetDescription(TData data);
         protected abstract string GetTag(TData data);
 
@@ -44,7 +40,7 @@ namespace AdvancedChatFeatures.UI
         private Keys heldKey = Keys.None;
         protected bool JustPressed(Keys key) => Main.keyState.IsKeyDown(key) && Main.oldKeyState.IsKeyUp(key);
 
-        public NavigationPanel()
+        public BasePanel()
         {
             // Set width
             Width.Set(320, 0);
@@ -131,7 +127,7 @@ namespace AdvancedChatFeatures.UI
             string text = Main.chatText ?? string.Empty;
             if (text.Length == 0) return true;
 
-            // Panel -> prefix (no virtuals, no globals)
+            // Panel -> prefix
             string prefix =
                 this is CommandPanel ? "/" :
                 this is ColorPanel ? "[c" :
@@ -143,21 +139,21 @@ namespace AdvancedChatFeatures.UI
             if (prefix.Length == 0)
                 return tag.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
 
-            char[] _stopChars = [' ', '\t', '\n', '\r', ']'];
+            char[] stopChars = [' ', '\t', '\n', '\r', ']'];
 
-            // Commands: /query (from last '/')
+            // Commands: /query
             if (prefix == "/")
             {
                 int s = text.LastIndexOf('/');
                 if (s < 0 || s + 1 >= text.Length) return true;
 
-                int e = text.IndexOfAny(_stopChars, s + 1); if (e < 0) e = text.Length;
+                int e = text.IndexOfAny(stopChars, s + 1); if (e < 0) e = text.Length;
                 string q = text.Substring(s + 1, e - (s + 1)).Trim();
                 if (q.Length == 0) return true;
                 return tag.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0;
             }
 
-            // Bracketed tags: [x:query or [x/query (use last prefix only)
+            // Bracketed tags: [x:query
             int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
             if (start < 0)
                 return tag.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0; // fallback
@@ -166,10 +162,33 @@ namespace AdvancedChatFeatures.UI
             if (qStart < text.Length && (text[qStart] == ':' || text[qStart] == '/')) qStart++;
             if (qStart >= text.Length) return true;
 
-            int qEnd = text.IndexOfAny(_stopChars, qStart); if (qEnd < 0) qEnd = text.Length;
+            int qEnd = text.IndexOfAny(stopChars, qStart); if (qEnd < 0) qEnd = text.Length;
             string query = text.Substring(qStart, qEnd - qStart).Trim();
             if (query.Length == 0) return true;
 
+            // 🔹 Emoji: also match synonyms
+            if (this is EmojiPanel && data is Emoji emoji)
+            {
+                if (tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
+                foreach (string syn in emoji.Synonyms)
+                    if (!string.IsNullOrEmpty(syn) && syn.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
+                        return true;
+                return false;
+            }
+
+            // 🔹 Item: match tag OR display name (and optionally numeric ID)
+            if (this is ItemPanel && data is ItemWindow.Item item)
+            {
+                if (tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
+                if ((item.DisplayName ?? string.Empty).IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
+
+                // Optional: allow typing a number to match by ID
+                if (int.TryParse(query, out int qid) && qid == item.ID) return true;
+
+                return false;
+            }
+
+            // Default: tag only
             return tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
         }
         #endregion
@@ -195,6 +214,8 @@ namespace AdvancedChatFeatures.UI
 
         public void SetSelectedIndex(int index)
         {
+            //Main.NewText("1");
+
             if (items.Count == 0) return;
 
             // wrap around
@@ -236,7 +257,7 @@ namespace AdvancedChatFeatures.UI
             list.ViewPosition = MathHelper.Clamp(view, 0f, maxView);
 
             // 🔹 Update description panel
-            if (ConnectedPanel is DescriptionPanel<TData> desc)
+            if (ConnectedPanel is DescriptionPanel<TData> descPanel)
             {
                 // Skip updating upload description panel
                 if (typeof(TData) == typeof(Upload))
@@ -247,20 +268,22 @@ namespace AdvancedChatFeatures.UI
                 var element = items[currentIndex];
                 if (element != null)
                 {
+                    string desc = GetDescription(element.Data);
+
                     if (element.Data is Emoji emoji && emoji.Synonyms.Count > 0)
                     {
-                        desc.SetTextWithLinebreak(string.Join(", ", emoji.Synonyms));
+                        descPanel.SetTextWithLinebreak(string.Join(", ", emoji.Synonyms));
                     }
                     else
                     {
-                        desc.SetTextWithLinebreak(GetDescription(element.Data));
+                        descPanel.SetTextWithLinebreak(desc);
                     }
                 }
 
                 // Set color text if description panel is connected to a color panel
-                if (desc.ConnectedPanel.GetType() == typeof(ColorPanel))
+                if (descPanel.ConnectedPanel.GetType() == typeof(ColorPanel))
                 {
-                    desc.GetText()._color = ColorElement.HexToColor(tag);
+                    descPanel.GetText()._color = ColorElement.HexToColor(tag);
                 }
             }
 
@@ -293,7 +316,20 @@ namespace AdvancedChatFeatures.UI
             if (!JustPressed(Keys.Tab) || items.Count == 0 || currentIndex < 0)
                 return;
 
+            InsertSelectedTag();
+
+            if (this is ColorPanel)
+            {
+                Main.chatText += "]";
+            }
+        }
+
+        public void InsertSelectedTag()
+        {
+            if (items.Count == 0 || currentIndex < 0) return;
+
             string tag = GetTag(items[currentIndex].Data);
+            if (string.IsNullOrEmpty(tag)) return;
 
             if (this is CommandPanel)
             {
@@ -302,12 +338,8 @@ namespace AdvancedChatFeatures.UI
                 return;
             }
 
-            if (string.IsNullOrEmpty(tag))
-                return;
-
             string text = Main.chatText ?? string.Empty;
 
-            // Determine prefix and filtering logic
             string prefix = this switch
             {
                 ColorPanel => "[c",
@@ -321,17 +353,14 @@ namespace AdvancedChatFeatures.UI
             int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
             if (start < 0)
             {
-                // no prefix -> just append
                 Main.chatText += tag;
                 HandleChatHook.SetCaretPos(Main.chatText.Length);
                 return;
             }
 
-            // find end of unfinished segment (whitespace or ] or end of string)
-            int end = text.IndexOfAny([' ', '\t', '\n', '\r', ']'], start);
+            int end = text.IndexOfAny(new[] { ' ', '\t', '\n', '\r', ']' }, start);
             if (end < 0) end = text.Length;
 
-            // replace segment
             string before = text[..start];
             string after = text[end..];
             Main.chatText = before + tag + after;

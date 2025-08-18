@@ -9,7 +9,7 @@ using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.Emojis
 {
-    public class EmojiElement : NavigationElement<Emoji>
+    public class EmojiElement : BaseElement<Emoji>
     {
         public Emoji Emoji;
 

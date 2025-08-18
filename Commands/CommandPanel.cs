@@ -5,11 +5,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AdvancedChatFeatures.Commands
 {
-    public class CommandPanel : NavigationPanel<Command>
+    public class CommandPanel : BasePanel<Command>
     {
         // Properties
         protected override IEnumerable<Command> GetSource() => CommandInitializer.Commands;
-        protected override NavigationElement<Command> BuildElement(Command data) => new CommandElement(data);
+        protected override BaseElement<Command> BuildElement(Command data) => new CommandElement(data);
         protected override string GetDescription(Command data) => data.Description;
         protected override string GetTag(Command data) => data.Name;
 

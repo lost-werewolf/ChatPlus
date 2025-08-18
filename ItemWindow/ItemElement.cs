@@ -6,7 +6,7 @@ using Terraria.UI.Chat;
 namespace AdvancedChatFeatures.ItemWindow
 {
     // Shows an item color with its [i:ID] tag and name
-    public class ItemElement : NavigationElement<Item>
+    public class ItemElement : BaseElement<Item>
     {
         public Item item;
         public ItemElement(Item item) : base(item)

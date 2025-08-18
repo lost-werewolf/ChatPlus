@@ -52,7 +52,9 @@ namespace AdvancedChatFeatures.Emojis
             Vector2 drawPos = Main.MouseScreen + new Vector2(16f);
             Vector2 origin = new(tex.Width / 2f, tex.Height / 2f);
 
-            sb.Draw(tex, drawPos, null, color, 0f, origin, scaleHover, SpriteEffects.None, 0f);
+            UICommon.TooltipMouseText(Text);
+
+            //sb.Draw(tex, drawPos, null, color, 0f, origin, scaleHover, SpriteEffects.None, 0f);
         }
 
         private static readonly HashSet<Texture2D> _sanitizedTextures = new();

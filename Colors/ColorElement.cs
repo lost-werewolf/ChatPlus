@@ -6,7 +6,7 @@ using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.Colors
 {
-    public class ColorElement : NavigationElement<ColorItem>
+    public class ColorElement : BaseElement<ColorItem>
     {
         public ColorItem color;
 

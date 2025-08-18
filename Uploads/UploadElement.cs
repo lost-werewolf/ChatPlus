@@ -7,7 +7,7 @@ using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.Uploads
 {
-    public class UploadElement : NavigationElement<Upload>
+    public class UploadElement : BaseElement<Upload>
     {
         public Upload Element;
         public UploadElement(Upload data) : base(data)

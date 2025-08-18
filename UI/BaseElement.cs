@@ -17,9 +17,9 @@ using Item = AdvancedChatFeatures.ItemWindow.Item;
 namespace AdvancedChatFeatures.UI
 {
     /// <summary>
-    /// An element that can be navigated in a <see cref="NavigationPanel"/>.
+    /// An element that can be navigated in a <see cref="BasePanel<TData>"/>.
     /// </summary>
-    public abstract class NavigationElement<TData> : UIElement
+    public abstract class BaseElement<TData> : UIElement
     {
         // Variables
         private bool isSelected;
@@ -28,7 +28,7 @@ namespace AdvancedChatFeatures.UI
         // Properties
         public TData Data { get; }
 
-        protected NavigationElement(TData data)
+        protected BaseElement(TData data)
         {
             Height.Set(30, 0);
             Width.Set(0, 1);
@@ -39,58 +39,21 @@ namespace AdvancedChatFeatures.UI
         {
             base.LeftClick(evt);
 
-            //Main.NewText(Data);
+            // Walk up until we find the panel
+            // (which is 3 steps, usually from InnerList -> List -> EmojiPanel
+            UIElement parent = Parent;
+            while (parent != null && parent is not BasePanel<TData>)
+                parent = parent.Parent;
 
-            string tag = "";
-            if (Data is Command command) tag = command.Name;
-            else if (Data is ColorItem color) tag = color.Tag;
-            else if (Data is Emoji emoji) tag = emoji.Tag;
-            else if (Data is Glyph glyph) tag = glyph.Tag;
-            else if (Data is Item item) tag = item.Tag;
-            else if (Data is Upload upload) tag = upload.Tag;
-
-            if (this is CommandPanel)
+            if (parent is BasePanel<TData> panel)
             {
-                Main.chatText = tag;
-                HandleChatHook.SetCaretPos(Main.chatText.Length);
-                return;
+                int index = panel.items.IndexOf(this);
+                if (index >= 0)
+                {
+                    panel.SetSelectedIndex(index);
+                    panel.InsertSelectedTag();
+                }
             }
-
-            if (string.IsNullOrEmpty(tag))
-                return;
-
-            string text = Main.chatText ?? string.Empty;
-
-            // Determine prefix and filtering logic
-            string prefix = this switch
-            {
-                ColorPanel => "[c",
-                EmojiPanel => "[e",
-                GlyphPanel => "[g",
-                ItemPanel => "[i",
-                UploadPanel => "[u",
-                _ => "[e"
-            };
-
-            int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
-            if (start < 0)
-            {
-                // no prefix -> just append
-                Main.chatText += tag;
-                HandleChatHook.SetCaretPos(Main.chatText.Length);
-                return;
-            }
-
-            // find end of unfinished segment (whitespace or ] or end of string)
-            int end = text.IndexOfAny(new[] { ' ', '\t', '\n', '\r', ']' }, start);
-            if (end < 0) end = text.Length;
-
-            // replace segment
-            string before = text[..start];
-            string after = text[end..];
-            Main.chatText = before + tag + after;
-
-            HandleChatHook.SetCaretPos(before.Length + tag.Length);
         }
 
         public override void Update(GameTime gameTime)

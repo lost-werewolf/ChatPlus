@@ -5,9 +5,9 @@ using Terraria;
 
 namespace AdvancedChatFeatures.Uploads
 {
-    public class UploadPanel : NavigationPanel<Upload>
+    public class UploadPanel : BasePanel<Upload>
     {
-        protected override NavigationElement<Upload> BuildElement(Upload data) => new UploadElement(data);
+        protected override BaseElement<Upload> BuildElement(Upload data) => new UploadElement(data);
         protected override IEnumerable<Upload> GetSource() => UploadInitializer.Uploads;
         protected override string GetDescription(Upload data) => data.FileName;
         protected override string GetTag(Upload data) => data.Tag;

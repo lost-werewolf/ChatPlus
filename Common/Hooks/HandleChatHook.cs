@@ -1,4 +1,5 @@
 ﻿using System;
+using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Common.Configs;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
@@ -54,6 +55,11 @@ namespace AdvancedChatFeatures.Common.Hooks
 
         private void DoUpdate_HandleChat(On_Main.orig_DoUpdate_HandleChat orig)
         {
+            bool active = HandleChatILHook.IsAnyStateActive();
+            //Main.NewText(active);
+
+            //if (HandleChatILHook.IsAnyStateActive()) return;
+
             orig();
 
             if (!Conf.C.featuresConfig.EnableTextEditingShortcuts)

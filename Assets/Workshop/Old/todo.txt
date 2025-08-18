@@ -172,9 +172,9 @@ Todo:
 ✅ Up down arrow keys - navigate through items
 ✅ Prefix checking - open or close states
 ✅ Tab input - add tag to chat input
-2. Key input - filter items
+✅. Key input - filter items
 
 Future:
-4. Left click - select item and add tag to chat input
+✅. Left click - select item and add tag to chat input
 5. Escape input - close the active panel
 ----------------------------------------------------------------

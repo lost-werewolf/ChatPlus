@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework;
 
 namespace AdvancedChatFeatures.Colors
 {
-    public class ColorPanel : NavigationPanel<ColorItem>
+    public class ColorPanel : BasePanel<ColorItem>
     {
-        protected override NavigationElement<ColorItem> BuildElement(ColorItem data) => new ColorElement(data);
+        protected override BaseElement<ColorItem> BuildElement(ColorItem data) => new ColorElement(data);
         protected override IEnumerable<ColorItem> GetSource() => ColorInitializer.Colors;
         protected override string GetDescription(ColorItem data) => data.Description;
         protected override string GetTag(ColorItem data) => data.Tag;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using AdvancedChatFeatures.Colors;
 using AdvancedChatFeatures.Commands;
 using AdvancedChatFeatures.Emojis;
@@ -7,7 +8,10 @@ using AdvancedChatFeatures.Helpers;
 using AdvancedChatFeatures.ItemWindow;
 using AdvancedChatFeatures.UI;
 using AdvancedChatFeatures.Uploads;
+using Microsoft.Xna.Framework.Input;
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using MonoMod.Core.Platforms;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
@@ -39,28 +43,58 @@ namespace AdvancedChatFeatures.Common.Hooks
         {
             try
             {
-                var cursor = new ILCursor(il);
-                if (cursor.TryGotoNext(
+                // Match to linesOffset setter
+                var c = new ILCursor(il);
+                if (c.TryGotoNext(
                         i => i.MatchLdsfld(typeof(Main), nameof(Main.chatMonitor)),
                         i => i.MatchLdloc0(),
                         i => i.MatchCallvirt(typeof(IChatMonitor), nameof(IChatMonitor.Offset))))
                 {
-                    cursor.Index += 2;
+                    c.Index += 2;
 
-                    cursor.EmitDelegate<Func<int, int>>(v => IsAnyStateActive() ? 0 : v);
+                    // Set linesOffset = 0 if any state is active.
+                    // This effectively stops lines scrolling if any state is active.
+                    c.EmitDelegate<Func<int, int>>(v => IsAnyStateActive() ? 0 : v);
                 }
                 else
                 {
                     Log.Error("Failed to patch linesOffset in HandleChat.");
-                    MonoModHooks.DumpIL(Mod, il);
                 }
 
+                c.Index = 0;
+
+                if (c.TryGotoNext(
+            i => i.MatchLdsflda(typeof(Main), nameof(Main.keyState)),
+            i => i.MatchLdcI4((int)Keys.Escape),
+            i => i.MatchCall(typeof(KeyboardState), nameof(KeyboardState.IsKeyDown)),
+            i => i.MatchBrfalse(out var skipEscBlock) // capture the original target label
+        ))
+                {
+                    int oldIndex = c.Index;
+                    // oldIndex should be at the *start* of the ESC block (the ldsflda Main.keyState)
+                    if (c.TryGotoNext(i => i.MatchStsfld<Main>(nameof(Main.drawingPlayerChat))))
+                    {
+                        // mark jump target *after* the ESC-close write
+                        c.Index++;
+                        ILLabel afterEscBlock = il.DefineLabel();
+                        c.MarkLabel(afterEscBlock);
+
+                        // return to the start of the ESC block
+                        c.Index = oldIndex;
+
+                        var mi = typeof(HandleChatILHook).GetMethod(nameof(IsAnyStateActive));
+
+                        c.EmitCall(mi);          // push bool result
+                        c.EmitBrtrue(afterEscBlock);
+                    }
+                }
             }
+
             catch (Exception ex)
             {
                 Log.Error($"HandleChatILHook failed: {ex}");
-                MonoModHooks.DumpIL(Mod, il);
             }
+            MonoModHooks.DumpIL(Mod, il);
         }
 
         public static bool IsAnyStateActive()
@@ -72,7 +106,12 @@ namespace AdvancedChatFeatures.Common.Hooks
             var itemSys = ModContent.GetInstance<ItemSystem>();
             var uploadSys = ModContent.GetInstance<UploadSystem>();
 
-            if (cmdSys.ui != null || colorSys.ui != null || emojiSys.ui != null || glyphSys.ui != null || itemSys.ui != null || uploadSys.ui != null)
+            if (cmdSys.ui.CurrentState != null || 
+                colorSys.ui.CurrentState != null || 
+                emojiSys.ui.CurrentState != null || 
+                glyphSys.ui.CurrentState != null || 
+                itemSys.ui.CurrentState != null || 
+                uploadSys.ui.CurrentState != null)
             {
                 return true;
             }

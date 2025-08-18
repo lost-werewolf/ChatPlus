@@ -15,7 +15,7 @@ namespace AdvancedChatFeatures.Commands
     /// <summary>
     /// Represents a chat command element in the UI.
     /// </summary>
-    public class CommandElement : NavigationElement<Command>
+    public class CommandElement : BaseElement<Command>
     {
         public Command Command;
         private ModIconImage modIconImage;

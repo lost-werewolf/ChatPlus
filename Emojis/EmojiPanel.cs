@@ -6,9 +6,9 @@ using Terraria;
 
 namespace AdvancedChatFeatures.Emojis
 {
-    public class EmojiPanel : NavigationPanel<Emoji>
+    public class EmojiPanel : BasePanel<Emoji>
     {
-        protected override NavigationElement<Emoji> BuildElement(Emoji data) => new EmojiElement(data);
+        protected override BaseElement<Emoji> BuildElement(Emoji data) => new EmojiElement(data);
 
         protected override IEnumerable<Emoji> GetSource() => EmojiInitializer.Emojis;
 

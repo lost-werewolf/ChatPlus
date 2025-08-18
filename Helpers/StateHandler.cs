@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.UI;
 
@@ -8,6 +9,14 @@ public static class StateHandler
 {
     public static void OpenStateIfPrefixMatches(GameTime gameTime, UserInterface ui, UIState state, string prefix)
     {
+        if (Main.keyState.IsKeyDown(Keys.Escape) && Main.oldKeyState.IsKeyDown(Keys.Escape))
+        {
+            //Main.NewText("esc");
+            //ui.SetState(null);
+            //Main.drawingPlayerChat = true;
+            //return;
+        }
+
         if (!Main.drawingPlayerChat)
         {
             if (ui.CurrentState != null)

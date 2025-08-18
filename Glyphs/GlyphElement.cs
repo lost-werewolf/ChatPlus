@@ -6,7 +6,7 @@ using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.Glyphs
 {
-    public class GlyphElement : NavigationElement<Glyph>
+    public class GlyphElement : BaseElement<Glyph>
     {
         public Glyph Glyph;
         public GlyphElement(Glyph glyph) : base(glyph)

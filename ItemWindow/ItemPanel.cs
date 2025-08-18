@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework;
 
 namespace AdvancedChatFeatures.ItemWindow
 {
-    public class ItemPanel : NavigationPanel<Item>
+    public class ItemPanel : BasePanel<Item>
     {
-        protected override NavigationElement<Item> BuildElement(Item data) => new ItemElement(data);
+        protected override BaseElement<Item> BuildElement(Item data) => new ItemElement(data);
 
         protected override IEnumerable<Item> GetSource() => ItemInitializer.Items.OrderBy(i => i.ID);
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -34,6 +35,15 @@ namespace AdvancedChatFeatures.Commands
 
         public override void UpdateUI(GameTime gameTime)
         {
+            if (Main.keyState.IsKeyDown(Keys.Escape))
+            {
+                ui.SetState(null);
+
+                Main.drawingPlayerChat = true;
+
+                return;
+            }
+
             if (!Main.drawingPlayerChat)
             {
                 if (ui.CurrentState != null)

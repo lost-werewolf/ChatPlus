@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework;
 
 namespace AdvancedChatFeatures.Glyphs
 {
-    public class GlyphPanel : NavigationPanel<Glyph>
+    public class GlyphPanel : BasePanel<Glyph>
     {
-        protected override NavigationElement<Glyph> BuildElement(Glyph data) =>
+        protected override BaseElement<Glyph> BuildElement(Glyph data) =>
             new GlyphElement(data);
 
         protected override IEnumerable<Glyph> GetSource() =>
