@@ -79,7 +79,7 @@ namespace ChatPlus.Common.Systems
                 //                // return to the start of the ESC block
                 //                c.Index = oldIndex;
 
-                //                var mi = typeof(HandleChatILSystem).GetMethod(nameof(IsAnyStateActive));
+                //                var mi = typeof(HandleChatILSystem).GetMethodNewTextMultilineMethod(nameof(IsAnyStateActive));
 
                 //                c.EmitCall(mi);          // push bool result
                 //                c.EmitBrtrue(afterEscBlock);

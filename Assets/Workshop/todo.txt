@@ -196,10 +196,11 @@ Workshop images. Make sure they have the same format, zoom, resolution, text siz
 3. Autocomplete!
 4. Text editor!
 [todo low prio] Fix cursor position of colors (HandleChat)
-
+[done] Fix uploads not saving (UploadInitializer)
+[done] Fix image size (UploadTagHandler, HandleChat "\n"). Force same height every time.
+[todo low prio] Move image chat pos to below the playername 
 ---
 
 [todo] Fix image size compat for chitterchatter
-[todo] Fix uploads not saving (UploadInitializer)
-[todo] Fix image size (UploadTagHandler, HandleChat "\n"). Force same height every time.
+
 
