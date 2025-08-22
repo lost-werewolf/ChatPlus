@@ -12,6 +12,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
+using static System.Net.Mime.MediaTypeNames;
 using static Terraria.Localization.NetworkText;
 
 namespace ChatPlus.Common.Configs.ConfigElements
@@ -65,19 +66,12 @@ namespace ChatPlus.Common.Configs.ConfigElements
 
             Utils.DrawInvBG(sb, r, ColorHelper.UIPanelBlue);
 
-            var nameSnips = new[] { new TextSnippet("[e:heart] -> ") { Color = Color.White, CheckForHover = false } };
-            ChatManager.DrawColorCodedStringWithShadow(
-                sb,
-                FontAssets.MouseText.Value,
-                nameSnips,
-                pos + new Vector2(0, 0),
-                0f,
-                Vector2.Zero,
-                new Vector2(1.0f),
-                out _
-            );
-            pos += new Vector2(105, 0);
+            // Draw first text
+            TextSnippet[] nameSnips = [new TextSnippet("[e:heart] -> ")];
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, nameSnips, pos += new Vector2(0, 0), 0f, Vector2.Zero, Vector2.One, out _);
 
+            // Draw second text
+            pos += new Vector2(105, 0);
             Utils.DrawBorderString(sb, "[e:heart]", pos, Color.White);
         }
 

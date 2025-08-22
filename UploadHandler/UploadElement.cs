@@ -3,6 +3,7 @@ using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.GameContent.UI.Elements;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.UploadHandler
@@ -10,42 +11,37 @@ namespace ChatPlus.UploadHandler
     public class UploadElement : BaseElement<Upload>
     {
         public Upload Element;
+
+        private UIText img;
+        private UIText imgTagName;
+
         public UploadElement(Upload data) : base(data)
         {
             Element = data;
             Height.Set(90, 0);
             Width.Set(0, 1);
+
+            img = new(Element.Tag);
+            Append(img);
         }
 
         public override void Draw(SpriteBatch sb)
         {
-            Height.Set(30, 0);
+            Height.Set(90, 0);
             base.Draw(sb);
+
+            img._textScale = 0.4f;
+            img.Left.Set(10, 0);
+            img.Top.Set(-5, 0);
+            //imgTagName.SetText(Element.Tag-="", 0.1f, true);
 
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
 
-            // Draw preview image
-            string path = Element.FullFilePath;
-
-            Texture2D tex = Data.Texture;
-
-            if (tex != null)
-            {
-                Rectangle rect = new(
-                    (int)pos.X + 2,
-                    (int)pos.Y + 2,
-                    (int)dims.Height - 4,
-                    (int)dims.Height - 4
-                );
-
-                sb.Draw(tex, rect, Color.White);
-            }
-
             // Draw file name
-            var imgName = new[] { new TextSnippet(Data.Tag) };
-            pos += new Vector2(30, 5);
-            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, imgName, pos, 0f, Vector2.Zero, Vector2.One, out _);
+            TextSnippet[] snip = [new TextSnippet(Data.Tag)];
+            pos += new Vector2(90, 5);
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos, 0f, Vector2.Zero, Vector2.One, out _);
         }
     }
 }

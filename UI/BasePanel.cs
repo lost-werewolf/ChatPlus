@@ -93,10 +93,15 @@ namespace ChatPlus.UI
             }
         }
 
-        public void PopulatePanel()
+        public void ClearPanel()
         {
             items.Clear();
             list.Clear();
+        }
+
+        public void PopulatePanel()
+        {
+            ClearPanel();
 
             var source = GetSource();
             if (source == null) return;

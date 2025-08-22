@@ -1,10 +1,7 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Text;
+﻿using System.Buffers.Text;
 using System.Text.RegularExpressions;
-using ChatPlus.Common.Configs;
 using ChatPlus.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -17,34 +14,24 @@ namespace ChatPlus.Common.Systems
 {
     internal class DrawChatSystem : ModSystem
     {
+        const int BaseHeight = 32;   // vanilla input line height
+        const int ExtraH = 180;      // image height = 10 lines * 20px
+        const int Expanded = BaseHeight + ExtraH; // 232
+
         public override void Load()
         {
-            if (ModLoader.TryGetMod("ChatImprover", out Mod _))
-            {
-                return;
-            }
-
             On_Main.DrawPlayerChat += DrawPlayerChat;
             On_RemadeChatMonitor.DrawChat += DrawMonitor;
         }
-
         public override void Unload()
         {
-            if (ModLoader.TryGetMod("ChatImprover", out Mod _))
-            {
-                return;
-            }
-
             On_Main.DrawPlayerChat -= DrawPlayerChat;
             On_RemadeChatMonitor.DrawChat -= DrawMonitor;
         }
 
         private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
         {
-            bool hasUpload =
-                drawingPlayerChat &&
-                !string.IsNullOrEmpty(Main.chatText) &&
-                System.Text.RegularExpressions.Regex.IsMatch(Main.chatText, @"\[u:[^\]]+\]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            bool hasUpload = drawingPlayerChat && HasUpload(Main.chatText);
 
             if (!hasUpload)
             {
@@ -52,127 +39,137 @@ namespace ChatPlus.Common.Systems
                 return;
             }
 
-            const int lift = 200; // 10 lines * 20px
-
+            // Lift monitor so it renders above the taller input area
             var sb = Main.spriteBatch;
-
             sb.End();
-            var lifted = Main.UIScaleMatrix * Microsoft.Xna.Framework.Matrix.CreateTranslation(0f, -lift, 0f);
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, lifted);
+            var lifted = Main.UIScaleMatrix * Matrix.CreateTranslation(0f, -ExtraH, 0f);
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
+                     DepthStencilState.None, RasterizerState.CullCounterClockwise, null, lifted);
 
-            // draw the monitor with the lifted matrix so its first line starts higher
             orig(self, true);
 
-            // restore the normal UI batch for everything else (your input box, caret, etc.)
             sb.End();
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
+                     DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
         }
 
         private void DrawPlayerChat(On_Main.orig_DrawPlayerChat orig, Main self)
         {
-            if (!Conf.C.featuresConfig.EnableTextEditingShortcuts)
+            bool hasUpload = HasUpload(Main.chatText);
+            int height = hasUpload ? Expanded-20 : BaseHeight;
+
+            if (!Main.drawingPlayerChat)
             {
                 orig(self);
                 return;
             }
 
-            bool hasUpload = !string.IsNullOrEmpty(Main.chatText) &&
-                             System.Text.RegularExpressions.Regex.IsMatch(Main.chatText, @"\[u:[^\]]+\]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            PlayerInput.WritingText = true;
+            Main.instance.HandleIME();
 
-            int extraLines = hasUpload ? 10 : 0;
-            const int baseHeight = 32;
-            const int lineStep = 20;
-            int height = baseHeight + extraLines * lineStep;
-
-            if (Main.drawingPlayerChat)
+            // caret blink
+            if (++Main.instance.textBlinkerCount >= 20)
             {
-                Terraria.GameInput.PlayerInput.WritingText = true;
-                Main.instance.HandleIME();
+                Main.instance.textBlinkerState = 1 - Main.instance.textBlinkerState;
+                Main.instance.textBlinkerCount = 0;
+            }
 
-                Main.instance.textBlinkerCount++;
-                if (Main.instance.textBlinkerCount >= 20)
-                {
-                    Main.instance.textBlinkerState = Main.instance.textBlinkerState == 0 ? 1 : 0;
-                    Main.instance.textBlinkerCount = 0;
-                }
+            DrawChatbox(height);
 
-                if (hasUpload)
-                {
-                    Main.chatMonitor.DrawChat(true);
-                }
-
-                DrawChatbox(height);
-
-                int inputX = 88;
-                int inputY = Main.screenHeight - height;
-
-                int textOffsetX = 0;
-
-                if (hasUpload && TryGetFirstUploadTexture(Main.chatText, out var tex))
-                {
-                    float targetH = 200f; // 10 lines * 20px
-                    float s = targetH / System.Math.Max(tex.Width, tex.Height);
-                    float drawnW = tex.Width * s;
-
-                    Main.spriteBatch.Draw(tex, new Vector2(inputX, inputY + 2), null, Color.White, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
-
-                    textOffsetX = (int)System.Math.Ceiling(drawnW) + 8;
-                }
-
-                DrawSelectionRectangle(height, inputY, textOffsetX);
-                DrawInputText(height, inputY, textOffsetX);
+            if (!hasUpload)
+            {
+                DrawInputLine(height, textOffsetX: 0, hasUpload: false);
+                DrawSelectionRectangle(height, Main.screenHeight - height, 0);
             }
             else
             {
-                Terraria.GameInput.PlayerInput.WritingText = false;
+                int textOffsetX = DrawUploadAndGetTextOffset(height);
+                DrawInputLine(height, textOffsetX, hasUpload: true);
             }
 
-            // when no upload is active, keep vanilla order (monitor after input draw)
-            if (!hasUpload)
-            {
-                Main.chatMonitor.DrawChat(Main.drawingPlayerChat);
-            }
-
-            static bool TryGetFirstUploadTexture(string s, out Texture2D tex)
-            {
-                tex = null;
-                var m = System.Text.RegularExpressions.Regex.Match(s ?? "", @"\[u:([^\]\|]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                if (!m.Success) return false;
-                string key = m.Groups[1].Value;
-                return UploadHandler.UploadTagHandler.TryGet(key, out tex);
-            }
+            Main.chatMonitor.DrawChat(true);
         }
 
-        private void DrawChatbox(int height)
+
+        // --- helpers ---
+
+        private static bool HasUpload(string s) =>
+            !string.IsNullOrEmpty(s) && Regex.IsMatch(s, @"\[u:[^\]]+\]", RegexOptions.IgnoreCase);
+
+        private static int DrawUploadAndGetTextOffset(int totalHeight)
         {
-            int width = Main.screenWidth - 300;
-            int startX = 78;
-            int startY = Main.screenHeight - 4 - height;
+            // Draw the first upload image at 200px tall, return text X offset (image width + padding)
+            if (!TryGetFirstUploadTexture(Main.chatText, out var tex)) return 0;
 
-            DrawNineSlice(startX, startY, width, height, TextureAssets.TextBack.Value, new Color(100, 100, 100, 100));
+            int inputX = 88;
+            int inputY = Main.screenHeight - totalHeight;
+
+            float targetH = ExtraH; // 200px
+            float s = targetH / System.Math.Max(tex.Width, tex.Height);
+            float drawnW = tex.Width * s;
+
+            Main.spriteBatch.Draw(tex, new Vector2(inputX, inputY + 2), null, Color.White, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
+            return (int)System.Math.Ceiling(drawnW) + 8;
         }
 
-        /// <summary>
-        /// Draws a nine slice for the chat
-        /// </summary>
-        public static void DrawNineSlice(int x, int y, int w, int h, Texture2D tex, Color color)
+        private static bool TryGetFirstUploadTexture(string s, out Texture2D tex)
         {
-            int c = 10;
-            int ew = tex.Width - c * 2;
-            int eh = tex.Height - c * 2;
-
-            Main.spriteBatch.Draw(tex, new Vector2(x, y), new Rectangle(0, 0, c, c), color);
-            Main.spriteBatch.Draw(tex, new Rectangle(x + c, y, w - c * 2, c), new Rectangle(c, 0, ew, c), color);
-            Main.spriteBatch.Draw(tex, new Vector2(x + w - c, y), new Rectangle(tex.Width - c, 0, c, c), color);
-
-            Main.spriteBatch.Draw(tex, new Rectangle(x, y + c, c, h - c * 2), new Rectangle(0, c, c, eh), color);
-            Main.spriteBatch.Draw(tex, new Rectangle(x + c, y + c, w - c * 2, h - c * 2), new Rectangle(c, c, ew, eh), color);
-            Main.spriteBatch.Draw(tex, new Rectangle(x + w - c, y + c, c, h - c * 2), new Rectangle(tex.Width - c, c, c, eh), color);
-
-            Main.spriteBatch.Draw(tex, new Vector2(x, y + h - c), new Rectangle(0, tex.Height - c, c, c), color);
-            Main.spriteBatch.Draw(tex, new Rectangle(x + c, y + h - c, w - c * 2, c), new Rectangle(c, tex.Height - c, ew, c), color);
-            Main.spriteBatch.Draw(tex, new Vector2(x + w - c, y + h - c), new Rectangle(tex.Width - c, tex.Height - c, c, c), color);
+            tex = null;
+            var m = Regex.Match(s ?? "", @"\[u:([^\]]+)\]", RegexOptions.IgnoreCase);
+            if (!m.Success) return false;
+            string key = m.Groups[1].Value.Trim();
+            return UploadHandler.UploadTagHandler.TryGet(key, out tex);
         }
+
+        private static void DrawChatbox(int height)
+        {
+            int w = Main.screenWidth - 300;
+            int x = 78;
+            int y = Main.screenHeight - 4 - height;
+            DrawNineSlice(x, y, w, height, TextureAssets.TextBack.Value, new Color(100, 100, 100, 100));
+        }
+
+        private static void DrawInputLine(int height, int textOffsetX, bool hasUpload)
+        {
+            int baseX = 88;
+            int baseY = Main.screenHeight - height;
+
+            // Strip upload tag from rendered text so input appears to the right of the image.
+            string raw = Main.chatText ?? "";
+            var tag = Regex.Match(raw, @"\[u:[^\]]+\]", RegexOptions.IgnoreCase);
+            string cleaned = tag.Success ? raw.Remove(tag.Index, tag.Length) : raw;
+
+            // Draw text
+            var snips = ChatManager.ParseMessage(cleaned, Color.White).ToArray();
+            ChatManager.DrawColorCodedStringWithShadow(
+                Main.spriteBatch, FontAssets.MouseText.Value,
+                snips, new Vector2(baseX + textOffsetX, baseY),
+                0f, Vector2.Zero, Vector2.One, out _
+            );
+
+            // Caret
+            if (Main.instance.textBlinkerState == 1)
+            {
+                int caretRaw = System.Math.Clamp(Common.Systems.HandleChatSystem.GetCaretPos(), 0, raw.Length);
+                int caretClean = caretRaw;
+
+                if (tag.Success)
+                {
+                    int tagStart = tag.Index;
+                    int tagEnd = tag.Index + tag.Length;
+                    if (caretRaw <= tagEnd) caretClean = 0;                  // inside/at tag → snap to start of cleaned
+                    else caretClean = caretRaw - tag.Length;                 // after tag → shift left by tag length
+                }
+
+                caretClean = System.Math.Clamp(caretClean, 0, cleaned.Length);
+                var before = ChatManager.ParseMessage(cleaned.Substring(0, caretClean), Color.White).ToArray();
+                Vector2 beforeSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, before, Vector2.One);
+
+                int caretX = baseX + textOffsetX + (int)beforeSize.X;
+                Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(caretX, baseY + 2, 1, 17), Color.White);
+            }
+        }
+
         private void DrawSelectionRectangle(int height, int baselineY, int textOffsetX)
         {
             var sel = HandleChatSystem.GetSelection();
@@ -231,48 +228,24 @@ namespace ChatPlus.Common.Systems
             }
         }
 
-        private void DrawInputText(int height, int baselineY, int textOffsetX)
+        private static void DrawNineSlice(int x, int y, int w, int h, Texture2D tex, Color color)
         {
-            string raw = Main.chatText ?? "";
-            int caretRaw = System.Math.Clamp(HandleChatSystem.GetCaretPos(), 0, raw.Length);
+            int c = 10;
+            int ew = tex.Width - c * 2;
+            int eh = tex.Height - c * 2;
 
-            var tag = System.Text.RegularExpressions.Regex.Match(raw, @"\[u:[^\]]+\]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            var sb = Main.spriteBatch;
+            sb.Draw(tex, new Vector2(x, y), new Rectangle(0, 0, c, c), color);
+            sb.Draw(tex, new Rectangle(x + c, y, w - c * 2, c), new Rectangle(c, 0, ew, c), color);
+            sb.Draw(tex, new Vector2(x + w - c, y), new Rectangle(tex.Width - c, 0, c, c), color);
 
-            string cleaned;
-            int caretClean;
+            sb.Draw(tex, new Rectangle(x, y + c, c, h - c * 2), new Rectangle(0, c, c, eh), color);
+            sb.Draw(tex, new Rectangle(x + c, y + c, w - c * 2, h - c * 2), new Rectangle(c, c, ew, eh), color);
+            sb.Draw(tex, new Rectangle(x + w - c, y + c, c, h - c * 2), new Rectangle(tex.Width - c, c, c, eh), color);
 
-            if (!tag.Success)
-            {
-                cleaned = raw;
-                caretClean = caretRaw;
-            }
-            else
-            {
-                cleaned = raw.Remove(tag.Index, tag.Length);
-
-                if (caretRaw <= tag.Index + tag.Length) caretClean = 0;
-                else caretClean = caretRaw - tag.Length;
-            }
-
-            var snips = ChatManager.ParseMessage(cleaned, Color.White).ToArray();
-            ChatManager.DrawColorCodedStringWithShadow(
-                Main.spriteBatch, Terraria.GameContent.FontAssets.MouseText.Value,
-                snips, new Vector2(88f + textOffsetX, baselineY),
-                0f, Vector2.Zero, Vector2.One, out _
-            );
-
-            if (HandleChatSystem.GetSelection() == null && Main.instance.textBlinkerState == 1)
-            {
-                Vector2 beforeSize = MeasureSnippets(cleaned.Substring(0, System.Math.Clamp(caretClean, 0, cleaned.Length)));
-                int caretX = 88 + textOffsetX + (int)beforeSize.X;
-                Main.spriteBatch.Draw(Terraria.GameContent.TextureAssets.MagicPixel.Value, new Rectangle(caretX, baselineY + 2, 1, 17), Color.White);
-            }
-
-            static Vector2 MeasureSnippets(string s)
-            {
-                var ss = ChatManager.ParseMessage(s ?? "", Color.White).ToArray();
-                return ChatManager.GetStringSize(Terraria.GameContent.FontAssets.MouseText.Value, ss, Vector2.One);
-            }
+            sb.Draw(tex, new Vector2(x, y + h - c), new Rectangle(0, tex.Height - c, c, c), color);
+            sb.Draw(tex, new Rectangle(x + c, y + h - c, w - c * 2, c), new Rectangle(c, tex.Height - c, ew, c), color);
+            sb.Draw(tex, new Vector2(x + w - c, y + h - c), new Rectangle(tex.Width - c, tex.Height - c, c, c), color);
         }
     }
 }

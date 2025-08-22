@@ -56,16 +56,7 @@ namespace ChatPlus.Common.Configs.ConfigElements
 
             Utils.DrawInvBG(sb, r, ColorHelper.UIPanelBlue);
             TextSnippet[] snip = [new TextSnippet("/")];
-            ChatManager.DrawColorCodedStringWithShadow(
-                sb,
-                FontAssets.MouseText.Value,
-                snip,
-                pos + new Vector2(0, 0),
-                0f,
-                Vector2.Zero,
-                new Vector2(1.0f),
-                out _
-            );
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(0, 0), 0f, Vector2.Zero, Vector2.One, out _);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)

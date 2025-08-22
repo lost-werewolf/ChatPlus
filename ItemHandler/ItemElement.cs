@@ -1,3 +1,4 @@
+using ChatPlus.GlyphHandler;
 using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
@@ -39,17 +40,9 @@ namespace ChatPlus.ItemHandler
             );
 
             // Render display name
-            var glyphSnippet = new[] { new TextSnippet(item.Tag.ToString()) { Color = Color.White, CheckForHover = false } };
-            ChatManager.DrawColorCodedStringWithShadow(
-                sb,
-                FontAssets.MouseText.Value,
-                glyphSnippet,
-                pos + new Vector2(32, 3),
-                0f,
-                Vector2.Zero,
-                new Vector2(1.0f),
-                out _
-            );
+            // Render raw tag in text form
+            TextSnippet[] snip = [new TextSnippet(item.Tag)];
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32, 3), 0f, Vector2.Zero, Vector2.One, out _);
         }
     }
 }

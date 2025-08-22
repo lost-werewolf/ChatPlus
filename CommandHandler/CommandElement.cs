@@ -9,6 +9,7 @@ using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using Terraria.UI.Chat;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ChatPlus.CommandHandler
 {
@@ -19,7 +20,6 @@ namespace ChatPlus.CommandHandler
     {
         public Command Command;
         private ModIconImage modIconImage;
-        private UIText cmdText;
 
         public CommandElement(Command command) : base(command)
         {
@@ -34,17 +34,6 @@ namespace ChatPlus.CommandHandler
                 Height = { Pixels = 22 }
             };
             Append(modIconImage);
-
-            // Add command name
-            //if (command.Name != null)
-            //{
-            //    cmdText = new(command.Name, textScale: 1, large: false)
-            //    {
-            //        Left = { Pixels = 32 },
-            //        VAlign = 0.5f,
-            //    };
-            //    Append(cmdText);
-            //}
         }
         public override void LeftClick(UIMouseEvent evt)
         {
@@ -66,15 +55,12 @@ namespace ChatPlus.CommandHandler
         {
             base.Draw(sb);
 
-            if (cmdText != null) RemoveChild(cmdText);
-
             var dims = GetDimensions();
             var pos = dims.Position();
 
-            // Draw file name
-            var imgName = new[] { new TextSnippet(Command.Name) };
-            pos += new Vector2(32, 5);
-            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, imgName, pos, 0f, Vector2.Zero, Vector2.One, out _);
+            // Draw command name
+            TextSnippet[] snip = [new TextSnippet(Command.Name)];
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32,4), 0f, Vector2.Zero, Vector2.One, out _);
         }
     }
 }

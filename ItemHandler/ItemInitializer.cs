@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ChatPlus.Helpers;
@@ -13,33 +14,42 @@ namespace ChatPlus.ItemHandler
 
         public override void PostSetupContent()
         {
+            InitializeItems();
+        }
+
+        private void InitializeItems()
+        {
             Items.Clear();
+
+            var payload = new List<Item>(ItemLoader.ItemCount);
 
             for (int i = 1; i < ItemLoader.ItemCount; i++)
             {
                 try
                 {
-                    Terraria.Item item = new Terraria.Item();
-                    item.SetDefaults(i);
+                    Terraria.Item t = new Terraria.Item();
+                    t.SetDefaults(i);
 
-                    // Skip unobtainable or placeholder
-                    if (item == null || string.IsNullOrWhiteSpace(item.Name))
+                    // Skip unobtainable/placeholder
+                    if (t == null || string.IsNullOrWhiteSpace(t.Name))
                         continue;
 
-                    string name = item.Name;
-                    string prefix = "[i";
-                    string tag = $"{prefix}:{i}]"; // chat tag shows icon
-
-                    Items.Add(new Item(
+                    string tag = $"[i:{i}]"; // chat icon tag
+                    payload.Add(new Item(
                         ID: i,
                         Tag: tag,
-                        DisplayName: name
+                        DisplayName: t.Name
                     ));
                 }
-                catch { /* ignore bad item types */ }
+                catch
+                {
+                    // ignore bad item types
+                }
             }
 
-            Items.Sort((a, b) => string.Compare(a.DisplayName, b.DisplayName, System.StringComparison.OrdinalIgnoreCase));
+            payload.Sort((a, b) => string.Compare(a.DisplayName, b.DisplayName, StringComparison.OrdinalIgnoreCase));
+
+            Items.AddRange(payload);
         }
     }
 }

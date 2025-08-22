@@ -32,24 +32,15 @@ namespace ChatPlus.ColorHandler
                 width: 25,
                 height: 25
             );
-            Microsoft.Xna.Framework.Color previewColor = HexToColor(tag);
+            Color previewColor = HexToColor(tag);
             sb.Draw(TextureAssets.MagicPixel.Value, previewColorPos, previewColor);
 
             // Render color tag name
-            var glyphSnippet = new[] { new TextSnippet(tag) { Color = Microsoft.Xna.Framework.Color.White, CheckForHover = false } };
-            ChatManager.DrawColorCodedStringWithShadow(
-                sb,
-                FontAssets.MouseText.Value,
-                glyphSnippet,
-                pos += new Microsoft.Xna.Framework.Vector2(32, 4),
-                0f,
-                Vector2.Zero,
-                new Vector2(1.0f),
-                out _
-            );
+            TextSnippet[] colorSnippet = [new TextSnippet(color.Tag.ToString())];
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, colorSnippet, pos += new Vector2(32, 4), 0f, Vector2.Zero, Vector2.One, out _);
         }
 
-        public static Microsoft.Xna.Framework.Color HexToColor(string tag)
+        public static Color HexToColor(string tag)
         {
             string hex = tag[3..].Replace(":", " ").Trim();
 
@@ -58,9 +49,9 @@ namespace ChatPlus.ColorHandler
                 byte r = Convert.ToByte(hex[..2], 16);
                 byte g = Convert.ToByte(hex.Substring(2, 2), 16);
                 byte b = Convert.ToByte(hex.Substring(4, 2), 16);
-                return new Microsoft.Xna.Framework.Color(r, g, b, 255);
+                return new Color(r, g, b, 255);
             }
-            return new Microsoft.Xna.Framework.Color(0, 0, 0) * 0f;
+            return new Color(0, 0, 0) * 0f;
         }
     }
 }

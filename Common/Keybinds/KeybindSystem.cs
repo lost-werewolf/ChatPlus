@@ -1,5 +1,6 @@
 ﻿using ChatPlus.ColorHandler;
 using ChatPlus.CommandHandler;
+using ChatPlus.Common.Systems;
 using ChatPlus.EmojiHandler;
 using ChatPlus.GlyphHandler;
 using ChatPlus.ItemHandler;
@@ -53,6 +54,9 @@ namespace ChatPlus.Common.Keybinds
                 // Add the system prefix.
                 // The system will handle opening the state by checking for the prefix.
                 Main.chatText = prefix;
+
+                // Set caret to last
+                HandleChatSystem.SetCaretPos(Main.chatText.Length);
             }
 
             OpenSystem(KeybindSystem.OpenCommandKeybind, ModContent.GetInstance<CommandSystem>(), "/");

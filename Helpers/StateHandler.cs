@@ -9,17 +9,9 @@ public static class StateHandler
 {
     public static void OpenStateIfPrefixMatches(GameTime gameTime, UserInterface ui, UIState state, string prefix)
     {
-        if (Main.keyState.IsKeyDown(Keys.Escape) && Main.oldKeyState.IsKeyDown(Keys.Escape))
-        {
-            //Main.NewText("esc");
-            //ui.SetState(null);
-            //Main.drawingPlayerChat = true;
-            //return;
-        }
-
         if (!Main.drawingPlayerChat)
         {
-            if (ui.CurrentState != null)
+            if (ui?.CurrentState != null)
             {
                 ui.SetState(null);
             }
@@ -33,7 +25,7 @@ public static class StateHandler
         if (start == -1)
         {
             // No active prefix → close
-            if (ui.CurrentState == state)
+            if (ui?.CurrentState == state)
                 ui.SetState(null);
             return;
         }
@@ -53,8 +45,8 @@ public static class StateHandler
         else
         {
             // Found a closing bracket → close state
-            if (ui.CurrentState == state)
-                ui.SetState(null);
+            if (ui?.CurrentState == state)
+                ui?.SetState(null);
         }
     }
 }

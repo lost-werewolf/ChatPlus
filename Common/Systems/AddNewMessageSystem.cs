@@ -31,7 +31,7 @@ internal class AddNewMessageSystem : ModSystem
     {
         if (!string.IsNullOrEmpty(text) && System.Text.RegularExpressions.Regex.IsMatch(text, @"\[u:[^\]]+\]", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
         {
-            text += "\n\n\n\n\n\n\n\n\n";
+            text += string.Concat(Enumerable.Repeat("\n", 9)); // 9 is MAXIMUM!
         }
 
         self._showCount = 15;

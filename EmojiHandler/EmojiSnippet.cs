@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
@@ -48,16 +47,7 @@ namespace ChatPlus.EmojiHandler
             if (!bounds.Contains(Main.MouseScreen.ToPoint()))
                 return;
 
-            float scaleHover = s * 2f;
-            Vector2 drawPos = Main.MouseScreen + new Vector2(16f);
-            Vector2 origin = new(tex.Width / 2f, tex.Height / 2f);
-
             UICommon.TooltipMouseText(Text);
-
-            //sb.Draw(tex, drawPos, null, color, 0f, origin, scaleHover, SpriteEffects.None, 0f);
         }
-
-        private static readonly HashSet<Texture2D> _sanitizedTextures = new();
-
     }
 }

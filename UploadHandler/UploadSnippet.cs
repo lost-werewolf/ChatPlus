@@ -1,20 +1,18 @@
-﻿using Microsoft.Xna.Framework;               // Vector2, ColorItem
+﻿// UploadSnippet.cs
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.UploadHandler
 {
     public class UploadSnippet : TextSnippet
     {
-        private readonly Texture2D uploadedTexture;
-        private readonly float targetHeight;
+        private readonly Texture2D tex;
 
-        public UploadSnippet(Texture2D texture, float targetHeight = 20f)
-        {
-            uploadedTexture = texture;
-            this.targetHeight = targetHeight;
-        }
+        // 9 lines * 20px = 180px image; total chat input height elsewhere = 32 + 180 = 212
+        private const float TargetH = 180f;
+
+        public UploadSnippet(Texture2D texture) => tex = texture;
 
         public override bool UniqueDraw(
             bool justCheckingString,
@@ -24,25 +22,25 @@ namespace ChatPlus.UploadHandler
             Color color = default,
             float scale = 1f)
         {
-            float h = targetHeight * scale;
+            float h = TargetH * scale;
 
-            if (uploadedTexture == null)
+            if (tex == null)
             {
                 size = new Vector2(0f, h);
                 return true;
             }
 
-            float texMax = System.Math.Max(uploadedTexture.Width, uploadedTexture.Height);
-            float s = h / texMax;
-            float w = uploadedTexture.Width * s;
-            size = new Vector2(w, h);
+            float maxDim = tex.Width > tex.Height ? tex.Width : tex.Height;
+            float s = h / maxDim;
+            float w = tex.Width * s;
 
+            size = new Vector2(w, h);
             if (justCheckingString) return true;
 
-            // Custom y offset
-            position += new Vector2(0, 5);
+            // small vertical nudge to match input baseline look
+            position.Y += 5f;
 
-            spriteBatch.Draw(uploadedTexture, position, null, Color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
+            spriteBatch.Draw(tex, position, null, Color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
             return true;
         }
     }

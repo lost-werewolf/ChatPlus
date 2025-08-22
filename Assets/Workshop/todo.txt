@@ -195,6 +195,11 @@ Workshop images. Make sure they have the same format, zoom, resolution, text siz
 2. Share images!
 3. Autocomplete!
 4. Text editor!
+[todo low prio] Fix cursor position of colors (HandleChat)
+
 ---
 
+[todo] Fix image size compat for chitterchatter
+[todo] Fix uploads not saving (UploadInitializer)
+[todo] Fix image size (UploadTagHandler, HandleChat "\n"). Force same height every time.
 

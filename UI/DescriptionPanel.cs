@@ -3,9 +3,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ChatPlus.Common.Configs;
+using ChatPlus.GlyphHandler;
 using ChatPlus.Helpers;
+using ChatPlus.ItemHandler;
+using ChatPlus.ModIconHandler;
 using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
@@ -163,7 +167,19 @@ namespace ChatPlus.UI
 
         public override void RightClick(UIMouseEvent evt)
         {
-            OpenUploadsFolder();
+            if (Main.keyState.IsKeyDown(Keys.LeftShift))
+            {
+                // Walk up until we find the panel
+                // (which is 3 steps, usually from InnerList -> List -> EmojiPanel
+                if (ConnectedPanel is UploadPanel panel)
+                {
+                    panel.ClearPanel();
+                }
+            }
+            else
+            {
+                OpenUploadsFolder();
+            }
         }
 
         private void OpenUploadsFolder()
@@ -185,6 +201,12 @@ namespace ChatPlus.UI
 
         public void SetTextWithLinebreak(string rawText)
         {
+            if (rawText == null)
+            {
+                Log.Error("rawtext is null in panel: " + ConnectedPanel.GetType().ToString());
+                return;
+            }
+
             float scale = 0.9f;
             string tooltip = rawText;
 
@@ -218,6 +240,21 @@ namespace ChatPlus.UI
             {
                 Height.Set(60, 0);
                 text.SetText("Left click here to upload an image\nRight click to open image folder");
+            }
+
+            if (ConnectedPanel.GetType() == typeof(ModIconPanel))
+            {
+                Height.Set(40, 0);
+            }
+
+            if (ConnectedPanel.GetType() == typeof(ItemPanel))
+            {
+                Height.Set(40, 0);
+            }
+
+            if (ConnectedPanel.GetType() == typeof(GlyphPanel))
+            {
+                Height.Set(40, 0);
             }
 
             base.Draw(spriteBatch);
