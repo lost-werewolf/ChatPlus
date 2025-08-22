@@ -57,8 +57,6 @@ namespace ChatPlus.Common.Configs.ConfigElements
             DrawExampleEmoji(sb);
         }
 
-        private bool requested = false;
-
         private void DrawExampleEmoji(SpriteBatch sb)
         {
             CalculatedStyle dims = GetDimensions();

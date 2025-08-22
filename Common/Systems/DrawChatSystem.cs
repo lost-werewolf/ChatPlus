@@ -41,7 +41,31 @@ namespace ChatPlus.Common.Systems
 
         private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
         {
+            bool hasUpload =
+                drawingPlayerChat &&
+                !string.IsNullOrEmpty(Main.chatText) &&
+                System.Text.RegularExpressions.Regex.IsMatch(Main.chatText, @"\[u:[^\]]+\]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+            if (!hasUpload)
+            {
+                orig(self, drawingPlayerChat);
+                return;
+            }
+
+            const int lift = 200; // 10 lines * 20px
+
+            var sb = Main.spriteBatch;
+
+            sb.End();
+            var lifted = Main.UIScaleMatrix * Microsoft.Xna.Framework.Matrix.CreateTranslation(0f, -lift, 0f);
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, lifted);
+
+            // draw the monitor with the lifted matrix so its first line starts higher
             orig(self, true);
+
+            // restore the normal UI batch for everything else (your input box, caret, etc.)
+            sb.End();
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
         }
 
         private void DrawPlayerChat(On_Main.orig_DrawPlayerChat orig, Main self)
@@ -72,6 +96,11 @@ namespace ChatPlus.Common.Systems
                     Main.instance.textBlinkerCount = 0;
                 }
 
+                if (hasUpload)
+                {
+                    Main.chatMonitor.DrawChat(true);
+                }
+
                 DrawChatbox(height);
 
                 int inputX = 88;
@@ -81,7 +110,7 @@ namespace ChatPlus.Common.Systems
 
                 if (hasUpload && TryGetFirstUploadTexture(Main.chatText, out var tex))
                 {
-                    float targetH = 200f;
+                    float targetH = 200f; // 10 lines * 20px
                     float s = targetH / System.Math.Max(tex.Width, tex.Height);
                     float drawnW = tex.Width * s;
 
@@ -98,7 +127,11 @@ namespace ChatPlus.Common.Systems
                 Terraria.GameInput.PlayerInput.WritingText = false;
             }
 
-            Main.chatMonitor.DrawChat(Main.drawingPlayerChat);
+            // when no upload is active, keep vanilla order (monitor after input draw)
+            if (!hasUpload)
+            {
+                Main.chatMonitor.DrawChat(Main.drawingPlayerChat);
+            }
 
             static bool TryGetFirstUploadTexture(string s, out Texture2D tex)
             {
@@ -109,8 +142,6 @@ namespace ChatPlus.Common.Systems
                 return UploadHandler.UploadTagHandler.TryGet(key, out tex);
             }
         }
-
-
 
         private void DrawChatbox(int height)
         {

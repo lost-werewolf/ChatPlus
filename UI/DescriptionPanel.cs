@@ -216,8 +216,8 @@ namespace ChatPlus.UI
 
             if (ConnectedPanel.GetType() == typeof(UploadPanel))
             {
-                Height.Set(90, 0);
-                text.SetText("Left click here to upload an image\nRight click to open image folder\nModify image size with (u:img|size=100)");
+                Height.Set(60, 0);
+                text.SetText("Left click here to upload an image\nRight click to open image folder");
             }
 
             base.Draw(spriteBatch);

@@ -34,10 +34,16 @@ namespace ChatPlus.UploadHandler
         TextSnippet ITagHandler.Parse(string text, Color baseColor, string options)
         {
             string key = text ?? string.Empty;
+            float size = 32f; // default size
+            bool sizeSpecified = false;
+
+            ParseSizeParameter(ref key, ref size, ref sizeSpecified);
 
             if (Registry.TryGetValue(key, out var texture))
             {
-                return new UploadSnippet(texture, 232) // one chat height + 10 lines = 32*20+10 = 32+200=232
+                int height = (int)(size + 20 * 8 + 10); // size for first line + 10 lines
+
+                return new UploadSnippet(texture, height)
                 {
                     Text = GenerateTag(key)
                 };

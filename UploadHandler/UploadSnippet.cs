@@ -39,6 +39,9 @@ namespace ChatPlus.UploadHandler
 
             if (justCheckingString) return true;
 
+            // Custom y offset
+            position += new Vector2(0, 5);
+
             spriteBatch.Draw(uploadedTexture, position, null, Color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
             return true;
         }

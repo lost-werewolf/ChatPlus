@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
@@ -24,6 +23,15 @@ namespace ChatPlus.UploadHandler
 
         public override void Unload()
         {
+            // Dispose all textures on unload
+            if (Uploads != null)
+            {
+                foreach (var u in Uploads)
+                {
+                    try { u.Texture?.Dispose(); } catch { }
+                }
+            }
+
             Uploads = null;
             UploadTagHandler.Clear();
         }
@@ -35,61 +43,72 @@ namespace ChatPlus.UploadHandler
                 string.Equals(u.Tag, upload.Tag, StringComparison.OrdinalIgnoreCase));
 
             if (idx >= 0)
-                Uploads[idx] = upload;  // replace in place (refresh)
+                Uploads[idx] = upload;
             else
                 Uploads.Add(upload);
         }
-
 
         public static void InitializeUploadedTextures()
         {
             string folder = Path.Combine(Main.SavePath, "ChatPlus", "Uploads");
             Directory.CreateDirectory(folder);
 
-            var exts = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".png", ".jpg", ".jpeg" };
             var files = Directory.EnumerateFiles(folder, "*.*", SearchOption.TopDirectoryOnly)
-                                 .Where(f => exts.Contains(Path.GetExtension(f)))
+                                 .Where(f =>
+                                 {
+                                     string e = Path.GetExtension(f);
+                                     return e.Equals(".png", StringComparison.OrdinalIgnoreCase)
+                                         || e.Equals(".jpg", StringComparison.OrdinalIgnoreCase)
+                                         || e.Equals(".jpeg", StringComparison.OrdinalIgnoreCase);
+                                 })
                                  .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
                                  .ToList();
 
-            // Load on the main thread (for GraphicsDevice)
             Main.QueueMainThreadAction(() =>
             {
-                var fresh = new List<Upload>(files.Count);
-
-                // Reset the tag registry so removed files are truly gone
-                UploadTagHandler.Clear();
-
-                foreach (var file in files)
+                try
                 {
-                    try
-                    {
-                        string key = Path.GetFileNameWithoutExtension(file);
-                        using var fs = File.OpenRead(file);
-                        Texture2D texture = Texture2D.FromStream(Main.instance.GraphicsDevice, fs);
+                    var fresh = new List<Upload>(files.Count);
+                    UploadTagHandler.Clear();
 
-                        if (UploadTagHandler.Register(key, texture))
+                    foreach (var file in files)
+                    {
+                        try
                         {
-                            fresh.Add(new Upload(
-                                Tag: UploadTagHandler.GenerateTag(key),
-                                FileName: Path.GetFileName(file),
-                                FullFilePath: file,
-                                Texture: texture
-                            ));
+                            string key = Path.GetFileNameWithoutExtension(file);
+                            using var fs = File.OpenRead(file);
+                            Texture2D texture = Texture2D.FromStream(Main.instance.GraphicsDevice, fs);
+
+                            if (UploadTagHandler.Register(key, texture))
+                            {
+                                fresh.Add(new Upload(
+                                    Tag: UploadTagHandler.GenerateTag(key),
+                                    FileName: Path.GetFileName(file),
+                                    FullFilePath: file,
+                                    Texture: texture
+                                ));
+                            }
+                        }
+                        catch
+                        {
+                            // ignore bad file
                         }
                     }
-                    catch
+
+                    // swap atomically
+                    foreach (var old in Uploads)
                     {
-                        // ignore broken files
+                        try { old.Texture?.Dispose(); } catch { }
                     }
+                    Uploads.Clear();
+                    Uploads.AddRange(fresh);
+
+                    Log.Info($"Uploads refreshed: {Uploads.Count} files");
                 }
-
-                // 🔹 Swap atomically so UI reflects current disk state (adds + deletions)
-                Uploads.Clear();
-                Uploads.AddRange(fresh);
-
-                int fileCountInFolder = Directory.GetFiles(folder).Length;
-                Log.Info($"[end] Found ({Uploads.Count}/{fileCountInFolder}) uploads");
+                catch (Exception ex)
+                {
+                    Log.Error("InitializeUploadedTextures failed: " + ex);
+                }
             });
         }
     }
