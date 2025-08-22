@@ -1,10 +1,9 @@
 ﻿using AdvancedChatFeatures.ColorHandler;
-using AdvancedChatFeatures.Commands;
-using AdvancedChatFeatures.Emojis;
+using AdvancedChatFeatures.CommandHandler;
+using AdvancedChatFeatures.EmojiHandler;
 using AdvancedChatFeatures.Glyphs;
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.ItemWindow;
-using AdvancedChatFeatures.Uploads;
+using AdvancedChatFeatures.ItemHandler;
+using AdvancedChatFeatures.UploadHandler;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameInput;

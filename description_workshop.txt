@@ -1,60 +1,12 @@
-﻿[h1] Chat+ [/h1]
-Chat+ makes Terraria's chat smoother, smarter and more fun with emojis, images, links, text editing shortcuts and more!
+﻿Makes Terraria's chat smoother, smarter and more fun with emojis, images, links, text editing shortcuts and more!
 
-[h1] Features [/h1] 
-[list]
-[*] [b]Emoji Support[/b]: Access thousands of emojis directly in chat, powered by [url=https://emojibase.dev/emojis?] Emojibase [/url].
-[*] [b]Image Support[/b]: Upload and send your own images!
-[*] [b]Link Support[/b]: Links you type in chat become clickable.
-[*] [b]Autocomplete Commands[/b]: Type "/" into chat to autocomplete commands. Press Tab to insert the selected command.
-[*] [b]Autocomplete Tags[/b]: Type any tag to open autocomplete window. See the [url=https://terraria.wiki.gg/wiki/Chat#Tags] wiki [/url] for all tags supported.
-[*] [b]Text Editing Shortcuts[/b]: Use common text-editing shortcuts like Ctrl+C, Ctrl+V, and more directly in chat.
+[h3] ✨ What’s New? [/h3] 
+1. [b]Emojis🌳[/b]: Access thousands of emojis directly in chat!
+2. [b]Images📷[/b]: Upload and send your own images!
+3. [b]Links🔗[/b]: Links you type in chat become clickable.
+4. [b]Autocomplete Commands↪️[/b]: Type "/" into chat to autocomplete commands.
+5. [b]Autocomplete Tags🏷️[/b]: Type any tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
+6. [b]Text Editing✍️[/b]: Use shortcuts like copy/paste, character selection and more.
 
-[/list]
-
-[h2] New Tag: Emojis [/h2] 
-Type [e into chat to insert emojis. Press Tab to insert the selected emoji.
-
-[h2] New Tag: Upload Images [/h2] 
-Type [u into chat to upload your images. Press Tab to insert the selected image.
-
-[h2] Text Editing Shortcuts [/h2] 
-You can now use common text editing keyboard shortcuts directly in the chat input for a smoother experience.
-
-[table equalcells=1]
-    [tr]
-        [th]Shortcut[/th]
-        [th]Action[/th]
-    [/tr]
-    [tr]
-        [td]← / →[/td]
-        [td]Move cursor left/right[/td]
-    [/tr]
-    [tr]
-        [td]Shift+← / →[/td]
-        [td]Select characters[/td]
-    [/tr]
-    [tr]
-        [td]Ctrl+Shift+← / →[/td]
-        [td]Select words[/td]
-    [/tr]
-    [tr]
-        [td]Ctrl+X[/td]
-        [td]Cut[/td]
-    [/tr]
-    [tr]
-        [td]Ctrl+C[/td]
-        [td]Copy[/td]
-    [/tr]
-    [tr]
-        [td]Ctrl+V[/td]
-        [td]Paste[/td]
-    [/tr]
-[/table]
-
-[h2] Support me! [/h2]
-[list]
-[*] Source code hosted at: [url=https://github.com/emyhrberg/AdvancedChatFeatures] GitHub [/url]
-[*] Got questions or suggestions? Join us at: [url=https://discord.gg/JWbYUktRPV] Discord [/url]
-[*] Wish to support my mod development? You can do so at [url=https://ko-fi.com/erkyy] Ko-Fi [/url]
-[/list]
+[h3] ❤️ Support the Project [/h3]
+[url=https://github.com/emyhrberg/AdvancedChatFeatures] GitHub [/url] | [url=https://discord.gg/JWbYUktRPV] Discord [/url] | [url=https://ko-fi.com/erkyy] Ko-Fi [/url]

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.ItemWindow
+namespace AdvancedChatFeatures.ItemHandler
 {
     // Shows an item color with its [i:ID] tag and name
     public class ItemElement : BaseElement<Item>

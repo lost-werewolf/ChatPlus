@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.Uploads;
+using AdvancedChatFeatures.UploadHandler;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;

@@ -1,37 +1,47 @@
-﻿using System.Collections.Generic;
-using AdvancedChatFeatures.Glyphs;
+﻿using System;
+using System.Collections.Generic;
+using AdvancedChatFeatures.CommandHandler;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.ItemHandler
+namespace AdvancedChatFeatures.EmojiHandler
 {
     [Autoload(Side = ModSide.Client)]
-    public class ItemSystem : ModSystem
+    public class EmojiSystem : ModSystem
     {
         public UserInterface ui;
-        public ItemState itemWindowState;
+        public EmojiState emojiState;
+
+        public override void OnModLoad()
+        {
+            base.OnModLoad();
+        }
 
         public override void Load()
         {
             ui = new UserInterface();
-            itemWindowState = new ItemState();
-            ui.SetState(null);
+            emojiState = new EmojiState();
+            ui.SetState(null); // start hidden
         }
 
         public override void Unload()
         {
             ui = new UserInterface();
-            itemWindowState = new ItemState();
-            ui.SetState(null);
+            emojiState = new EmojiState();
+            ui.SetState(null); // start hidden
+        }
+
+        public override void OnWorldUnload()
+        {
+            base.OnWorldUnload();
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, itemWindowState, "[i");
+            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, emojiState, "[e");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -40,7 +50,7 @@ namespace AdvancedChatFeatures.ItemHandler
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: ItemWindowSystem",
+                "AdvancedChatFeatures: Emojis Panel",
                 () =>
                 {
                     if (ui?.CurrentState != null)

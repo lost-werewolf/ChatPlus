@@ -1,18 +1,18 @@
 using System;
 using AdvancedChatFeatures.ColorHandler;
-using AdvancedChatFeatures.Commands;
-using AdvancedChatFeatures.Common.Hooks;
-using AdvancedChatFeatures.Emojis;
+using AdvancedChatFeatures.CommandHandler;
+using AdvancedChatFeatures.Common.Systems;
+using AdvancedChatFeatures.EmojiHandler;
 using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.ItemWindow;
-using AdvancedChatFeatures.Uploads;
+using AdvancedChatFeatures.ItemHandler;
+using AdvancedChatFeatures.UploadHandler;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI;
-using Item = AdvancedChatFeatures.ItemWindow.Item;
+using Item = AdvancedChatFeatures.ItemHandler.Item;
 
 namespace AdvancedChatFeatures.UI
 {

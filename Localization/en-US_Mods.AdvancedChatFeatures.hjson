@@ -32,8 +32,10 @@ Configs: {
 				'''
 				Allows for autocompletion of the following tags:
 				[c for colors
+				            [e for emojis (new!)
 				[g for glyphs
 				[i for items
+				            [u for uploads (new!)
 				'''
 		}
 
@@ -42,8 +44,7 @@ Configs: {
 			Tooltip:
 				'''
 				Allows for autocompletion of chat commands. 
-				Type / into chat to see all commands
-				Type Tab to select current command to chat input
+				Type / into chat to see all commands.
 				'''
 		}
 
@@ -51,8 +52,8 @@ Configs: {
 			Label: Enable Emojis
 			Tooltip:
 				'''
-				Allows for inserting emojis:
-				; for emojis
+				Allows for inserting emojis.
+				            Type [e into chat to see all commands.
 				'''
 		}
 
@@ -60,8 +61,8 @@ Configs: {
 			Label: Enable Upload Images
 			Tooltip:
 				'''
-				Allows for uploading images:
-				@ for uploading images
+				Allows for uploading images.
+				            Type [u into chat to see upload window.
 				'''
 		}
 
@@ -90,7 +91,7 @@ Configs: {
 
 		ItemsPerWindow: {
 			Label: Items Per Window
-			Tooltip: ""
+			Tooltip: Adjust the number of items visible at the same time
 		}
 	}
 }

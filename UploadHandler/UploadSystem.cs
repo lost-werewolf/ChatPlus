@@ -1,37 +1,36 @@
-﻿using System.Collections.Generic;
-using AdvancedChatFeatures.Glyphs;
+using System.Collections.Generic;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI;
+using AdvancedChatFeatures.ItemHandler;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.ItemHandler
+namespace AdvancedChatFeatures.UploadHandler
 {
     [Autoload(Side = ModSide.Client)]
-    public class ItemSystem : ModSystem
+    public class UploadSystem : ModSystem
     {
         public UserInterface ui;
-        public ItemState itemWindowState;
+        public UploadState state;
 
         public override void Load()
         {
             ui = new UserInterface();
-            itemWindowState = new ItemState();
+            state = new UploadState();
             ui.SetState(null);
         }
 
         public override void Unload()
         {
             ui = new UserInterface();
-            itemWindowState = new ItemState();
+            state = new UploadState();
             ui.SetState(null);
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, itemWindowState, "[i");
+            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, state, "[u");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -40,7 +39,7 @@ namespace AdvancedChatFeatures.ItemHandler
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: ItemWindowSystem",
+                "AdvancedChatFeatures: Uploads Panel",
                 () =>
                 {
                     if (ui?.CurrentState != null)

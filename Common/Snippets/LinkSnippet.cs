@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using AdvancedChatFeatures.Common.Hooks;
+using AdvancedChatFeatures.Common.Systems;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -28,7 +28,7 @@ namespace AdvancedChatFeatures.Common.Snippets
         private Rectangle lastDrawRect = Rectangle.Empty;
         private int lastUnderlineDrawFrame = -1;
 
-        public LinkSnippet(TextSnippet snippet): base(snippet.Text, snippet.Color, snippet.Scale)
+        public LinkSnippet(TextSnippet snippet) : base(snippet.Text, snippet.Color, snippet.Scale)
         {
             this.snippet = snippet;
             CheckForHover = snippet.CheckForHover;

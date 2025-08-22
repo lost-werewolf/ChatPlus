@@ -5,7 +5,7 @@ using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.ItemWindow
+namespace AdvancedChatFeatures.ItemHandler
 {
     internal class ItemInitializer : ModSystem
     {

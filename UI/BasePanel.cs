@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Formats.Asn1;
 using AdvancedChatFeatures.ColorHandler;
-using AdvancedChatFeatures.Commands;
+using AdvancedChatFeatures.CommandHandler;
 using AdvancedChatFeatures.Common.Configs;
-using AdvancedChatFeatures.Common.Hooks;
-using AdvancedChatFeatures.Emojis;
+using AdvancedChatFeatures.Common.Systems;
+using AdvancedChatFeatures.EmojiHandler;
 using AdvancedChatFeatures.Glyphs;
 using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.ItemWindow;
-using AdvancedChatFeatures.Uploads;
+using AdvancedChatFeatures.ItemHandler;
+using AdvancedChatFeatures.UploadHandler;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using Stubble.Core.Classes;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
@@ -177,7 +175,7 @@ namespace AdvancedChatFeatures.UI
             }
 
             // 🔹 Item: match tag OR display name (and optionally numeric ID)
-            if (this is ItemPanel && data is ItemWindow.Item item)
+            if (this is ItemPanel && data is ItemHandler.Item item)
             {
                 if (tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
                 if ((item.DisplayName ?? string.Empty).IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
@@ -290,7 +288,7 @@ namespace AdvancedChatFeatures.UI
             if (this is CommandPanel)
             {
                 //Main.chatText = tag;
-                //HandleChatHook.SetCaretPos(Main.chatText.Length);
+                //HandleChatSystem.SetCaretPos(Main.chatText.Length);
             }
         }
 
@@ -330,7 +328,7 @@ namespace AdvancedChatFeatures.UI
             if (this is CommandPanel)
             {
                 Main.chatText = tag;
-                HandleChatHook.SetCaretPos(Main.chatText.Length);
+                HandleChatSystem.SetCaretPos(Main.chatText.Length);
                 return;
             }
 
@@ -350,7 +348,7 @@ namespace AdvancedChatFeatures.UI
             if (start < 0)
             {
                 Main.chatText += tag;
-                HandleChatHook.SetCaretPos(Main.chatText.Length);
+                HandleChatSystem.SetCaretPos(Main.chatText.Length);
                 return;
             }
 
@@ -361,7 +359,7 @@ namespace AdvancedChatFeatures.UI
             string after = text[end..];
             Main.chatText = before + tag + after;
 
-            HandleChatHook.SetCaretPos(before.Length + tag.Length);
+            HandleChatSystem.SetCaretPos(before.Length + tag.Length);
         }
 
         private void HandleNavigationKeys(GameTime gt)

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using AdvancedChatFeatures.Emojis;
+using AdvancedChatFeatures.EmojiHandler;
 using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;

@@ -1,5 +1,5 @@
 using System;
-using AdvancedChatFeatures.Common.Hooks;
+using AdvancedChatFeatures.Common.Systems;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -29,7 +29,7 @@ namespace AdvancedChatFeatures.Helpers
                     tex = ModContent.Request<Texture2D>(path).Value;
             }
 
-            Rectangle target = new((int)pos.X-3, (int)pos.Y-2, size, size);
+            Rectangle target = new((int)pos.X - 3, (int)pos.Y - 2, size, size);
 
             if (tex != null)
             {
@@ -39,7 +39,7 @@ namespace AdvancedChatFeatures.Helpers
             {
                 // fallback to initials
                 string initials = mod.DisplayName.Length >= 2 ? mod.DisplayName[..2] : mod.DisplayName;
-                Vector2 initialsPos = target.Center.ToVector2(); 
+                Vector2 initialsPos = target.Center.ToVector2();
                 initialsPos += new Vector2(0, 5);
                 Utils.DrawBorderString(sb, initials, initialsPos, Color.White, scale: 1.0f, 0.5f, 0.5f);
             }
