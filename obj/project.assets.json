@@ -70,11 +70,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\erikm\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\AdvancedChatFeatures\\AdvancedChatFeatures.csproj",
-      "projectName": "AdvancedChatFeatures",
-      "projectPath": "C:\\Users\\erikm\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\AdvancedChatFeatures\\AdvancedChatFeatures.csproj",
+      "projectUniqueName": "C:\\Users\\erikm\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\ChatPlus\\ChatPlus.csproj",
+      "projectName": "ChatPlus",
+      "projectPath": "C:\\Users\\erikm\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\ChatPlus\\ChatPlus.csproj",
       "packagesPath": "C:\\Users\\erikm\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\erikm\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\AdvancedChatFeatures\\obj\\",
+      "outputPath": "C:\\Users\\erikm\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\ChatPlus\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

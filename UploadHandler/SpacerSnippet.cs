@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.UploadHandler;
+namespace ChatPlus.UploadHandler;
 
 public sealed class SpacerSnippet : TextSnippet
 {

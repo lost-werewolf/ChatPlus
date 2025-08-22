@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using AdvancedChatFeatures.ColorHandler;
-using AdvancedChatFeatures.CommandHandler;
-using AdvancedChatFeatures.Common.Configs;
-using AdvancedChatFeatures.Common.Systems;
-using AdvancedChatFeatures.EmojiHandler;
-using AdvancedChatFeatures.Glyphs;
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.ItemHandler;
-using AdvancedChatFeatures.UploadHandler;
+using ChatPlus.ColorHandler;
+using ChatPlus.CommandHandler;
+using ChatPlus.Common.Configs;
+using ChatPlus.Common.Systems;
+using ChatPlus.EmojiHandler;
+using ChatPlus.GlyphHandler;
+using ChatPlus.Helpers;
+using ChatPlus.ItemHandler;
+using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.UI
+namespace ChatPlus.UI
 {
     public abstract class BasePanel<TData> : DraggablePanel
     {

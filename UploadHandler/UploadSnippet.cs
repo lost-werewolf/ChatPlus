@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.UploadHandler
+namespace ChatPlus.UploadHandler
 {
     public class UploadSnippet : TextSnippet
     {

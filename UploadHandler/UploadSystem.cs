@@ -1,12 +1,12 @@
 using System.Collections.Generic;
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.ItemHandler;
+using ChatPlus.Helpers;
+using ChatPlus.ItemHandler;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.UploadHandler
+namespace ChatPlus.UploadHandler
 {
     [Autoload(Side = ModSide.Client)]
     public class UploadSystem : ModSystem
@@ -39,7 +39,7 @@ namespace AdvancedChatFeatures.UploadHandler
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: Uploads Panel",
+                "ChatPlus: Uploads Panel",
                 () =>
                 {
                     if (ui?.CurrentState != null)

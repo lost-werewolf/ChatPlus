@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using AdvancedChatFeatures.UI;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace AdvancedChatFeatures.CommandHandler
+namespace ChatPlus.CommandHandler
 {
     public class CommandPanel : BasePanel<Command>
     {

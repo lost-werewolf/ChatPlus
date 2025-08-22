@@ -1,8 +1,8 @@
-using AdvancedChatFeatures.UI;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.UploadHandler
+namespace ChatPlus.UploadHandler
 {
     public class UploadState : BaseState<Upload>
     {

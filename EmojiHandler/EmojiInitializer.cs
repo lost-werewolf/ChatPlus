@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Helpers;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.EmojiHandler
+namespace ChatPlus.EmojiHandler
 {
     internal class EmojiInitializer : ModSystem
     {

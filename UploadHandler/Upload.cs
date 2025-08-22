@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 
-namespace AdvancedChatFeatures.UploadHandler
+namespace ChatPlus.UploadHandler
 {
     /// <summary>
     /// An uploaded image/content that can be sent and rendered as a tag in chat.

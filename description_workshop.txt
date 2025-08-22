@@ -9,4 +9,4 @@
 6. [b]Text Editing✍️[/b]: Use shortcuts like copy/paste, character selection and more.
 
 [h3] ❤️ Support the Project [/h3]
-[url=https://github.com/emyhrberg/AdvancedChatFeatures] GitHub [/url] | [url=https://discord.gg/JWbYUktRPV] Discord [/url] | [url=https://ko-fi.com/erkyy] Ko-Fi [/url]
+[url=https://github.com/emyhrberg/ChatPlus] GitHub [/url] | [url=https://discord.gg/JWbYUktRPV] Discord [/url] | [url=https://ko-fi.com/erkyy] Ko-Fi [/url]

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.ColorHandler
+namespace ChatPlus.ColorHandler
 {
     internal class ColorInitializer : ModSystem
     {

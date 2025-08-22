@@ -4,11 +4,11 @@ using System.Runtime.CompilerServices;
 using log4net;
 using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.Helpers
+namespace ChatPlus.Helpers
 {
     public static class Log
     {
-        private static ILog LoggerInstance => ModContent.GetInstance<AdvancedChatFeatures>().Logger;
+        private static ILog LoggerInstance => ModContent.GetInstance<ChatPlus>().Logger;
 
         private static DateTime lastLogTime;
 
@@ -25,7 +25,7 @@ namespace AdvancedChatFeatures.Helpers
 
             // Extract the class name from the caller's file path.
             string className = Path.GetFileNameWithoutExtension(callerFilePath);
-            var instance = ModContent.GetInstance<AdvancedChatFeatures>();
+            var instance = ModContent.GetInstance<ChatPlus>();
             if (instance == null || instance.Logger == null)
                 return; // Skip logging if the mod is unloading or null
 
@@ -39,13 +39,13 @@ namespace AdvancedChatFeatures.Helpers
             }
         }
 
-        public static void Info(string message, bool printCallerInMessage=true,[CallerFilePath] string callerFilePath = "")
+        public static void Info(string message, bool printCallerInMessage = true, [CallerFilePath] string callerFilePath = "")
         {
             //if (Conf.C != null && !Conf.C.ShowDebugMessages) return; 
 
             // Extract the class name from the caller's file path.
             string className = Path.GetFileNameWithoutExtension(callerFilePath);
-            var instance = ModContent.GetInstance<AdvancedChatFeatures>();
+            var instance = ModContent.GetInstance<ChatPlus>();
             if (instance == null || instance.Logger == null)
                 return; // Skip logging if the mod is unloading or null
 
@@ -62,7 +62,7 @@ namespace AdvancedChatFeatures.Helpers
 
             // Extract the class name from the caller's file path.
             string className = Path.GetFileNameWithoutExtension(callerFilePath);
-            var instance = ModContent.GetInstance<AdvancedChatFeatures>();
+            var instance = ModContent.GetInstance<ChatPlus>();
             if (instance == null || instance.Logger == null)
                 return; // Skip logging if the mod is unloading or null
 

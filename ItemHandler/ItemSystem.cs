@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using AdvancedChatFeatures.Glyphs;
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI;
+using ChatPlus.GlyphHandler;
+using ChatPlus.Helpers;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.ItemHandler
+namespace ChatPlus.ItemHandler
 {
     [Autoload(Side = ModSide.Client)]
     public class ItemSystem : ModSystem
@@ -40,7 +40,7 @@ namespace AdvancedChatFeatures.ItemHandler
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: ItemWindowSystem",
+                "ChatPlus: ItemWindowSystem",
                 () =>
                 {
                     if (ui?.CurrentState != null)

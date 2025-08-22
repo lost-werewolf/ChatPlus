@@ -1,4 +1,4 @@
-Keybinds: {
+﻿Keybinds: {
 	"Open Command Window.DisplayName": Open  Command  Window
 	"Open Emoji Window.DisplayName": Open  Emoji  Window
 	"Open Glyph Window.DisplayName": Open  Glyph  Window
@@ -32,10 +32,10 @@ Configs: {
 				'''
 				Allows for autocompletion of the following tags:
 				[c for colors
-				            [e for emojis (new!)
+				[e for emojis (new!)
 				[g for glyphs
 				[i for items
-				            [u for uploads (new!)
+				[u for uploads (new!)
 				'''
 		}
 
@@ -53,7 +53,7 @@ Configs: {
 			Tooltip:
 				'''
 				Allows for inserting emojis.
-				            Type [e into chat to see all commands.
+				Type [e into chat to see all commands.
 				'''
 		}
 
@@ -62,7 +62,7 @@ Configs: {
 			Tooltip:
 				'''
 				Allows for uploading images.
-				            Type [u into chat to see upload window.
+				Type [u into chat to see all upload options.
 				'''
 		}
 

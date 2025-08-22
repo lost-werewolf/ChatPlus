@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.UploadHandler
+namespace ChatPlus.UploadHandler
 {
     [Autoload(Side = ModSide.Client)]
     internal class UploadInitializer : ModSystem
@@ -43,7 +43,7 @@ namespace AdvancedChatFeatures.UploadHandler
 
         public static void InitializeUploadedTextures()
         {
-            string folder = Path.Combine(Main.SavePath, "AdvancedChatFeatures", "Uploads");
+            string folder = Path.Combine(Main.SavePath, "ChatPlus", "Uploads");
             Directory.CreateDirectory(folder);
 
             var exts = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".png", ".jpg", ".jpeg" };

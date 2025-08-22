@@ -2,15 +2,15 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using AdvancedChatFeatures.CommandHandler;
-using AdvancedChatFeatures.Common.Configs.ConfigElements;
-using AdvancedChatFeatures.EmojiHandler;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.CommandHandler;
+using ChatPlus.Common.Configs.ConfigElements;
+using ChatPlus.EmojiHandler;
+using ChatPlus.Helpers;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.Common.Configs
+namespace ChatPlus.Common.Configs
 {
     public class Config : ModConfig
     {

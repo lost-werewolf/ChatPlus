@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.Helpers
+namespace ChatPlus.Helpers
 {
     /// <summary>
     /// Static class to hold all assets used in the mod.
@@ -28,7 +28,7 @@ namespace AdvancedChatFeatures.Helpers
             {
                 if (field.FieldType == typeof(Asset<Texture2D>))
                 {
-                    string modName = "AdvancedChatFeatures";
+                    string modName = "ChatPlus";
                     string path = field.Name;
                     var asset = ModContent.Request<Texture2D>($"{modName}/Assets/{path}", AssetRequestMode.AsyncLoad);
                     field.SetValue(null, asset);

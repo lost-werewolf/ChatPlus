@@ -1,16 +1,16 @@
-﻿using AdvancedChatFeatures.ColorHandler;
-using AdvancedChatFeatures.CommandHandler;
-using AdvancedChatFeatures.EmojiHandler;
-using AdvancedChatFeatures.Glyphs;
-using AdvancedChatFeatures.ItemHandler;
-using AdvancedChatFeatures.UploadHandler;
+﻿using ChatPlus.ColorHandler;
+using ChatPlus.CommandHandler;
+using ChatPlus.EmojiHandler;
+using ChatPlus.GlyphHandler;
+using ChatPlus.ItemHandler;
+using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.Common.Keybinds
+namespace ChatPlus.Common.Keybinds
 {
     public class KeybindSystem : ModSystem
     {

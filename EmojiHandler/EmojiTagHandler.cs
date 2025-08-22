@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.EmojiHandler
+namespace ChatPlus.EmojiHandler
 {
     public class EmojiTagHandler : ITagHandler
     {

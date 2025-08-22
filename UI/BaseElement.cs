@@ -1,20 +1,10 @@
-using System;
-using AdvancedChatFeatures.ColorHandler;
-using AdvancedChatFeatures.CommandHandler;
-using AdvancedChatFeatures.Common.Systems;
-using AdvancedChatFeatures.EmojiHandler;
-using AdvancedChatFeatures.Glyphs;
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.ItemHandler;
-using AdvancedChatFeatures.UploadHandler;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.GameContent;
 using Terraria.UI;
-using Item = AdvancedChatFeatures.ItemHandler.Item;
 
-namespace AdvancedChatFeatures.UI
+namespace ChatPlus.UI
 {
     /// <summary>
     /// An element that can be navigated in a <see cref="BasePanel<TData>"/>.

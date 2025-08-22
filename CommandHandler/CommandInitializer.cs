@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.CommandHandler
+namespace ChatPlus.CommandHandler
 {
     internal class CommandInitializer : ModSystem
     {

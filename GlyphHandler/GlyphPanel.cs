@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using AdvancedChatFeatures.UI;
+using ChatPlus.GlyphHandler;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 
-namespace AdvancedChatFeatures.Glyphs
+namespace ChatPlus.GlyphHandler
 {
     public class GlyphPanel : BasePanel<Glyph>
     {

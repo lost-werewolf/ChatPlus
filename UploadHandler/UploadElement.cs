@@ -1,11 +1,11 @@
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI;
+using ChatPlus.Helpers;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.UploadHandler
+namespace ChatPlus.UploadHandler
 {
     public class UploadElement : BaseElement<Upload>
     {

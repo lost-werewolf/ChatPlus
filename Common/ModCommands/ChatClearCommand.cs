@@ -1,10 +1,10 @@
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.ModLoader;
 using Terraria.GameContent.UI.Chat;
+using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.Common.ModCommands
+namespace ChatPlus.Common.ModCommands
 {
     public class ChatClearCommand : ModCommand
     {

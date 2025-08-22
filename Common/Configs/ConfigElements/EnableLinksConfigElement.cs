@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Reflection.Emit;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -11,7 +11,7 @@ using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Configs.ConfigElements
+namespace ChatPlus.Common.Configs.ConfigElements
 {
     /// <summary>
     /// Reference:
@@ -37,7 +37,7 @@ namespace AdvancedChatFeatures.Common.Configs.ConfigElements
             };
 
             //TooltipFunction = () => Language.GetTextValue(
-                //"Mods.AdvancedChatFeatures.Configs.Config.Features.EnableEmojis.Tooltip");
+            //"Mods.ChatPlus.Configs.Config.Features.EnableEmojis.Tooltip");
         }
 
         public override void OnInitialize()
@@ -66,7 +66,7 @@ namespace AdvancedChatFeatures.Common.Configs.ConfigElements
             float x = pos.X + 8 + xOffset;
             float y = pos.Y + textSize.Y - 8;
             float scale = 0.72f;
-            float w = scale * textSize.X+20;
+            float w = scale * textSize.X + 20;
             Rectangle underlineRect = new Rectangle((int)x, (int)y, (int)w, 2);
             sb.Draw(TextureAssets.MagicPixel.Value, underlineRect, ColorHelper.BlueUnderline);
 
@@ -84,7 +84,7 @@ namespace AdvancedChatFeatures.Common.Configs.ConfigElements
             );
 
             // 3. If clicked, open the link
-            if (Main.MouseScreen.Between(textPos, textPos + new Vector2(w, textSize.Y)) && 
+            if (Main.MouseScreen.Between(textPos, textPos + new Vector2(w, textSize.Y)) &&
                 Main.mouseLeft && Main.mouseLeftRelease)
             {
                 // Open the link in the default browser

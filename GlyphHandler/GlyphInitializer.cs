@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using ChatPlus.GlyphHandler;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.Glyphs
+namespace ChatPlus.GlyphHandler
 {
     internal class GlyphInitializer : ModSystem
     {

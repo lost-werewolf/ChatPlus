@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using AdvancedChatFeatures.EmojiHandler;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.EmojiHandler;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.ColorHandler
+namespace ChatPlus.ColorHandler
 {
     [Autoload(Side = ModSide.Client)]
     public class ColorSystem : ModSystem
@@ -39,7 +39,7 @@ namespace AdvancedChatFeatures.ColorHandler
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: Colors Panel",
+                "ChatPlus: Colors Panel",
                 () =>
                 {
                     if (ui?.CurrentState != null)

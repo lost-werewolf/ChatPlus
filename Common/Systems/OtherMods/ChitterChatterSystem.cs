@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using AdvancedChatFeatures.Common.Snippets;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Common.Snippets;
+using ChatPlus.Helpers;
 using MonoMod.RuntimeDetour;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Systems.OtherMods
+namespace ChatPlus.Common.Systems.OtherMods
 {
     internal class ChitterChatterSystem : ModSystem
     {
@@ -38,7 +38,7 @@ namespace AdvancedChatFeatures.Common.Systems.OtherMods
             // Get vanillaChatRoom
             var vanillaField = self.GetType().GetField("vanillaChatRoom", BindingFlags.NonPublic | BindingFlags.Instance);
             var vanilla = vanillaField.GetValue(self);
-            
+
             // Get messages
             var msgsField = vanilla.GetType().GetField("messages", BindingFlags.NonPublic | BindingFlags.Instance);
             var msgs = msgsField.GetValue(vanilla) as System.Collections.IList;

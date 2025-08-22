@@ -1,18 +1,18 @@
 ﻿using System;
-using AdvancedChatFeatures.ColorHandler;
-using AdvancedChatFeatures.CommandHandler;
-using AdvancedChatFeatures.Common.Configs;
-using AdvancedChatFeatures.EmojiHandler;
-using AdvancedChatFeatures.Glyphs;
-using AdvancedChatFeatures.ItemHandler;
-using AdvancedChatFeatures.UploadHandler;
+using ChatPlus.ColorHandler;
+using ChatPlus.CommandHandler;
+using ChatPlus.Common.Configs;
+using ChatPlus.EmojiHandler;
+using ChatPlus.GlyphHandler;
+using ChatPlus.ItemHandler;
+using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.UI
+namespace ChatPlus.UI
 {
     public abstract class DraggablePanel : UIPanel
     {

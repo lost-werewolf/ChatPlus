@@ -1,4 +1,4 @@
-namespace AdvancedChatFeatures.Helpers
+namespace ChatPlus.Helpers
 {
     public static class ColorHelper
     {

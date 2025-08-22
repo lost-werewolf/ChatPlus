@@ -36,7 +36,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore packages
-        run: dotnet restore AdvancedChatFeatures.sln
+        run: dotnet restore ChatPlus.sln
 
       - name: Build solution
-        run: dotnet build AdvancedChatFeatures.sln --configuration Release
+        run: dotnet build ChatPlus.sln --configuration Release

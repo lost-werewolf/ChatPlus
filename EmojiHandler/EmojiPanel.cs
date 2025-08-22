@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using AdvancedChatFeatures.UI;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
 
-namespace AdvancedChatFeatures.EmojiHandler
+namespace ChatPlus.EmojiHandler
 {
     public class EmojiPanel : BasePanel<Emoji>
     {

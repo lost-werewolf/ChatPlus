@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.Helpers;
+namespace ChatPlus.Helpers;
 
 public static class StateHandler
 {

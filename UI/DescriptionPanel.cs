@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using AdvancedChatFeatures.Common.Configs;
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UploadHandler;
+using ChatPlus.Common.Configs;
+using ChatPlus.Helpers;
+using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -15,7 +15,7 @@ using Terraria.UI;
 using Terraria.Utilities.FileBrowser;
 using static nativefiledialog;
 
-namespace AdvancedChatFeatures.UI
+namespace ChatPlus.UI
 {
     public class DescriptionPanel<TData> : DraggablePanel
     {
@@ -69,7 +69,7 @@ namespace AdvancedChatFeatures.UI
                 string key = Path.GetFileNameWithoutExtension(fileName);
 
                 // 1) Persist a copy into the mod's uploads folder FIRST
-                string folder = Path.Combine(Main.SavePath, "AdvancedChatFeatures", "Uploads");
+                string folder = Path.Combine(Main.SavePath, "ChatPlus", "Uploads");
                 Directory.CreateDirectory(folder);
                 string dest = Path.Combine(folder, fileName);
 
@@ -170,7 +170,7 @@ namespace AdvancedChatFeatures.UI
         {
             try
             {
-                string folder = Path.Combine(Main.SavePath, "AdvancedChatFeatures", "Uploads");
+                string folder = Path.Combine(Main.SavePath, "ChatPlus", "Uploads");
                 Process.Start(new ProcessStartInfo($@"{folder}")
                 {
                     UseShellExecute = true

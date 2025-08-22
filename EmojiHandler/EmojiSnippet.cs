@@ -6,7 +6,7 @@ using Terraria;
 using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.EmojiHandler
+namespace ChatPlus.EmojiHandler
 {
     public class EmojiSnippet : TextSnippet
     {

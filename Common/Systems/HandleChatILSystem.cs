@@ -1,17 +1,17 @@
 ﻿using System;
-using AdvancedChatFeatures.ColorHandler;
-using AdvancedChatFeatures.CommandHandler;
-using AdvancedChatFeatures.EmojiHandler;
-using AdvancedChatFeatures.Glyphs;
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.ItemHandler;
-using AdvancedChatFeatures.UploadHandler;
+using ChatPlus.ColorHandler;
+using ChatPlus.CommandHandler;
+using ChatPlus.EmojiHandler;
+using ChatPlus.GlyphHandler;
+using ChatPlus.Helpers;
+using ChatPlus.ItemHandler;
+using ChatPlus.UploadHandler;
 using MonoMod.Cil;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.Common.Systems
+namespace ChatPlus.Common.Systems
 {
     /// <summary>
     /// This system does IL edits the chat to implement and modify some features related to the chat:

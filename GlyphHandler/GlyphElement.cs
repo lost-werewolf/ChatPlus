@@ -1,10 +1,11 @@
-using AdvancedChatFeatures.UI;
+using ChatPlus.GlyphHandler;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Glyphs
+namespace ChatPlus.GlyphHandler
 {
     public class GlyphElement : BaseElement<Glyph>
     {

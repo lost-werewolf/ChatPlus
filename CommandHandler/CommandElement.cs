@@ -1,7 +1,7 @@
-﻿using AdvancedChatFeatures.Common.Configs;
-using AdvancedChatFeatures.Common.Systems;
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI;
+﻿using ChatPlus.Common.Configs;
+using ChatPlus.Common.Systems;
+using ChatPlus.Helpers;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -10,7 +10,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.CommandHandler
+namespace ChatPlus.CommandHandler
 {
     /// <summary>
     /// Represents a chat command element in the UI.

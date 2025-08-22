@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using AdvancedChatFeatures.Common.Snippets;
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UploadHandler;
+using ChatPlus.Common.Snippets;
+using ChatPlus.Helpers;
+using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework;
 using MonoMod.RuntimeDetour;
 using MonoMod.RuntimeDetour.HookGen;
@@ -14,7 +14,7 @@ using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Systems.OtherMods;
+namespace ChatPlus.Common.Systems;
 
 internal class AddNewMessageSystem : ModSystem
 {

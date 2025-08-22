@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.GlyphHandler;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.Glyphs
+namespace ChatPlus.GlyphHandler
 {
     [Autoload(Side = ModSide.Client)]
     public class GlyphSystem : ModSystem
@@ -38,7 +39,7 @@ namespace AdvancedChatFeatures.Glyphs
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: GlyphSystem",
+                "ChatPlus: GlyphSystem",
                 () =>
                 {
                     if (ui?.CurrentState != null)

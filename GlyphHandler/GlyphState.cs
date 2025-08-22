@@ -1,9 +1,9 @@
-using AdvancedChatFeatures.Glyphs;
-using AdvancedChatFeatures.UI;
+using ChatPlus.GlyphHandler;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.Glyphs
+namespace ChatPlus.GlyphHandler
 {
     public class GlyphState : UIState
     {

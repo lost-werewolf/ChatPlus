@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using AdvancedChatFeatures.UI;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 
-namespace AdvancedChatFeatures.ItemHandler
+namespace ChatPlus.ItemHandler
 {
     public class ItemPanel : BasePanel<Item>
     {

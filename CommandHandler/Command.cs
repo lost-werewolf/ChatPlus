@@ -1,6 +1,6 @@
 ﻿using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.CommandHandler
+namespace ChatPlus.CommandHandler
 {
     /// <summary>
     /// A command structure that represents a chat command.

@@ -1,5 +1,5 @@
 ﻿using System;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
@@ -8,7 +8,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 
-namespace AdvancedChatFeatures.CommandHandler
+namespace ChatPlus.CommandHandler
 {
     internal class ModIconImage : UIImage
     {
@@ -28,27 +28,10 @@ namespace AdvancedChatFeatures.CommandHandler
 
             if (IsMouseHovering && mod != null && !string.IsNullOrEmpty(mod.Name))
             {
-                //UICommon.TooltipMouseText(mod.Name);
+                UICommon.TooltipMouseText(mod.Name);
                 //Main.hoverItemName = mod.Name;
-                DrawTextAtMouse(sb, mod.Name);
+                //DrawTextAtMouse(sb, mod.Name);
             }
-        }
-        private static void DrawTextAtMouse(SpriteBatch sb, string text)
-        {
-            // This method is used for drawing tooltips in main menu
-            // Inspired by UICharacterCreation::Draw()
-            float x = FontAssets.MouseText.Value.MeasureString(text).X;
-            Vector2 vector = new Vector2(Main.mouseX, Main.mouseY) + new Vector2(16f);
-            if (vector.Y > (float)(Main.screenHeight - 15))
-            {
-                vector.Y = Main.screenHeight - 15;
-            }
-            if (vector.X > (float)Main.screenWidth - x + 40)
-            {
-                vector.X = Main.screenWidth - 460;
-            }
-            Utils.DrawBorderStringFourWay(
-                sb, FontAssets.MouseText.Value, text, vector.X, vector.Y, new Color(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor), Color.Black, Vector2.Zero);
         }
 
         private static void DrawSmallModIcon(SpriteBatch sb, Mod mod, Vector2 pos, int size = 16)

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using AdvancedChatFeatures.CommandHandler;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.CommandHandler;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.EmojiHandler
+namespace ChatPlus.EmojiHandler
 {
     [Autoload(Side = ModSide.Client)]
     public class EmojiSystem : ModSystem
@@ -50,7 +50,7 @@ namespace AdvancedChatFeatures.EmojiHandler
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: Emojis Panel",
+                "ChatPlus: Emojis Panel",
                 () =>
                 {
                     if (ui?.CurrentState != null)

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.UploadHandler
+namespace ChatPlus.UploadHandler
 {
     public sealed class UploadTagHandler : ITagHandler
     {

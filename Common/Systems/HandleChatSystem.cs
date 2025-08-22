@@ -1,12 +1,12 @@
 ﻿using System;
-using AdvancedChatFeatures.CommandHandler;
-using AdvancedChatFeatures.Common.Configs;
+using ChatPlus.CommandHandler;
+using ChatPlus.Common.Configs;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace AdvancedChatFeatures.Common.Systems
+namespace ChatPlus.Common.Systems
 {
     /// <summary>
     /// Multiple chat detours which implement new functionality:

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using AdvancedChatFeatures.UI;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 
-namespace AdvancedChatFeatures.ColorHandler
+namespace ChatPlus.ColorHandler
 {
     public class ColorPanel : BasePanel<ColorItem>
     {

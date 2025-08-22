@@ -3,8 +3,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using AdvancedChatFeatures.Common.Configs;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Common.Configs;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -13,7 +13,7 @@ using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Systems
+namespace ChatPlus.Common.Systems
 {
     internal class DrawChatSystem : ModSystem
     {
@@ -57,10 +57,9 @@ namespace AdvancedChatFeatures.Common.Systems
                     Main.instance.textBlinkerCount = 0;
                 }
 
-                //int height = 32;
-
                 // 🔹 Compute extra lines from any [u:...] tags in the input
-                int extraLines = GetExtraUploadLinesFromInput(Main.chatText ?? string.Empty);
+                //int extraLines = GetExtraUploadLinesFromInput(Main.chatText ?? string.Empty);
+                int extraLines = 0;
                 const int baseHeight = 32;
                 const int lineStep = 20;      // one text line height
                 int height = baseHeight + extraLines * lineStep;

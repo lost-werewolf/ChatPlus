@@ -1,7 +1,7 @@
-using AdvancedChatFeatures.UI;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace AdvancedChatFeatures.EmojiHandler
+namespace ChatPlus.EmojiHandler
 {
     public class EmojiState : BaseState<Emoji>
     {

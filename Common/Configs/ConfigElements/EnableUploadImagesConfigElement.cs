@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Reflection.Emit;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -11,7 +11,7 @@ using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Configs.ConfigElements
+namespace ChatPlus.Common.Configs.ConfigElements
 {
     /// <summary>
     /// Reference:
@@ -37,7 +37,7 @@ namespace AdvancedChatFeatures.Common.Configs.ConfigElements
             };
 
             //TooltipFunction = () => Language.GetTextValue(
-                //"Mods.AdvancedChatFeatures.Configs.Config.Features.EnableEmojis.Tooltip");
+            //"Mods.ChatPlus.Configs.Config.Features.EnableEmojis.Tooltip");
         }
 
         public override void OnInitialize()

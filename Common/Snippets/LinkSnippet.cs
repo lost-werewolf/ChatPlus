@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.Common.Snippets
+namespace ChatPlus.Common.Snippets
 {
     /// <summary>
     /// A custom snippet that changes drawing behavior for chat messages. 
@@ -90,7 +90,7 @@ namespace AdvancedChatFeatures.Common.Snippets
         }
 
         #region helpers
-        
+
 
         /// <summary>
         /// Returns true if the string is a valid link.

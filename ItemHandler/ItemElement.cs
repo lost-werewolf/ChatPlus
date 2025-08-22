@@ -1,9 +1,9 @@
-using AdvancedChatFeatures.UI;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.ItemHandler
+namespace ChatPlus.ItemHandler
 {
     // Shows an item color with its [i:ID] tag and name
     public class ItemElement : BaseElement<Item>

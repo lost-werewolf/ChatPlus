@@ -1,10 +1,10 @@
 using System;
-using AdvancedChatFeatures.UI;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.ColorHandler
+namespace ChatPlus.ColorHandler
 {
     public class ColorElement : BaseElement<ColorItem>
     {

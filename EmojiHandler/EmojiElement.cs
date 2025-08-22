@@ -1,13 +1,13 @@
-using AdvancedChatFeatures.Helpers;
-using AdvancedChatFeatures.UI;
-using AdvancedChatFeatures.UploadHandler;
+using ChatPlus.Helpers;
+using ChatPlus.UI;
+using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace AdvancedChatFeatures.EmojiHandler
+namespace ChatPlus.EmojiHandler
 {
     public class EmojiElement : BaseElement<Emoji>
     {

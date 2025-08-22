@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using AdvancedChatFeatures.Helpers;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace AdvancedChatFeatures.CommandHandler
+namespace ChatPlus.CommandHandler
 {
     [Autoload(Side = ModSide.Client)]
     public class CommandSystem : ModSystem
@@ -71,7 +71,7 @@ namespace AdvancedChatFeatures.CommandHandler
             if (index == -1) return;
 
             layers.Insert(index, new LegacyGameInterfaceLayer(
-                "AdvancedChatFeatures: Commands Panel",
+                "ChatPlus: Commands Panel",
                 () =>
                 {
                     if (ui?.CurrentState != null)
