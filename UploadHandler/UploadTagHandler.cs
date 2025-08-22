@@ -16,9 +16,7 @@ namespace ChatPlus.UploadHandler
         public static bool Unregister(string key) => Registry.Remove(key);
         public static bool IsRegistered(string key) => Registry.ContainsKey(key);
         public static bool TryGet(string key, out Texture2D tex) => Registry.TryGetValue(key, out tex);
-
         public static void Clear() => Registry.Clear();
-
         public static string GetPrefixTag() => "[u";
         public static string GenerateTag(string key) => $"[u:{key}]";
         public static string GenerateTag(string key, float size) =>
@@ -35,31 +33,21 @@ namespace ChatPlus.UploadHandler
 
         TextSnippet ITagHandler.Parse(string text, Color baseColor, string options)
         {
-            // text may include inline options (e.g., "cat size=64" or "cat|96").
-            // options parameter may also carry them (depending on the chat parser).
             string key = text ?? string.Empty;
-            float size = 20f;
-            bool sizeSpecified = false;
-
-            ParseInlineKeyAndOptions(ref key, ref size, ref sizeSpecified);
 
             if (Registry.TryGetValue(key, out var texture))
             {
-                // Preserve the size option in the snippet text so it round-trips.
-                string renderedTag = sizeSpecified ? GenerateTag(key, size) : GenerateTag(key);
-
-                return new UploadSnippet(texture, size)
+                return new UploadSnippet(texture, 232) // one chat height + 10 lines = 32*20+10 = 32+200=232
                 {
-                    Text = renderedTag,
+                    Text = GenerateTag(key)
                 };
             }
 
-            // Fallback: show raw key if not registered
             return new TextSnippet(key);
         }
 
-        // Accepts "cat size=64", "cat|size=64", "cat,96", "cat|96" 
-        private static void ParseInlineKeyAndOptions(ref string key, ref float size, ref bool sizeSpecified)
+        // Accepts "cat size=64", "cat|size=64", "cat,96", "cat|96", etc
+        private static void ParseSizeParameter(ref string key, ref float size, ref bool sizeSpecified)
         {
             if (string.IsNullOrWhiteSpace(key)) return;
 
@@ -69,27 +57,26 @@ namespace ChatPlus.UploadHandler
             key = parts[0];
 
             for (int i = 1; i < parts.Length; i++)
-                TryParseSizeToken(parts[i], ref size, ref sizeSpecified);
-        }
-
-        private static void TryParseSizeToken(string token, ref float size, ref bool sizeSpecified)
-        {
-            if (string.IsNullOrWhiteSpace(token)) return;
-
-            string val = token;
-            int eq = token.IndexOf('=');
-            if (eq >= 0)
             {
-                var name = token[..eq];
-                if (!name.Equals("size", StringComparison.OrdinalIgnoreCase)) return;
-                val = token[(eq + 1)..];
-            }
+                // Try parse size token
+                string token = parts[i];
+                if (string.IsNullOrWhiteSpace(token)) return;
 
-            if (float.TryParse(val, NumberStyles.Float, CultureInfo.InvariantCulture, out var v))
-            {
-                float max = 100f;
-                size = MathHelper.Clamp(v, 8f, max);
-                sizeSpecified = true;
+                string val = token;
+                int eq = token.IndexOf('=');
+                if (eq >= 0)
+                {
+                    var name = token[..eq];
+                    if (!name.Equals("size", StringComparison.OrdinalIgnoreCase)) return;
+                    val = token[(eq + 1)..];
+                }
+
+                if (float.TryParse(val, NumberStyles.Float, CultureInfo.InvariantCulture, out var v))
+                {
+                    float max = 100f;
+                    size = MathHelper.Clamp(v, 8f, max);
+                    sizeSpecified = true;
+                }
             }
         }
     }

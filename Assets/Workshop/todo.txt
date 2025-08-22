@@ -184,16 +184,15 @@ Future:
 [SCRATCHED] 2. Feat: Add escape key press to exit a state.
 [SCRATCHED] 3. Feat: Add enter key press to input the selected item and close the state.
 [SCRATCHED] Feat: More colors!
+[DONE] Bug: Ensure compat with ChatImprover (meaning, if that mod is enabled, disable our text editor since user probably wants that mods text editor instead).
+[DONE] Config elements preview
+
 
 --------------------------------------------------------------------------------------------------------------------------------
 2025-08-22
-1. Feat: Improve uploader to:
-1a: Automatically upload a bigger image e.g always resize to a height of 300px and fit aspect ratio.
-1b: Automatically resize draw chat height and move chat monitor lines.
-1c: Automatically add spacer snippets to fit the size.
-
-2. Bug: Ensure compat with ChatImprover (meaning, if that mod is enabled, disable our text editor since user probably wants that mods text editor instead).
-4. Config elements preview
+[1a] Automatically upload a bigger image e.g always resize to a height of 300px and fit aspect ratio.
+[1b] Automatically resize draw chat height and move chat monitor lines.
+[1c] Automatically add spacer snippets to fit the size.
 
 Workshop images. Make sure they have the same format, zoom, resolution, text size/font, etc.
 1. Share emojis!

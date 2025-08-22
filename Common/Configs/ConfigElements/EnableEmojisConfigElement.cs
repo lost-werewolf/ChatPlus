@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection.Emit;
+using ChatPlus.EmojiHandler;
 using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,9 +8,11 @@ using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.Localization;
+using Terraria.ModLoader;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
+using static Terraria.Localization.NetworkText;
 
 namespace ChatPlus.Common.Configs.ConfigElements
 {
@@ -54,9 +57,30 @@ namespace ChatPlus.Common.Configs.ConfigElements
             DrawExampleEmoji(sb);
         }
 
+        private bool requested = false;
+
         private void DrawExampleEmoji(SpriteBatch sb)
         {
+            CalculatedStyle dims = GetDimensions();
+            Rectangle r = new((int)dims.X + 180, (int)dims.Y, 200, 30);
+            Vector2 pos = new(r.X + 8, r.Y + 4);
 
+            Utils.DrawInvBG(sb, r, ColorHelper.UIPanelBlue);
+
+            var nameSnips = new[] { new TextSnippet("[e:heart] -> ") { Color = Color.White, CheckForHover = false } };
+            ChatManager.DrawColorCodedStringWithShadow(
+                sb,
+                FontAssets.MouseText.Value,
+                nameSnips,
+                pos + new Vector2(0, 0),
+                0f,
+                Vector2.Zero,
+                new Vector2(1.0f),
+                out _
+            );
+            pos += new Vector2(105, 0);
+
+            Utils.DrawBorderString(sb, "[e:heart]", pos, Color.White);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)

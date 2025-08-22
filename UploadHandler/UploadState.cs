@@ -14,7 +14,7 @@ namespace ChatPlus.UploadHandler
             panel = new();
             Append(panel);
 
-            desc = new("Left click to upload an image\nRight click to open image folder\nExample: [u:Your_Image|100] for a 100px image");
+            desc = new("Click to upload");
             Append(desc);
 
             panel.ConnectedPanel = desc;

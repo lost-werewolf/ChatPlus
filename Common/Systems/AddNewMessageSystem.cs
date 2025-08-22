@@ -29,6 +29,13 @@ internal class AddNewMessageSystem : ModSystem
 
     private void RemadeChatMonitor_AddNewMessage(On_RemadeChatMonitor.orig_AddNewMessage orig, RemadeChatMonitor self, string text, Color color, int widthLimitInPixels)
     {
+        if (!string.IsNullOrEmpty(text) && System.Text.RegularExpressions.Regex.IsMatch(text, @"\[u:[^\]]+\]", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+        {
+            text += "\n\n\n\n\n\n\n\n\n";
+        }
+
+        self._showCount = 15;
+
         orig(self, text, color, widthLimitInPixels);
 
         Intercept(self);
@@ -51,6 +58,8 @@ internal class AddNewMessageSystem : ModSystem
             var snip = line[i];
             if (snip == null || string.IsNullOrWhiteSpace(snip.Text))
                 continue;
+
+            Log.Info("Chat Message: " + snip.Text.Trim(), printCallerInMessage: false);
 
             if (LinkSnippet.IsWholeLink(snip.Text.Trim()) && snip is not LinkSnippet)
             {

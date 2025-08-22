@@ -9,5 +9,6 @@ namespace ChatPlus.Helpers
         public static Color BlueHover => new(7, 55, 99);
 
         public static Color DarkBlue = new(33, 43, 79);
+        public static Color UIPanelBlue => new Color(63, 82, 151) * 0.7f;
     }
 }

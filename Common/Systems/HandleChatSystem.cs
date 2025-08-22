@@ -1,6 +1,7 @@
 ﻿using System;
 using ChatPlus.CommandHandler;
 using ChatPlus.Common.Configs;
+using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
 using Terraria;
@@ -40,30 +41,45 @@ namespace ChatPlus.Common.Systems
 
         public override void Load()
         {
+            if (ModLoader.TryGetMod("ChatImprover", out Mod _))
+            {
+                return;
+            }
+
             On_Main.GetInputText += GetInputText;
             On_Main.DoUpdate_HandleChat += DoUpdate_HandleChat;
         }
 
         public override void Unload()
         {
+            if (ModLoader.TryGetMod("ChatImprover", out Mod _))
+            {
+                return;
+            }
+
             On_Main.GetInputText -= GetInputText;
             On_Main.DoUpdate_HandleChat -= DoUpdate_HandleChat;
         }
 
         private void DoUpdate_HandleChat(On_Main.orig_DoUpdate_HandleChat orig)
         {
-            bool active = HandleChatILSystem.IsAnyStateActive();
-            //Main.NewText(active);
-
-            //if (HandleChatILSystem.IsAnyStateActive()) return;
 
             orig();
 
             if (!Conf.C.featuresConfig.EnableTextEditingShortcuts)
                 return;
 
-            if (!Main.drawingPlayerChat) { caretPos = 0; selectAll = false; }
-            else if (caretPos > Main.chatText.Length) caretPos = Main.chatText.Length;
+            bool active = HandleChatILSystem.IsAnyStateActive();
+
+            if (!Main.drawingPlayerChat)
+            {
+                caretPos = 0;
+                selectAll = false;
+            }
+            else if (caretPos > Main.chatText.Length)
+            {
+                caretPos = Main.chatText.Length;
+            }
         }
 
         private string GetInputText(On_Main.orig_GetInputText orig, string oldString, bool allowMultiLine = false)

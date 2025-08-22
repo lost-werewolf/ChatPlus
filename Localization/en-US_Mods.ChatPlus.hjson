@@ -32,10 +32,10 @@ Configs: {
 				'''
 				Allows for autocompletion of the following tags:
 				[c for colors
-                [e for emojis (new!)
+				[e for emojis (new!)
 				[g for glyphs
 				[i for items
-                [u for uploads (new!)
+				[u for uploads (new!)
 				'''
 		}
 
@@ -53,7 +53,7 @@ Configs: {
 			Tooltip:
 				'''
 				Allows for inserting emojis.
-                Type [e into chat to see all commands.
+				            Type [e into chat to see all commands.
 				'''
 		}
 
@@ -62,7 +62,7 @@ Configs: {
 			Tooltip:
 				'''
 				Allows for uploading images.
-                Type [u into chat to see all upload options.
+				            Type [u into chat to see all upload options.
 				'''
 		}
 
@@ -91,7 +91,13 @@ Configs: {
 
 		ItemsPerWindow: {
 			Label: Items Per Window
-			Tooltip: Adjust the number of items visible at the same time
+			Tooltip:
+				'''
+				Adjust the number of items visible at the same time
+				Minimum: 3
+				Recommended: 10
+				Maximum: 20
+				'''
 		}
 	}
 }

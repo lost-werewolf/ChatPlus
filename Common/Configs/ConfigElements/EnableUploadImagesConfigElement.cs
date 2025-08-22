@@ -56,6 +56,23 @@ namespace ChatPlus.Common.Configs.ConfigElements
 
         private void DrawExampleImage(SpriteBatch sb)
         {
+            CalculatedStyle dims = GetDimensions();
+            Rectangle r = new((int)dims.X + 180, (int)dims.Y, 200, 30);
+            Vector2 pos = new(r.X + 8, r.Y + 4);
+
+            Utils.DrawInvBG(sb, r, ColorHelper.UIPanelBlue);
+
+            TextSnippet[] snip = [new TextSnippet("[u:your_image]")];
+            ChatManager.DrawColorCodedStringWithShadow(
+                sb,
+                FontAssets.MouseText.Value,
+                snip,
+                pos + new Vector2(0, 0),
+                0f,
+                Vector2.Zero,
+                new Vector2(1.0f),
+                out _
+            );
         }
 
         private void DrawToggleTexture(SpriteBatch sb)

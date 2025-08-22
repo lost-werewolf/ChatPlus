@@ -54,15 +54,21 @@ namespace ChatPlus.Common.Configs.ConfigElements
             DrawExampleLink(sb);
         }
 
+        private Color linkColor;
+
         private void DrawExampleLink(SpriteBatch sb)
         {
-            string exampleLink = "https://forums.terraria.org/";
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = dims.Position();
+            Rectangle r = new((int)dims.X + 180, (int)dims.Y, 200, 30);
+            string exampleLink = "https://forums.terraria.org/";
+
+            // Draw chat box
+            Utils.DrawInvBG(sb, r, ColorHelper.UIPanelBlue);
 
             // 1. Draw underline
             Vector2 textSize = FontAssets.MouseText.Value.MeasureString(exampleLink);
-            int xOffset = 150;
+            int xOffset = 180;
             float x = pos.X + 8 + xOffset;
             float y = pos.Y + textSize.Y - 8;
             float scale = 0.72f;
@@ -77,22 +83,29 @@ namespace ChatPlus.Common.Configs.ConfigElements
                 FontAssets.MouseText.Value,
                 exampleLink,
                 textPos,
-                new Color(17, 85, 204),
+                linkColor,
                 0f,
                 Vector2.Zero,
                 baseScale: new Vector2(0.8f)
             );
 
             // 3. If clicked, open the link
-            if (Main.MouseScreen.Between(textPos, textPos + new Vector2(w, textSize.Y)) &&
-                Main.mouseLeft && Main.mouseLeftRelease)
+            if (Main.MouseScreen.Between(textPos, textPos + new Vector2(w, textSize.Y)))
             {
-                // Open the link in the default browser
-                Process.Start(new ProcessStartInfo
+                linkColor = ColorHelper.BlueHover;
+                if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
-                    FileName = exampleLink,
-                    UseShellExecute = true
-                });
+                    // Open the link in the default browser
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = exampleLink,
+                        UseShellExecute = true
+                    });
+                }
+            }
+            else
+            {
+                linkColor = ColorHelper.Blue;
             }
         }
 

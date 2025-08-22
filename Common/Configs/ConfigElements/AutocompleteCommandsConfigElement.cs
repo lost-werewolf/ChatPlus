@@ -51,11 +51,21 @@ namespace ChatPlus.Common.Configs.ConfigElements
         private void DrawCommandExample(SpriteBatch sb)
         {
             CalculatedStyle dims = GetDimensions();
-            int xOffset = 16 + 150;
-            int yOffset = 14;
-            Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
+            Rectangle r = new((int)dims.X + 180, (int)dims.Y, 200, 30);
+            Vector2 pos = new(r.X + 8, r.Y + 4);
 
-            //DrawHelper.DrawPlayerHead(drawPosition, sb: sb);
+            Utils.DrawInvBG(sb, r, ColorHelper.UIPanelBlue);
+            TextSnippet[] snip = [new TextSnippet("/")];
+            ChatManager.DrawColorCodedStringWithShadow(
+                sb,
+                FontAssets.MouseText.Value,
+                snip,
+                pos + new Vector2(0, 0),
+                0f,
+                Vector2.Zero,
+                new Vector2(1.0f),
+                out _
+            );
         }
 
         private void DrawToggleTexture(SpriteBatch sb)

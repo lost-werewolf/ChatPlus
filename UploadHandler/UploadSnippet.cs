@@ -39,8 +39,7 @@ namespace ChatPlus.UploadHandler
 
             if (justCheckingString) return true;
 
-            // Use the snippet’s color (set to White in handler) so images aren’t tinted.
-            spriteBatch.Draw(uploadedTexture, position, null, this.Color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
+            spriteBatch.Draw(uploadedTexture, position, null, Color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
             return true;
         }
     }
