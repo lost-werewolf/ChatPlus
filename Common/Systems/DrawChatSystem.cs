@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using AdvancedChatFeatures.Common.Configs;
 using AdvancedChatFeatures.Helpers;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Chat;
@@ -88,7 +89,29 @@ namespace AdvancedChatFeatures.Common.Systems
             int startX = 78;
             int startY = Main.screenHeight - 4 - height;
 
-            DrawHelper.DrawNineSlice(startX, startY, width, height, TextureAssets.TextBack.Value, new Color(100, 100, 100, 100));
+            DrawNineSlice(startX, startY, width, height, TextureAssets.TextBack.Value, new Color(100, 100, 100, 100));
+        }
+
+        /// <summary>
+        /// Draws a nine slice for the chat
+        /// </summary>
+        public static void DrawNineSlice(int x, int y, int w, int h, Texture2D tex, Color color)
+        {
+            int c = 10;
+            int ew = tex.Width - c * 2;
+            int eh = tex.Height - c * 2;
+
+            Main.spriteBatch.Draw(tex, new Vector2(x, y), new Rectangle(0, 0, c, c), color);
+            Main.spriteBatch.Draw(tex, new Rectangle(x + c, y, w - c * 2, c), new Rectangle(c, 0, ew, c), color);
+            Main.spriteBatch.Draw(tex, new Vector2(x + w - c, y), new Rectangle(tex.Width - c, 0, c, c), color);
+
+            Main.spriteBatch.Draw(tex, new Rectangle(x, y + c, c, h - c * 2), new Rectangle(0, c, c, eh), color);
+            Main.spriteBatch.Draw(tex, new Rectangle(x + c, y + c, w - c * 2, h - c * 2), new Rectangle(c, c, ew, eh), color);
+            Main.spriteBatch.Draw(tex, new Rectangle(x + w - c, y + c, c, h - c * 2), new Rectangle(tex.Width - c, c, c, eh), color);
+
+            Main.spriteBatch.Draw(tex, new Vector2(x, y + h - c), new Rectangle(0, tex.Height - c, c, c), color);
+            Main.spriteBatch.Draw(tex, new Rectangle(x + c, y + h - c, w - c * 2, c), new Rectangle(c, tex.Height - c, ew, c), color);
+            Main.spriteBatch.Draw(tex, new Vector2(x + w - c, y + h - c), new Rectangle(tex.Width - c, tex.Height - c, c, c), color);
         }
         private void DrawSelectionRectangle(int height)
         {

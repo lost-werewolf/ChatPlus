@@ -1,7 +1,9 @@
-﻿using AdvancedChatFeatures.Helpers;
+﻿using System;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
@@ -22,14 +24,89 @@ namespace AdvancedChatFeatures.CommandHandler
             // Dimensions
             Vector2 target = GetDimensions().Position();
 
-            DrawHelper.DrawSmallModIcon(sb, mod, target, size: 26);
+            DrawSmallModIcon(sb, mod, target, size: 26);
 
             if (IsMouseHovering && mod != null && !string.IsNullOrEmpty(mod.Name))
             {
                 //UICommon.TooltipMouseText(mod.Name);
                 //Main.hoverItemName = mod.Name;
-                DrawHelper.DrawTextAtMouse(sb, mod.Name);
+                DrawTextAtMouse(sb, mod.Name);
             }
+        }
+        private static void DrawTextAtMouse(SpriteBatch sb, string text)
+        {
+            // This method is used for drawing tooltips in main menu
+            // Inspired by UICharacterCreation::Draw()
+            float x = FontAssets.MouseText.Value.MeasureString(text).X;
+            Vector2 vector = new Vector2(Main.mouseX, Main.mouseY) + new Vector2(16f);
+            if (vector.Y > (float)(Main.screenHeight - 15))
+            {
+                vector.Y = Main.screenHeight - 15;
+            }
+            if (vector.X > (float)Main.screenWidth - x + 40)
+            {
+                vector.X = Main.screenWidth - 460;
+            }
+            Utils.DrawBorderStringFourWay(
+                sb, FontAssets.MouseText.Value, text, vector.X, vector.Y, new Color(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor), Color.Black, Vector2.Zero);
+        }
+
+        private static void DrawSmallModIcon(SpriteBatch sb, Mod mod, Vector2 pos, int size = 16)
+        {
+            Texture2D tex = null;
+
+            // Default fallback for unknown mods
+            if (mod == null)
+            {
+                tex = Ass.TerrariaIcon.Value;
+            }
+            else if (mod.Name == "ModLoader")
+            {
+                tex = Ass.tModLoaderIcon.Value;
+            }
+            else
+            {
+                string path = $"{mod.Name}/icon_small";
+                if (ModContent.HasAsset(path))
+                    tex = ModContent.Request<Texture2D>(path).Value;
+            }
+
+            Rectangle target = new((int)pos.X - 3, (int)pos.Y - 2, size, size);
+
+            if (tex != null)
+            {
+                DrawTextureScaledToFit(sb, tex, target);
+            }
+            else if (mod != null)
+            {
+                // fallback to initials
+                string initials = mod.DisplayName.Length >= 2 ? mod.DisplayName[..2] : mod.DisplayName;
+                Vector2 initialsPos = target.Center.ToVector2();
+                initialsPos += new Vector2(0, 5);
+                Utils.DrawBorderString(sb, initials, initialsPos, Color.White, scale: 1.0f, 0.5f, 0.5f);
+            }
+        }
+        private static void DrawTextureScaledToFit(SpriteBatch sb, Texture2D tex, Rectangle target)
+        {
+            if (tex == null)
+                return;
+
+            float scale = Math.Min(
+                target.Width / (float)tex.Width,
+                target.Height / (float)tex.Height
+            );
+
+            sb.Draw(
+                tex,
+                target.Center.ToVector2(),
+                null,
+                Color.White,
+                0f,
+                tex.Size() / 2f,
+                scale,
+                SpriteEffects.None,
+                0f
+            );
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AdvancedChatFeatures.Helpers;
+﻿using System;
+using AdvancedChatFeatures.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
@@ -39,12 +40,35 @@ namespace AdvancedChatFeatures.EmojiHandler
             {
                 // Draw the emoji icon
                 Rectangle target = GetDimensions().ToRectangle();
-                DrawHelper.DrawTextureScaledToFit(sb, tex, target);
+                DrawTextureScaledToFit(sb, tex, target);
             }
             else
             {
                 base.Draw(sb);
             }
+        }
+
+        private static void DrawTextureScaledToFit(SpriteBatch sb, Texture2D tex, Rectangle target)
+        {
+            if (tex == null)
+                return;
+
+            float scale = Math.Min(
+                target.Width / (float)tex.Width,
+                target.Height / (float)tex.Height
+            );
+
+            sb.Draw(
+                tex,
+                target.Center.ToVector2(),
+                null,
+                Color.White,
+                0f,
+                tex.Size() / 2f,
+                scale,
+                SpriteEffects.None,
+                0f
+            );
         }
     }
 }

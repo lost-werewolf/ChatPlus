@@ -1,7 +1,7 @@
 ﻿Makes Terraria's chat smoother, smarter and more fun with emojis, images, links, text editing shortcuts and more!
 
 [h3] ✨ What’s New? [/h3] 
-1. [b]Emojis🌳[/b]: Access thousands of emojis directly in chat!
+1. [b]Emojis😎[/b]: Access thousands of emojis directly in chat!
 2. [b]Images📷[/b]: Upload and send your own images!
 3. [b]Links🔗[/b]: Links you type in chat become clickable.
 4. [b]Autocomplete Commands↪️[/b]: Type "/" into chat to autocomplete commands.

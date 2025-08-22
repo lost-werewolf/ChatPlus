@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using AdvancedChatFeatures.Common.Systems;
 using AdvancedChatFeatures.Helpers;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
 namespace AdvancedChatFeatures.Common.Snippets
@@ -16,7 +13,6 @@ namespace AdvancedChatFeatures.Common.Snippets
     /// A custom snippet that changes drawing behavior for chat messages. 
     /// Features:
     /// 1. Detects and styles links in chat messages and opens them in a web browser when clicked.
-    /// 2. Draws a player head icon at the start of the link.
     /// <see cref="NewMessageHook"/>
     /// </summary>
     public class LinkSnippet : TextSnippet
@@ -39,7 +35,7 @@ namespace AdvancedChatFeatures.Common.Snippets
         public override Color GetVisibleColor()
         {
             // Always use a link color for link snippets.
-            if (LinkHelper.IsWholeLink(text))
+            if (IsWholeLink(text))
             {
                 // Optionally, you can choose a different color if the mouse is hovering.
                 // Here we check if Main.MouseScreen is within lastDrawRect.
@@ -71,7 +67,7 @@ namespace AdvancedChatFeatures.Common.Snippets
             Vector2 textPosition = position + new Vector2(12f, 0f);
 
             // Draw link underline
-            if (!justCheckingString && LinkHelper.IsWholeLink(text))
+            if (!justCheckingString && IsWholeLink(text))
             {
                 if (Main.GameUpdateCount != lastUnderlineDrawFrame)
                 {
@@ -89,8 +85,43 @@ namespace AdvancedChatFeatures.Common.Snippets
         public override void OnClick()
         {
             snippet?.OnClick();
-            if (LinkHelper.IsWholeLink(text))
-                LinkHelper.OpenURL(text);
+            if (IsWholeLink(text))
+                OpenURL(text);
         }
+
+        #region helpers
+        
+
+        /// <summary>
+        /// Returns true if the string is a valid link.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsWholeLink(string text)
+        {
+            return Regex.IsMatch(text, @"^(https?://|www\.)\S+\.\S+$", RegexOptions.IgnoreCase);
+        }
+
+        public static void OpenURL(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return;
+
+            try
+            {
+                // Start a process to open the URL in a web browser
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception e)
+            {
+                Main.NewText($"Failed to open URL: {url}" + e.Message, Color.Red);
+                Log.Error($"Failed to open URL: {url}" + e);
+            }
+        }
+        #endregion
     }
 }

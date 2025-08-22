@@ -103,17 +103,12 @@ namespace AdvancedChatFeatures.Common.Systems
             var itemSys = ModContent.GetInstance<ItemSystem>();
             var uploadSys = ModContent.GetInstance<UploadSystem>();
 
-            if (cmdSys.ui.CurrentState != null ||
-                colorSys.ui.CurrentState != null ||
-                emojiSys.ui.CurrentState != null ||
-                glyphSys.ui.CurrentState != null ||
-                itemSys.ui.CurrentState != null ||
-                uploadSys.ui.CurrentState != null)
-            {
-                return true;
-            }
-
-            return false;
+            return (cmdSys?.ui?.CurrentState != null) ||
+                   (colorSys?.ui?.CurrentState != null) ||
+                   (emojiSys?.ui?.CurrentState != null) ||
+                   (glyphSys?.ui?.CurrentState != null) ||
+                   (itemSys?.ui?.CurrentState != null) ||
+                   (uploadSys?.ui?.CurrentState != null);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿Chat+ 
-Chat+ makes Terraria's chat smoother, smarter and more fun with emojis, images, links, text editing shortcuts and more!
+﻿Chat+ makes Terraria's chat smoother, smarter and more fun with emojis, images, links, text editing shortcuts and more!
 
 Features:
     Emoji Support: Access thousands of emojis directly in chat, powered by Emojibase.
