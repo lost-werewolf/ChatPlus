@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ChatPlus.Core.Chat;
+using ChatPlus.Core.Helpers;
+using ChatPlus.Core.UI;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;

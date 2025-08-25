@@ -1,4 +1,11 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using ChatPlus.Core.Chat;
+using ChatPlus.Core.Features.Colors;
+using ChatPlus.Core.Features.Commands;
+using ChatPlus.Core.Features.Emojis;
+using ChatPlus.Core.Features.Glyphs;
+using ChatPlus.Core.Features.Items;
+using ChatPlus.Core.Features.Uploads;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;

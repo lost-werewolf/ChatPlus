@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -28,7 +29,7 @@ namespace ChatPlus.Core.Features.Colors
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, colorState, "[c");
+            StateManager.OpenStateIfPrefixMatches(gameTime, ui, colorState, "[c");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

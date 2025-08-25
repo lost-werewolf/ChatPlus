@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -28,7 +29,7 @@ namespace ChatPlus.Core.Features.Items
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, itemWindowState, "[i");
+            StateManager.OpenStateIfPrefixMatches(gameTime, ui, itemWindowState, "[i");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

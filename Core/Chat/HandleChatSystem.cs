@@ -1,5 +1,6 @@
 ﻿using System;
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
 using Terraria;
@@ -67,7 +68,7 @@ namespace ChatPlus.Core.Chat
             if (!Conf.C.featuresConfig.EnableTextEditingShortcuts)
                 return;
 
-            bool active = HandleChatILSystem.IsAnyStateActive();
+            bool active = StateManager.IsAnyStateActive();
 
             if (!Main.drawingPlayerChat)
             {

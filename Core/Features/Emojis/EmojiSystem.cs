@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -11,6 +12,8 @@ namespace ChatPlus.Core.Features.Emojis
     {
         public UserInterface ui;
         public EmojiState emojiState;
+
+        public object StateHandler { get; private set; }
 
         public override void OnModLoad()
         {
@@ -38,7 +41,7 @@ namespace ChatPlus.Core.Features.Emojis
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateHandler.OpenStateIfPrefixMatches(gameTime, ui, emojiState, "[e");
+            StateManager.OpenStateIfPrefixMatches(gameTime, ui, emojiState, "[e");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

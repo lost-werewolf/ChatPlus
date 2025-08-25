@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using ChatPlus.Core.Features.Links;
+using ChatPlus.Core.Helpers;
 using MonoMod.RuntimeDetour;
 using Terraria;
 using Terraria.GameContent;

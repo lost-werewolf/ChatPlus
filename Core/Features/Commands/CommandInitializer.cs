@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ChatPlus.Core.Helpers;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;

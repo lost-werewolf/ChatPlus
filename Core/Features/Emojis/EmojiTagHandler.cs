@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.ModLoader;

@@ -1,4 +1,5 @@
 using System;
+using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;

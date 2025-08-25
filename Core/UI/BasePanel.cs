@@ -1,6 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Chat;
+using ChatPlus.Core.Features.Colors;
+using ChatPlus.Core.Features.Commands;
+using ChatPlus.Core.Features.Emojis;
+using ChatPlus.Core.Features.Glyphs;
+using ChatPlus.Core.Features.Items;
+using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
@@ -172,7 +181,7 @@ namespace ChatPlus.Core.UI
             }
 
             // 🔹 Item: match tag OR display name (and optionally numeric ID)
-            if (this is ItemPanel && data is ItemHandler.Item item)
+            if (this is ItemPanel && data is Features.Items.Item item)
             {
                 if (tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
                 if ((item.DisplayName ?? string.Empty).IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;

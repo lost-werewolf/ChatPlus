@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using ChatPlus.Core.Features.Links;
+using ChatPlus.Core.Helpers;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -31,7 +32,7 @@ public class ModIconSystem : ModSystem
             return;
         }
 
-        StateHandler.OpenStateIfPrefixMatches(gameTime, ui, state, "[mi");
+        StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[mi");
     }
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

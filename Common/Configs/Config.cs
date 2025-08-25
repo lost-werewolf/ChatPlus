@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 using ChatPlus.Common.Configs.ConfigElements;
+using ChatPlus.Core.Helpers;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.UI;

@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -15,6 +17,8 @@ namespace ChatPlus.Core.Chat
         const int BaseHeight = 32;   // vanilla input line height
         const int ExtraH = 180;      // image height = 10 lines * 20px
         const int Expanded = BaseHeight + ExtraH; // 232
+
+        public static object UploadHandler { get; private set; }
 
         public override void Load()
         {
@@ -126,7 +130,7 @@ namespace ChatPlus.Core.Chat
             var m = Regex.Match(s ?? "", @"\[u:([^\]]+)\]", RegexOptions.IgnoreCase);
             if (!m.Success) return false;
             string key = m.Groups[1].Value.Trim();
-            return UploadHandler.UploadTagHandler.TryGet(key, out tex);
+            return UploadTagHandler.TryGet(key, out tex);
         }
 
         private static void DrawChatbox(int height)

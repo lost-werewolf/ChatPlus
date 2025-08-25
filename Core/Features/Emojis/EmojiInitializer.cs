@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using ChatPlus.Core.Helpers;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 

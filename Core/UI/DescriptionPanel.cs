@@ -2,6 +2,11 @@
 using System.Diagnostics;
 using System.IO;
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.Glyphs;
+using ChatPlus.Core.Features.Items;
+using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
