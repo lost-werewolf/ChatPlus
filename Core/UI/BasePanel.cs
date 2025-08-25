@@ -34,6 +34,10 @@ namespace ChatPlus.Core.UI
         // Navigation
         protected int currentIndex = 0; // first item
 
+        // Commands
+        private static bool freezeCommandFilter;
+        private static string frozenCommandText;
+
         // Holding keys
         private double repeatTimer;
         private Keys heldKey = Keys.None;
@@ -47,7 +51,7 @@ namespace ChatPlus.Core.UI
             // Set position just above the chat
             VAlign = 1f;
             Top.Set(-38, 0);
-            Left.Set(80, 0);
+            Left.Set(190, 0);
 
             // Style
             OverflowHidden = true;
@@ -120,6 +124,15 @@ namespace ChatPlus.Core.UI
             }
             list.AddRange(fastList);
 
+            if (fastList.Count == 0)
+            {
+                // Update description panel to say "no entries found"
+                if (ConnectedPanel is DescriptionPanel<TData> descPanel)
+                {
+                    descPanel.SetTextWithLinebreak("No entries found.");
+                }
+            }
+
             if (items.Count > 0) SetSelectedIndex(0);
             else currentIndex = -1;
         }
@@ -128,10 +141,14 @@ namespace ChatPlus.Core.UI
         private bool MatchesFilter(TData data)
         {
             string tag = GetTag(data) ?? string.Empty;
+
+            // Use frozen text while navigating commands with Up/Down so we don't re-filter to a single item
             string text = Main.chatText ?? string.Empty;
+            if (this is CommandPanel && freezeCommandFilter && !string.IsNullOrEmpty(frozenCommandText))
+                text = frozenCommandText;
+
             if (text.Length == 0) return true;
 
-            // Panel -> prefix
             string prefix =
                 this is CommandPanel ? "/" :
                 this is ColorPanel ? "[c" :
@@ -145,7 +162,6 @@ namespace ChatPlus.Core.UI
 
             char[] stopChars = [' ', '\t', '\n', '\r', ']'];
 
-            // Commands: /query
             if (prefix == "/")
             {
                 int s = text.LastIndexOf('/');
@@ -157,10 +173,9 @@ namespace ChatPlus.Core.UI
                 return tag.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0;
             }
 
-            // Bracketed tags: [x:query
             int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
             if (start < 0)
-                return tag.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0; // fallback
+                return tag.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
 
             int qStart = start + prefix.Length;
             if (qStart < text.Length && (text[qStart] == ':' || text[qStart] == '/')) qStart++;
@@ -170,7 +185,6 @@ namespace ChatPlus.Core.UI
             string query = text.Substring(qStart, qEnd - qStart).Trim();
             if (query.Length == 0) return true;
 
-            // 🔹 Emoji: also match synonyms
             if (this is EmojiPanel && data is Emoji emoji)
             {
                 if (tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
@@ -180,21 +194,17 @@ namespace ChatPlus.Core.UI
                 return false;
             }
 
-            // 🔹 Item: match tag OR display name (and optionally numeric ID)
             if (this is ItemPanel && data is Features.Items.Item item)
             {
                 if (tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
                 if ((item.DisplayName ?? string.Empty).IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
-
-                // Optional: allow typing a number to match by ID
                 if (int.TryParse(query, out int qid) && qid == item.ID) return true;
-
                 return false;
             }
 
-            // Default: tag only
             return tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
         }
+
         #endregion
 
         public override void Update(GameTime gt)
@@ -288,14 +298,6 @@ namespace ChatPlus.Core.UI
                     descPanel.GetText()._color = ColorElement.HexToColor(tag);
                 }
             }
-
-            // Force chat text if a command
-            // TODO: Uncomment this but allows up and down arrow keys and backspace and searching still
-            if (this is CommandPanel)
-            {
-                //Main.chatText = tag;
-                //HandleChatSystem.SetCaretPos(Main.chatText.Length);
-            }
         }
 
         private void HandleKeyPressed()
@@ -306,6 +308,10 @@ namespace ChatPlus.Core.UI
                     continue;
 
                 if (key == Keys.Tab || key == Keys.Up || key == Keys.Down) return;
+
+                // Any non-Tab/Up/Down key: resume normal filtering
+                freezeCommandFilter = false;
+                frozenCommandText = null;
 
                 PopulatePanel();
             }
@@ -374,13 +380,43 @@ namespace ChatPlus.Core.UI
             // Tap key
             if (JustPressed(Keys.Up))
             {
-                SetSelectedIndex(currentIndex - 1);
+                if (this is CommandPanel)
+                {
+                    if (!freezeCommandFilter) frozenCommandText = Main.chatText;
+                    freezeCommandFilter = true;
+
+                    SetSelectedIndex(currentIndex - 1);
+                    if (items.Count > 0)
+                    {
+                        Main.chatText = GetTag(items[currentIndex].Data);
+                        HandleChatSystem.SetCaretPos(Main.chatText.Length);
+                    }
+                }
+                else
+                {
+                    SetSelectedIndex(currentIndex - 1);
+                }
                 heldKey = Keys.Up;
                 repeatTimer = 0.35;
             }
             else if (JustPressed(Keys.Down))
             {
-                SetSelectedIndex(currentIndex + 1);
+                if (this is CommandPanel)
+                {
+                    if (!freezeCommandFilter) frozenCommandText = Main.chatText;
+                    freezeCommandFilter = true;
+
+                    SetSelectedIndex(currentIndex + 1);
+                    if (items.Count > 0)
+                    {
+                        Main.chatText = GetTag(items[currentIndex].Data);
+                        HandleChatSystem.SetCaretPos(Main.chatText.Length);
+                    }
+                }
+                else
+                {
+                    SetSelectedIndex(currentIndex + 1);
+                }
                 heldKey = Keys.Down;
                 repeatTimer = 0.35;
             }
@@ -394,8 +430,24 @@ namespace ChatPlus.Core.UI
                 {
                     repeatTimer += 0.06;
 
-                    if (Main.keyState.IsKeyDown(Keys.Up)) SetSelectedIndex(currentIndex - 1);
-                    else if (Main.keyState.IsKeyDown(Keys.Down)) SetSelectedIndex(currentIndex + 1);
+                    if (Main.keyState.IsKeyDown(Keys.Up))
+                    {
+                        SetSelectedIndex(currentIndex - 1);
+                        if (this is CommandPanel && items.Count > 0)
+                        {
+                            Main.chatText = GetTag(items[currentIndex].Data);
+                            HandleChatSystem.SetCaretPos(Main.chatText.Length);
+                        }
+                    }
+                    else if (Main.keyState.IsKeyDown(Keys.Down))
+                    {
+                        SetSelectedIndex(currentIndex + 1);
+                        if (this is CommandPanel && items.Count > 0)
+                        {
+                            Main.chatText = GetTag(items[currentIndex].Data);
+                            HandleChatSystem.SetCaretPos(Main.chatText.Length);
+                        }
+                    }
                 }
             }
         }

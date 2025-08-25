@@ -1,7 +1,10 @@
 ﻿// UploadTagHandler.cs
 using System;
 using System.Collections.Generic;
+using ChatPlus.Core.Features.Uploads.Netcode;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
+using Terraria.ID;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.Uploads
@@ -41,6 +44,13 @@ namespace ChatPlus.Core.Features.Uploads
                 };
             }
 
+            // Handle multiplayer
+            if (Main.netMode != NetmodeID.SinglePlayer)
+            {
+                UploadNetHandler.Request(key);
+            }
+
+            // If no tag was found, return the regular snippet
             return new TextSnippet(text ?? string.Empty);
         }
     }

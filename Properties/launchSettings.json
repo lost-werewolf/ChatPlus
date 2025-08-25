@@ -16,7 +16,7 @@
 		"Terraria Fast": {
 			"commandName": "Executable",
 			"executablePath": "$(DotNetName)",
-			"commandLineArgs": "$(tMLPath) -skipselect TestPlayer:Test1",
+			"commandLineArgs": "$(tMLPath) -skipselect Erky:Springfield",
 			"workingDirectory": "$(tMLSteamPath)"
 		}
 	}

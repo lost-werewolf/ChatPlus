@@ -62,7 +62,6 @@ namespace ChatPlus.Core.Chat
 
         private void DoUpdate_HandleChat(On_Main.orig_DoUpdate_HandleChat orig)
         {
-
             orig();
 
             if (!Conf.C.featuresConfig.EnableTextEditingShortcuts)

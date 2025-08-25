@@ -1,4 +1,5 @@
-﻿using ChatPlus.Core.Features.Colors;
+﻿using System;
+using ChatPlus.Core.Features.Colors;
 using ChatPlus.Core.Features.Commands;
 using ChatPlus.Core.Features.Emojis;
 using ChatPlus.Core.Features.Glyphs;
@@ -19,41 +20,36 @@ public static class StateManager
         if (!Main.drawingPlayerChat)
         {
             if (ui?.CurrentState != null)
-            {
                 ui.SetState(null);
-            }
             return;
         }
 
-        string text = Main.chatText ?? "";
+        string text = Main.chatText ?? string.Empty;
 
-        // Look for last occurrence of the prefix
-        int start = text.LastIndexOf(prefix);
+        int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
         if (start == -1)
         {
-            // No active prefix → close
             if (ui?.CurrentState == state)
                 ui.SetState(null);
             return;
         }
 
-        // Check if this prefix is already "closed" with a ']'
         int end = text.IndexOf(']', start + prefix.Length);
         bool isClosed = end != -1;
 
         if (!isClosed)
         {
-            // Still typing an open prefix → keep state open
             if (ui.CurrentState != state)
+            {
+                CloseOthers(ui);     // <- ensure exclusivity
                 ui.SetState(state);
-
+            }
             ui.Update(gameTime);
         }
         else
         {
-            // Found a closing bracket → close state
             if (ui?.CurrentState == state)
-                ui?.SetState(null);
+                ui.SetState(null);
         }
     }
 
@@ -74,5 +70,30 @@ public static class StateManager
                itemSys?.ui?.CurrentState != null ||
                modIconSys?.ui?.CurrentState != null ||
                uploadSys?.ui?.CurrentState != null;
+    }
+
+    public static void CloseOthers(UserInterface keep)
+    {
+        void Close(UserInterface u)
+        {
+            if (u != null && u != keep && u.CurrentState != null)
+                u.SetState(null);
+        }
+
+        var cmdSys = ModContent.GetInstance<CommandSystem>();
+        var colorSys = ModContent.GetInstance<ColorSystem>();
+        var emojiSys = ModContent.GetInstance<EmojiSystem>();
+        var glyphSys = ModContent.GetInstance<GlyphSystem>();
+        var itemSys = ModContent.GetInstance<ItemSystem>();
+        var modIconSys = ModContent.GetInstance<ModIconSystem>();
+        var uploadSys = ModContent.GetInstance<UploadSystem>();
+
+        Close(cmdSys?.ui);
+        Close(colorSys?.ui);
+        Close(emojiSys?.ui);
+        Close(glyphSys?.ui);
+        Close(itemSys?.ui);
+        Close(modIconSys?.ui);
+        Close(uploadSys?.ui);
     }
 }

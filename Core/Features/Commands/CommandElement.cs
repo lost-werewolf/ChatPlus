@@ -45,7 +45,7 @@ namespace ChatPlus.Core.Features.Commands
 
         public override void Update(GameTime gameTime)
         {
-            base.Update(gameTime);
+            //base.Update(gameTime);
         }
 
         public override void Draw(SpriteBatch sb)

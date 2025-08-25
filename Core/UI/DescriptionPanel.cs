@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using ChatPlus.Common.Configs;
@@ -34,7 +35,7 @@ namespace ChatPlus.Core.UI
 
             // Position
             VAlign = 1f;
-            Left.Set(80, 0);
+            Left.Set(190, 0);
 
             // Text
             text = new(initialText ?? string.Empty, 0.9f, false)
@@ -200,36 +201,52 @@ namespace ChatPlus.Core.UI
         {
             if (rawText == null)
             {
-                Log.Error("rawtext is null in panel: " + ConnectedPanel.GetType().ToString());
+                Log.Error("rawtext is null in panel: " + ConnectedPanel.GetType());
+                return;
+            }
+            if (FontAssets.MouseText == null) return;
+
+            float scale = 0.9f;
+            float maxWidth = Width.Pixels;
+            var font = FontAssets.MouseText.Value;
+
+            // Collapse any existing newlines → they will break your layout otherwise
+            string str = rawText.Replace("\r\n", " ").Replace("\n", ". ");
+
+            // if it fits, just use it
+            if (font.MeasureString(str).X * scale / Main.UIScale <= maxWidth)
+            {
+                text.SetText(str);
                 return;
             }
 
-            float scale = 0.9f;
-            string tooltip = rawText;
-
-            // Measure the text size
-            if (FontAssets.MouseText == null) return;
-            Vector2 textSize = FontAssets.MouseText.Value.MeasureString(tooltip);
-            float scaledWidth = textSize.X * scale / Main.UIScale;
-
-            // If the text is too wide, insert a line break at the last space before it overflows
-            if (scaledWidth > Width.Pixels)
+            // binary search break point for first line
+            int lo = 1, hi = str.Length;
+            while (lo < hi)
             {
-                // Estimate the max number of characters that fit
-                int maxChars = (int)(Width.Pixels / scale / textSize.X * tooltip.Length) - 2;
-                int breakIndex = tooltip.LastIndexOf(' ', Math.Min(tooltip.Length - 1, maxChars));
-                if (breakIndex > 0)
-                {
-                    tooltip = tooltip[..breakIndex] + "\n" + tooltip[(breakIndex + 1)..];
-                }
+                int mid = (lo + hi + 1) / 2;
+                float w = font.MeasureString(str[..mid]).X * scale / Main.UIScale;
+                if (w <= maxWidth) lo = mid; else hi = mid - 1;
             }
 
-            text.SetText(tooltip);
+            int breakIndex = str.LastIndexOf(' ', lo);
+            if (breakIndex <= 0) breakIndex = lo;
+
+            string firstLine = str[..breakIndex].TrimEnd();
+            string secondLine = (breakIndex + 1 < str.Length) ? str[(breakIndex + 1)..].TrimStart() : string.Empty;
+
+            // now only two lines max
+            text.SetText(firstLine + (secondLine.Length > 0 ? "\n" + secondLine : ""));
+
+            // if HUGE text, set HAlign to 0
+            if (rawText.Length > 150) 
+                text.HAlign = 0f;
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             int pad = 2;
+            text.HAlign = 0.0f;
 
             Top.Set(-Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30 - 38 - pad, 0);
 
