@@ -1,8 +1,9 @@
+using ChatPlus.ModIconHandler;
 using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI;
 
-namespace ChatPlus.ModIconHandler;
+namespace ChatPlus.Core.Features.ModIcons;
 
 public class ModIconState : UIState
 {

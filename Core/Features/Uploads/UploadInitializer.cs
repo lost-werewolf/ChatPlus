@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ChatPlus.Helpers;
+using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.UploadHandler
+namespace ChatPlus.Core.Features.Uploads
 {
     [Autoload(Side = ModSide.Client)]
     internal class UploadInitializer : ModSystem

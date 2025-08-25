@@ -1,4 +1,4 @@
-namespace ChatPlus.ModIconHandler;
+namespace ChatPlus.Core.Features.ModIcons;
 
 /// <summary>
 /// Represents a mod icon reference that can be inserted into chat.

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ChatPlus.ColorHandler;
 using ChatPlus.EmojiHandler;
 using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
@@ -6,7 +7,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.ColorHandler
+namespace ChatPlus.Core.Features.Colors
 {
     [Autoload(Side = ModSide.Client)]
     public class ColorSystem : ModSystem

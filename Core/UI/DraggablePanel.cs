@@ -12,7 +12,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.UI
+namespace ChatPlus.Core.UI
 {
     public abstract class DraggablePanel : UIPanel
     {

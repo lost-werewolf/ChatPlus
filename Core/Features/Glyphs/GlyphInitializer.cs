@@ -3,7 +3,7 @@ using ChatPlus.GlyphHandler;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 
-namespace ChatPlus.GlyphHandler
+namespace ChatPlus.Core.Features.Glyphs
 {
     internal class GlyphInitializer : ModSystem
     {

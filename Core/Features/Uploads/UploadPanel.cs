@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using ChatPlus.UI;
+using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework;
 using Terraria;
 
-namespace ChatPlus.UploadHandler
+namespace ChatPlus.Core.Features.Uploads
 {
     public class UploadPanel : BasePanel<Upload>
     {

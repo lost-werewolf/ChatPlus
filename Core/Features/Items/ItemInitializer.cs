@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ChatPlus.Helpers;
+using ChatPlus.ItemHandler;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
-namespace ChatPlus.ItemHandler
+namespace ChatPlus.Core.Features.Items
 {
     internal class ItemInitializer : ModSystem
     {

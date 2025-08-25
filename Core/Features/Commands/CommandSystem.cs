@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ChatPlus.CommandHandler;
 using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -6,7 +7,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.CommandHandler
+namespace ChatPlus.Core.Features.Commands
 {
     [Autoload(Side = ModSide.Client)]
     public class CommandSystem : ModSystem

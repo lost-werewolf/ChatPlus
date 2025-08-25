@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using ChatPlus.ModIconHandler;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.ModIconHandler;
+namespace ChatPlus.Core.Features.ModIcons;
 
 internal class ModIconInitializer : ModSystem
 {

@@ -7,7 +7,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Common.Snippets
+namespace ChatPlus.Core.Features.Links
 {
     /// <summary>
     /// A custom snippet that changes drawing behavior for chat messages. 

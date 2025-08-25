@@ -1,5 +1,6 @@
 ﻿using System.Buffers.Text;
 using System.Text.RegularExpressions;
+using ChatPlus.Common.Systems;
 using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +11,7 @@ using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Common.Systems
+namespace ChatPlus.Core.Chat
 {
     internal class DrawChatSystem : ModSystem
     {
@@ -160,7 +161,7 @@ namespace ChatPlus.Common.Systems
             // Caret
             if (Main.instance.textBlinkerState == 1)
             {
-                int caretRaw = System.Math.Clamp(Common.Systems.HandleChatSystem.GetCaretPos(), 0, raw.Length);
+                int caretRaw = System.Math.Clamp(HandleChatSystem.GetCaretPos(), 0, raw.Length);
                 int caretClean = caretRaw;
 
                 if (tag.Success)
@@ -186,7 +187,7 @@ namespace ChatPlus.Common.Systems
             if (sel == null) return;
 
             string raw = Main.chatText ?? "";
-            var tag = System.Text.RegularExpressions.Regex.Match(raw, @"\[u:[^\]]+\]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            var tag = Regex.Match(raw, @"\[u:[^\]]+\]", RegexOptions.IgnoreCase);
 
             int start = sel.Value.start;
             int end = sel.Value.end;
@@ -229,12 +230,12 @@ namespace ChatPlus.Common.Systems
                 20
             );
 
-            Main.spriteBatch.Draw(Terraria.GameContent.TextureAssets.MagicPixel.Value, rect, ColorHelper.Blue * 0.5f);
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, ColorHelper.Blue * 0.5f);
 
             static Vector2 MeasureSnippets(string s)
             {
                 var snips = ChatManager.ParseMessage(s ?? "", Color.White).ToArray();
-                return ChatManager.GetStringSize(Terraria.GameContent.FontAssets.MouseText.Value, snips, Vector2.One);
+                return ChatManager.GetStringSize(FontAssets.MouseText.Value, snips, Vector2.One);
             }
         }
 

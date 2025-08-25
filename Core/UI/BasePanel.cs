@@ -9,6 +9,7 @@ using ChatPlus.GlyphHandler;
 using ChatPlus.Helpers;
 using ChatPlus.ItemHandler;
 using ChatPlus.ModIconHandler;
+using ChatPlus.UI;
 using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -16,7 +17,7 @@ using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-namespace ChatPlus.UI
+namespace ChatPlus.Core.UI
 {
     public abstract class BasePanel<TData> : DraggablePanel
     {

@@ -1,4 +1,4 @@
-namespace ChatPlus.ItemHandler
+namespace ChatPlus.Core.Features.Items
 {
     /// <summary>
     /// Represents an item color for the item window and [i:ID] tag insertion.

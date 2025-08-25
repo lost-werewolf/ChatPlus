@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ChatPlus.ModIconHandler;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.ModIconHandler;
+namespace ChatPlus.Core.Features.ModIcons;
 
 /// <summary>
 /// Tag handler for mod icons: [mi:InternalName]

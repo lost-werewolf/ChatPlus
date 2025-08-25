@@ -1,3 +1,4 @@
+using ChatPlus.EmojiHandler;
 using ChatPlus.Helpers;
 using ChatPlus.UI;
 using ChatPlus.UploadHandler;
@@ -7,7 +8,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.EmojiHandler
+namespace ChatPlus.Core.Features.Emojis
 {
     public class EmojiElement : BaseElement<Emoji>
     {

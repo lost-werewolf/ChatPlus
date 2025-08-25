@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ChatPlus.EmojiHandler
+namespace ChatPlus.Core.Features.Emojis
 {
     /// <summary>
     /// An emoji that can be sent and rendered in chat.

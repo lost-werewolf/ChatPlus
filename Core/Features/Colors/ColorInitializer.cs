@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using ChatPlus.ColorHandler;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace ChatPlus.ColorHandler
+namespace ChatPlus.Core.Features.Colors
 {
     internal class ColorInitializer : ModSystem
     {

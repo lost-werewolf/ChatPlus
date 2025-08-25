@@ -14,7 +14,7 @@ using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Common.Systems;
+namespace ChatPlus.Core.Chat;
 
 internal class AddNewMessageSystem : ModSystem
 {

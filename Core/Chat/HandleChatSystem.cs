@@ -1,13 +1,14 @@
 ﻿using System;
 using ChatPlus.CommandHandler;
 using ChatPlus.Common.Configs;
+using ChatPlus.Common.Systems;
 using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace ChatPlus.Common.Systems
+namespace ChatPlus.Core.Chat
 {
     /// <summary>
     /// Multiple chat detours which implement new functionality:
@@ -242,7 +243,7 @@ namespace ChatPlus.Common.Systems
             if (Main.keyState.IsKeyDown(Keys.Left))
             {
                 _leftArrowHoldFrames++;
-                if (_leftArrowHoldFrames == 1 || (_leftArrowHoldFrames > 35 && _leftArrowHoldFrames % 2 == 0))
+                if (_leftArrowHoldFrames == 1 || _leftArrowHoldFrames > 35 && _leftArrowHoldFrames % 2 == 0)
                 {
                     var sel = GetSelection();
                     if (sel != null && !shift)
@@ -269,7 +270,7 @@ namespace ChatPlus.Common.Systems
             if (Main.keyState.IsKeyDown(Keys.Right))
             {
                 _rightArrowHoldFrames++;
-                if (_rightArrowHoldFrames == 1 || (_rightArrowHoldFrames > 35 && _rightArrowHoldFrames % 2 == 0))
+                if (_rightArrowHoldFrames == 1 || _rightArrowHoldFrames > 35 && _rightArrowHoldFrames % 2 == 0)
                 {
                     var sel = GetSelection();
                     if (sel != null && !shift)
@@ -299,7 +300,7 @@ namespace ChatPlus.Common.Systems
             if (Main.keyState.IsKeyDown(Keys.Back))
             {
                 _backspaceHoldFrames++;
-                if (_backspaceHoldFrames == 1 || (_backspaceHoldFrames > 35 && _backspaceHoldFrames % 2 == 0))
+                if (_backspaceHoldFrames == 1 || _backspaceHoldFrames > 35 && _backspaceHoldFrames % 2 == 0)
                 {
                     var sel = GetSelection();
                     if (sel != null)

@@ -3,7 +3,7 @@ using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI;
 
-namespace ChatPlus.GlyphHandler
+namespace ChatPlus.Core.Features.Glyphs
 {
     public class GlyphState : UIState
     {

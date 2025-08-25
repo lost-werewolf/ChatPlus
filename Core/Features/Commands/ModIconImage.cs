@@ -8,7 +8,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 
-namespace ChatPlus.CommandHandler
+namespace ChatPlus.Core.Features.Commands
 {
     internal class ModIconImage : UIImage
     {

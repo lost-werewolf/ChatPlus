@@ -1,6 +1,6 @@
 using Terraria.UI;
 
-namespace ChatPlus.UI
+namespace ChatPlus.Core.UI
 {
     public class BaseState<TData> : UIState
     {

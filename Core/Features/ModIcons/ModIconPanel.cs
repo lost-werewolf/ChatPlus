@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using ChatPlus.ModIconHandler;
 using ChatPlus.UI;
 
-namespace ChatPlus.ModIconHandler;
+namespace ChatPlus.Core.Features.ModIcons;
 
 public class ModIconPanel : BasePanel<ModIcon>
 {

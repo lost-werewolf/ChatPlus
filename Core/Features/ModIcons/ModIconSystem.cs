@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using ChatPlus.Helpers;
+using ChatPlus.ModIconHandler;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.ModIconHandler;
+namespace ChatPlus.Core.Features.ModIcons;
 
 [Autoload(Side = ModSide.Client)]
 public class ModIconSystem : ModSystem

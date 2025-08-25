@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using log4net;
 using Terraria.ModLoader;
 
-namespace ChatPlus.Helpers
+namespace ChatPlus.Core.Helpers
 {
     public static class Log
     {

@@ -1,4 +1,4 @@
-namespace ChatPlus.GlyphHandler
+namespace ChatPlus.Core.Features.Glyphs
 {
     /// <summary>
     /// Represents a glyph that can be used in the chat UI.

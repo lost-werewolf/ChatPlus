@@ -1,8 +1,9 @@
+using ChatPlus.ColorHandler;
 using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI;
 
-namespace ChatPlus.ColorHandler
+namespace ChatPlus.Core.Features.Colors
 {
     public class ColorState : BaseState<ColorItem>
     {

@@ -1,4 +1,5 @@
-﻿using ChatPlus.Common.Configs;
+﻿using ChatPlus.CommandHandler;
+using ChatPlus.Common.Configs;
 using ChatPlus.Common.Systems;
 using ChatPlus.Helpers;
 using ChatPlus.UI;
@@ -11,7 +12,7 @@ using Terraria.UI;
 using Terraria.UI.Chat;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace ChatPlus.CommandHandler
+namespace ChatPlus.Core.Features.Commands
 {
     /// <summary>
     /// Represents a chat command element in the UI.

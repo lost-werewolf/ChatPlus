@@ -4,7 +4,7 @@ using ChatPlus.GlyphHandler;
 using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 
-namespace ChatPlus.GlyphHandler
+namespace ChatPlus.Core.Features.Glyphs
 {
     public class GlyphPanel : BasePanel<Glyph>
     {

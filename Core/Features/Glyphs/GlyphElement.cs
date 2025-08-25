@@ -6,7 +6,7 @@ using Terraria.GameContent;
 using Terraria.UI.Chat;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace ChatPlus.GlyphHandler
+namespace ChatPlus.Core.Features.Glyphs
 {
     public class GlyphElement : BaseElement<Glyph>
     {

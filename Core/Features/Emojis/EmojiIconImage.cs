@@ -7,7 +7,7 @@ using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
-namespace ChatPlus.EmojiHandler
+namespace ChatPlus.Core.Features.Emojis
 {
     public class EmojiIconImage : UIImage
     {

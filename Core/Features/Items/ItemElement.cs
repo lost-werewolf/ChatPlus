@@ -1,10 +1,11 @@
 using ChatPlus.GlyphHandler;
+using ChatPlus.ItemHandler;
 using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.ItemHandler
+namespace ChatPlus.Core.Features.Items
 {
     // Shows an item color with its [i:ID] tag and name
     public class ItemElement : BaseElement<Item>

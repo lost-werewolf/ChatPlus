@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using ChatPlus.GlyphHandler;
 using ChatPlus.Helpers;
+using ChatPlus.ItemHandler;
 using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.ItemHandler
+namespace ChatPlus.Core.Features.Items
 {
     [Autoload(Side = ModSide.Client)]
     public class ItemSystem : ModSystem

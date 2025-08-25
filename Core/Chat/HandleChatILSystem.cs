@@ -11,7 +11,7 @@ using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 
-namespace ChatPlus.Common.Systems
+namespace ChatPlus.Core.Chat
 {
     /// <summary>
     /// This system does IL edits the chat to implement and modify some features related to the chat:
@@ -103,12 +103,12 @@ namespace ChatPlus.Common.Systems
             var itemSys = ModContent.GetInstance<ItemSystem>();
             var uploadSys = ModContent.GetInstance<UploadSystem>();
 
-            return (cmdSys?.ui?.CurrentState != null) ||
-                   (colorSys?.ui?.CurrentState != null) ||
-                   (emojiSys?.ui?.CurrentState != null) ||
-                   (glyphSys?.ui?.CurrentState != null) ||
-                   (itemSys?.ui?.CurrentState != null) ||
-                   (uploadSys?.ui?.CurrentState != null);
+            return cmdSys?.ui?.CurrentState != null ||
+                   colorSys?.ui?.CurrentState != null ||
+                   emojiSys?.ui?.CurrentState != null ||
+                   glyphSys?.ui?.CurrentState != null ||
+                   itemSys?.ui?.CurrentState != null ||
+                   uploadSys?.ui?.CurrentState != null;
         }
     }
 }

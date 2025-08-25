@@ -7,6 +7,7 @@ using ChatPlus.GlyphHandler;
 using ChatPlus.Helpers;
 using ChatPlus.ItemHandler;
 using ChatPlus.ModIconHandler;
+using ChatPlus.UI;
 using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -19,7 +20,7 @@ using Terraria.UI;
 using Terraria.Utilities.FileBrowser;
 using static nativefiledialog;
 
-namespace ChatPlus.UI
+namespace ChatPlus.Core.UI
 {
     public class DescriptionPanel<TData> : DraggablePanel
     {

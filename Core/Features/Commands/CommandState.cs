@@ -1,7 +1,8 @@
-﻿using ChatPlus.UI;
+﻿using ChatPlus.CommandHandler;
+using ChatPlus.UI;
 using Terraria.UI;
 
-namespace ChatPlus.CommandHandler
+namespace ChatPlus.Core.Features.Commands
 {
     public class CommandState : BaseState<Command>
     {

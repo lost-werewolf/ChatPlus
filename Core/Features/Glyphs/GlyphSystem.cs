@@ -6,7 +6,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.GlyphHandler
+namespace ChatPlus.Core.Features.Glyphs
 {
     [Autoload(Side = ModSide.Client)]
     public class GlyphSystem : ModSystem

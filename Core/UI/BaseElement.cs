@@ -1,10 +1,11 @@
 using ChatPlus.Helpers;
+using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI;
 
-namespace ChatPlus.UI
+namespace ChatPlus.Core.UI
 {
     /// <summary>
     /// An element that can be navigated in a <see cref="BasePanel<TData>"/>.

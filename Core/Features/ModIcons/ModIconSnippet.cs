@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.ModIconHandler;
+namespace ChatPlus.Core.Features.ModIcons;
 
 /// <summary>
 /// Renders a mod icon inline as a snippet.
