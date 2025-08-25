@@ -1,5 +1,4 @@
 using System.Reflection;
-using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;

@@ -1,15 +1,7 @@
-﻿using ChatPlus.ColorHandler;
-using ChatPlus.CommandHandler;
-using ChatPlus.Common.Systems;
-using ChatPlus.EmojiHandler;
-using ChatPlus.GlyphHandler;
-using ChatPlus.ItemHandler;
-using ChatPlus.UploadHandler;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
-using Terraria.UI;
 
 namespace ChatPlus.Common.Keybinds
 {

@@ -1,11 +1,4 @@
 ﻿using System;
-using ChatPlus.ColorHandler;
-using ChatPlus.CommandHandler;
-using ChatPlus.Common.Configs;
-using ChatPlus.EmojiHandler;
-using ChatPlus.GlyphHandler;
-using ChatPlus.ItemHandler;
-using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;

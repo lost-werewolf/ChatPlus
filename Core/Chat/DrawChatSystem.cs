@@ -1,7 +1,4 @@
-﻿using System.Buffers.Text;
-using System.Text.RegularExpressions;
-using ChatPlus.Common.Systems;
-using ChatPlus.Helpers;
+﻿using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -67,7 +64,7 @@ namespace ChatPlus.Core.Chat
         private void DrawPlayerChat(On_Main.orig_DrawPlayerChat orig, Main self)
         {
             bool hasUpload = HasUpload(Main.chatText);
-            int height = hasUpload ? Expanded-20 : BaseHeight;
+            int height = hasUpload ? Expanded - 20 : BaseHeight;
 
             if (!Main.drawingPlayerChat)
             {

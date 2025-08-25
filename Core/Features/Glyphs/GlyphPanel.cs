@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using ChatPlus.GlyphHandler;
-using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 
 namespace ChatPlus.Core.Features.Glyphs

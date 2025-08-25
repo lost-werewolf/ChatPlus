@@ -1,11 +1,8 @@
-using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.GameContent.UI.Elements;
-using Terraria.ID;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
@@ -52,8 +49,8 @@ namespace ChatPlus.Common.Configs.ConfigElements
         private void DrawTagExample(SpriteBatch sb)
         {
             CalculatedStyle dims = GetDimensions();
-            Rectangle r = new((int)dims.X+180, (int)dims.Y, 200, 30);
-            Vector2 pos = new(r.X+8, r.Y+4);
+            Rectangle r = new((int)dims.X + 180, (int)dims.Y, 200, 30);
+            Vector2 pos = new(r.X + 8, r.Y + 4);
 
             Utils.DrawInvBG(sb, r, ColorHelper.UIPanelBlue);
 

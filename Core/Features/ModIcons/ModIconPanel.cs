@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using ChatPlus.ModIconHandler;
-using ChatPlus.UI;
 
 namespace ChatPlus.Core.Features.ModIcons;
 

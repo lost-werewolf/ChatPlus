@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using ChatPlus.GlyphHandler;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 

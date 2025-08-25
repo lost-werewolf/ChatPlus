@@ -1,7 +1,4 @@
 using System.Collections.Generic;
-using ChatPlus.Helpers;
-using ChatPlus.ItemHandler;
-using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;

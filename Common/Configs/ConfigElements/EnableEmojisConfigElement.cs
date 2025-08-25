@@ -1,19 +1,11 @@
-using System.Diagnostics;
-using System.Reflection.Emit;
-using ChatPlus.EmojiHandler;
-using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.Localization;
-using Terraria.ModLoader;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using static System.Net.Mime.MediaTypeNames;
-using static Terraria.Localization.NetworkText;
 
 namespace ChatPlus.Common.Configs.ConfigElements
 {

@@ -1,7 +1,4 @@
-using ChatPlus.ItemHandler;
-using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria.UI;
 
 namespace ChatPlus.Core.Features.Items
 {

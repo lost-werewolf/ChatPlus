@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using ChatPlus.ModIconHandler;
 using Terraria.ModLoader;
-using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.ModIcons;
 

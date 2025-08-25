@@ -1,8 +1,5 @@
 ﻿using System;
-using ChatPlus.CommandHandler;
 using ChatPlus.Common.Configs;
-using ChatPlus.Common.Systems;
-using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
 using Terraria;

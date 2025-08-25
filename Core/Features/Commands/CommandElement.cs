@@ -1,16 +1,9 @@
-﻿using ChatPlus.CommandHandler;
-using ChatPlus.Common.Configs;
-using ChatPlus.Common.Systems;
-using ChatPlus.Helpers;
-using ChatPlus.UI;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ChatPlus.Core.Features.Commands
 {
@@ -61,7 +54,7 @@ namespace ChatPlus.Core.Features.Commands
 
             // Draw command name
             TextSnippet[] snip = [new TextSnippet(Command.Name)];
-            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32,4), 0f, Vector2.Zero, Vector2.One, out _);
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32, 4), 0f, Vector2.Zero, Vector2.One, out _);
         }
     }
 }

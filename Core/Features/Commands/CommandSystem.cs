@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using ChatPlus.CommandHandler;
-using ChatPlus.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;

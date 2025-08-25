@@ -1,5 +1,3 @@
-using ChatPlus.EmojiHandler;
-using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace ChatPlus.Core.Features.Emojis

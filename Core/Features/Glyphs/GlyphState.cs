@@ -1,5 +1,3 @@
-using ChatPlus.GlyphHandler;
-using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI;
 

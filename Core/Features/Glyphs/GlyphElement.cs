@@ -1,10 +1,6 @@
-using ChatPlus.GlyphHandler;
-using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ChatPlus.Core.Features.Glyphs
 {
@@ -27,7 +23,7 @@ namespace ChatPlus.Core.Features.Glyphs
 
             // Render glyph
             string tag = Glyph.Tag;
-            ChatManager.DrawColorCodedStringWithShadow(sb,FontAssets.MouseText.Value,tag,pos + new Vector2(3, 2),Color.White, 0f,Vector2.Zero,Vector2.One, -1f, 1.0f);
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, tag, pos + new Vector2(3, 2), Color.White, 0f, Vector2.Zero, Vector2.One, -1f, 1.0f);
 
             // Render raw tag in text form
             TextSnippet[] snip = [new TextSnippet(Glyph.Tag)];

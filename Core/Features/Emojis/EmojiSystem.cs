@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ChatPlus.CommandHandler;
-using ChatPlus.EmojiHandler;
-using ChatPlus.Helpers;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;

@@ -1,11 +1,4 @@
 ﻿using System;
-using ChatPlus.ColorHandler;
-using ChatPlus.CommandHandler;
-using ChatPlus.EmojiHandler;
-using ChatPlus.GlyphHandler;
-using ChatPlus.Helpers;
-using ChatPlus.ItemHandler;
-using ChatPlus.UploadHandler;
 using MonoMod.Cil;
 using Terraria;
 using Terraria.GameContent.UI.Chat;

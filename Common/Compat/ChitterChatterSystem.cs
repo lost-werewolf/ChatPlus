@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using ChatPlus.Common.Snippets;
-using ChatPlus.Helpers;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoMod.RuntimeDetour;
 using Terraria;
 using Terraria.GameContent;

@@ -1,8 +1,6 @@
 ﻿// UploadTagHandler.cs
 using System;
 using System.Collections.Generic;
-using ChatPlus.UploadHandler;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI.Chat;
 

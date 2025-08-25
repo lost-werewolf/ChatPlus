@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.ModIcons;

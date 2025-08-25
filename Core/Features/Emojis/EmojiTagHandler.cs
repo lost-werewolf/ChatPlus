@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using ChatPlus.EmojiHandler;
-using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.ModLoader;

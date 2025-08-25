@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using ChatPlus.ColorHandler;
-using Terraria;
 using Terraria.ModLoader;
 
 namespace ChatPlus.Core.Features.Colors

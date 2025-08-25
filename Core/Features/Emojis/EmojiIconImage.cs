@@ -1,5 +1,4 @@
 ﻿using System;
-using ChatPlus.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;

@@ -1,11 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
-using System.Text.Json.Serialization;
-using ChatPlus.CommandHandler;
 using ChatPlus.Common.Configs.ConfigElements;
-using ChatPlus.EmojiHandler;
-using ChatPlus.Helpers;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.UI;

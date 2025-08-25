@@ -1,8 +1,4 @@
-using ChatPlus.GlyphHandler;
-using ChatPlus.ModIconHandler;
-using ChatPlus.UI;
 using Microsoft.Xna.Framework.Graphics;
-using Stubble.Core.Classes;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 

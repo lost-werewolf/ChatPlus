@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using ChatPlus.ItemHandler;
-using ChatPlus.UI;
 using Microsoft.Xna.Framework;
 
 namespace ChatPlus.Core.Features.Items
