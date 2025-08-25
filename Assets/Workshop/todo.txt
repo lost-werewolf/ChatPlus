@@ -208,6 +208,14 @@ Workshop images. Make sure they have the same format, zoom, resolution, text siz
 [nice to have low prio] match new lines to image height
 [nice to have low prio] sync all autocomplete windows pos and save it
 ---
+Systems:
+1. CommandSystem: prefix: "/"
+2. ColorSystem: prefix "[c"
+3. EmojiSystem: prefix: "[e"
+4. GlyphSystem: prefix: "[g"
+5. ItemSystem: prefix: "[i". 
+6. ModIconSystem: prefix: "[mi" 
+6. UploadSystem: . prefix: "[u"
 
 
 
