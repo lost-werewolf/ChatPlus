@@ -1,4 +1,4 @@
-﻿Makes Terraria's chat smoother, smarter and more fun with emojis, images, links, text editing shortcuts and more!
+﻿Chat+ makes Terraria's chat smoother, smarter and more fun with emojis, images, links, text editing shortcuts and more!
 
 [h3] ✨ What’s New? [/h3] 
 1. [b]Emojis😎[/b]: Access thousands of emojis directly in chat!
@@ -8,5 +8,19 @@
 5. [b]Autocomplete Tags🏷️[/b]: Type any tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
 6. [b]Text Editing✍️[/b]: Use shortcuts like copy/paste, character selection and more.
 
+[h3] 🤝Compatible Mods [/h3] 
+[table]
+    [tr]
+        [th][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3448785552] Chitter-Chatter [/url] [/th]
+    [/tr]
+    [tr]
+        [td][img] https://i.imgur.com/qVLRRr7.jpeg [/img] [/td]
+    [/tr]
+[/table]
+
+[h3] 🤝Credits [/h3] 
+- Thanks to thraaks for making icons and sprites!
+
 [h3] ❤️ Support the Project [/h3]
-[url=https://github.com/emyhrberg/ChatPlus] GitHub [/url] | [url=https://discord.gg/JWbYUktRPV] Discord [/url] | [url=https://ko-fi.com/erkyy] Ko-Fi [/url]
+[url=https://github.com/emyhrberg/ChatPlus] GitHub [/url] | [url=https://discord.gg/JWbYUktRPV] Discord [/url] | [url=https://ko-fi.com/erkyy] Ko-Fi [/url][quote=tModLoader ChatPlus]
+Developed By Erky[/quote]

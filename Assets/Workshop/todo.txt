@@ -195,12 +195,19 @@ Workshop images. Make sure they have the same format, zoom, resolution, text siz
 2. Share images!
 3. Autocomplete!
 4. Text editor!
-[todo low prio] Fix cursor position of colors (HandleChat)
+---
 [done] Fix uploads not saving (UploadInitializer)
 [done] Fix image size (UploadTagHandler, HandleChat "\n"). Force same height every time.
+[DONE!!!] Fix image size compat for chitterchatter
+
 [todo low prio] Move image chat pos to below the playername 
+[nice to have low prio] Fix cursor position of colors (HandleChat)
+[nice to have low prio] more colors
+[nice to have low prio] "header texts" for colors, emojis, glyphs, items, modicons, uploads.
+[nice to have low prio] better esc and enter handling
+[nice to have low prio] match new lines to image height
+[nice to have low prio] sync all autocomplete windows pos and save it
 ---
 
-[todo] Fix image size compat for chitterchatter
 
 

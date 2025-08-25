@@ -20,11 +20,21 @@ namespace ChatPlus.Common.Systems
 
         public override void Load()
         {
+            if (ModLoader.TryGetMod("ChatImprover", out Mod _))
+            {
+                return;
+            }
+
             On_Main.DrawPlayerChat += DrawPlayerChat;
             On_RemadeChatMonitor.DrawChat += DrawMonitor;
         }
         public override void Unload()
         {
+            if (ModLoader.TryGetMod("ChatImprover", out Mod _))
+            {
+                return;
+            }
+
             On_Main.DrawPlayerChat -= DrawPlayerChat;
             On_RemadeChatMonitor.DrawChat -= DrawMonitor;
         }

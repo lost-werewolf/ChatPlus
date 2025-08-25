@@ -8,6 +8,7 @@ using ChatPlus.EmojiHandler;
 using ChatPlus.GlyphHandler;
 using ChatPlus.Helpers;
 using ChatPlus.ItemHandler;
+using ChatPlus.ModIconHandler;
 using ChatPlus.UploadHandler;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -346,6 +347,7 @@ namespace ChatPlus.UI
                 GlyphPanel => "[g",
                 ItemPanel => "[i",
                 UploadPanel => "[u",
+                ModIconPanel => "[mi",
                 _ => "[e"
             };
 
@@ -357,7 +359,7 @@ namespace ChatPlus.UI
                 return;
             }
 
-            int end = text.IndexOfAny(new[] { ' ', '\t', '\n', '\r', ']' }, start);
+            int end = text.IndexOfAny([' ', '\t', '\n', '\r', ']'], start);
             if (end < 0) end = text.Length;
 
             string before = text[..start];

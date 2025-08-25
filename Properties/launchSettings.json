@@ -13,7 +13,7 @@
 			"workingDirectory": "$(tMLSteamPath)"
 		},
 
-		"TerrariaFast": {
+		"Terraria Fast": {
 			"commandName": "Executable",
 			"executablePath": "$(DotNetName)",
 			"commandLineArgs": "$(tMLPath) -skipselect TestPlayer:Test1",
