@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using ChatPlus.Core.Features.Uploads;
 using Terraria.ModLoader;
+using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.ModIcons;
 
@@ -9,10 +11,9 @@ internal class ModIconInitializer : ModSystem
 
     public override void PostSetupContent()
     {
+        ChatManager.Register<ModIconTagHandler>("m");
         BuildModIconList();
     }
-
-    public override void PostAddRecipes() => BuildModIconList();
 
     public override void Unload()
     {
@@ -26,13 +27,18 @@ internal class ModIconInitializer : ModSystem
         foreach (var mod in ModLoader.Mods)
         {
             if (mod == null) continue;
+
+            string internalName = mod.Name;
+            string displayName = mod.DisplayName ?? internalName;
+
             if (ModIconTagHandler.Register(mod))
             {
-                string internalName = mod.Name;
-                string displayName = mod.DisplayName ?? internalName;
-                ModIcons.Add(new ModIcon(ModIconTagHandler.GenerateTag(internalName), internalName, displayName));
+                // Successfully registered
+                ModIcons.Add(new ModIcon(ModIconTagHandler.GenerateTag(internalName), mod));
             }
         }
-        ModIcons.Sort((a, b) => string.Compare(a.DisplayName, b.DisplayName, System.StringComparison.OrdinalIgnoreCase));
+
+        // Sort alphabetically (a-z).
+        ModIcons.Sort((a, b) => string.Compare(a.mod.DisplayName, b.mod.DisplayName, System.StringComparison.OrdinalIgnoreCase));
     }
 }

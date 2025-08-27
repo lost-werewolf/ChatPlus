@@ -15,11 +15,6 @@ public class ModIconSystem : ModSystem
 
     public override void PostSetupContent()
     {
-        if (!ModLoader.TryGetMod("ChitterChatter", out Mod _))
-        {
-            return;
-        }
-
         ui = new UserInterface();
         state = new ModIconState();
         ui.SetState(null);
@@ -27,12 +22,7 @@ public class ModIconSystem : ModSystem
 
     public override void UpdateUI(GameTime gameTime)
     {
-        if (!ModLoader.TryGetMod("ChitterChatter", out Mod _))
-        {
-            return;
-        }
-
-        StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[mi");
+        StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[m");
     }
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -44,15 +34,8 @@ public class ModIconSystem : ModSystem
             "ChatPlus: ModIconSystem",
             () =>
             {
-                if (!ModLoader.TryGetMod("ChitterChatter", out Mod _))
-                {
-                    return true;
-                }
-                else
-                {
-                    if (ui?.CurrentState != null)
-                        ui.Draw(Main.spriteBatch, new GameTime());
-                }
+                if (ui?.CurrentState != null)
+                    ui.Draw(Main.spriteBatch, new GameTime());
                 return true;
             },
             InterfaceScaleType.UI

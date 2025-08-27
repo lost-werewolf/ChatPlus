@@ -155,6 +155,7 @@ namespace ChatPlus.Core.UI
                 this is EmojiPanel ? "[e" :
                 this is GlyphPanel ? "[g" :
                 this is ItemPanel ? "[i" :
+                this is ModIconPanel ? "[m" :
                 this is UploadPanel ? "[u" : string.Empty;
 
             if (prefix.Length == 0)
@@ -352,8 +353,8 @@ namespace ChatPlus.Core.UI
                 EmojiPanel => "[e",
                 GlyphPanel => "[g",
                 ItemPanel => "[i",
+                ModIconPanel => "[m",
                 UploadPanel => "[u",
-                ModIconPanel => "[mi",
                 _ => "[e"
             };
 

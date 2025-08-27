@@ -220,4 +220,9 @@ Systems:
 Fix unintended description panel overlapping for long text descriptions in CommandPanel
 Fix so multiple systems cannot be open simultaneously, because rn it is causing confusion and unintended bugs
 Fix so pressing enter on a command enters it into chat
+---
+2025-08-27:
+Add mod icons
+Add player icons
+Add scrollbar
 

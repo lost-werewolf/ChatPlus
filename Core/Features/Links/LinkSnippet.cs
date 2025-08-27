@@ -11,8 +11,7 @@ namespace ChatPlus.Core.Features.Links
 {
     /// <summary>
     /// A custom snippet that changes drawing behavior for chat messages. 
-    /// Features:
-    /// 1. Detects and styles links in chat messages and opens them in a web browser when clicked.
+    /// Detects and styles links in chat messages and opens them in a web browser when clicked.
     /// <see cref="NewMessageHook"/>
     /// </summary>
     public class LinkSnippet : TextSnippet

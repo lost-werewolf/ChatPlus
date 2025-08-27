@@ -25,49 +25,50 @@ namespace ChatPlus.Core.Features.Commands
 
             DrawSmallModIcon(sb, mod, target, size: 26);
 
+            if (IsMouseHovering && mod == null)
+            {
+                UICommon.TooltipMouseText("Terraria");
+            }
+
             if (IsMouseHovering && mod != null && !string.IsNullOrEmpty(mod.Name))
             {
-                UICommon.TooltipMouseText(mod.Name);
-                //Main.hoverItemName = mod.Name;
-                //DrawTextAtMouse(sb, mod.Name);
+                UICommon.TooltipMouseText(mod.DisplayName);
             }
         }
 
-        private static void DrawSmallModIcon(SpriteBatch sb, Mod mod, Vector2 pos, int size = 16)
+        private static void DrawSmallModIcon(SpriteBatch sb, Mod mod, Vector2 pos, int size)
         {
             Texture2D tex = null;
-
-            // Default fallback for unknown mods
-            if (mod == null)
-            {
+            if (mod == null) 
                 tex = Ass.TerrariaIcon.Value;
-            }
-            else if (mod.Name == "ModLoader")
-            {
+            else if (mod.Name == "ModLoader") 
                 tex = Ass.tModLoaderIcon.Value;
-            }
             else
             {
-                string path = $"{mod.Name}/icon_small";
-                if (ModContent.HasAsset(path))
-                    tex = ModContent.Request<Texture2D>(path).Value;
+                string smallPath = $"{mod.Name}/icon_small";
+                string normalPath = $"{mod.Name}/icon";
+
+                if (ModContent.HasAsset(smallPath))
+                    tex = ModContent.Request<Texture2D>(smallPath, AssetRequestMode.ImmediateLoad).Value;
+                else if (ModContent.HasAsset(normalPath))
+                    tex = ModContent.Request<Texture2D>(normalPath, AssetRequestMode.ImmediateLoad).Value;
             }
 
-            Rectangle target = new((int)pos.X - 3, (int)pos.Y - 2, size, size);
-
-            if (tex != null)
-            {
-                DrawTextureScaledToFit(sb, tex, target);
+            var target = new Rectangle((int)pos.X - 3, (int)pos.Y - 2, size, size);
+            if (tex != null) {
+                DrawTextureScaledToFit(sb, tex, target); 
+                return; 
             }
-            else if (mod != null)
+
+            if (mod != null)
             {
-                // fallback to initials
-                string initials = mod.DisplayName.Length >= 2 ? mod.DisplayName[..2] : mod.DisplayName;
-                Vector2 initialsPos = target.Center.ToVector2();
-                initialsPos += new Vector2(0, 5);
-                Utils.DrawBorderString(sb, initials, initialsPos, Color.White, scale: 1.0f, 0.5f, 0.5f);
+                string initials = string.IsNullOrEmpty(mod.DisplayName) ? mod.Name : mod.DisplayName;
+                initials = initials.Length >= 2 ? initials[..2] : initials;
+                Vector2 p = target.Center.ToVector2() + new Vector2(0, 5);
+                Utils.DrawBorderString(sb, initials, p, Color.White, 1f, 0.5f, 0.5f);
             }
         }
+
         private static void DrawTextureScaledToFit(SpriteBatch sb, Texture2D tex, Rectangle target)
         {
             if (tex == null)
@@ -78,17 +79,7 @@ namespace ChatPlus.Core.Features.Commands
                 target.Height / (float)tex.Height
             );
 
-            sb.Draw(
-                tex,
-                target.Center.ToVector2(),
-                null,
-                Color.White,
-                0f,
-                tex.Size() / 2f,
-                scale,
-                SpriteEffects.None,
-                0f
-            );
+            sb.Draw(tex,target.Center.ToVector2(),null,Color.White,0f,tex.Size() / 2f, scale,SpriteEffects.None, 0f);
         }
     }
 }

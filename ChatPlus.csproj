@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
@@ -15,7 +15,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Core\Features\Uploads\NewFolder\" />
+	  <Folder Include="Core\Features\PlayerColors\" />
+	  <Folder Include="Core\Features\PlayerIcons\" />
+	  <Folder Include="Core\Features\Timestamps\" />
 	</ItemGroup>
 
 	<!-- References -->

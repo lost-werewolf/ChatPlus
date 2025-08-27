@@ -1,3 +1,5 @@
+using Terraria.ModLoader;
+
 namespace ChatPlus.Core.Features.ModIcons;
 
 /// <summary>
@@ -6,4 +8,4 @@ namespace ChatPlus.Core.Features.ModIcons;
 /// <param name="Tag">e.g. "[mi:ModInternalName]"</param>
 /// <param name="InternalName">The mod's internal name (assembly / folder name)</param>
 /// <param name="DisplayName">The user facing display name</param>
-public readonly record struct ModIcon(string Tag, string InternalName, string DisplayName);
+public readonly record struct ModIcon(string Tag, Mod mod);

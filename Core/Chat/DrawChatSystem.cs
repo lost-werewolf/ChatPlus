@@ -27,7 +27,7 @@ namespace ChatPlus.Core.Chat
                 return;
             }
 
-            On_Main.DrawPlayerChat += DrawPlayerChat;
+            On_Main.DrawPlayerChat += DrawChat;
             On_RemadeChatMonitor.DrawChat += DrawMonitor;
         }
         public override void Unload()
@@ -37,7 +37,7 @@ namespace ChatPlus.Core.Chat
                 return;
             }
 
-            On_Main.DrawPlayerChat -= DrawPlayerChat;
+            On_Main.DrawPlayerChat -= DrawChat;
             On_RemadeChatMonitor.DrawChat -= DrawMonitor;
         }
 
@@ -65,11 +65,8 @@ namespace ChatPlus.Core.Chat
                      DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
         }
 
-        private void DrawPlayerChat(On_Main.orig_DrawPlayerChat orig, Main self)
+        private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
         {
-            bool hasUpload = HasUpload(Main.chatText);
-            int height = hasUpload ? Expanded - 20 : BaseHeight;
-
             if (!Main.drawingPlayerChat)
             {
                 orig(self);
@@ -85,6 +82,9 @@ namespace ChatPlus.Core.Chat
                 Main.instance.textBlinkerState = 1 - Main.instance.textBlinkerState;
                 Main.instance.textBlinkerCount = 0;
             }
+
+            bool hasUpload = HasUpload(Main.chatText);
+            int height = hasUpload ? Expanded - 20 : BaseHeight;
 
             DrawChatbox(height);
 

@@ -1,69 +1,74 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Policy;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.ModIcons;
 
 /// <summary>
-/// Tag handler for mod icons: [mi:InternalName]
+/// Tag handler for mod icons: [m:InternalName]
 /// </summary>
 public sealed class ModIconTagHandler : ITagHandler
 {
+    /// <summary>
+    /// The registry stores tags (e.g [m:ModReloader] and their associated textures.
+    /// </summary>
     private static readonly Dictionary<string, Texture2D> Registry = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly Dictionary<string, string> DisplayNames = new(StringComparer.OrdinalIgnoreCase);
-
-    public static void Clear()
-    {
-        Registry.Clear();
-        DisplayNames.Clear();
-    }
-
-    public static string GenerateTag(string internalName) => $"[mi:{internalName}]";
+    public static void Clear() => Registry.Clear();
+    public static string GenerateTag(string internalName) => $"[m:{internalName}]";
 
     public static bool Register(Mod mod)
     {
-        if (mod == null) return false;
-        string internalName = mod.Name ?? string.Empty;
-        if (string.IsNullOrEmpty(internalName)) return false;
+        string internalName = mod.Name;
 
         Texture2D tex = null;
-        string smallPath = $"{internalName}/icon_small"; // tML conventional small icon
+        string smallPath = $"{internalName}/icon_small";
+        string normalPath = $"{internalName}/icon";
+        bool smallExists = false;
+
         if (ModContent.HasAsset(smallPath))
         {
+            smallExists = true;
             tex = ModContent.Request<Texture2D>(smallPath).Value;
+        }
+        else if (ModContent.HasAsset(normalPath))
+        {
+            tex = ModContent.Request<Texture2D>(normalPath).Value;
+        }
+        else if (internalName == "ModLoader")
+        {
+            tex = Ass.tModLoaderIcon.Value;
         }
         else
         {
-            string normalPath = $"{internalName}/icon";
-            if (ModContent.HasAsset(normalPath))
-                tex = ModContent.Request<Texture2D>(normalPath).Value;
+            tex = null; // no icon found, means we draw fallback initials later
         }
 
-        if (tex == null) return false; // skip mods without icon assets
-
         Registry[internalName] = tex;
-        DisplayNames[internalName] = mod.DisplayName ?? internalName;
+        Log.Info($"Successfully registered mod icon for '{internalName}' (has texture: {tex != null}) (smallExists: {smallExists})");
         return true;
     }
-
-    public static bool TryGet(string internalName, out Texture2D tex) => Registry.TryGetValue(internalName, out tex);
-    public static bool TryGetDisplay(string internalName, out string display) => DisplayNames.TryGetValue(internalName, out display);
 
     TextSnippet ITagHandler.Parse(string text, Color baseColor, string options)
     {
         string key = text?.Trim() ?? string.Empty;
-        if (!Registry.TryGetValue(key, out var tex))
+
+        if (Registry.TryGetValue(key, out var tex))
         {
-            // fallback: show raw
-            return new TextSnippet($"[mi:{key}]");
+            if (ModLoader.TryGetMod(key, out Mod mod))
+            {
+                return new ModIconSnippet(tex, mod)
+                {
+                    Text = GenerateTag(key)
+                };
+            }
         }
 
-        string disp = DisplayNames.GetValueOrDefault(key, key);
-        return new ModIconSnippet(tex, key, disp)
-        {
-            Text = GenerateTag(key)
-        };
+        // Fallback: leave the raw tag visible if the key wasn't registered
+        return new TextSnippet($"[m:{key}]");
     }
 }

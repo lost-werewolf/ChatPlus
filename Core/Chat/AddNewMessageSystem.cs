@@ -49,7 +49,7 @@ internal class AddNewMessageSystem : ModSystem
             if (snip == null || string.IsNullOrWhiteSpace(snip.Text))
                 continue;
 
-            Log.Info("Chat Message: " + snip.Text.Trim(), printCallerInMessage: false);
+            //Log.Info("Chat Message: " + snip.Text.Trim(), printCallerInMessage: false);
 
             if (LinkSnippet.IsWholeLink(snip.Text.Trim()) && snip is not LinkSnippet)
             {

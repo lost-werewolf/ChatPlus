@@ -17,19 +17,20 @@ public static class StateManager
 {
     public static void OpenStateIfPrefixMatches(GameTime gameTime, UserInterface ui, UIState state, string prefix)
     {
+        //Main.NewText(ui.CurrentState);
+
         if (!Main.drawingPlayerChat)
         {
-            if (ui?.CurrentState != null)
+            if (ui.CurrentState != null)
                 ui.SetState(null);
             return;
         }
-
         string text = Main.chatText ?? string.Empty;
 
         int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
         if (start == -1)
         {
-            if (ui?.CurrentState == state)
+            if (ui.CurrentState == state)
                 ui.SetState(null);
             return;
         }
@@ -41,6 +42,7 @@ public static class StateManager
         {
             if (ui.CurrentState != state)
             {
+
                 CloseOthers(ui);     // <- ensure exclusivity
                 ui.SetState(state);
             }
@@ -48,7 +50,7 @@ public static class StateManager
         }
         else
         {
-            if (ui?.CurrentState == state)
+            if (ui.CurrentState == state)
                 ui.SetState(null);
         }
     }
