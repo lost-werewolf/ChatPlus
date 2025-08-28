@@ -19,11 +19,23 @@ public class ModIconElement : BaseElement<ModIcon>
     {
         base.Draw(sb);
         var dims = GetDimensions();
-        Vector2 pos = dims.Position() + new Microsoft.Xna.Framework.Vector2(3,0);
+        Vector2 pos = dims.Position() + new Vector2(3,0);
 
         // mod icon tag
         string tag = Data.Tag;
-        ChatManager.DrawColorCodedStringWithShadow(sb,FontAssets.MouseText.Value,tag,pos,Color.White,0f,Vector2.Zero,Vector2.One,-1f,1f);
+        float scale = 1.5f; // 150% bigger
+        ChatManager.DrawColorCodedStringWithShadow(
+            sb,
+            FontAssets.MouseText.Value,
+            tag,
+            pos,
+            Color.White,
+            0f,            // rotation
+            Vector2.Zero,  // origin
+            new Vector2(scale), // scale
+            -1f,
+            1f
+        );
 
         // mod icon display name
         TextSnippet[] snip = [new TextSnippet(Data.mod.DisplayName)];

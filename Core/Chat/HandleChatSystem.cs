@@ -64,7 +64,7 @@ namespace ChatPlus.Core.Chat
         {
             orig();
 
-            if (!Conf.C.featuresConfig.EnableTextEditingShortcuts)
+            if (!Conf.C.BetterTextEditor)
                 return;
 
             bool active = StateManager.IsAnyStateActive();
@@ -89,7 +89,7 @@ namespace ChatPlus.Core.Chat
                 return orig(oldString, allowMultiLine);
             }
 
-            if (!Conf.C.featuresConfig.EnableTextEditingShortcuts)
+            if (!Conf.C.BetterTextEditor)
                 return orig(oldString, allowMultiLine);
 
             Main.inputTextEnter = false;

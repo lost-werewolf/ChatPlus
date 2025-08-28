@@ -1,126 +1,66 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using ChatPlus.Core.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Core.Features.Links
+namespace ChatPlus.Core.Features.Links;
+
+public class LinkSnippet : TextSnippet
 {
-    /// <summary>
-    /// A custom snippet that changes drawing behavior for chat messages. 
-    /// Detects and styles links in chat messages and opens them in a web browser when clicked.
-    /// <see cref="NewMessageHook"/>
-    /// </summary>
-    public class LinkSnippet : TextSnippet
+    private Rectangle hoverRect;
+
+    public LinkSnippet(TextSnippet src)
+        : base(src.Text, src.Color, src.Scale) { }
+
+    public static bool IsLink(string t) =>
+        !string.IsNullOrWhiteSpace(t) &&
+        Regex.IsMatch(t, @"^(https?://|www\.)\S+\.\S+$", RegexOptions.IgnoreCase);
+
+    public override Color GetVisibleColor()
     {
-        private TextSnippet snippet;
-        private string text;
+        var baseC = new Color(32, 160, 255); // link blue
+        if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
+            return new Color(72, 190, 255);  // hover blue
+        return baseC;
+    }
 
-        // Hover rectangle for the link
-        private Rectangle lastDrawRect = Rectangle.Empty;
-        private int lastUnderlineDrawFrame = -1;
+    public override bool UniqueDraw(bool justCheckingString, out Vector2 size,
+        SpriteBatch sb, Vector2 pos = default, Color color = default, float scale = 1f)
+    {
+        // Let vanilla draw the text; we only add the underline & hover rect.
+        size = default;
 
-        public LinkSnippet(TextSnippet snippet) : base(snippet.Text, snippet.Color, snippet.Scale)
+        if (justCheckingString) return false;
+
+        string t = Text ?? "";
+        Vector2 m = FontAssets.MouseText.Value.MeasureString(t) * scale;
+        hoverRect = new Rectangle((int)pos.X, (int)pos.Y, (int)m.X, (int)m.Y);
+
+        // underline
+        int y = (int)(pos.Y + m.Y - 9);
+        sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)pos.X, y, (int)m.X, 1), GetVisibleColor());
+
+        return false; // return false so vanilla draws the glyphs normally
+    }
+
+    public override void OnClick()
+    {
+        string url = Text;
+        if (string.IsNullOrWhiteSpace(url)) return;
+        if (!url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            url = "https://" + url;
+
+        try
         {
-            this.snippet = snippet;
-            CheckForHover = snippet.CheckForHover;
-            DeleteWhole = snippet.DeleteWhole;
-            text = snippet.Text.Trim();
+            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
         }
-
-        public override Color GetVisibleColor()
+        catch (Exception e)
         {
-            // Always use a link color for link snippets.
-            if (IsWholeLink(text))
-            {
-                // Optionally, you can choose a different color if the mouse is hovering.
-                // Here we check if Main.MouseScreen is within lastDrawRect.
-                bool isHovered = lastDrawRect.Contains(Main.MouseScreen.ToPoint());
-                if (isHovered)
-                {
-                    return ColorHelper.BlueHover;
-                }
-                else
-                {
-                    return ColorHelper.Blue;
-                }
-            }
-            return snippet.GetVisibleColor();
+            Main.NewText($"Failed to open URL: {url}, {e.Message}", Color.Red);
         }
-
-        public override void Update()
-        {
-            snippet.Update();
-        }
-
-        public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch spriteBatch, Vector2 position = default, Color color = default, float scale = 1)
-        {
-            // Calculate the text size for this snippet
-            Vector2 textSize = FontAssets.MouseText.Value.MeasureString(text) * scale;
-            lastDrawRect = new Rectangle((int)position.X, (int)position.Y, (int)textSize.X, (int)textSize.Y);
-
-            // Offset the text so it doesn't overlap the head
-            Vector2 textPosition = position + new Vector2(12f, 0f);
-
-            // Draw link underline
-            if (!justCheckingString && IsWholeLink(text))
-            {
-                if (Main.GameUpdateCount != lastUnderlineDrawFrame)
-                {
-                    lastUnderlineDrawFrame = (int)Main.GameUpdateCount;
-                    Rectangle underlineRect = new((int)textPosition.X, (int)(textPosition.Y + textSize.Y - 9), (int)textSize.X, 1);
-                    Color underlineColor = GetVisibleColor();
-                    spriteBatch.Draw(TextureAssets.MagicPixel.Value, underlineRect, underlineColor);
-                }
-            }
-
-            // Draw the wrapped snippet'text text at the offset position
-            return snippet.UniqueDraw(justCheckingString, out size, spriteBatch, textPosition, color, scale);
-        }
-
-        public override void OnClick()
-        {
-            snippet?.OnClick();
-            if (IsWholeLink(text))
-                OpenURL(text);
-        }
-
-        #region helpers
-
-
-        /// <summary>
-        /// Returns true if the string is a valid link.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public static bool IsWholeLink(string text)
-        {
-            return Regex.IsMatch(text, @"^(https?://|www\.)\S+\.\S+$", RegexOptions.IgnoreCase);
-        }
-
-        public static void OpenURL(string url)
-        {
-            if (string.IsNullOrEmpty(url))
-                return;
-
-            try
-            {
-                // Start a process to open the URL in a web browser
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = url,
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception e)
-            {
-                Main.NewText($"Failed to open URL: {url}" + e.Message, Color.Red);
-                Log.Error($"Failed to open URL: {url}" + e);
-            }
-        }
-        #endregion
     }
 }

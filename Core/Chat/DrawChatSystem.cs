@@ -102,8 +102,6 @@ namespace ChatPlus.Core.Chat
             Main.chatMonitor.DrawChat(true);
         }
 
-        // --- helpers ---
-
         private static bool HasUpload(string s) =>
             !string.IsNullOrEmpty(s) && Regex.IsMatch(s, @"\[u:[^\]]+\]", RegexOptions.IgnoreCase);
 

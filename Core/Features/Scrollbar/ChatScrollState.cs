@@ -28,7 +28,7 @@ public class ChatScrollState : UIState
         base.Draw(sb);
 
         //DrawHelper.DrawSlices(sb, ele: chatScrollList);
-        DrawChatMonitorBackground(sb, 2);
+        //DrawChatMonitorBackground(sb, 2);
     }
 
     private static void DrawChatMonitorBackground(SpriteBatch sb, int padding = 0)
@@ -46,12 +46,12 @@ public class ChatScrollState : UIState
         Color fill = Color.White * 0.04f;
 
         // draw center fill
-        //sb.Draw(px, r, fill);
+        sb.Draw(px, r, fill);
 
         // draw edges
-        //sb.Draw(px, new Rectangle(r.X, r.Y, r.Width, Thickness), edge);
-        //sb.Draw(px, new Rectangle(r.X, r.Bottom - Thickness, r.Width, Thickness), edge);
-        //sb.Draw(px, new Rectangle(r.X, r.Y, Thickness, r.Height), edge);
-        //sb.Draw(px, new Rectangle(r.Right - Thickness, r.Y, Thickness, r.Height), edge);
+        sb.Draw(px, new Rectangle(r.X, r.Y, r.Width, Thickness), edge);
+        sb.Draw(px, new Rectangle(r.X, r.Bottom - Thickness, r.Width, Thickness), edge);
+        sb.Draw(px, new Rectangle(r.X, r.Y, Thickness, r.Height), edge);
+        sb.Draw(px, new Rectangle(r.Right - Thickness, r.Y, Thickness, r.Height), edge);
     }
 }

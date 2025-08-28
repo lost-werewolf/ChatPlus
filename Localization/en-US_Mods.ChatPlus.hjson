@@ -12,100 +12,52 @@ Keybinds: {
 Configs: {
 	Config: {
 		DisplayName: Config
-		Headers.Config: Config Header
+		Headers.Config: Config
 
-		featuresConfig: {
-			Label: Features
-			Tooltip: ""
-		}
-
-		autocompleteWindowConfig: {
-			Label: Autocomplete Window
-			Tooltip: ""
-		}
-	}
-
-	Features: {
-		Tooltip: ""
-
-		AutocompleteTags: {
-			Label: Autocomplete Tags
+		Autocomplete: {
+			Label: Autocomplete
 			Tooltip:
 				'''
-				Allows for autocompletion of the following tags:
+				Allows for autocompletion of the following:
+				/ for commands
 				[c for colors
-				[e for emojis (new!)
+				[e for emojis
 				[g for glyphs
 				[i for items
-				[mi for mod icons
-				[u for uploads (new!)
+				[m for mod icons
+				[p for player icons
+				[u for uploads
 				'''
 		}
 
-		AutocompleteCommands: {
-			Label: Autocomplete Commands
-			Tooltip:
-				'''
-				Allows for autocompletion of chat commands. 
-				Type / into chat to see all commands.
-				'''
-		}
-
-		EnableEmojis: {
-			Label: Enable Emojis
-			Tooltip:
-				'''
-				Allows for inserting emojis.
-				            Type [e into chat to see all commands.
-				'''
-		}
-
-		EnableUploadImages: {
-			Label: Enable Upload Images
-			Tooltip:
-				'''
-				Allows for uploading images.
-				            Type [u into chat to see all upload options.
-				'''
-		}
-
-		EnableLinks: {
-			Label: Enable Links
+		ShowLinks: {
+			Label: Show Links
 			Tooltip: Links you type in chat become clickable.
 		}
 
-		EnableTextEditingShortcuts: {
-			Label: Enable Text Editing Shortcuts
+		BetterTextEditor: {
+			Label: Better Text Editor
 			Tooltip:
 				'''
-				Modifies the chat box in various ways, including these shortcuts:
-				← / → : Move cursor left/right
-				Shift+← / → : Select characters
-				Ctrl+Shift+← / → : Select words
-				Ctrl+X : Cut
-				Ctrl+C : Copy
-				Ctrl+V : Paste
+				Improves the chat box with the following shortcuts:
+				Ctrl+C: Copy
+				Ctrl+V: Paste
+				Ctrl+X: Cut
+				Ctrl+A: Select all
+				Arrows: Move cursor
+				Shift+Arrows: Select characters
+				Ctrl+Shift+Arrows: Select words
 				'''
 		}
 
-		EnableChatScrollbar: {
-			Label: Enable Chat Scrollbar
+		Scrollbar: {
+			Label: Scrollbar
+			Tooltip: Shows a scrollbar when more than 10 messages have been sent.
+		}
+
+		ShowCount: {
+			Label: Show Count
 			Tooltip: ""
-		}
-	}
-
-	AutocompleteWindowConfig: {
-		Tooltip: ""
-
-		ItemsPerWindow: {
-			Label: Items Per Window
-			Tooltip:
-				'''
-				Adjust the number of items visible at the same time
-				Minimum: 3
-				Recommended: 10
-				Maximum: 20
-				'''
 		}
 	}
 }

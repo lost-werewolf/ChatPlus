@@ -213,12 +213,10 @@ namespace ChatPlus.Core.UI
             base.Update(gt);
 
             // Sizing and position
-            if (Conf.C != null)
-            {
-                Top.Set(-38, 0);
-                Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
-                list.Height.Set(Conf.C.autocompleteWindowConfig.ItemsPerWindow * 30, 0);
-            }
+            int itemCount = 10;
+            Top.Set(-38, 0);
+            Height.Set(itemCount * 30, 0);
+            list.Height.Set(itemCount * 30, 0);
 
             HandleKeyPressed();
             HandleNavigationKeys(gt);

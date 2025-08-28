@@ -12,30 +12,25 @@ using Terraria.UI.Chat;
 namespace ChatPlus.Common.Configs.ConfigElements
 {
     /// <summary>
-    /// Reference:
-    /// <see cref="BooleanElement"/> 
+    /// Reference <see cref="BooleanElement"/> 
     /// </summary>
     public class EnableLinksConfigElement : ConfigElement<bool>
     {
-        private Asset<Texture2D> _toggleTexture = Asset<Texture2D>.Empty;
+        private Asset<Texture2D> _toggleTexture;
 
-        // Called once when the config UI binds this element to your Width property
+        // Called once when the config UI binds this element
         public override void OnBind()
         {
             base.OnBind();
 
             _toggleTexture = Main.Assets.Request<Texture2D>("Images/UI/Settings_Toggle");
 
-            // OpenSystem the value when clicked
             OnLeftClick += delegate
             {
                 Value = !Value;
 
-                Conf.C.featuresConfig.EnableLinks = Value;
+                Conf.C.ShowLinks = Value;
             };
-
-            //TooltipFunction = () => Language.GetTextValue(
-            //"Mods.ChatPlus.Configs.Config.Features.EnableEmojis.Tooltip");
         }
 
         public override void OnInitialize()
@@ -58,15 +53,16 @@ namespace ChatPlus.Common.Configs.ConfigElements
         {
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = dims.Position();
-            Rectangle r = new((int)dims.X + 180, (int)dims.Y, 200, 30);
-            string exampleLink = "https://forums.terraria.org/";
+            int xOffset = 225;
+            Rectangle rect = new((int)dims.X + xOffset, (int)dims.Y, 225, 30);
+
+            string exampleLink = "https://tmodloader.net/";
 
             // Draw chat box
-            Utils.DrawInvBG(sb, r, ColorHelper.UIPanelBlue);
+            DrawHelper.DrawInvBG(sb,rect, new Color(28, 57, 120)*0.9f);
 
             // 1. Draw underline
             Vector2 textSize = FontAssets.MouseText.Value.MeasureString(exampleLink);
-            int xOffset = 180;
             float x = pos.X + 8 + xOffset;
             float y = pos.Y + textSize.Y - 8;
             float scale = 0.72f;
@@ -87,23 +83,23 @@ namespace ChatPlus.Common.Configs.ConfigElements
                 baseScale: new Vector2(0.8f)
             );
 
-            // 3. If clicked, open the link
-            if (Main.MouseScreen.Between(textPos, textPos + new Vector2(w, textSize.Y)))
+            //// 3. If clicked, open the link
+            //if (Main.MouseScreen.Between(textPos, textPos + new Vector2(w, textSize.Y)))
+            //{
+            //    linkColor = ColorHelper.BlueHover;
+            //    if (Main.mouseLeft && Main.mouseLeftRelease)
+            //    {
+            //        // Open the link in the default browser
+            //        Process.Start(new ProcessStartInfo
+            //        {
+            //            FileName = exampleLink,
+            //            UseShellExecute = true
+            //        });
+            //    }
+            //}
+            //else
             {
-                linkColor = ColorHelper.BlueHover;
-                if (Main.mouseLeft && Main.mouseLeftRelease)
-                {
-                    // Open the link in the default browser
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = exampleLink,
-                        UseShellExecute = true
-                    });
-                }
-            }
-            else
-            {
-                linkColor = ColorHelper.Blue;
+                linkColor = ColorHelper.Blue*0.8f;
             }
         }
 

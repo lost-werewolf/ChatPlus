@@ -15,8 +15,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Core\Features\PlayerColors\" />
-	  <Folder Include="Core\Features\PlayerIcons\" />
 	  <Folder Include="Core\Features\Timestamps\" />
 	</ItemGroup>
 

@@ -26,7 +26,7 @@ public class ChatScrollSystem : ModSystem
     /// </summary>
     public override void UpdateUI(GameTime gameTime)
     {
-        if (!Conf.C.featuresConfig.EnableChatScrollbar && chatScrollUI.CurrentState != null)
+        if (!Conf.C.Scrollbar && chatScrollUI.CurrentState != null)
             chatScrollUI.SetState(null);
 
         if (Main.drawingPlayerChat)
@@ -56,7 +56,8 @@ public class ChatScrollSystem : ModSystem
             layers.Insert(index, new LegacyGameInterfaceLayer(
                 "ChatPlus: Chat Scrollbar",
                 () => {
-                    if (Main.drawingPlayerChat && chatScrollUI?.CurrentState != null && Conf.C.featuresConfig.EnableChatScrollbar)
+                    bool moreThan10 = ChatScrollList.GetTotalLines() > 10;
+                    if (Main.drawingPlayerChat && chatScrollUI?.CurrentState != null && Conf.C.Scrollbar && moreThan10)
                     {
                         chatScrollUI.Draw(Main.spriteBatch, Main.gameTimeCache);
                     }

@@ -56,19 +56,6 @@ public sealed class ModIconTagHandler : ITagHandler
     TextSnippet ITagHandler.Parse(string text, Color baseColor, string options)
     {
         string key = text?.Trim() ?? string.Empty;
-
-        if (Registry.TryGetValue(key, out var tex))
-        {
-            if (ModLoader.TryGetMod(key, out Mod mod))
-            {
-                return new ModIconSnippet(tex, mod)
-                {
-                    Text = GenerateTag(key)
-                };
-            }
-        }
-
-        // Fallback: leave the raw tag visible if the key wasn't registered
-        return new TextSnippet($"[m:{key}]");
+        return new ModIconSnippet(key);
     }
 }

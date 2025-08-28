@@ -184,12 +184,14 @@ namespace ChatPlus.Common.Compat
                 var t = snip.Text?.Trim();
                 if (string.IsNullOrEmpty(t)) continue;
 
-                if (LinkSnippet.IsWholeLink(t) && snip is not LinkSnippet)
+                if (IsWholeLink(t) && snip is not LinkSnippet)
                 {
                     line[i] = new LinkSnippet(snip);
                 }
             }
         }
+
+        private static bool IsWholeLink(string text) { return Regex.IsMatch(text, @"^(https?://|www\.)\S+\.\S+$", RegexOptions.IgnoreCase); }
 
         private static bool HasUpload(string s) => Regex.IsMatch(s, @"\[u:[^\]]+\]", RegexOptions.IgnoreCase);
 

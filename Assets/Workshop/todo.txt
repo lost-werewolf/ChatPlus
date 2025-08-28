@@ -230,3 +230,5 @@ Scrollbar functionality:
 - Works to drag the handle
 - Works to scroll with up down arrow keys
 - Works to scroll with mouse wheel
+---
+~ Show GIFs in tooltips of config

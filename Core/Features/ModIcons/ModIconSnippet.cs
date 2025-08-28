@@ -1,106 +1,107 @@
 using System;
-using ChatPlus.Core.Helpers;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ReLogic.Graphics;
 using Terraria;
-using Terraria.GameContent;
+using Terraria.GameContent.Bestiary;
 using Terraria.ModLoader;
-using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.ModIcons;
 
-/// <summary>
-/// Renders a mod icon inline as a snippet.
-/// </summary>
-public class ModIconSnippet : TextSnippet
+public sealed class ModIconSnippet : TextSnippet
 {
-    public readonly Texture2D tex;
-    public readonly Mod mod;
+    private const float BaseIconSize = 26f;      // logical size; chat multiplies by 'scale'
+    private readonly string modName;
 
-    public ModIconSnippet(Texture2D tex, Mod mod)
+    public ModIconSnippet(string modName)
     {
-        this.tex = tex;
-        this.mod = mod;
-
-        var pixel = TextureAssets.MagicPixel.Value;
-        //sb.Draw(pixel, position, Color.Gray);
+        this.modName = modName ?? string.Empty;
+        Text = string.Empty;    // no fallback text – we fully handle drawing
+        Color = Color.White;
     }
 
-    public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch sb, Vector2 position = default, Color color = default, float scale = 1f)
+    public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch sb,
+                                    Vector2 pos = default, Color color = default, float scale = 1f)
     {
-        float h = 20 * scale;
+        float px = BaseIconSize * Math.Max(0f, scale);
+        size = new Vector2(px, px);
 
-        if (tex == null)
+        if (justCheckingString || color == Color.Black)
+            return true;
+
+        var dest = new Rectangle((int)pos.X, (int)(pos.Y - 2), (int)px, (int)px);
+
+        // Special-case: vanilla "Terraria" tag (matches tMod example)
+        if (modName.Equals("Terraria", StringComparison.OrdinalIgnoreCase))
         {
-            size = new Vector2(0f, h);
+            var sheet = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Tags_Shadow", AssetRequestMode.ImmediateLoad);
+            var frame = BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface._filterIconFrame;
+            sb.Draw(sheet.Value, dest, sheet.Frame(16, 5, frame.X, frame.Y), Color.White);
             return true;
         }
-        color = Color.White;
 
-        float maxDim = tex.Width > tex.Height ? tex.Width : tex.Height;
-        float s = h / maxDim;
-        float w = tex.Width * s;
-
-        size = new Vector2(w, h);
-        position.Y += 5f; // small vertical nudge to match input baseline look
-        if (!justCheckingString && color != Color.Black)
+        // Try to resolve icon_small -> icon
+        if (TryGetModIcon(modName, out var icon))
         {
-            DrawSmallModIcon(sb, mod, position, 26);
+            sb.Draw(icon, dest, Color.White);
+            return true;
+        }
+
+        // Fallback: draw two-letter initials centered
+        string initials = GetDisplayName(modName);
+        if (!string.IsNullOrWhiteSpace(initials))
+        {
+            initials = initials.Length >= 2 ? initials[..2] : initials;
+            Vector2 center = dest.Center.ToVector2();
+            Terraria.Utils.DrawBorderString(sb, initials, center + new Vector2(0, 4f), Color.White, 0.8f * scale, 0.5f, 0.5f);
         }
         return true;
     }
-    private static void DrawSmallModIcon(SpriteBatch sb, Mod mod, Vector2 pos, int size)
-    {
-        Texture2D tex = null;
-        if (mod == null)
-            tex = Ass.TerrariaIcon.Value;
-        else if (mod.Name == "ModLoader")
-            tex = Ass.tModLoaderIcon.Value;
-        else
-        {
-            string smallPath = $"{mod.Name}/icon_small";
-            string normalPath = $"{mod.Name}/icon";
 
-            if (ModContent.HasAsset(smallPath))
-                tex = ModContent.Request<Texture2D>(smallPath).Value;
-            else if (ModContent.HasAsset(normalPath))
-                tex = ModContent.Request<Texture2D>(normalPath).Value;
-        }
-
-        var target = new Rectangle((int)pos.X - 3, (int)pos.Y - 2, size, size);
-        if (tex != null)
-        {
-            DrawTextureScaledToFit(sb, tex, target);
-            return;
-        }
-
-        if (mod != null)
-        {
-            string initials = string.IsNullOrEmpty(mod.DisplayName) ? mod.Name : mod.DisplayName;
-            initials = initials.Length >= 2 ? initials[..2] : initials;
-            Vector2 p = target.Center.ToVector2() + new Vector2(0, 5);
-            Utils.DrawBorderString(sb, initials, p, Color.White, 1f, 0.5f, 0.5f);
-        }
-    }
-
-    private static void DrawTextureScaledToFit(SpriteBatch sb, Texture2D tex, Rectangle target)
-    {
-        if (tex == null)
-            return;
-
-        float scale = Math.Min(
-            target.Width / (float)tex.Width,
-            target.Height / (float)tex.Height
-        );
-
-        sb.Draw(tex, target.Center.ToVector2(), null, Color.White, 0f, tex.Size() / 2f, scale, SpriteEffects.None, 0f);
-    }
+    public override float GetStringLength(DynamicSpriteFont font) => BaseIconSize;
+    public override Color GetVisibleColor() => Color.White;
 
     public override void OnHover()
     {
-        base.OnHover();
+        Main.instance.MouseText(GetDisplayName(modName));
+    }
 
-        UICommon.TooltipMouseText(mod.DisplayName);
+    private static bool TryGetModIcon(string name, out Texture2D tex)
+    {
+        tex = null;
+
+        // Known special case
+        if (name.Equals("ModLoader", StringComparison.OrdinalIgnoreCase))
+        {
+            // If you have a cached tML icon asset, you can use it here.
+            // Otherwise this block can be omitted.
+            // tex = Ass.tModLoaderIcon.Value;
+            // return tex != null;
+        }
+
+        if (!ModLoader.TryGetMod(name, out var mod))
+            return false;
+
+        // Priority: icon_small.rawimg -> icon.png
+        if (mod.FileExists("icon_small.rawimg"))
+        {
+            tex = mod.Assets.Request<Texture2D>("icon_small", AssetRequestMode.ImmediateLoad).Value;
+            return tex != null;
+        }
+
+        if (mod.FileExists("icon.png"))
+        {
+            tex = mod.Assets.Request<Texture2D>("icon", AssetRequestMode.ImmediateLoad).Value;
+            return tex != null;
+        }
+
+        return false;
+    }
+    private static string GetDisplayName(string name)
+    {
+        return ModLoader.TryGetMod(name, out var mod) ? (mod.DisplayName ?? name) : name;
     }
 }

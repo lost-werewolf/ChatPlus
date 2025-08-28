@@ -1,10 +1,4 @@
 ﻿using System;
-using ChatPlus.Core.Features.Colors;
-using ChatPlus.Core.Features.Commands;
-using ChatPlus.Core.Features.Emojis;
-using ChatPlus.Core.Features.Glyphs;
-using ChatPlus.Core.Features.Items;
-using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using MonoMod.Cil;
 using Terraria;

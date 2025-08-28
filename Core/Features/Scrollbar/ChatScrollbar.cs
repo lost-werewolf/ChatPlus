@@ -95,7 +95,7 @@ public class ChatScrollbar : UIElement
         isHoveringHandle = GetHandleRectangle().Contains(Main.MouseScreen.ToPoint());
         
         // draw track and handle
-        DrawBar(sb, trackTexture.Value, GetDimensions().ToRectangle(), Color.White);
+        DrawBar(sb, trackTexture.Value, GetDimensions().ToRectangle(), Color.White*0.7f);
         DrawBar(sb, handleTexture.Value, GetHandleRectangle(),Color.White * (isDragging || isHoveringHandle ? 1f : 0.65f));
     }
 

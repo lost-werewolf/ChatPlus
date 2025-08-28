@@ -86,7 +86,7 @@ public class ChatScrollList : UIElement
             ViewPosition = MathHelper.Clamp(ViewPosition, 0f, Math.Max(0f, contentHeight - viewHeight));
         }
 
-        // ⬇Only drive vanilla when mouse is actually controlling (dragging or scrolled this frame while hovering)
+        // Only drive vanilla when mouse is actually controlling (dragging or scrolled this frame while hovering)
         bool mouseActive = (scrollbar?.IsDragging == true) ||
                            (IsMouseHovering && PlayerInput.ScrollWheelDeltaForUI != 0);
         bool followMonitor = !mouseActive;
@@ -110,8 +110,8 @@ public class ChatScrollList : UIElement
     #region Helpers
     public static int GetTotalLines()
     {
-        var monitorType = typeof(Main).Assembly.GetType("Terraria.GameContent.UI.Chat.RemadeChatMonitor");
-        var messagesField = monitorType?.GetField("_messages", BindingFlags.Instance | BindingFlags.NonPublic);
+        var monitorType = Main.chatMonitor.GetType();
+        var messagesField = monitorType.GetField("_messages", BindingFlags.Instance | BindingFlags.NonPublic);
         var list = messagesField?.GetValue(Main.chatMonitor) as IEnumerable;
 
         var containerType = typeof(Main).Assembly.GetType("Terraria.UI.Chat.ChatMessageContainer");
