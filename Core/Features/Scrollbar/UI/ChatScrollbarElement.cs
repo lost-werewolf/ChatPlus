@@ -119,7 +119,7 @@ namespace ChatPlus.Core.Features.Scrollbar.UI
                 SoundEngine.PlaySound(SoundID.MenuTick);
             }
 
-            DrawBar(spriteBatch, _texture.Value, dimensions.ToRectangle(), Color.White);
+            DrawBar(spriteBatch, _texture.Value, dimensions.ToRectangle(), Color.White*0.7f);
             DrawBar(spriteBatch, _innerTexture.Value, handleRectangle, Color.White * (_isDragging || _isHoveringOverHandle ? 1f : 0.65f));
         }
 

@@ -30,6 +30,7 @@ namespace ChatPlus.Core.Features.Scrollbar
             base.Draw(sb);
 
             ScrollHelper.DrawChatMonitorBackground(sb);
+
             //ScrollHelper.DrawChatScrollList(sb, chatScrollList);
         }
     }

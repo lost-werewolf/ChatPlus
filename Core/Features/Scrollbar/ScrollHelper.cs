@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.IO.Pipelines;
 using System.Reflection;
 using ChatPlus.Core.Features.Scrollbar.UI;
 using ChatPlus.Core.Helpers;
@@ -66,9 +67,20 @@ namespace ChatPlus.Core.Features.Scrollbar
 
         public static void DrawChatMonitorBackground(SpriteBatch sb)
         {
-            Texture2D pixel = TextureAssets.MagicPixel.Value;
             Rectangle r = new(82, Main.screenHeight - 247, Main.screenWidth - 300-7, height: 210);
-            sb.Draw(pixel, r, Color.White*0.02f);
+            //DrawHelper.DrawFill(sb, r);
+            DrawHelper.DrawSlices(sb, rect: r);
+
+            // fill
+            sb.Draw(TextureAssets.MagicPixel.Value, r, Color.White*0.02f);
+
+            // border lines
+            //Texture2D pixel = TextureAssets.MagicPixel.Value;
+            //Color c = Color.Black * 0.5f;
+            //sb.Draw(pixel, new Rectangle(r.Left, r.Top, r.Width, 1), c);              // top
+            //sb.Draw(pixel, new Rectangle(r.Left, r.Bottom - 1, r.Width, 1),c);       // bottom
+            //sb.Draw(pixel, new Rectangle(r.Left, r.Top, 1, r.Height), c);             // left
+            //sb.Draw(pixel, new Rectangle(r.Right - 1, r.Top, 1, r.Height), c);        // right
         }
     }
 }

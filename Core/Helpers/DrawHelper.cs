@@ -1,35 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI;
 
 namespace ChatPlus.Core.Helpers;
 public static class DrawHelper
 {
-    public static void DrawFill(SpriteBatch sb, UIElement ele)
+    public static void DrawFill(SpriteBatch sb, UIElement ele=null, Rectangle rect = default)
     {
-        CalculatedStyle dims = ele.GetDimensions();
+        Rectangle t = new(0, 0, 0, 0);
+
+        // Dimensions
+        if (ele != null)
+        {
+            CalculatedStyle dims = ele.GetDimensions();
+             t = new((int)dims.X + 4, (int)dims.Y + 4, (int)dims.Width - 8, (int)dims.Height - 6);
+        }
+        if (rect != default)
+        {
+            t = rect;
+        }
+        
+
         Texture2D pixel = TextureAssets.MagicPixel.Value;
-        Rectangle r = new((int)dims.X + 4, (int)dims.Y + 4, (int)dims.Width - 8, (int)dims.Height - 6);
 
         // fill (slightly brighter blue, semi-transparent)
-        sb.Draw(pixel, r, new Color(70, 120, 220, 140));
+        sb.Draw(pixel, t, new Color(70, 120, 220, 140));
 
         // white border
         const int b = 0;
-        sb.Draw(pixel, new Rectangle(r.X, r.Y, r.Width, b), Color.White);                 // top
-        sb.Draw(pixel, new Rectangle(r.X, r.Bottom - b, r.Width, b), Color.White);        // bottom
-        sb.Draw(pixel, new Rectangle(r.X, r.Y, b, r.Height), Color.White);                // left
-        sb.Draw(pixel, new Rectangle(r.Right - b, r.Y, b, r.Height), Color.White);        // right
+        sb.Draw(pixel, new Rectangle(t.X, t.Y, t.Width, b), Color.White);                 // top
+        sb.Draw(pixel, new Rectangle(t.X, t.Bottom - b, t.Width, b), Color.White);        // bottom
+        sb.Draw(pixel, new Rectangle(t.X, t.Y, b, t.Height), Color.White);                // left
+        sb.Draw(pixel, new Rectangle(t.Right - b, t.Y, b, t.Height), Color.White);        // right
     }
 
-    public static void DrawSlices(SpriteBatch sb, UIElement ele, bool fill = true, float fillOpacity = 0.3f)
+    public static void DrawSlices(SpriteBatch sb, UIElement ele=null, Rectangle rect = default)
     {
-        Rectangle t = ele.GetDimensions().ToRectangle();
+        Rectangle t = new(0,0,0,0);
+
+        if (ele != null)
+            t = ele.GetDimensions().ToRectangle();
+        if (rect != default)
+            t = rect;
 
         var tex = Ass.Hitbox.Value;
         int c = 5;
@@ -40,8 +52,8 @@ public static class DrawHelper
 
         Color color = Color.White;
 
-        if (fill)
-            sb.Draw(tex, new Rectangle(t.X + c, t.Y + c, t.Width - 2 * c, t.Height - 2 * c), ce, color * 0.3f);
+        // Draw fill
+        sb.Draw(tex, new Rectangle(t.X + c, t.Y + c, t.Width - 2 * c, t.Height - 2 * c), ce, color * 0.3f);
 
         sb.Draw(tex, new Rectangle(t.X + c, t.Y, t.Width - 2 * c, c), eh, color);                                       // top
         sb.Draw(tex, new Rectangle(t.X + c, t.Bottom - c, t.Width - 2 * c, c), eh, color, 0, Vector2.Zero, SpriteEffects.FlipVertically, 0); // bottom

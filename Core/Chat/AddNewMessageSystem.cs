@@ -33,8 +33,6 @@ internal class AddNewMessageSystem : ModSystem
 
         orig(self, text, color, widthLimitInPixels);
 
-        Log.Info("yes");
-
         AddLineCounters(self);
         Intercept(self);
     }
