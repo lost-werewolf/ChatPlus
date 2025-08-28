@@ -5,6 +5,7 @@ using ChatPlus.Core.Features.Emojis;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Features.Uploads;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -83,6 +84,7 @@ namespace ChatPlus.Core.UI
             var glyphSys = ModContent.GetInstance<GlyphSystem>();
             var itemSys = ModContent.GetInstance<ItemSystem>();
             var modIconSys = ModContent.GetInstance<ModIconSystem>();
+            var playerHeadSys = ModContent.GetInstance<PlayerHeadSystem>();
             var uploadSys = ModContent.GetInstance<UploadSystem>();
 
             if (cmdSys.commandState.commandPanel.scrollbar.IsMouseHovering
@@ -91,6 +93,7 @@ namespace ChatPlus.Core.UI
             || glyphSys.glyphState.glyphPanel.scrollbar.IsMouseHovering
             || itemSys.itemWindowState.itemPanel.scrollbar.IsMouseHovering
             || modIconSys.state.panel.scrollbar.IsMouseHovering
+            || playerHeadSys.state.Panel.scrollbar.IsMouseHovering
             || uploadSys.state.panel.scrollbar.IsMouseHovering)
                 return;
 

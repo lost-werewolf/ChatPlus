@@ -55,9 +55,14 @@ Configs: {
 			Tooltip: Shows a scrollbar when more than 10 messages have been sent.
 		}
 
-		ShowCount: {
-			Label: Show Count
-			Tooltip: ""
+		ChatItemCount: {
+			Label: Chats Visible
+			Tooltip: Set the number of chat messages that can be visible at one time.
+		}
+
+		AutocompleteItemCount: {
+			Label: Autocomplete Items Visible
+			Tooltip: Set the number of items in the autocomplete window that can be visible at one time.
 		}
 	}
 }

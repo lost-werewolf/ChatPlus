@@ -8,6 +8,7 @@ using ChatPlus.Core.Features.Emojis;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
@@ -156,6 +157,7 @@ namespace ChatPlus.Core.UI
                 this is GlyphPanel ? "[g" :
                 this is ItemPanel ? "[i" :
                 this is ModIconPanel ? "[m" :
+                this is PlayerHeadPanel ? "[p" :
                 this is UploadPanel ? "[u" : string.Empty;
 
             if (prefix.Length == 0)
@@ -214,6 +216,8 @@ namespace ChatPlus.Core.UI
 
             // Sizing and position
             int itemCount = 10;
+            if (Conf.C != null)
+                itemCount = (int)Conf.C.AutocompleteItemCount;
             Top.Set(-38, 0);
             Height.Set(itemCount * 30, 0);
             list.Height.Set(itemCount * 30, 0);
@@ -352,6 +356,7 @@ namespace ChatPlus.Core.UI
                 GlyphPanel => "[g",
                 ItemPanel => "[i",
                 ModIconPanel => "[m",
+                PlayerHeadPanel => "[p",
                 UploadPanel => "[u",
                 _ => "[e"
             };

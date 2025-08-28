@@ -19,7 +19,7 @@ namespace ChatPlus.Core.Helpers
             LoggerInstance.Error(message);
         }
 
-        public static void SlowInfo(string message, int seconds = 1, [CallerFilePath] string callerFilePath = "")
+        public static void SlowInfo(object message, int seconds = 1, [CallerFilePath] string callerFilePath = "")
         {
             //if (Conf.C != null && !Conf.C.ShowDebugMessages) return;
 
@@ -39,7 +39,7 @@ namespace ChatPlus.Core.Helpers
             }
         }
 
-        public static void Info(string message, bool printCallerInMessage = true, [CallerFilePath] string callerFilePath = "")
+        public static void Info(object message, bool printCallerInMessage = true, [CallerFilePath] string callerFilePath = "")
         {
             //if (Conf.C != null && !Conf.C.ShowDebugMessages) return; 
 

@@ -5,6 +5,7 @@ using ChatPlus.Core.Features.Emojis;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Features.Uploads;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -63,6 +64,7 @@ public static class StateManager
         var glyphSys = ModContent.GetInstance<GlyphSystem>();
         var itemSys = ModContent.GetInstance<ItemSystem>();
         var modIconSys = ModContent.GetInstance<ModIconSystem>();
+        var playerHeadSys = ModContent.GetInstance<PlayerHeadSystem>();
         var uploadSys = ModContent.GetInstance<UploadSystem>();
 
         return cmdSys?.ui?.CurrentState != null ||
@@ -71,6 +73,7 @@ public static class StateManager
                glyphSys?.ui?.CurrentState != null ||
                itemSys?.ui?.CurrentState != null ||
                modIconSys?.ui?.CurrentState != null ||
+               playerHeadSys?.ui?.CurrentState != null ||
                uploadSys?.ui?.CurrentState != null;
     }
 
@@ -88,6 +91,7 @@ public static class StateManager
         var glyphSys = ModContent.GetInstance<GlyphSystem>();
         var itemSys = ModContent.GetInstance<ItemSystem>();
         var modIconSys = ModContent.GetInstance<ModIconSystem>();
+        var playerHeadSys = ModContent.GetInstance<PlayerHeadSystem>();
         var uploadSys = ModContent.GetInstance<UploadSystem>();
 
         Close(cmdSys?.ui);
@@ -96,6 +100,7 @@ public static class StateManager
         Close(glyphSys?.ui);
         Close(itemSys?.ui);
         Close(modIconSys?.ui);
+        Close(playerHeadSys?.ui);
         Close(uploadSys?.ui);
     }
 }

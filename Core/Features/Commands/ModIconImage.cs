@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Drawing;
+using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
+using Terraria.UI.Chat;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ChatPlus.Core.Features.Commands
 {
@@ -23,7 +28,30 @@ namespace ChatPlus.Core.Features.Commands
             // Dimensions
             Vector2 target = GetDimensions().Position();
 
-            DrawSmallModIcon(sb, mod, target, size: 26);
+            if (mod == null)
+            {
+                var tex = Ass.TerrariaIcon.Value;
+                Rectangle rect = new Rectangle((int)target.X - 3, (int)target.Y - 1, 26, 26);
+                DrawTextureScaledToFit(sb, tex, rect);
+            }
+            else
+            {
+                string tag = ModIconTagHandler.GenerateTag(mod.Name);
+                ChatManager.DrawColorCodedStringWithShadow(
+                    sb,
+                    FontAssets.MouseText.Value,
+                    tag,
+                    target + new Vector2(-2, -1),
+                    Color.White,
+                    0f,            // rotation
+                    Vector2.Zero,  // origin
+                    Vector2.One, // scale
+                    -1f,
+                    1f
+                );
+            }
+
+            //DrawSmallModIcon(sb, mod, target, size: 26);
 
             if (IsMouseHovering && mod == null)
             {

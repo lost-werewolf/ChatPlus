@@ -249,6 +249,8 @@ namespace ChatPlus.Core.UI
             text.HAlign = 0.0f;
 
             int itemCount = 10;
+            if (Conf.C != null)
+                itemCount = (int)Conf.C.AutocompleteItemCount;
             Top.Set(-itemCount * 30 - 38 - pad, 0);
 
             if (ConnectedPanel.GetType() == typeof(UploadPanel))

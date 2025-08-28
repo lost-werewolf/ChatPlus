@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
-using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -17,7 +16,6 @@ public class ChatScrollList : UIElement
 {
     private ChatScrollbar scrollbar;
     private int lastTotalLines;
-    private bool wasAtBottom = true;
 
     public ChatScrollList()
     {
@@ -155,7 +153,6 @@ public class ChatScrollList : UIElement
     public void Clear()
     {
         lastTotalLines = 0;
-        wasAtBottom = true;
         scrollbar?.SetView(GetInnerDimensions().Height, 0f);
     }
     #endregion

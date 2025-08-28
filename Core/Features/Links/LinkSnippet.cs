@@ -15,7 +15,6 @@ public class LinkSnippet : TextSnippet
 
     public LinkSnippet(TextSnippet src)
         : base(src.Text, src.Color, src.Scale) { }
-
     public static bool IsLink(string t) =>
         !string.IsNullOrWhiteSpace(t) &&
         Regex.IsMatch(t, @"^(https?://|www\.)\S+\.\S+$", RegexOptions.IgnoreCase);

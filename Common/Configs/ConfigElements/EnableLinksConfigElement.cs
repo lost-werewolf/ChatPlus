@@ -59,7 +59,8 @@ namespace ChatPlus.Common.Configs.ConfigElements
             string exampleLink = "https://tmodloader.net/";
 
             // Draw chat box
-            DrawHelper.DrawInvBG(sb,rect, new Color(28, 57, 120)*0.9f);
+            //DrawHelper.DrawInvBG(sb,rect, new Color(28, 57, 120)*0.9f);
+            Utils.DrawInvBG(sb, rect);
 
             // 1. Draw underline
             Vector2 textSize = FontAssets.MouseText.Value.MeasureString(exampleLink);
@@ -99,7 +100,8 @@ namespace ChatPlus.Common.Configs.ConfigElements
             //}
             //else
             {
-                linkColor = ColorHelper.Blue*0.8f;
+
+                linkColor = new Microsoft.Xna.Framework.Color(32, 160, 255);
             }
         }
 

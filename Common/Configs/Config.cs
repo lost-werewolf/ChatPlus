@@ -33,11 +33,17 @@ namespace ChatPlus.Common.Configs
         [DefaultValue(true)]
         public bool Scrollbar = true;
 
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [Range(10f, 10f)]
+        [Increment(1f)]
+        [DefaultValue(10f)]
+        public float ChatItemCount = 10f;
+
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
         [Range(10f, 20f)]
         [Increment(1f)]
-        [DrawTicks]
         [DefaultValue(10f)]
-        public float ShowCount = 10f;
+        public float AutocompleteItemCount = 10f;
 
         public override void OnChanged()
         {

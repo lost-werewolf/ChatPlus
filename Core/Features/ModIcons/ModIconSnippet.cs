@@ -1,6 +1,5 @@
 using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using ReLogic.Graphics;
@@ -13,13 +12,13 @@ namespace ChatPlus.Core.Features.ModIcons;
 
 public sealed class ModIconSnippet : TextSnippet
 {
-    private const float BaseIconSize = 26f;      // logical size; chat multiplies by 'scale'
+    private const float BaseIconSize = 26f;
     private readonly string modName;
 
     public ModIconSnippet(string modName)
     {
         this.modName = modName ?? string.Empty;
-        Text = string.Empty;    // no fallback text – we fully handle drawing
+        Text = string.Empty;
         Color = Color.White;
     }
 
@@ -34,12 +33,16 @@ public sealed class ModIconSnippet : TextSnippet
 
         var dest = new Rectangle((int)pos.X, (int)(pos.Y - 2), (int)px, (int)px);
 
-        // Special-case: vanilla "Terraria" tag (matches tMod example)
         if (modName.Equals("Terraria", StringComparison.OrdinalIgnoreCase))
         {
             var sheet = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Tags_Shadow", AssetRequestMode.ImmediateLoad);
             var frame = BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface._filterIconFrame;
-            sb.Draw(sheet.Value, dest, sheet.Frame(16, 5, frame.X, frame.Y), Color.White);
+            //sb.Draw(sheet.Value, dest, sheet.Frame(16, 5, frame.X, frame.Y), Color.White);
+            return true;
+        }
+        else if (modName.Equals("ModLoader", StringComparison.OrdinalIgnoreCase))
+        {
+            sb.Draw(Ass.tModLoaderIcon.Value, dest, Color.White);
             return true;
         }
 
@@ -56,7 +59,7 @@ public sealed class ModIconSnippet : TextSnippet
         {
             initials = initials.Length >= 2 ? initials[..2] : initials;
             Vector2 center = dest.Center.ToVector2();
-            Terraria.Utils.DrawBorderString(sb, initials, center + new Vector2(0, 4f), Color.White, 0.8f * scale, 0.5f, 0.5f);
+            Utils.DrawBorderString(sb, initials, center + new Vector2(0, 4f), Color.White, 0.8f * scale, 0.5f, 0.5f);
         }
         return true;
     }
@@ -72,15 +75,6 @@ public sealed class ModIconSnippet : TextSnippet
     private static bool TryGetModIcon(string name, out Texture2D tex)
     {
         tex = null;
-
-        // Known special case
-        if (name.Equals("ModLoader", StringComparison.OrdinalIgnoreCase))
-        {
-            // If you have a cached tML icon asset, you can use it here.
-            // Otherwise this block can be omitted.
-            // tex = Ass.tModLoaderIcon.Value;
-            // return tex != null;
-        }
 
         if (!ModLoader.TryGetMod(name, out var mod))
             return false;

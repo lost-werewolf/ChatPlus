@@ -50,10 +50,11 @@ namespace ChatPlus.Common.Configs.ConfigElements
         private void DrawTagExample(SpriteBatch sb)
         {
             CalculatedStyle dims = GetDimensions();
-            Rectangle r = new((int)dims.X + 225, (int)dims.Y, 225, 30);
-            Vector2 pos = new(r.X + 8, r.Y + 4);
+            Rectangle rect = new((int)dims.X + 225, (int)dims.Y, 225, 30);
+            Vector2 pos = new(rect.X + 8, rect.Y + 4);
 
-            Utils.DrawInvBG(sb, r, ColorHelper.UIPanelBlue);
+            //Utils.DrawInvBG(sb, rect, ColorHelper.UIPanelBlue);
+            Utils.DrawInvBG(sb, rect);
 
             string text = "/, [c, [e, [g, [i, [m, [p, [u";
             TextSnippet[] snip = [new TextSnippet(text)];
