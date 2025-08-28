@@ -4,59 +4,63 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.Scrollbar
+namespace ChatPlus.Core.Features.Scrollbar;
+
+public class ChatScrollSystem : ModSystem
 {
-    public class ChatScrollSystem : ModSystem
+    private UserInterface _chatUI;
+    public ChatScrollState state;
+
+    public override void PostSetupContent()
     {
-        private UserInterface ui;
-        public ChatScrollState state;
+        // Initialize the user interface for the chat scrollbar, but keep it hidden initially
+        _chatUI = new UserInterface();
+        state = new ChatScrollState();
+        _chatUI.SetState(null);
+    }
 
-        public override void PostSetupContent()
+    public override void UpdateUI(GameTime gameTime)
+    {
+        // Toggle the custom chat UI when the vanilla chat opens or closes
+        if (Main.drawingPlayerChat)
         {
-            ui = new UserInterface();
-            state = new ChatScrollState();
-            ui.SetState(null);
-        }
-
-        /// <summary>
-        /// Sets the current state to a scroll state if chat is open, or null otherwise.
-        /// </summary>
-        public override void UpdateUI(GameTime gameTime)
-        {
-            if (!Main.drawingPlayerChat)
+            if (_chatUI.CurrentState != state)
             {
-                // Close scroll state
-                if (ui.CurrentState != null) ui.SetState(null);
-                return;
+                // Chat just opened: activate our scroll UI
+                _chatUI.SetState(state);
+                Main.chatMonitor.ResetOffset();    // reset vanilla chat offset to show latest messages
+                state.chatScrollbar.GoToBottom();  // initialize scrollbar thumb at bottom
             }
-
-            if (ui.CurrentState != state)
-            {
-                // Open scroll state
-                ui.SetState(state);
-                Main.chatMonitor.ResetOffset();
-                state.chatScrollbar.GoToBottom();
-            }
-
-            ui.Update(gameTime);
+            // Update our UI state (scrollbar & list)
+            _chatUI.Update(gameTime);
         }
-
-        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
+        else
         {
-            int vanillaDeathTextLayerIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Death Text");
-            if (vanillaDeathTextLayerIndex != -1)
+            // Chat closed: remove our UI state
+            if (_chatUI.CurrentState != null)
             {
-                layers.Insert(vanillaDeathTextLayerIndex, new LegacyGameInterfaceLayer(
-                "ChatPlus: Scroll System",
-                () =>
-                {
-                    if (Main.drawingPlayerChat && ui?.CurrentState != null)
-                        ui.Draw(Main.spriteBatch, Main.gameTimeCache);
+                _chatUI.SetState(null);
+            }
+        }
+    }
+
+    public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
+    {
+        // Draw our chat UI just before the vanilla chat text draws (just above "Death Text" layer)
+        int index = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Death Text"));
+        if (index != -1)
+        {
+            layers.Insert(index, new LegacyGameInterfaceLayer(
+                "ChatPlus: Chat Scrollbar",
+                delegate {
+                    if (Main.drawingPlayerChat && _chatUI?.CurrentState != null)
+                    {
+                        _chatUI.Draw(Main.spriteBatch, Main.gameTimeCache);
+                    }
                     return true;
                 },
-                InterfaceScaleType.UI
-            ));
-            }
+                InterfaceScaleType.UI)
+            );
         }
     }
 }

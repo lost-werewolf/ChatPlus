@@ -33,7 +33,7 @@ internal class AddNewMessageSystem : ModSystem
 
         orig(self, text, color, widthLimitInPixels);
 
-        AddLineCounters(self);
+        //AddLineCounters(self);
         Intercept(self);
     }
 

@@ -3,35 +3,27 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.Scrollbar
+namespace ChatPlus.Core.Features.Scrollbar;
+
+public class ChatScrollState : UIState
 {
-    public class ChatScrollState : UIState
+    public ChatScrollbarElement chatScrollbar;
+    public ChatScrollList chatScrollList;
+
+    public ChatScrollState()
     {
-        public ChatScrollbarElement chatScrollbar;
-        public ChatScrollList chatScrollList;
+        // Initialize chat scroll UI elements
+        chatScrollList = new ChatScrollList();
+        chatScrollbar = new ChatScrollbarElement();
+        chatScrollList.SetScrollbar(chatScrollbar);
+        Append(chatScrollList);
+        Append(chatScrollbar);
+    }
 
-        public ChatScrollState()
-        {
-            chatScrollList = [];
-            chatScrollbar = new();
-            chatScrollList.SetScrollbar(chatScrollbar);
-
-            Append(chatScrollList);
-            Append(chatScrollbar);
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            base.Update(gameTime);
-        }
-
-        public override void Draw(SpriteBatch sb)
-        {
-            base.Draw(sb);
-
-            ScrollHelper.DrawChatMonitorBackground(sb);
-
-            //ScrollHelper.DrawChatScrollList(sb, chatScrollList);
-        }
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+        // Draw a subtle background behind the chat text area for readability
+        ScrollHelper.DrawChatMonitorBackground(spriteBatch);
     }
 }

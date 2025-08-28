@@ -8,79 +8,55 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 
-namespace ChatPlus.Core.Features.Scrollbar
+namespace ChatPlus.Core.Features.Scrollbar;
+
+public static class ScrollHelper
 {
-    public static class ScrollHelper
+    public static int GetTotalLineCount()
     {
-        public static int GetTotalLineCount()
+        // Reflect into Terraria's RemadeChatMonitor to get all message containers
+        var monitorType = typeof(Main).Assembly.GetType("Terraria.GameContent.UI.Chat.RemadeChatMonitor");
+        var messagesField = monitorType?.GetField("_messages", BindingFlags.Instance | BindingFlags.NonPublic);
+        if (messagesField == null) return 0;
+        var messagesList = messagesField.GetValue(Main.chatMonitor) as IEnumerable;
+
+        // Reflect ChatMessageContainer to get line counts
+        var containerType = typeof(Main).Assembly.GetType("Terraria.UI.Chat.ChatMessageContainer");
+        var lineCountProp = containerType?.GetProperty("LineCount", BindingFlags.Instance | BindingFlags.Public);
+
+        int totalLines = 0;
+        if (messagesList != null)
         {
-            // Get RemadeChatMonitor
-            var monitorType = typeof(Main).Assembly.GetType("Terraria.GameContent.UI.Chat.RemadeChatMonitor");
-            var messagesField = monitorType.GetField("_messages", BindingFlags.Instance | BindingFlags.NonPublic);
-            var list = messagesField.GetValue(Main.chatMonitor) as IEnumerable;
-
-            // Get ChatMessageContainer
-            var containerType = typeof(Main).Assembly.GetType("Terraria.UI.Chat.ChatMessageContainer");
-            var lineCountProp = containerType?.GetProperty("LineCount", BindingFlags.Instance | BindingFlags.Public);
-
-            // Count total
-            int total = 0;
-            foreach (var msg in list)
+            foreach (var msg in messagesList)
             {
-                if (msg != null)
+                if (msg == null) continue;
+                if (lineCountProp != null)
                 {
                     try
                     {
                         int lines = (int)lineCountProp.GetValue(msg);
-                        total += Math.Max(1, lines);
+                        totalLines += Math.Max(1, lines);
                     }
                     catch
                     {
-                        total++;
+                        totalLines++;
                     }
                 }
-            }
-            return total;
-        }
-
-        public static void DebugDrawChatScrollList(SpriteBatch sb, ChatScrollList list)
-        {
-            Texture2D pixel = TextureAssets.MagicPixel.Value;
-
-            foreach (var child in list)
-            {
-                var dims = child.GetOuterDimensions(); // child bounds
-                Rectangle r = dims.ToRectangle();
-
-                // fill
-                sb.Draw(pixel, r, Color.Red * 0.5f);
-
-                // border lines
-                sb.Draw(pixel, new Rectangle(r.Left, r.Top, r.Width, 1), Color.White);              // top
-                sb.Draw(pixel, new Rectangle(r.Left, r.Bottom - 1, r.Width, 1), Color.White);       // bottom
-                sb.Draw(pixel, new Rectangle(r.Left, r.Top, 1, r.Height), Color.White);             // left
-                sb.Draw(pixel, new Rectangle(r.Right - 1, r.Top, 1, r.Height), Color.White);        // right
-
-                //Log.Info($"Child {i++} rect: {r}");
+                else
+                {
+                    // If LineCount property isn't found, count each message as 1 line
+                    totalLines++;
+                }
             }
         }
+        return totalLines;
+    }
 
-        public static void DrawChatMonitorBackground(SpriteBatch sb)
-        {
-            Rectangle r = new(82, Main.screenHeight - 247, Main.screenWidth - 300-7, height: 210);
-            //DrawHelper.DrawFill(sb, r);
-            DrawHelper.DrawSlices(sb, rect: r);
-
-            // fill
-            sb.Draw(TextureAssets.MagicPixel.Value, r, Color.White*0.02f);
-
-            // border lines
-            //Texture2D pixel = TextureAssets.MagicPixel.Value;
-            //Color c = Color.Black * 0.5f;
-            //sb.Draw(pixel, new Rectangle(r.Left, r.Top, r.Width, 1), c);              // top
-            //sb.Draw(pixel, new Rectangle(r.Left, r.Bottom - 1, r.Width, 1),c);       // bottom
-            //sb.Draw(pixel, new Rectangle(r.Left, r.Top, 1, r.Height), c);             // left
-            //sb.Draw(pixel, new Rectangle(r.Right - 1, r.Top, 1, r.Height), c);        // right
-        }
+    public static void DrawChatMonitorBackground(SpriteBatch spriteBatch)
+    {
+        // Draw a faint background rectangle behind the chat area for readability
+        Texture2D pixel = TextureAssets.MagicPixel.Value;
+        Rectangle chatBounds = new Rectangle(82, Main.screenHeight - 247, Main.screenWidth - 300 - 7, 210);
+        spriteBatch.Draw(pixel, chatBounds, Color.White * 0.02f);
     }
 }

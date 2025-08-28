@@ -13,352 +13,177 @@ namespace ChatPlus.Core.Features.Scrollbar.UI;
 /// <summary>
 /// A scrollable list. Paired with a <see cref="ChatScrollbarElement"/>
 /// </summary>
-public class ChatScrollList : UIElement, IEnumerable<UIElement>, IEnumerable
+public class ChatScrollList : UIElement
 {
-    public delegate bool ElementSearchMethod(UIElement element);
+    private ChatScrollbarElement _scrollbar;
+    private UIElement _innerList;
+    // Track chat content state for scroll logic
+    private int _lastTotalLines = 0;
+    private bool _wasAtBottom = true;
 
-    public class UIInnerList : UIElement
+    public ChatScrollList()
     {
-        public override bool ContainsPoint(Vector2 point)
+        // Inner container (currently not holding individual message elements, but could)
+        _innerList = new UIElement
         {
-            return true;
-        }
+            Width = { Percent = 1f },   // match parent width
+            Height = { Percent = 1f },
+            OverflowHidden = false
+        };
+        Append(_innerList);
 
-        protected override void DrawChildren(SpriteBatch spriteBatch)
-        {
-            Vector2 position = Parent.GetDimensions().Position();
-            Vector2 dimensions = new Vector2(Parent.GetDimensions().Width, Parent.GetDimensions().Height);
-            foreach (UIElement element in Elements)
-            {
-                Vector2 position2 = element.GetDimensions().Position();
-                Vector2 dimensions2 = new Vector2(element.GetDimensions().Width, element.GetDimensions().Height);
-                if (Collision.CheckAABBvAABBCollision(position, dimensions, position2, dimensions2))
-                {
-                    element.Draw(spriteBatch);
-                }
-            }
-        }
-
-        public override Rectangle GetViewCullingArea()
-        {
-            return Parent.GetDimensions().ToRectangle();
-        }
+        // Position the scroll list overlay to cover the chat message area
+        Left.Set(82f, 0f);
+        Top.Set(Main.screenHeight - 247, 0f);
+        Width.Set(Main.screenWidth - 300f, 0f);
+        Height.Set(210f, 0f);
     }
-
-    public List<UIElement> _items = new List<UIElement>();
-
-    public ChatScrollbarElement _scrollbar;
-
-    public UIElement _innerList = new UIInnerList();
-
-    public float _innerListHeight;
-
-    public float ListPadding = 0f;
-
-    public Action<List<UIElement>> ManualSortMethod;
-
-    public int Count => _items.Count;
 
     public float ViewPosition
     {
         get
         {
-            return _scrollbar.ViewPosition;
+            return this._scrollbar.ViewPosition;
         }
         set
         {
-            _scrollbar.ViewPosition = value;
+            this._scrollbar.ViewPosition = value;
         }
     }
 
-    public ChatScrollList()
+    public void Add(UIElement item)
     {
-        _innerList.OverflowHidden = false;
-        _innerList.Width.Set(0f, 1f);
-        _innerList.Height.Set(0f, 1f);
-        OverflowHidden = false;
-        Append(_innerList);
-
-        // Set Chat Dimensions!
-        //Rectangle r = new(82, Main.screenHeight-247, Main.screenWidth - 300, 210);
-        Left.Set(82, 0);
-        Top.Set(Main.screenHeight - 247,0);
-        Width.Set(Main.screenWidth - 300,0);
-        Height.Set(210, 0);
-
-        // Preserve insertion order
-        ManualSortMethod = (_) => { };
+        this._innerList.Append(item);
+        this._innerList.Recalculate();
     }
 
     public float GetTotalHeight()
     {
-        return _innerListHeight;
-    }
-
-    public void Goto(ElementSearchMethod searchMethod)
-    {
-        for (int i = 0; i < _items.Count; i++)
-        {
-            if (searchMethod(_items[i]))
-            {
-                _scrollbar.ViewPosition = _items[i].Top.Pixels;
-                break;
-            }
-        }
-    }
-
-    public void Goto(ElementSearchMethod searchMethod, bool center = false)
-    {
-        float height = GetInnerDimensions().Height;
-        for (int i = 0; i < _items.Count; i++)
-        {
-            UIElement uIElement = _items[i];
-            if (searchMethod(uIElement))
-            {
-                _scrollbar.ViewPosition = uIElement.Top.Pixels;
-                if (center)
-                {
-                    _scrollbar.ViewPosition = uIElement.Top.Pixels - height / 2f + uIElement.GetOuterDimensions().Height / 2f;
-                }
-
-                break;
-            }
-        }
-    }
-
-    public virtual void Add(UIElement item)
-    {
-        _items.Add(item);
-        _innerList.Append(item);
-        UpdateOrder();
-        _innerList.Recalculate();
-    }
-
-    public virtual void Clear()
-    {
-        _innerList.RemoveAllChildren();
-        _items.Clear();
-    }
-
-    public override void Recalculate()
-    {
-        base.Recalculate();
-        UpdateScrollbar();
-    }
-
-    public override void ScrollWheel(UIScrollWheelEvent evt)
-    {
-        base.ScrollWheel(evt);
-        if (_scrollbar != null)
-        {
-            _scrollbar.ViewPosition -= evt.ScrollWheelValue;
-            SyncMonitorOffset(); // keep RemadeChatMonitor in step with our scroll
-        }
-    }
-
-    public override void RecalculateChildren()
-    {
-        base.RecalculateChildren();
-
-        // 1) Measure total content height
-        float totalHeight = 0f;
-        for (int i = 0; i < _items.Count; i++)
-        {
-            _items[i].Recalculate();
-            totalHeight += _items[i].GetOuterDimensions().Height;
-        }
-
-        // 2) Bottom align when content is shorter than the viewport
-        float viewHeight = GetInnerDimensions().Height;
-        float startY = MathF.Max(0f, viewHeight - totalHeight);
-
-        // 3) Position items from startY downward
-        float y = startY;
-        for (int i = 0; i < _items.Count; i++)
-        {
-            UIElement element = _items[i];
-            element.Top.Set(y, 0f);
-            element.Recalculate();
-            y += element.GetOuterDimensions().Height;
-        }
-
-        _innerListHeight = MathF.Max(totalHeight, 0f);
-        _innerList.Height.Set(_innerListHeight, 0f);
-
-        UpdateScrollbar();
-    }
-
-    public void UpdateScrollbar()
-    {
-        if (_scrollbar != null)
-        {
-            float height = GetInnerDimensions().Height;
-            _scrollbar.SetView(height, _innerListHeight);
-        }
+        return _innerList.Height.Pixels;
     }
 
     public void SetScrollbar(ChatScrollbarElement scrollbar)
     {
         _scrollbar = scrollbar;
-        UpdateScrollbar();
+        // Initialize scrollbar thumb size for the viewport (no content initially)
+        _scrollbar.SetView(GetInnerDimensions().Height, 0f);
     }
 
-    public void UpdateOrder()
+    public override void ScrollWheel(UIScrollWheelEvent evt)
     {
-        ManualSortMethod?.Invoke(_items);
-        UpdateScrollbar();
-    }
-
-    public int SortMethod(UIElement item1, UIElement item2)
-    {
-        return item1.CompareTo(item2);
-    }
-
-    public override List<SnapPoint> GetSnapPoints()
-    {
-        List<SnapPoint> list = new List<SnapPoint>();
-        if (GetSnapPoint(out var point))
-        {
-            list.Add(point);
-        }
-
-        foreach (UIElement item in _items)
-        {
-            list.AddRange(item.GetSnapPoints());
-        }
-
-        return list;
-    }
-
-    protected override void DrawSelf(SpriteBatch spriteBatch)
-    {
-        Top.Set(Main.screenHeight - 247, 0);
-
-        if (_scrollbar != null)
-        {
-            _innerList.Top.Set(0f - _scrollbar.GetValue(), 0f);
-        }
-    }
-
-    public IEnumerator<UIElement> GetEnumerator()
-    {
-        return ((IEnumerable<UIElement>)_items).GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return ((IEnumerable<UIElement>)_items).GetEnumerator();
-    }
-
-    public virtual void AddRange(IEnumerable<UIElement> items)
-    {
-        foreach (UIElement item in items)
-        {
-            _items.Add(item);
-            _innerList.Append(item);
-        }
-
-        UpdateOrder();
-        _innerList.Recalculate();
+        base.ScrollWheel(evt);
+        if (_scrollbar == null) return;
+        // Terraria: ScrollWheelValue > 0 means scroll up (to older messages)
+        _scrollbar.ViewPosition -= evt.ScrollWheelValue;
+        SyncChatMonitorToScroll();
     }
 
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-
-        SyncMonitorOffset();
-
+        if (_scrollbar == null) return;
+        // Synchronize scroll every frame
+        SyncChatMonitorToScroll();
+        // If mouse over chat area, prevent vanilla scroll behavior
         if (IsMouseHovering)
         {
             PlayerInput.LockVanillaMouseScroll("ModLoader/UIList");
         }
     }
 
-    private void SyncMonitorOffset()
+    private void SyncChatMonitorToScroll()
     {
-        // Safety checks
-        if (_scrollbar == null || _items.Count == 0)
-            return;
-
-        // 1) Gather geometry
-        float viewHeight = GetInnerDimensions().Height;
-        float contentHeight = _innerListHeight;
-        if (contentHeight <= 0f || viewHeight <= 0f)
-            return;
-
-        // Line height: derive from first item; fall back to vanilla-ish 21 px
-        float lineHeight = MathF.Max(1f, _items[0].GetOuterDimensions().Height);
-        if (lineHeight < 1f)
-            lineHeight = 21f;
-
-        // When content is shorter than view, there is nothing to scroll; offset must be 0.
-        if (contentHeight <= viewHeight)
-        {
-            SetMonitorStartChatLine(0, recalc: true);
-            return;
-        }
-
-        // 2) Compute our top visible line index from current view position
-        //    With your layout, items start at y=0 when content > view, so this is straightforward.
-        float viewPos = _scrollbar.GetValue();
-        int topIndex = (int)MathF.Floor(viewPos / lineHeight);
-        if (topIndex < 0) topIndex = 0;
-
-        // 3) Derive totalLines and showCount
+        // 1. Determine total lines of chat text and visible lines
         int totalLines = ScrollHelper.GetTotalLineCount();
-        int showCount = TryGetMonitorShowCount(out var monitorShow)
-            ? monitorShow
-            : Math.Max(1, (int)MathF.Floor(viewHeight / lineHeight));
+        if (totalLines < 0) totalLines = 0;
+        float viewHeight = GetInnerDimensions().Height;
+        float lineHeight = 21f;  // approximate height of a chat line in pixels
+        // Try to get the actual number of lines the game is showing (ShowCount), otherwise calculate from height
+        int showCount = TryGetMonitorShowCount(out int monitorShow)
+                        ? monitorShow
+                        : Math.Max(1, (int)Math.Floor(viewHeight / lineHeight));
+        showCount = Math.Clamp(showCount, 1, totalLines > 0 ? totalLines : 1);
 
-        // Clamp showCount to sane bounds
-        showCount = Math.Clamp(showCount, 1, Math.Max(1, totalLines));
+        // 2. Update scrollbar size based on content
+        float contentHeight = totalLines * lineHeight;
+        _scrollbar.SetView(viewHeight, contentHeight);
 
-        // 4) Map to RemadeChatMonitor's startChatLine semantics:
-        //    At bottom: topIndex == totalLines - showCount  -> startChatLine = 0
-        //    Scrolling up decreases topIndex -> increases startChatLine.
-        int desiredStart = Math.Clamp(totalLines - showCount - topIndex, 0, Math.Max(0, totalLines - showCount));
-
-        // 5) Write back to the monitor (and flag a recalc so vanilla rebuilds line cache)
-        SetMonitorStartChatLine(desiredStart, recalc: true);
-    }
-    private static bool TryGetMonitorShowCount(out int showCount)
-    {
-        showCount = 0;
-        var monitor = Main.chatMonitor;
-        if (monitor == null)
-            return false;
-
-        var type = monitor.GetType();
-        // Prefer a public property if it exists, otherwise private field
-        var prop = type.GetProperty("ShowCount", BindingFlags.Instance | BindingFlags.Public);
-        if (prop != null)
+        // 3. Adjust scroll position if content size changed
+        if (totalLines != _lastTotalLines)
         {
-            if (prop.GetValue(monitor) is int v)
+            if (totalLines > _lastTotalLines)
             {
-                showCount = v;
-                return true;
+                // New lines added
+                if (_wasAtBottom)
+                {
+                    // If was at bottom, stay at bottom to show new messages
+                    _scrollbar.GoToBottom();
+                }
+                // If user was scrolled up, do nothing (new lines remain out of view)
+            }
+            else if (totalLines < _lastTotalLines)
+            {
+                // Lines removed (chat cleared or trimmed) -> ensure we don't scroll past the end
+                _scrollbar.ViewPosition = MathHelper.Clamp(
+                    _scrollbar.ViewPosition, 0f, Math.Max(0f, contentHeight - viewHeight)
+                );
             }
         }
 
-        var field = type.GetField("_showCount", BindingFlags.Instance | BindingFlags.NonPublic);
+        // 4. Update tracking state for next time
+        _wasAtBottom = (_scrollbar.ViewPosition >= _scrollbar.MaxViewSize - _scrollbar.ViewSize - 1e-2);
+        _lastTotalLines = totalLines;
+
+        // 5. Set chat monitor offset (which lines to actually display)
+        if (totalLines <= showCount)
+        {
+            // If all lines fit, always show the latest lines (no scrolling needed)
+            SetMonitorStartChatLine(0, recalc: true);
+        }
+        else
+        {
+            // Calculate the index of the top visible line based on scroll position
+            int topLineIndex = (int)Math.Floor(_scrollbar.GetValue() / lineHeight);
+            if (topLineIndex < 0) topLineIndex = 0;
+            // Visible line count (could use showCount directly)
+            int visibleCount = showCount;
+            if (visibleCount > totalLines) visibleCount = totalLines;
+            // Compute startChatLine: at bottom, this should be 0; if scrolled up, startChatLine increases
+            int startIndex = Math.Clamp(totalLines - visibleCount - topLineIndex,
+                                        0, Math.Max(0, totalLines - visibleCount));
+            SetMonitorStartChatLine(startIndex, recalc: true);
+        }
+    }
+
+    private bool TryGetMonitorShowCount(out int showCount)
+    {
+        showCount = 0;
+        var monitor = Main.chatMonitor;
+        if (monitor == null) return false;
+        Type monitorType = monitor.GetType();
+        // Check if Terraria's chat monitor exposes ShowCount (or similar) 
+        var prop = monitorType.GetProperty("ShowCount", BindingFlags.Instance | BindingFlags.Public);
+        if (prop != null && prop.GetValue(monitor) is int value)
+        {
+            showCount = value;
+            return true;
+        }
+        // Fallback to private field _showCount if available
+        var field = monitorType.GetField("_showCount", BindingFlags.Instance | BindingFlags.NonPublic);
         if (field != null)
         {
             showCount = (int)field.GetValue(monitor);
             return true;
         }
-
         return false;
     }
 
-    private static void SetMonitorStartChatLine(int value, bool recalc)
+    private void SetMonitorStartChatLine(int value, bool recalc)
     {
         var monitor = Main.chatMonitor;
-        if (monitor == null)
-            return;
-
-        var type = monitor.GetType();
-
-        // Try a public Offset/StartChatLine property first (some builds expose one)
+        if (monitor == null) return;
+        Type type = monitor.GetType();
+        // Try public property first (e.g., Offset or StartChatLine)
         var prop = type.GetProperty("Offset", BindingFlags.Instance | BindingFlags.Public)
                    ?? type.GetProperty("StartChatLine", BindingFlags.Instance | BindingFlags.Public);
         if (prop != null && prop.CanWrite)
@@ -367,18 +192,26 @@ public class ChatScrollList : UIElement, IEnumerable<UIElement>, IEnumerable
         }
         else
         {
-            // Fallback to private backing field in 1.4.4.x
+            // Otherwise, set private field _startChatLine
             var field = type.GetField("_startChatLine", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (field != null)
-                field.SetValue(monitor, value);
+            field?.SetValue(monitor, value);
         }
-
         if (recalc)
         {
-            // Nudge vanilla to rebuild wrapped lines if necessary
+            // Flag the chat monitor to recalculate wrapping if needed
             var recalcField = type.GetField("_recalculateOnNextUpdate", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (recalcField != null)
-                recalcField.SetValue(monitor, true);
+            recalcField?.SetValue(monitor, true);
         }
+    }
+
+    public void Clear()
+    {
+        // Remove any child elements (if we had added message UI elements in future)
+        _innerList.RemoveAllChildren();
+        // Reset scroll tracking
+        _lastTotalLines = 0;
+        _wasAtBottom = true;
+        // Reset scrollbar view (content height = 0)
+        _scrollbar?.SetView(GetInnerDimensions().Height, 0f);
     }
 }
