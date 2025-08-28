@@ -53,14 +53,14 @@ namespace ChatPlus.Common.Configs.ConfigElements
         {
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = dims.Position();
-            int xOffset = 225;
-            Rectangle rect = new((int)dims.X + xOffset, (int)dims.Y, 225, 30);
+            int xOffset = 150;
+            Rectangle rect = new((int)dims.X + xOffset, (int)dims.Y, 175, 30);
 
             string exampleLink = "https://tmodloader.net/";
 
             // Draw chat box
             //DrawHelper.DrawInvBG(sb,rect, new Color(28, 57, 120)*0.9f);
-            Utils.DrawInvBG(sb, rect);
+            //Utils.DrawInvBG(sb, rect);
 
             // 1. Draw underline
             Vector2 textSize = FontAssets.MouseText.Value.MeasureString(exampleLink);

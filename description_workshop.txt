@@ -1,25 +1,15 @@
-﻿Chat+ makes Terraria's chat smoother, smarter and more fun with emojis, images, links, text editing shortcuts and more!
+﻿Chat+ is a massive overhaul to Terraria's chat system; making it look better, smarter and more fun with player icons, mod icons, emojis, images, links, a scrollbar, a better text editor, and more!
 
 [h3] ✨ What’s New? [/h3] 
-1. [b]Emojis😎[/b]: Access thousands of emojis directly in chat!
-2. [b]Images📷[/b]: Upload and send your own images!
+1. [b]Emojis😎 and Images📷[/b]: Access thousands of emojis directly in chat!
+2. [b]Images[/b]: Upload and send your own images!
 3. [b]Links🔗[/b]: Links you type in chat become clickable.
-4. [b]Autocomplete Commands↪️[/b]: Type "/" into chat to autocomplete commands.
-5. [b]Autocomplete Tags🏷️[/b]: Type any tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
-6. [b]Text Editing✍️[/b]: Use shortcuts like copy/paste, character selection and more.
-
-[h3] 🤝Compatible Mods [/h3] 
-[table]
-    [tr]
-        [th][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3448785552] Chitter-Chatter [/url] [/th]
-    [/tr]
-    [tr]
-        [td][img] https://i.imgur.com/qVLRRr7.jpeg [/img] [/td]
-    [/tr]
-[/table]
+5. [b]Autocomplete🏷️[/b]: Type any command OR tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
+5. [b]Autocomplete Tags And Commands🏷️[/b]: Type any tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
+6. [b]More✍️[/b]: A better text editor, customizable scrollbar, and much more!
 
 [h3] 🤝Credits [/h3] 
-- Thanks to thraaks for making icons and sprites!
+- Thanks to thraaks for making the icon!
 
 [h3] ❤️ Support the Project [/h3]
 [url=https://github.com/emyhrberg/ChatPlus] GitHub [/url] | [url=https://discord.gg/JWbYUktRPV] Discord [/url] | [url=https://ko-fi.com/erkyy] Ko-Fi [/url][quote=tModLoader ChatPlus]

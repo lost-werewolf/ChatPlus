@@ -6,6 +6,7 @@ using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,6 +15,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
+using Terraria.UI.Chat;
 using Terraria.Utilities.FileBrowser;
 using static nativefiledialog;
 
@@ -24,7 +26,18 @@ namespace ChatPlus.Core.UI
         private readonly UIText text;
         public UIText GetText() => text;
 
-        public DescriptionPanel(string initialText = null, bool centerText = false)
+        protected override float SharedYOffset
+        {
+            get
+            {
+                int pad = 2;
+                int itemCount = 10;
+                if (Conf.C != null) itemCount = (int)Conf.C.AutocompleteItemCount;
+                return -itemCount * 30 - pad; // sit above the base panel
+            }
+        }
+
+        public DescriptionPanel(string initialText = null)
         {
             // Size
             Width.Set(320, 0);
@@ -40,14 +53,8 @@ namespace ChatPlus.Core.UI
             // Text
             text = new(initialText ?? string.Empty, 0.9f, false)
             {
-                HAlign = 0.5f
+                HAlign = 0.0f
             };
-
-            if (centerText)
-            {
-                text.HAlign = 0.5f;
-                text.VAlign = 0.5f;
-            }
 
             Append(text);
         }
@@ -199,64 +206,19 @@ namespace ChatPlus.Core.UI
 
         public void SetTextWithLinebreak(string rawText)
         {
-            if (rawText == null)
-            {
-                Log.Error("rawtext is null in panel: " + ConnectedPanel.GetType());
-                return;
-            }
-            if (FontAssets.MouseText == null) return;
+            if (rawText == null) { Log.Error("rawtext is null in panel: " + ConnectedPanel.GetType()); return; }
 
-            float scale = 0.9f;
-            float maxWidth = Width.Pixels;
-            var font = FontAssets.MouseText.Value;
 
-            // Collapse any existing newlines → they will break your layout otherwise
-            string str = rawText.Replace("\r\n", " ").Replace("\n", ". ");
-
-            // if it fits, just use it
-            if (font.MeasureString(str).X * scale / Main.UIScale <= maxWidth)
-            {
-                text.SetText(str);
-                return;
-            }
-
-            // binary search break point for first line
-            int lo = 1, hi = str.Length;
-            while (lo < hi)
-            {
-                int mid = (lo + hi + 1) / 2;
-                float w = font.MeasureString(str[..mid]).X * scale / Main.UIScale;
-                if (w <= maxWidth) lo = mid; else hi = mid - 1;
-            }
-
-            int breakIndex = str.LastIndexOf(' ', lo);
-            if (breakIndex <= 0) breakIndex = lo;
-
-            string firstLine = str[..breakIndex].TrimEnd();
-            string secondLine = (breakIndex + 1 < str.Length) ? str[(breakIndex + 1)..].TrimStart() : string.Empty;
-
-            // now only two lines max
-            text.SetText(firstLine + (secondLine.Length > 0 ? "\n" + secondLine : ""));
-
-            // if HUGE text, set HAlign to 0
-            if (rawText.Length > 150) 
-                text.HAlign = 0f;
+            text.SetText(rawText);
         }
+
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            int pad = 2;
-            text.HAlign = 0.0f;
-
-            int itemCount = 10;
-            if (Conf.C != null)
-                itemCount = (int)Conf.C.AutocompleteItemCount;
-            Top.Set(-itemCount * 30 - 38 - pad, 0);
-
             if (ConnectedPanel.GetType() == typeof(UploadPanel))
             {
                 Height.Set(60, 0);
-                text.SetText("Left click here to upload an image\nRight click to open image folder");
+                text.SetText("Click here to upload an image\nRight click to open image folder");
             }
 
             if (ConnectedPanel.GetType() == typeof(ModIconPanel))
@@ -272,6 +234,10 @@ namespace ChatPlus.Core.UI
             if (ConnectedPanel.GetType() == typeof(GlyphPanel))
             {
                 Height.Set(40, 0);
+            }
+            if (ConnectedPanel.GetType() == typeof(PlayerHeadPanel))
+            {
+                Height.Set(60, 0);
             }
 
             base.Draw(spriteBatch);

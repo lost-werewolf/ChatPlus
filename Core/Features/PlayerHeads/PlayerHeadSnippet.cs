@@ -2,6 +2,7 @@ using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.PlayerHeads;
@@ -21,34 +22,25 @@ public class PlayerHeadSnippet : TextSnippet
 
     public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch spriteBatch, Vector2 position = default, Color color = default, float scale = 1f)
     {
-        const int dim = 20;
-        size = new Vector2(dim * scale, dim * scale);
-        if (justCheckingString) return true;
+        const float box = 26f;
+        const float line = 20f;
+        const float headScale = 0.75f;
 
-        if (_playerIndex >= 0 && _playerIndex < Main.maxPlayers)
-        {
-            position += new Vector2(9, 9);
-            DrawPlayerHead(position);
-        }
-        return true;
-    }
+        size = new Vector2(box * scale, box * scale);
+        if (justCheckingString || color == Color.Black) return true;
 
-    private void DrawPlayerHead(Vector2 position)
-    {
-        if (Main.LocalPlayer == null || Main.Camera == null || _playerIndex < 0 || _playerIndex >= Main.maxPlayers) { 
-            Log.Error("Oof invalid draw for player head"); 
-            return; 
-        }
-
+        if (_playerIndex < 0 || _playerIndex >= Main.maxPlayers) return true;
         var player = Main.player[_playerIndex];
-        if (player == null || !player.active) { 
-            Log.Error("Oof invalid player"); 
-            return; 
-        }
+        if (player == null || !player.active) return true;
+
+        float headPx = line * headScale * scale;
+        float x = position.X + 8;
+        float y = position.Y + 8; // same baseline lift as mod icon, centered in box
 
         PlayerHeadFlipHook.shouldFlipHeadDraw = player.direction == -1;
-        Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, position, 1f, 0.8f, Color.White);
+        Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, new Vector2(x, y), 1f, headScale * scale, Color.White);
         PlayerHeadFlipHook.shouldFlipHeadDraw = false;
+        return true;
     }
 
     public override void OnHover()
@@ -57,7 +49,10 @@ public class PlayerHeadSnippet : TextSnippet
         {
             var p = Main.player[_playerIndex];
             if (p?.active == true)
-                Main.instance.MouseText(p.name);
+            {
+                UICommon.TooltipMouseText(p.name);
+                //Main.instance.MouseText(p.name);
+            }
         }
     }
 }

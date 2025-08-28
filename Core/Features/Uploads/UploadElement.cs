@@ -25,12 +25,12 @@ namespace ChatPlus.Core.Features.Uploads
 
         public override void Draw(SpriteBatch sb)
         {
-            Height.Set(90, 0);
+            Height.Set(60, 0);
             base.Draw(sb);
 
-            img._textScale = 0.4f;
-            img.Left.Set(10, 0);
-            img.Top.Set(-5, 0);
+            img._textScale = 0.3f;
+            img.Left.Set(5, 0);
+            img.Top.Set(8, 0);
             //imgTagName.SetText(Element.Tag-="", 0.1f, true);
 
             var dims = GetDimensions();
@@ -38,7 +38,7 @@ namespace ChatPlus.Core.Features.Uploads
 
             // Draw file name
             TextSnippet[] snip = [new TextSnippet(Data.Tag)];
-            pos += new Vector2(90, 5);
+            pos += new Vector2(65, 5);
             ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos, 0f, Vector2.Zero, Vector2.One, out _);
         }
     }

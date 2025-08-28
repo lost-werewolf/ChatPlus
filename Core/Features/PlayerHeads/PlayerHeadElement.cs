@@ -22,12 +22,12 @@ public class PlayerHeadElement : BaseElement<PlayerHead>
 
         // mod icon tag
         string tag = Data.Tag;
-        float scale = 2.0f; // 150% bigger
+        float scale = 1.05f; // 150% bigger
         ChatManager.DrawColorCodedStringWithShadow(
             sb,
             FontAssets.MouseText.Value,
             tag,
-            pos + new Microsoft.Xna.Framework.Vector2(3, 4),
+            pos + new Vector2(5, 5),
             Color.White,
             0f,            // rotation
             Vector2.Zero,  // origin

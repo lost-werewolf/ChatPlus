@@ -14,7 +14,7 @@ namespace ChatPlus.Core.Features.Glyphs
             glyphPanel = new();
             Append(glyphPanel);
 
-            glyphDescPanel = new(centerText: true);
+            glyphDescPanel = new();
             Append(glyphDescPanel);
 
             glyphPanel.ConnectedPanel = glyphDescPanel;

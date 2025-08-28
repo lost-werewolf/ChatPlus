@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ChatPlus.Common.Configs;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -34,8 +35,8 @@ public class ChatScrollSystem : ModSystem
             if (chatScrollUI.CurrentState != chatScrollState)
             {
                 chatScrollUI.SetState(chatScrollState);
-                Main.chatMonitor.ResetOffset();
-                chatScrollState.chatScrollbar.GoToBottom();  
+                //Main.chatMonitor.ResetOffset();
+                //chatScrollState.chatScrollbar.GoToBottom();  
             }
             chatScrollUI.Update(gameTime);
         }
@@ -55,16 +56,15 @@ public class ChatScrollSystem : ModSystem
         {
             layers.Insert(index, new LegacyGameInterfaceLayer(
                 "ChatPlus: Chat Scrollbar",
-                () => {
-                    bool moreThan10 = ChatScrollList.GetTotalLines() > 10;
-                    if (Main.drawingPlayerChat && chatScrollUI?.CurrentState != null && Conf.C.Scrollbar && moreThan10)
-                    {
+                () =>
+                {
+                    int show = Math.Clamp((int)Conf.C.ChatItemCount, 10, 20);
+                    bool moreThanVisible = ChatScrollList.GetTotalLines() > show;
+                    if (Main.drawingPlayerChat && chatScrollUI?.CurrentState != null && Conf.C.Scrollbar && moreThanVisible)
                         chatScrollUI.Draw(Main.spriteBatch, Main.gameTimeCache);
-                    }
                     return true;
                 },
-                InterfaceScaleType.UI)
-            );
+                InterfaceScaleType.UI));
         }
     }
 }

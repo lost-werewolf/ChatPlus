@@ -23,12 +23,12 @@ public class ModIconElement : BaseElement<ModIcon>
 
         // mod icon tag
         string tag = Data.Tag;
-        float scale = 1.0f; // 150% bigger
+        float scale = 1.25f; // 150% bigger
         ChatManager.DrawColorCodedStringWithShadow(
             sb,
             FontAssets.MouseText.Value,
             tag,
-            pos + new Microsoft.Xna.Framework.Vector2(3,4),
+            pos + new Microsoft.Xna.Framework.Vector2(3,2),
             Color.White,
             0f,            // rotation
             Vector2.Zero,  // origin

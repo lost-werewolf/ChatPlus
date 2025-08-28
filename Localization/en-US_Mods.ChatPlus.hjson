@@ -12,7 +12,11 @@ Keybinds: {
 Configs: {
 	Config: {
 		DisplayName: Config
-		Headers.Config: Config
+
+		Headers: {
+			Config: Config
+			ChatFormat: Chat Format
+		}
 
 		Autocomplete: {
 			Label: Autocomplete
@@ -31,7 +35,7 @@ Configs: {
 		}
 
 		ShowLinks: {
-			Label: Show Links
+			Label: Links
 			Tooltip: Links you type in chat become clickable.
 		}
 
@@ -63,6 +67,26 @@ Configs: {
 		AutocompleteItemCount: {
 			Label: Autocomplete Items Visible
 			Tooltip: Set the number of items in the autocomplete window that can be visible at one time.
+		}
+
+		ModIcons: {
+			Label: Mod Icons
+			Tooltip: A mod icon before every chat sent by a mod.
+		}
+
+		PlayerIcons: {
+			Label: Player Icons
+			Tooltip: A player head before every chat sent by a player.
+		}
+
+		PlayerColors: {
+			Label: Player Colors
+			Tooltip: Assigns every player a color.
+		}
+
+		PlayerFormat: {
+			Label: Player Format
+			Tooltip: Sets the prefix and suffix around your name.
 		}
 	}
 }

@@ -32,8 +32,6 @@ namespace ChatPlus.Core.Features.Commands
             base.OnWorldUnload();
         }
 
-        private bool JustPressed(Keys key) => Main.keyState.IsKeyDown(key) && Main.oldKeyState.IsKeyUp(key);
-
         public override void UpdateUI(GameTime gameTime)
         {
             if (!Main.drawingPlayerChat)

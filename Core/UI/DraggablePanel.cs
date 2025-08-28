@@ -1,114 +1,146 @@
 ﻿using System;
-using ChatPlus.Core.Features.Colors;
-using ChatPlus.Core.Features.Commands;
-using ChatPlus.Core.Features.Emojis;
-using ChatPlus.Core.Features.Glyphs;
-using ChatPlus.Core.Features.Items;
-using ChatPlus.Core.Features.ModIcons;
-using ChatPlus.Core.Features.PlayerHeads;
-using ChatPlus.Core.Features.Uploads;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.Core.UI
+namespace ChatPlus.Core.UI;
+
+public abstract class DraggablePanel : UIPanel
 {
-    public abstract class DraggablePanel : UIPanel
+    private static readonly HashSet<DraggablePanel> live = [];
+    private static Vector2 sharedPos;
+    private static bool sharedInitialized;
+
+    private bool dragging;
+    private Vector2 dragOffset;
+    private const float dragThreshold = 3f;
+    private Vector2 mouseDownPos;
+
+    public DraggablePanel ConnectedPanel { get; set; }
+    protected virtual float SharedYOffset => 0f;
+
+    public override void OnActivate()
     {
-        // Dragging
-        private bool dragging;
-        private Vector2 dragOffset;
-        private const float DragThreshold = 3f; // very low threshold for dragging
-        private Vector2 mouseDownPos;
+        base.OnActivate();
+        live.Add(this);
+        if (!sharedInitialized) { sharedPos = new Vector2(Left.Pixels, Top.Pixels - SharedYOffset); sharedInitialized = true; }
+        Left.Set(sharedPos.X, 0f);
+        Top.Set(sharedPos.Y + SharedYOffset, 0f);
+        Recalculate();
+    }
 
-        /// <summary>
-        /// If set, this panel will drag together with this one.
-        /// </summary>
-        public DraggablePanel ConnectedPanel { get; set; }
+    public override void OnDeactivate()
+    {
+        live.Remove(this);
+        base.OnDeactivate();
+    }
 
-        public override void Update(GameTime gameTime)
+    public override void Update(GameTime gameTime)
+    {
+        if (IsMouseHovering) Main.LocalPlayer.mouseInterface = true;
+
+        // keep snapped when not dragging
+        if (!dragging && sharedInitialized)
         {
-            if (IsMouseHovering)
-                Main.LocalPlayer.mouseInterface = true;
-
-            if (dragging)
+            float exX = sharedPos.X, exY = sharedPos.Y + SharedYOffset;
+            if (Math.Abs(Left.Pixels - exX) > 0.5f || Math.Abs(Top.Pixels - exY) > 0.5f)
             {
-                float dragDistance = Vector2.Distance(new Vector2(Main.mouseX, Main.mouseY), mouseDownPos);
-                if (dragDistance > DragThreshold)
-                {
-                    // Current rect
-                    var thisRect = GetDimensions().ToRectangle();
-                    float oldX = Left.Pixels;
-
-                    // Only allow X dragging
-                    float targetX = Main.mouseX - dragOffset.X;
-                    float rawDx = targetX - oldX;
-
-                    float dxMin = -thisRect.Left;
-                    float dxMax = Main.screenWidth - thisRect.Right;
-
-                    // If there’s a connected panel, constrain so it stays onscreen too
-                    if (ConnectedPanel != null)
-                    {
-                        var otherRect = ConnectedPanel.GetDimensions().ToRectangle();
-                        dxMin = Math.Max(dxMin, -otherRect.Left);
-                        dxMax = Math.Min(dxMax, Main.screenWidth - otherRect.Right);
-                    }
-
-                    // Clamp X delta
-                    float dx = MathHelper.Clamp(rawDx, dxMin, dxMax);
-
-                    // Apply to this panel
-                    float newX = oldX + dx;
-                    Left.Set(newX, 0f);
-                    Recalculate();
-
-                    // Apply to connected panel
-                    if (ConnectedPanel != null)
-                    {
-                        ConnectedPanel.Left.Set(ConnectedPanel.Left.Pixels + dx, 0f);
-                        ConnectedPanel.Recalculate();
-                    }
-                }
+                Left.Set(exX, 0f);
+                Top.Set(exY, 0f);
+                Recalculate();
             }
         }
 
-        public override void LeftMouseDown(UIMouseEvent evt)
+        if (!dragging) return;
+
+        float moved = Vector2.Distance(new Vector2(Main.mouseX, Main.mouseY), mouseDownPos);
+        if (moved <= dragThreshold) return;
+
+        var r = GetDimensions().ToRectangle();
+        float oldX = Left.Pixels;
+        float targetX = Main.mouseX - dragOffset.X;
+        float rawDx = targetX - oldX;
+
+        float dxMin = -r.Left;
+        float dxMax = Main.screenWidth - r.Right;
+
+        if (ConnectedPanel != null)
         {
-            // If hovering any UIScrollbar, skip drag
-            var cmdSys = ModContent.GetInstance<CommandSystem>();
-            var colorSys = ModContent.GetInstance<ColorSystem>();
-            var emojiSys = ModContent.GetInstance<EmojiSystem>();
-            var glyphSys = ModContent.GetInstance<GlyphSystem>();
-            var itemSys = ModContent.GetInstance<ItemSystem>();
-            var modIconSys = ModContent.GetInstance<ModIconSystem>();
-            var playerHeadSys = ModContent.GetInstance<PlayerHeadSystem>();
-            var uploadSys = ModContent.GetInstance<UploadSystem>();
-
-            if (cmdSys.commandState.commandPanel.scrollbar.IsMouseHovering
-            || colorSys.colorState.colorPanel.scrollbar.IsMouseHovering
-            || emojiSys.emojiState.emojiPanel.scrollbar.IsMouseHovering
-            || glyphSys.glyphState.glyphPanel.scrollbar.IsMouseHovering
-            || itemSys.itemWindowState.itemPanel.scrollbar.IsMouseHovering
-            || modIconSys.state.panel.scrollbar.IsMouseHovering
-            || playerHeadSys.state.Panel.scrollbar.IsMouseHovering
-            || uploadSys.state.panel.scrollbar.IsMouseHovering)
-                return;
-
-            // Start dragging
-            mouseDownPos = evt.MousePosition;
-            base.LeftMouseDown(evt);
-            dragging = true;
-            dragOffset = evt.MousePosition - new Vector2(Left.Pixels, Top.Pixels);
+            var other = ConnectedPanel.GetDimensions().ToRectangle();
+            dxMin = Math.Max(dxMin, -other.Left);
+            dxMax = Math.Min(dxMax, Main.screenWidth - other.Right);
         }
 
-        public override void LeftMouseUp(UIMouseEvent evt)
+        float dx = MathHelper.Clamp(rawDx, dxMin, dxMax);
+
+        // ► Move X only during drag; never touch Top here
+        Left.Set(oldX + dx, 0f);
+        Recalculate();
+
+        if (ConnectedPanel != null)
         {
-            base.LeftMouseUp(evt);
-            dragging = false; // stop dragging
-            Recalculate();
+            ConnectedPanel.Left.Set(ConnectedPanel.Left.Pixels + dx, 0f);
+            ConnectedPanel.Recalculate();
         }
+
+        // update shared X only; keep shared Y unchanged while dragging
+        sharedPos = new Vector2(Left.Pixels, sharedPos.Y);
+
+        foreach (var p in live)
+        {
+            if (p == this) continue;
+            p.Left.Set(sharedPos.X, 0f);
+            p.Recalculate(); // no Top changes while dragging
+        }
+    }
+
+    public override void LeftMouseDown(UIMouseEvent evt)
+    {
+        if (IsAnyScrollbarHovering()) return;
+        mouseDownPos = evt.MousePosition;
+        base.LeftMouseDown(evt);
+        dragging = true;
+        dragOffset = evt.MousePosition - new Vector2(Left.Pixels, Top.Pixels);
+    }
+
+    public override void LeftMouseUp(UIMouseEvent evt)
+    {
+        base.LeftMouseUp(evt);
+        dragging = false;
+
+        // Persist only X; Y stays whatever each panel’s layout dictates.
+        sharedPos = new Vector2(Left.Pixels, sharedPos.Y);
+
+        foreach (var p in live)
+        {
+            if (p == this) continue;
+            p.Left.Set(sharedPos.X, 0f);
+            p.Top.Set(sharedPos.Y + p.SharedYOffset, 0f); // safe to reapply Y after drag
+            p.Recalculate();
+        }
+    }
+
+    private static bool IsAnyScrollbarHovering()
+    {
+        var cmd = ModContent.GetInstance<Features.Commands.CommandSystem>();
+        var col = ModContent.GetInstance<Features.Colors.ColorSystem>();
+        var emo = ModContent.GetInstance<Features.Emojis.EmojiSystem>();
+        var gly = ModContent.GetInstance<Features.Glyphs.GlyphSystem>();
+        var itm = ModContent.GetInstance<Features.Items.ItemSystem>();
+        var mod = ModContent.GetInstance<Features.ModIcons.ModIconSystem>();
+        var head = ModContent.GetInstance<Features.PlayerHeads.PlayerHeadSystem>();
+        var upl = ModContent.GetInstance<Features.Uploads.UploadSystem>();
+
+        return cmd.commandState.commandPanel.scrollbar.IsMouseHovering
+            || col.colorState.colorPanel.scrollbar.IsMouseHovering
+            || emo.emojiState.emojiPanel.scrollbar.IsMouseHovering
+            || gly.glyphState.glyphPanel.scrollbar.IsMouseHovering
+            || itm.itemWindowState.itemPanel.scrollbar.IsMouseHovering
+            || mod.state.panel.scrollbar.IsMouseHovering
+            || head.state.Panel.scrollbar.IsMouseHovering
+            || upl.state.panel.scrollbar.IsMouseHovering;
     }
 }

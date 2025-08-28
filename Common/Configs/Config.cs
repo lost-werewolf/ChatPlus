@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using AdvancedChatFeatures.Common.Configs;
 using ChatPlus.Common.Configs.ConfigElements;
 using ChatPlus.Core.Helpers;
 using Terraria.ModLoader;
@@ -15,15 +16,9 @@ namespace ChatPlus.Common.Configs
 
         [Header("Config")]
 
-        [CustomModConfigItem(typeof(AutocompleteConfigElement))]
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
         public bool Autocomplete = true;
-
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [CustomModConfigItem(typeof(EnableLinksConfigElement))]
-        [DefaultValue(true)]
-        public bool ShowLinks = true;
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
@@ -32,9 +27,10 @@ namespace ChatPlus.Common.Configs
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
         public bool Scrollbar = true;
+        
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [Range(10f, 10f)]
+        [Range(10f, 20f)]
         [Increment(1f)]
         [DefaultValue(10f)]
         public float ChatItemCount = 10f;
@@ -44,6 +40,33 @@ namespace ChatPlus.Common.Configs
         [Increment(1f)]
         [DefaultValue(10f)]
         public float AutocompleteItemCount = 10f;
+
+        [Header("ChatFormat")]
+        [CustomModConfigItem(typeof(ModIconsConfigElement))]
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [DefaultValue(true)]
+        public bool ModIcons = true;
+
+        [CustomModConfigItem(typeof(PlayerIconsConfigElement))]
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [DefaultValue(true)]
+        public bool PlayerIcons = true;
+
+        [CustomModConfigItem(typeof(PlayerColorsConfigElement))]
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [DefaultValue(true)]
+        public bool PlayerColors = true;
+
+        [BackgroundColor(255, 192, 8)]
+        [CustomModConfigItem(typeof(PlayerFormatConfigElement))]
+        [OptionStrings(["<PlayerName>", "PlayerName:"])]
+        [DefaultValue("<PlayerName>")]
+        public string PlayerFormat { get; set; } = "<PlayerName>";
+
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [CustomModConfigItem(typeof(EnableLinksConfigElement))]
+        [DefaultValue(true)]
+        public bool ShowLinks = true;
 
         public override void OnChanged()
         {

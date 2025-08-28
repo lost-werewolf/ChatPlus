@@ -133,14 +133,26 @@ public class ChatScrollbar : UIElement
     {
         base.Update(gameTime);
 
-        // Set position
-        Top.Set(Main.screenHeight - 247, 0f);
-        Height.Set(210f, 0f);
+        // derive visible lines from chat monitor (_showCount), clamp 10–20
+        var f = Main.chatMonitor?.GetType().GetField("_showCount", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        int show = f != null ? Math.Clamp((int)f.GetValue(Main.chatMonitor), 10, 20) : 10;
 
-        // If hovering the scrollbar, also consume vanilla scroll to prevent hotbar changes.
-        if (IsMouseHovering)
+        const float line = 21f;
+        float h = show * line;
+        float top = Main.screenHeight - (h + 37f); // keep bottom edge at screenHeight-37
+
+        Top.Set(top, 0f);
+        Height.Set(h, 0f);
+
+        if (IsMouseHovering) Main.LocalPlayer.mouseInterface = true;
+
+        if (isDragging)
         {
-            Main.LocalPlayer.mouseInterface = true;
+            var inner = GetInnerDimensions();
+            float mouseOffset = UserInterface.ActiveInstance.MousePosition.Y - inner.Y - dragYOffset;
+            ViewPosition = mouseOffset / inner.Height * (maxViewSize <= 0f ? 1f : maxViewSize);
         }
+
+        isHoveringHandle = GetHandleRectangle().Contains(Main.MouseScreen.ToPoint());
     }
 }

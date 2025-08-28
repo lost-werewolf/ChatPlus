@@ -15,10 +15,6 @@ namespace ChatPlus.Core.Chat
 {
     internal class DrawChatSystem : ModSystem
     {
-        const int BaseHeight = 32;   // vanilla input line height
-        const int ExtraH = 180;      // image height = 10 lines * 20px
-        const int Expanded = BaseHeight + ExtraH; // 232
-
         public override void Load()
         {
             if (ModLoader.TryGetMod("ChatImprover", out Mod _))
@@ -44,59 +40,39 @@ namespace ChatPlus.Core.Chat
         private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
         {
             bool hasUpload = drawingPlayerChat && HasUpload(Main.chatText);
+            if (!hasUpload) { orig(self, drawingPlayerChat); return; }
 
-            if (!hasUpload)
-            {
-                orig(self, drawingPlayerChat);
-                return;
-            }
-
-            // Lift monitor so it renders above the taller input area
             var sb = Main.spriteBatch;
             sb.End();
-            var lifted = Main.UIScaleMatrix * Matrix.CreateTranslation(0f, -ExtraH, 0f);
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
-                     DepthStencilState.None, RasterizerState.CullCounterClockwise, null, lifted);
-
+            var lifted = Main.UIScaleMatrix * Matrix.CreateTranslation(0f, -147, 0f);
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, lifted);
             orig(self, true);
-
             sb.End();
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
-                     DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
         }
 
         private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
         {
-            if (!Main.drawingPlayerChat)
-            {
-                orig(self);
-                return;
-            }
+            if (!Main.drawingPlayerChat) { orig(self); return; }
 
             PlayerInput.WritingText = true;
             Main.instance.HandleIME();
-
-            // caret blink
-            if (++Main.instance.textBlinkerCount >= 20)
-            {
-                Main.instance.textBlinkerState = 1 - Main.instance.textBlinkerState;
-                Main.instance.textBlinkerCount = 0;
-            }
+            if (++Main.instance.textBlinkerCount >= 20) { Main.instance.textBlinkerState = 1 - Main.instance.textBlinkerState; Main.instance.textBlinkerCount = 0; }
 
             bool hasUpload = HasUpload(Main.chatText);
-            int height = hasUpload ? Expanded - 20 : BaseHeight;
+            int height = hasUpload ? 147+21 : 32;
 
             DrawChatbox(height);
 
             if (!hasUpload)
             {
-                DrawInputLine(height, textOffsetX: 0, hasUpload: false);
+                DrawInputLine(height, 0, false);
                 DrawSelectionRectangle(height, Main.screenHeight - height, 0);
             }
             else
             {
                 int textOffsetX = DrawUploadAndGetTextOffset(height);
-                DrawInputLine(height, textOffsetX, hasUpload: true);
+                DrawInputLine(height, textOffsetX, true);
             }
 
             Main.chatMonitor.DrawChat(true);
@@ -107,18 +83,17 @@ namespace ChatPlus.Core.Chat
 
         private static int DrawUploadAndGetTextOffset(int totalHeight)
         {
-            // Draw the first upload image at 200px tall, return text X offset (image width + padding)
             if (!TryGetFirstUploadTexture(Main.chatText, out var tex)) return 0;
 
             int inputX = 88;
             int inputY = Main.screenHeight - totalHeight;
 
-            float targetH = ExtraH; // 200px
-            float s = targetH / System.Math.Max(tex.Width, tex.Height);
+            float targetH = 147;
+            float s = targetH / tex.Height;
             float drawnW = tex.Width * s;
 
-            Main.spriteBatch.Draw(tex, new Vector2(inputX, inputY + 2), null, Color.White, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
-            return (int)System.Math.Ceiling(drawnW) + 8;
+            Main.spriteBatch.Draw(tex, new Vector2(inputX, inputY), null, Color.White, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
+            return (int)Math.Ceiling(drawnW) + 8;
         }
 
         private static bool TryGetFirstUploadTexture(string s, out Texture2D tex)

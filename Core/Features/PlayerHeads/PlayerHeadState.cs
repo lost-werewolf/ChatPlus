@@ -14,7 +14,7 @@ public class PlayerHeadState : UIState
         Panel = new PlayerHeadPanel();
         Append(Panel);
 
-        Desc = new DescriptionPanel<PlayerHead>(centerText: true);
+        Desc = new DescriptionPanel<PlayerHead>();
         Append(Desc);
 
         Panel.ConnectedPanel = Desc;

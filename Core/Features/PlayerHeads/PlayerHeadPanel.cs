@@ -7,7 +7,7 @@ public class PlayerHeadPanel : BasePanel<PlayerHead>
 {
     protected override IEnumerable<PlayerHead> GetSource() => PlayerHeadInitializer.PlayerIcons;
     protected override BaseElement<PlayerHead> BuildElement(PlayerHead data) => new PlayerHeadElement(data);
-    protected override string GetDescription(PlayerHead data) => data.PlayerName;
+    protected override string GetDescription(PlayerHead data) => data.PlayerName + "\nClick to view more";
     protected override string GetTag(PlayerHead data) => data.Tag;
 
     public override void Update(Microsoft.Xna.Framework.GameTime gt)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
+using ChatPlus.Common.Configs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -50,13 +51,20 @@ public class ChatScrollList : UIElement
     {
         base.Update(gameTime);
         if (scrollbar == null) return;
-        Top.Set(Main.screenHeight - 247, 0f);
+
+        // dynamic sizing from monitor show count
+        int show = Math.Clamp(GetShowCount() ?? 10, 10, 20);
+        const float line = 21f;
+        float h = show * line;
+        float top = Main.screenHeight - (h + 37f);
+
+        Top.Set(top, 0f);
         Width.Set(Main.screenWidth - 300f, 0f);
+        Height.Set(h, 0f);
 
         Sync();
 
-        if (IsMouseHovering)
-            PlayerInput.LockVanillaMouseScroll("ChatPlus/ChatScroll");
+        if (IsMouseHovering) PlayerInput.LockVanillaMouseScroll("ChatPlus/ChatScroll");
     }
 
     public override void Draw(SpriteBatch sb)

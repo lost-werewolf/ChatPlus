@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Linq;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -6,6 +8,7 @@ using ReLogic.Graphics;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.ModLoader;
+using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.ModIcons;
@@ -25,13 +28,14 @@ public sealed class ModIconSnippet : TextSnippet
     public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch sb,
                                     Vector2 pos = default, Color color = default, float scale = 1f)
     {
+        const float BaseIconSize = 22f;
         float px = BaseIconSize * Math.Max(0f, scale);
         size = new Vector2(px, px);
 
         if (justCheckingString || color == Color.Black)
             return true;
 
-        var dest = new Rectangle((int)pos.X, (int)(pos.Y - 2), (int)px, (int)px);
+        var dest = new Rectangle((int)pos.X, (int)(pos.Y - 1), (int)px, (int)px);
 
         if (modName.Equals("Terraria", StringComparison.OrdinalIgnoreCase))
         {
@@ -69,7 +73,8 @@ public sealed class ModIconSnippet : TextSnippet
 
     public override void OnHover()
     {
-        Main.instance.MouseText(GetDisplayName(modName));
+        //Main.instance.MouseText(GetDisplayName(modName));
+        UICommon.TooltipMouseText(modName);
     }
 
     private static bool TryGetModIcon(string name, out Texture2D tex)
@@ -97,5 +102,48 @@ public sealed class ModIconSnippet : TextSnippet
     private static string GetDisplayName(string name)
     {
         return ModLoader.TryGetMod(name, out var mod) ? (mod.DisplayName ?? name) : name;
+    }
+
+    public static string GetModSource()
+    {
+        try
+        {
+            var trace = new StackTrace();
+            var frames = trace.GetFrames();
+            if (frames == null) return null;
+            var terrariaAssembly = typeof(Main).Assembly;
+            var loaderAssembly = typeof(ModLoader).Assembly;
+            var pivot = -1;
+            for (int k = 0; k < frames.Length; k++)
+            {
+                var method = frames[k].GetMethod();
+                if (method == null) continue;
+                var name = method.Name;
+                if (name.IndexOf("NewText", StringComparison.Ordinal) >= 0 || name.IndexOf("AddNewMessage", StringComparison.Ordinal) >= 0) { pivot = k; break; }
+            }
+            if (pivot < 0) return null;
+            Type chosenType = null;
+            for (int k = pivot + 1; k < frames.Length; k++)
+            {
+                var method = frames[k].GetMethod();
+                if (method == null) continue;
+                var type = method.DeclaringType;
+                if (type == null || type.Namespace == null) continue;
+                var asm = type.Assembly;
+                if (asm == terrariaAssembly || asm == loaderAssembly) continue;
+                chosenType = type;
+                break;
+            }
+            if (chosenType == null) return "Terraria";
+            var mod = ModLoader.Mods.FirstOrDefault(z => z.Name != "ModLoader" && z.Code == chosenType.Assembly);
+            if (mod.Name == "DragonLens" || mod.Name == "CheatSheet")
+                return null;
+            if (mod == null) return "Terraria";
+            return mod.Name;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }
