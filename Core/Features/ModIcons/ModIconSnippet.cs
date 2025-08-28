@@ -43,13 +43,11 @@ public class ModIconSnippet : TextSnippet
         float w = tex.Width * s;
 
         size = new Vector2(w, h);
-        if (justCheckingString) return true;
-
-        // small vertical nudge to match input baseline look
-        position.Y += 5f;
-
-        DrawSmallModIcon(sb, mod, position, 26);
-
+        position.Y += 5f; // small vertical nudge to match input baseline look
+        if (!justCheckingString && color != Color.Black)
+        {
+            DrawSmallModIcon(sb, mod, position, 26);
+        }
         return true;
     }
     private static void DrawSmallModIcon(SpriteBatch sb, Mod mod, Vector2 pos, int size)
@@ -65,9 +63,9 @@ public class ModIconSnippet : TextSnippet
             string normalPath = $"{mod.Name}/icon";
 
             if (ModContent.HasAsset(smallPath))
-                tex = ModContent.Request<Texture2D>(smallPath, AssetRequestMode.ImmediateLoad).Value;
+                tex = ModContent.Request<Texture2D>(smallPath).Value;
             else if (ModContent.HasAsset(normalPath))
-                tex = ModContent.Request<Texture2D>(normalPath, AssetRequestMode.ImmediateLoad).Value;
+                tex = ModContent.Request<Texture2D>(normalPath).Value;
         }
 
         var target = new Rectangle((int)pos.X - 3, (int)pos.Y - 2, size, size);

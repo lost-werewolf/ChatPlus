@@ -5,6 +5,8 @@ Keybinds: {
 	"Open Item Window.DisplayName": Open  Item  Window
 	"Open Color Window.DisplayName": Open  Color  Window
 	"Open Upload Window.DisplayName": Open  Upload  Window
+	"DEBUG: Write Lines.DisplayName": D E B U G:  Write  Lines
+	"DEBUG: Write Chat Line Count.DisplayName": D E B U G:  Write  Chat  Line  Count
 }
 
 Configs: {

@@ -4,6 +4,7 @@ using ChatPlus.Core.Features.Commands;
 using ChatPlus.Core.Features.Emojis;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
+using ChatPlus.Core.Features.Scrollbar;
 using ChatPlus.Core.Features.Uploads;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
@@ -21,6 +22,9 @@ namespace ChatPlus.Common.Keybinds
         public static ModKeybind OpenColorWindowKeybind;
         public static ModKeybind OpenUploadWindow;
 
+        // Debug
+        public static ModKeybind WriteLineCount;
+
         public override void Load()
         {
             OpenCommandKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Command Window", Keys.C);
@@ -29,6 +33,10 @@ namespace ChatPlus.Common.Keybinds
             OpenItemWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Item Window", Keys.I);
             OpenColorWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Color Window", Keys.O);
             OpenUploadWindow = KeybindLoader.RegisterKeybind(Mod, "Open Upload Window", Keys.U);
+
+#if DEBUG
+            WriteLineCount = KeybindLoader.RegisterKeybind(Mod, "DEBUG: Write Chat Line Count", Keys.L);
+#endif
         }
     }
 
@@ -36,6 +44,14 @@ namespace ChatPlus.Common.Keybinds
     {
         public override void ProcessTriggers(TriggersSet t)
         {
+#if DEBUG
+            if (KeybindSystem.WriteLineCount.JustPressed)
+            {
+                // Your debug logic here
+                Main.NewText($"Line count: {ScrollHelper.GetTotalLineCount()}");
+            }
+#endif
+
             void OpenSystem<TSystem>(ModKeybind keybind, TSystem sys, string prefix) where TSystem : ModSystem
             {
                 if (!keybind.JustPressed)

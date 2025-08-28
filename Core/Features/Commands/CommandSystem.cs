@@ -36,10 +36,6 @@ namespace ChatPlus.Core.Features.Commands
 
         public override void UpdateUI(GameTime gameTime)
         {
-            if (JustPressed(Keys.Enter))
-            {
-
-            }
             if (!Main.drawingPlayerChat)
             {
                 if (ui.CurrentState != null)

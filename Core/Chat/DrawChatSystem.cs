@@ -18,8 +18,6 @@ namespace ChatPlus.Core.Chat
         const int ExtraH = 180;      // image height = 10 lines * 20px
         const int Expanded = BaseHeight + ExtraH; // 232
 
-        public static object UploadHandler { get; private set; }
-
         public override void Load()
         {
             if (ModLoader.TryGetMod("ChatImprover", out Mod _))
@@ -30,6 +28,7 @@ namespace ChatPlus.Core.Chat
             On_Main.DrawPlayerChat += DrawChat;
             On_RemadeChatMonitor.DrawChat += DrawMonitor;
         }
+
         public override void Unload()
         {
             if (ModLoader.TryGetMod("ChatImprover", out Mod _))
@@ -101,7 +100,6 @@ namespace ChatPlus.Core.Chat
 
             Main.chatMonitor.DrawChat(true);
         }
-
 
         // --- helpers ---
 
