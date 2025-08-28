@@ -47,8 +47,11 @@ namespace ChatPlus.Common.Keybinds
 #if DEBUG
             if (KeybindSystem.WriteLineCount.JustPressed)
             {
-                // Your debug logic here
-                Main.NewText($"Line count: {ScrollHelper.GetTotalLineCount()}");
+                int count = 10;
+                for (int i = 0; i < count; i++)
+                {
+                    Main.NewText($"Line count: {ChatScrollList.GetTotalLines()}");
+                }
             }
 #endif
 
@@ -67,7 +70,7 @@ namespace ChatPlus.Common.Keybinds
                 Main.chatRelease = false;
 
                 // Add the system prefix.
-                // The system will handle opening the state by checking for the prefix.
+                // The system will handle opening the chatScrollState by checking for the prefix.
                 Main.chatText = prefix;
 
                 // Set caret to last

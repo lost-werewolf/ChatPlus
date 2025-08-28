@@ -225,4 +225,8 @@ Fix so pressing enter on a command enters it into chat
 Add mod icons
 Add player icons
 Add scrollbar
-
+---
+Scrollbar functionality:
+- Works to drag the handle
+- Works to scroll with up down arrow keys
+- Works to scroll with mouse wheel

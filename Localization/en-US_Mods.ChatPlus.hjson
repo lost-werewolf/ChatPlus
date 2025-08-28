@@ -87,6 +87,11 @@ Configs: {
 				Ctrl+V : Paste
 				'''
 		}
+
+		EnableChatScrollbar: {
+			Label: Enable Chat Scrollbar
+			Tooltip: ""
+		}
 	}
 
 	AutocompleteWindowConfig: {

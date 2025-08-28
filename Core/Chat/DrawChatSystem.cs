@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
@@ -160,7 +161,7 @@ namespace ChatPlus.Core.Chat
             // Caret
             if (Main.instance.textBlinkerState == 1)
             {
-                int caretRaw = System.Math.Clamp(HandleChatSystem.GetCaretPos(), 0, raw.Length);
+                int caretRaw = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, raw.Length);
                 int caretClean = caretRaw;
 
                 if (tag.Success)
@@ -171,7 +172,7 @@ namespace ChatPlus.Core.Chat
                     else caretClean = caretRaw - tag.Length;                 // after tag → shift left by tag length
                 }
 
-                caretClean = System.Math.Clamp(caretClean, 0, cleaned.Length);
+                caretClean = Math.Clamp(caretClean, 0, cleaned.Length);
                 var before = ChatManager.ParseMessage(cleaned.Substring(0, caretClean), Color.White).ToArray();
                 Vector2 beforeSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, before, Vector2.One);
 

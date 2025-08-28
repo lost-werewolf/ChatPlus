@@ -44,10 +44,10 @@ namespace ChatPlus.Core.Features.Emojis
                 return;
 
             Rectangle bounds = new((int)position.X, (int)position.Y, (int)w, (int)h);
-            if (!bounds.Contains(Main.MouseScreen.ToPoint()))
-                return;
-
-            UICommon.TooltipMouseText(Text);
+            if (bounds.Contains(Main.MouseScreen.ToPoint()))
+            {
+                UICommon.TooltipMouseText(Text);
+            }
         }
     }
 }

@@ -18,7 +18,7 @@ namespace ChatPlus.Common.ModCommands
 
             // Clear scroll list
             var sys = ModContent.GetInstance<ChatScrollSystem>();
-            sys.state.chatScrollList.Clear();
+            sys.chatScrollState.chatScrollList.Clear();
         }
 
         private void ClearChatMonitor()

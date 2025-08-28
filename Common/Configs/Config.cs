@@ -53,6 +53,10 @@ namespace ChatPlus.Common.Configs
             [BackgroundColor(255, 192, 8)] // Golden Yellow
             [DefaultValue(true)]
             public bool EnableTextEditingShortcuts = true;
+
+            [BackgroundColor(255, 192, 8)] // Golden Yellow
+            [DefaultValue(true)]
+            public bool EnableChatScrollbar = true;
         }
 
         public class AutocompleteWindowConfig
