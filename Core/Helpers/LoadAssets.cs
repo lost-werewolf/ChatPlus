@@ -18,6 +18,7 @@ namespace ChatPlus.Core.Helpers
 
         public static Asset<Texture2D> Hitbox;
         public static Asset<Texture2D> GuideHead;
+        public static Asset<Texture2D> StatPanel;
 
         // This bool automatically initializes all specified assets
         public static bool Initialized { get; set; }

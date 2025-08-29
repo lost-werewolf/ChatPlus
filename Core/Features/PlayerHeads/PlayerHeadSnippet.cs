@@ -1,9 +1,11 @@
+using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader.UI;
+using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.PlayerHeads;
@@ -41,7 +43,35 @@ public class PlayerHeadSnippet : TextSnippet
         PlayerHeadFlipHook.shouldFlipHeadDraw = player.direction == -1;
         Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, new Vector2(x, y), 1f, headScale * scale, Color.White);
         PlayerHeadFlipHook.shouldFlipHeadDraw = false;
+
+        PlayerInfoDrawer.Draw(Main.spriteBatch, player);
+
         return true;
+    }
+
+    public override void OnClick()
+    {
+        base.OnClick();
+
+        if (_playerIndex < 0 || _playerIndex >= Main.maxPlayers) return;
+        var plr = Main.player[_playerIndex];
+        if (plr == null || !plr.active) return;
+
+        var state = PlayerInfoState.instance;
+        if (state == null)
+        {
+            Main.NewText("Player info UI not available.", Color.Orange);
+            return;
+        }
+
+        // Snapshot current chat so the info UI can restore it later
+        var snap = ChatSession.Capture();                 // <- your existing helper
+
+        state.SetPlayer(_playerIndex, plr.name);          // tell the UI which player to show
+        state.SetReturnSnapshot(snap);                    // so Back can restore chat/session
+
+        Main.drawingPlayerChat = false;                   // hide chat while the modal is open (optional)
+        IngameFancyUI.OpenUIState(state);                 // open the "view more" UI
     }
 
     public override void OnHover()
@@ -51,9 +81,7 @@ public class PlayerHeadSnippet : TextSnippet
             Player player = Main.player[_playerIndex];
             if (player?.active == true)
             {
-                UICommon.TooltipMouseText(player.name);
                 PlayerInfoDrawer.Draw(Main.spriteBatch, player);
-                //Main.instance.MouseText(player.name);
             }
         }
     }
