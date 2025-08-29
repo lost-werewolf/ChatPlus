@@ -4,19 +4,8 @@ namespace ChatPlus.Core.Features.Commands
 {
     public class CommandState : BaseState<Command>
     {
-        public CommandPanel commandPanel;
-        public DescriptionPanel<Command> commandDescriptionPanel;
-        public CommandState()
+        public CommandState() : base(new CommandPanel(), new DescriptionPanel<Command>())
         {
-            // Initialize the UI elements
-            commandPanel = new();
-            Append(commandPanel);
-
-            commandDescriptionPanel = new();
-            Append(commandDescriptionPanel);
-
-            commandPanel.ConnectedPanel = commandDescriptionPanel;
-            commandDescriptionPanel.ConnectedPanel = commandPanel;
         }
     }
 }

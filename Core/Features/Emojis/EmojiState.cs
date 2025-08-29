@@ -1,29 +1,11 @@
 using ChatPlus.Core.UI;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace ChatPlus.Core.Features.Emojis
 {
     public class EmojiState : BaseState<Emoji>
     {
-        public EmojiPanel emojiPanel;
-        public DescriptionPanel<Emoji> emojiDescriptionPanel;
-
-        public EmojiState()
+        public EmojiState() : base(new EmojiPanel(), new DescriptionPanel<Emoji>())
         {
-            // Initialize the UI elements
-            emojiPanel = new();
-            Append(emojiPanel);
-
-            emojiDescriptionPanel = new();
-            Append(emojiDescriptionPanel);
-
-            emojiPanel.ConnectedPanel = emojiDescriptionPanel;
-            emojiDescriptionPanel.ConnectedPanel = emojiPanel;
-        }
-
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            base.Draw(spriteBatch);
         }
     }
 }

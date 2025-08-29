@@ -1,28 +1,11 @@
 using ChatPlus.Core.UI;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace ChatPlus.Core.Features.Colors
 {
     public class ColorState : BaseState<ColorItem>
     {
-        public ColorPanel colorPanel;
-        public DescriptionPanel<ColorItem> colorDescPanel;
-
-        public ColorState()
+        public ColorState() : base(new ColorPanel(), new DescriptionPanel<ColorItem>())
         {
-            colorPanel = new();
-            Append(colorPanel);
-
-            colorDescPanel = new();
-            Append(colorDescPanel);
-
-            colorPanel.ConnectedPanel = colorDescPanel;
-            colorDescPanel.ConnectedPanel = colorPanel;
-        }
-
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            base.Draw(spriteBatch);
         }
     }
 }

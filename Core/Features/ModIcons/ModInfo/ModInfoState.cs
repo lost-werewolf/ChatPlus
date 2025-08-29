@@ -170,6 +170,8 @@ public class ModInfoState : UIState, ILoadable
     {
         Log.Info("Finding workshop ID for mod: " + modInternalName);
 
+        if (modInternalName == "ModLoader") return;
+
         // Get the Mod instance for the current mod
         // This only works for enabled mods.
         LocalMod[] mods = ModOrganizer.FindAllMods();
@@ -272,8 +274,18 @@ public class ModInfoState : UIState, ILoadable
         modInternalName = internalName;
     }
 
+    private ChatSession.Snapshot? _returnSnapshot;
+
+    public void SetReturnSnapshot(ChatSession.Snapshot snap) => _returnSnapshot = snap;
+
+    // existing back button handler
     private void BackButton_OnLeftClick(UIMouseEvent evt, UIElement listeningElement)
     {
-        IngameFancyUI.Close();
+        Terraria.UI.IngameFancyUI.Close();
+        if (_returnSnapshot.HasValue)
+        {
+            ChatSession.Restore(_returnSnapshot.Value);
+            _returnSnapshot = null;
+        }
     }
 }

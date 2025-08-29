@@ -11,27 +11,14 @@ namespace ChatPlus.Core.Features.Commands
     public class CommandSystem : ModSystem
     {
         public UserInterface ui;
-        public CommandState commandState;
+        public CommandState state;
 
         public override void Load()
         {
             ui = new UserInterface();
-            commandState = new CommandState();
+            state = new CommandState();
             ui.SetState(null); // start hidden
         }
-
-        public override void Unload()
-        {
-            ui = new UserInterface();
-            commandState = new CommandState();
-            ui.SetState(null); // start hidden
-        }
-
-        public override void OnWorldUnload()
-        {
-            base.OnWorldUnload();
-        }
-
         public override void UpdateUI(GameTime gameTime)
         {
             if (!Main.drawingPlayerChat)
@@ -47,15 +34,15 @@ namespace ChatPlus.Core.Features.Commands
 
             if (Main.chatText.StartsWith(prefix))
             {
-                if (ui.CurrentState != commandState)
+                if (ui.CurrentState != state)
                 {
-                    ui.SetState(commandState);
+                    ui.SetState(state);
                 }
                 ui.Update(gameTime);
             }
             else
             {
-                if (ui.CurrentState == commandState)
+                if (ui.CurrentState == state)
                 {
                     ui.SetState(null);
                 }

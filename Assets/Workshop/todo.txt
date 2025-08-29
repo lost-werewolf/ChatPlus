@@ -233,10 +233,9 @@ Scrollbar functionality:
 ---
 ---
 Bugs:
-1. Fix so uploads are appropriately sized, they should be forced to a size where exactly 9 lines are always needed. Or maybe 5 lines looks cleaner for smaller images.
-2. Fix so we can increase chat item count by making bigger scrollbar and chatscrolllist view size etc
+[done] Fix so uploads are appropriately sized, they should be forced to a size where exactly 9 lines are always needed. Or maybe 5 lines looks cleaner for smaller images.
+[done] Fix so we can increase chat item count by making bigger scrollbar and chatscrolllist view size etc
 
 New features:
-1. Add to PlayerIcon: Hover player icon to see quick stats, click to see more: (player interaction, DL player manager).
-2. Add to ModIcon: A show more when clicking DescriptionPanel<ModIcon>
-3. Add inital header when opening a new state, e.g "Emojis", "Commands", etc.
+1. Hover player icon to see quick stats
+

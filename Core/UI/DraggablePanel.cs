@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -124,23 +125,25 @@ public abstract class DraggablePanel : UIPanel
     }
 
     private static bool IsAnyScrollbarHovering()
+{
+    var states = new object[]
     {
-        var cmd = ModContent.GetInstance<Features.Commands.CommandSystem>();
-        var col = ModContent.GetInstance<Features.Colors.ColorSystem>();
-        var emo = ModContent.GetInstance<Features.Emojis.EmojiSystem>();
-        var gly = ModContent.GetInstance<Features.Glyphs.GlyphSystem>();
-        var itm = ModContent.GetInstance<Features.Items.ItemSystem>();
-        var mod = ModContent.GetInstance<Features.ModIcons.ModIconSystem>();
-        var head = ModContent.GetInstance<Features.PlayerHeads.PlayerHeadSystem>();
-        var upl = ModContent.GetInstance<Features.Uploads.UploadSystem>();
+        ModContent.GetInstance<Features.Commands.CommandSystem>()?.state,
+        ModContent.GetInstance<Features.Colors.ColorSystem>()?.state,
+        ModContent.GetInstance<Features.Emojis.EmojiSystem>()?.state,
+        ModContent.GetInstance<Features.Glyphs.GlyphSystem>()?.state,
+        ModContent.GetInstance<Features.Items.ItemSystem>()?.state,
+        ModContent.GetInstance<Features.ModIcons.ModIconSystem>()?.state,
+        ModContent.GetInstance<Features.PlayerHeads.PlayerHeadSystem>()?.state,
+        ModContent.GetInstance<Features.Uploads.UploadSystem>()?.state
+    };
 
-        return cmd.commandState.commandPanel.scrollbar.IsMouseHovering
-            || col.colorState.colorPanel.scrollbar.IsMouseHovering
-            || emo.emojiState.emojiPanel.scrollbar.IsMouseHovering
-            || gly.glyphState.glyphPanel.scrollbar.IsMouseHovering
-            || itm.itemWindowState.itemPanel.scrollbar.IsMouseHovering
-            || mod.state.panel.scrollbar.IsMouseHovering
-            || head.state.Panel.scrollbar.IsMouseHovering
-            || upl.state.panel.scrollbar.IsMouseHovering;
+    foreach (var s in states)
+    {
+        if (s is BaseState<dynamic> baseState && baseState.Panel?.scrollbar?.IsMouseHovering == true)
+            return true;
     }
+    return false;
+}
+
 }

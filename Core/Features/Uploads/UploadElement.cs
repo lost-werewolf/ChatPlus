@@ -20,6 +20,9 @@ namespace ChatPlus.Core.Features.Uploads
             Width.Set(0, 1);
 
             img = new(Element.Tag);
+            img._textScale = 0.3f;
+            img.Left.Set(5, 0);
+            img.Top.Set(8, 0);
             Append(img);
         }
 
@@ -31,7 +34,6 @@ namespace ChatPlus.Core.Features.Uploads
             img._textScale = 0.3f;
             img.Left.Set(5, 0);
             img.Top.Set(8, 0);
-            //imgTagName.SetText(Element.Tag-="", 0.1f, true);
 
             var dims = GetDimensions();
             Vector2 pos = dims.Position();

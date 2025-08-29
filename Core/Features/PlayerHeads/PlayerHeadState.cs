@@ -4,25 +4,9 @@ using Terraria.UI;
 
 namespace ChatPlus.Core.Features.PlayerHeads;
 
-public class PlayerHeadState : UIState
+public class PlayerHeadState : BaseState<PlayerHead>
 {
-    public PlayerHeadPanel Panel { get; }
-    public DescriptionPanel<PlayerHead> Desc { get; }
-
-    public PlayerHeadState()
+    public PlayerHeadState() : base(new PlayerHeadPanel(), new DescriptionPanel<PlayerHead>())
     {
-        Panel = new PlayerHeadPanel();
-        Append(Panel);
-
-        Desc = new DescriptionPanel<PlayerHead>();
-        Append(Desc);
-
-        Panel.ConnectedPanel = Desc;
-        Desc.ConnectedPanel = Panel;
-    }
-
-    public override void Draw(SpriteBatch spriteBatch)
-    {
-        base.Draw(spriteBatch);
     }
 }

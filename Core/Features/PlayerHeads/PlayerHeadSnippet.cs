@@ -1,3 +1,4 @@
+using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -47,11 +48,12 @@ public class PlayerHeadSnippet : TextSnippet
     {
         if (_playerIndex >= 0 && _playerIndex < Main.maxPlayers)
         {
-            var p = Main.player[_playerIndex];
-            if (p?.active == true)
+            Player player = Main.player[_playerIndex];
+            if (player?.active == true)
             {
-                UICommon.TooltipMouseText(p.name);
-                //Main.instance.MouseText(p.name);
+                UICommon.TooltipMouseText(player.name);
+                PlayerInfoDrawer.Draw(Main.spriteBatch, player);
+                //Main.instance.MouseText(player.name);
             }
         }
     }

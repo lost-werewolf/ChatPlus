@@ -1,28 +1,10 @@
 using ChatPlus.Core.UI;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.UI;
 
 namespace ChatPlus.Core.Features.ModIcons;
 
-public class ModIconState : UIState
+public class ModIconState : BaseState<ModIcon>
 {
-    public ModIconPanel panel;
-    public DescriptionPanel<ModIcon> desc;
-
-    public ModIconState()
+    public ModIconState() : base(new ModIconPanel(), new DescriptionPanel<ModIcon>())
     {
-        panel = new();
-        Append(panel);
-
-        desc = new("Mod icon");
-        Append(desc);
-
-        panel.ConnectedPanel = desc;
-        desc.ConnectedPanel = panel;
-    }
-
-    public override void Draw(SpriteBatch spriteBatch)
-    {
-        base.Draw(spriteBatch);
     }
 }

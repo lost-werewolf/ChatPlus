@@ -11,25 +11,25 @@ namespace ChatPlus.Core.Features.Glyphs
     public class GlyphSystem : ModSystem
     {
         public UserInterface ui;
-        public GlyphState glyphState;
+        public GlyphState state;
 
         public override void Load()
         {
             ui = new UserInterface();
-            glyphState = new GlyphState();
+            state = new GlyphState();
             ui.SetState(null);
         }
 
         public override void Unload()
         {
             ui = new UserInterface();
-            glyphState = new GlyphState();
+            state = new GlyphState();
             ui.SetState(null);
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateManager.OpenStateIfPrefixMatches(gameTime, ui, glyphState, "[g");
+            StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[g");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

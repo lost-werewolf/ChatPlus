@@ -11,25 +11,25 @@ namespace ChatPlus.Core.Features.Items
     public class ItemSystem : ModSystem
     {
         public UserInterface ui;
-        public ItemState itemWindowState;
+        public ItemState state;
 
         public override void Load()
         {
             ui = new UserInterface();
-            itemWindowState = new ItemState();
+            state = new ItemState();
             ui.SetState(null);
         }
 
         public override void Unload()
         {
             ui = new UserInterface();
-            itemWindowState = new ItemState();
+            state = new ItemState();
             ui.SetState(null);
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateManager.OpenStateIfPrefixMatches(gameTime, ui, itemWindowState, "[i");
+            StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[i");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

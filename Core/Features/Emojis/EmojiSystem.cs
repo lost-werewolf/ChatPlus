@@ -11,37 +11,18 @@ namespace ChatPlus.Core.Features.Emojis
     public class EmojiSystem : ModSystem
     {
         public UserInterface ui;
-        public EmojiState emojiState;
+        public EmojiState state;
 
-        public object StateHandler { get; private set; }
-
-        public override void OnModLoad()
-        {
-            base.OnModLoad();
-        }
-
-        public override void Load()
+        public override void PostSetupContent()
         {
             ui = new UserInterface();
-            emojiState = new EmojiState();
+            state = new EmojiState();
             ui.SetState(null); // start hidden
-        }
-
-        public override void Unload()
-        {
-            ui = new UserInterface();
-            emojiState = new EmojiState();
-            ui.SetState(null); // start hidden
-        }
-
-        public override void OnWorldUnload()
-        {
-            base.OnWorldUnload();
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateManager.OpenStateIfPrefixMatches(gameTime, ui, emojiState, "[e");
+            StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[e");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

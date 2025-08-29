@@ -13,6 +13,7 @@ using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using MonoMod.Core.Utils;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
@@ -31,6 +32,17 @@ namespace ChatPlus.Core.UI
         protected abstract BaseElement<TData> BuildElement(TData data); // The method to create a new element from the data
         protected abstract string GetDescription(TData data);
         protected abstract string GetTag(TData data);
+
+        public bool TryGetSelected(out TData data)
+        {
+            if (currentIndex >= 0 && currentIndex < items.Count && items[currentIndex] != null)
+            {
+                data = items[currentIndex].Data;
+                return true;
+            }
+            data = default;
+            return false;
+        }
 
         // Navigation
         protected int currentIndex = 0; // first item
@@ -82,7 +94,7 @@ namespace ChatPlus.Core.UI
             Append(scrollbar);
 
             // Populate the panel with items
-            PopulatePanel();
+            //PopulatePanel();
         }
 
         public override void LeftClick(UIMouseEvent evt)
@@ -105,6 +117,9 @@ namespace ChatPlus.Core.UI
             list.Clear();
         }
 
+        private bool initialized;
+        public void ResetInit() => initialized = false;
+
         public void PopulatePanel()
         {
             ClearPanel();
@@ -117,7 +132,6 @@ namespace ChatPlus.Core.UI
             {
                 var element = BuildElement(data);
                 if (element == null) continue;
-
                 if (!MatchesFilter(data)) continue;
 
                 items.Add(element);
@@ -127,15 +141,71 @@ namespace ChatPlus.Core.UI
 
             if (fastList.Count == 0)
             {
-                // Update description panel to say "no entries found"
                 if (ConnectedPanel is DescriptionPanel<TData> descPanel)
                 {
-                    descPanel.SetTextWithLinebreak("No entries found.");
+                    descPanel.SetText("No entries found.");
+                    descPanel.Height.Set(40, 0);
+                    descPanel.GetText().VAlign = 0.5f;
+                    descPanel.GetText().Top.Set(0, 0);
+                }
+                currentIndex = -1;
+            }
+            else
+            {
+                if (!initialized)
+                {
+                    initialized = true;
+                    SetSelectedIndex(0);
+                    if (ConnectedPanel is DescriptionPanel<TData> d)
+                    {
+                        d.GetText().VAlign = 0.5f;
+                    }
+                    SetInitialHeader(ConnectedPanel);
+                    ConnectedPanel.Height.Set(40, 0);
+                }
+                else
+                {
+                    // normal behavior on refresh/search
+                    SetSelectedIndex(Math.Clamp(currentIndex, 0, items.Count - 1));
                 }
             }
+        }
 
-            if (items.Count > 0) SetSelectedIndex(0);
-            else currentIndex = -1;
+        private void SetInitialHeader(object panel)
+        {
+            switch (panel)
+            {
+                case DescriptionPanel<Command> d:
+                    d.SetText("[c/FFF014:Commands]");
+                    break;
+                case DescriptionPanel<ColorItem> d:
+                    d.SetText("[c/FFF014:Colors]");
+                    //d.SetText("[c/FF0000:C][c/DD0033:o][c/BB0066:l][c/990099:o][c/7700CC:r][c/5500FF:s]");
+                    break;
+                case DescriptionPanel<Emoji> d:
+                    d.SetText("[c/FFF014:Emojis]");
+                    break;
+                case DescriptionPanel<Glyph> d:
+                    d.SetText("[c/FFF014:Glyphs]");
+                    break;
+                case DescriptionPanel<Features.Items.Item> d:
+                    d.SetText("[c/FFF014:Items]");
+                    break;
+                case DescriptionPanel<ModIcon> d:
+                    d.SetText("[c/FFF014:Mods]");
+                    break;
+                case DescriptionPanel<PlayerHead> d:
+                    d.SetText("[c/FFF014:Players]");
+                    break;
+                case DescriptionPanel<Upload> d:
+                    string t = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
+                    d.SetText(t);
+                    break;
+                default:
+                    if (panel is UIElement u)
+                        Log.Info($"No header defined for {u.GetType()}");
+                    break;
+            }
         }
 
         #region Filter
@@ -287,11 +357,11 @@ namespace ChatPlus.Core.UI
 
                     if (element.Data is Emoji emoji && emoji.Synonyms.Count > 0)
                     {
-                        descPanel.SetTextWithLinebreak(string.Join(", ", emoji.Synonyms));
+                        descPanel.SetText(string.Join(", ", emoji.Synonyms));
                     }
                     else
                     {
-                        descPanel.SetTextWithLinebreak(desc);
+                        descPanel.SetText(desc);
                     }
                 }
 
@@ -310,7 +380,7 @@ namespace ChatPlus.Core.UI
                 if (!JustPressed(key))
                     continue;
 
-                if (key == Keys.Tab || key == Keys.Up || key == Keys.Down) return;
+                if (key == Keys.Tab || key == Keys.Up || key == Keys.Down || key == Keys.LeftControl) return;
 
                 // Any non-Tab/Up/Down key: resume normal filtering
                 freezeCommandFilter = false;

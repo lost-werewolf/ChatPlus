@@ -54,6 +54,7 @@ namespace ChatPlus.Core.Features.Commands
 
             var dims = GetDimensions();
             var pos = dims.Position();
+            modIconImage.Top.Set(1, 0);
 
             // Draw command name
             TextSnippet[] snip = [new TextSnippet(Command.Name)];

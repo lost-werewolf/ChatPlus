@@ -7,6 +7,7 @@ using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -18,8 +19,6 @@ public static class StateManager
 {
     public static void OpenStateIfPrefixMatches(GameTime gameTime, UserInterface ui, UIState state, string prefix)
     {
-        //Main.NewText(ui.CurrentState);
-
         if (!Main.drawingPlayerChat)
         {
             if (ui.CurrentState != null)
@@ -43,7 +42,6 @@ public static class StateManager
         {
             if (ui.CurrentState != state)
             {
-
                 CloseOthers(ui);     // <- ensure exclusivity
                 ui.SetState(state);
             }

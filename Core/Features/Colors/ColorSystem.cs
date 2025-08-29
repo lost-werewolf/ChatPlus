@@ -11,25 +11,22 @@ namespace ChatPlus.Core.Features.Colors
     public class ColorSystem : ModSystem
     {
         public UserInterface ui;
-        public ColorState colorState;
+        public ColorState state;
 
         public override void Load()
         {
             ui = new UserInterface();
-            colorState = new ColorState();
+            state = new ColorState();
             ui.SetState(null);
         }
 
         public override void Unload()
         {
-            ui = new UserInterface();
-            colorState = new ColorState();
-            ui.SetState(null);
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateManager.OpenStateIfPrefixMatches(gameTime, ui, colorState, "[c");
+            StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[c");
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
