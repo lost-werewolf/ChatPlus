@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ID;
+using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -12,113 +15,264 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 public static class PlayerInfoDrawer
 {
     /// <summary>
-    /// Draws a big tooltip panel with player info, bestiary-style.
-    /// // Extra to add maybe later:
-    /// red team, death count since he joined 
-    /// ammo, coins, 
-    /// armor/accessories/equipment/dyes
+    /// Draws a big tooltip panel with player info, pokémon style.
     /// </summary>
     public static void Draw(SpriteBatch sb, Player player)
     {
         // Dimensions
-        const int W = 96*2+6*2+12;
-        const int H = 350;
-        Vector2 pos = Main.MouseScreen + new Vector2(20, 20);
-        pos = new(300, 300); // debug
+        const int panelWidth = 96;
+        const int gutter = 10;
+        const int side = 7;
+        const int H = 356;
+        const int W = panelWidth * 2 + gutter + side * 2;
+        const int rowHeight = 31;
+        var pos = Main.MouseScreen + new Vector2(20, 20);
+        //pos = new(300, 300); // debug
         pos.X = Math.Clamp(pos.X, 0, Main.screenWidth - W);
         pos.Y = Math.Clamp(pos.Y, 0, Main.screenHeight - H);
-        Rectangle rect = new((int)pos.X, (int)pos.Y, W, H);
+        var rect = new Rectangle((int)pos.X, (int)pos.Y, W, H);
 
-        // Draw header and player
-        DrawPlayer(sb, pos, player);
-        DrawFullBGPanel(sb,rect);
+        // Draw background and player
+        DrawFullBGPanel(sb, rect);
         DrawPlayerText(sb, rect, player);
-        pos += new Vector2(7, 32);
-        DrawHorizontalSeparator(sb, pos, W-14);
-        pos += new Vector2(0, 10);
-        rect = new((int)pos.X, (int)pos.Y, W-14, 100);
+        var cursor = pos + new Vector2(side, 32);
+        DrawHorizontalSeparator(sb, cursor, W - side * 2);
+        cursor += new Vector2(0, 10);
+        rect = new Rectangle((int)cursor.X, (int)cursor.Y, W - side * 2, 100);
         DrawSeparatorBorder(sb, rect);
         DrawSurfaceBackground(sb, rect);
-        DrawTeamText(sb, pos, player);
-        pos += new Vector2(0, 110);
-        DrawHorizontalSeparator(sb, pos, W - 14);
-        pos += new Vector2(0, 10);
-        rect = new((int)pos.X, (int)pos.Y, W - 14, 21);
+        DrawPlayer(sb, pos, player);
+        //DrawTeamText(sb, cursor, player);
+        cursor += new Vector2(0, 110);
+        DrawHorizontalSeparator(sb, cursor, W - side * 2);
 
-        // Draw stats
-        //DrawDebugRect(rect);
-        DrawStat_HP(sb, rect, player);
-        DrawStat_Mana(sb, rect, player);
-        DrawStat_Defense(sb, rect, player);
-        DrawStat_DeathCount(sb, rect, player);
+        // Draw stats rows
+        cursor += new Vector2(0, 10);
+        int leftColumn = (int)cursor.X;
+        int rightColumn = leftColumn + panelWidth + gutter;
+
+        // Draw row 1
+        DrawStat_HP(sb, new Rectangle(leftColumn, (int)cursor.Y, panelWidth, rowHeight), player);
+        DrawStat_Mana(sb, new Rectangle(rightColumn, (int)cursor.Y, panelWidth, rowHeight), player);
+
+        // Draw row 2
+        int rowY2 = (int)cursor.Y + rowHeight + 6;
+        DrawStat_Defense(sb, new Rectangle(leftColumn, rowY2, panelWidth, rowHeight), player);
+        DrawStat_DeathCount(sb, new Rectangle(rightColumn, rowY2, panelWidth, rowHeight), player);
+
+        // Draw row 3
+        int rowY3 = (int)cursor.Y + rowHeight * 2 + 6*2;
+        DrawStat_Coins(sb, new Rectangle(leftColumn, rowY3, panelWidth, rowHeight), player);
+        DrawStat_Ammo(sb, new Rectangle(rightColumn, rowY3, panelWidth, rowHeight), player);
+
+        // Draw row 4
+        int rowY4 = (int)cursor.Y + rowHeight * 3 + 6 * 3;
+        DrawStat_Minions(sb, new Rectangle(leftColumn, rowY4, panelWidth, rowHeight), player);
+        DrawStat_Sentries(sb, new Rectangle(rightColumn, rowY4, panelWidth, rowHeight), player);
+
+        // Draw row 5
+        int rowY5 = (int)cursor.Y + rowHeight * 4 + 6 * 4;
     }
 
+
     #region Stats
+    private static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)
+    {
+        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
+        int max = player.maxMinions; int cur = (int)Math.Round(player.slotsMinions); int bestProj = -1; float bestScore = 0f; var owned = player.ownedProjectileCounts; int limit = owned.Length;
+        for (int t = 0; t < limit; t++)
+        {
+            int c = owned[t]; if (c <= 0) continue; var proj = ContentSamples.ProjectilesByType[t]; if (!proj.minion) continue; if (!(proj.minionSlots > 0f)) continue; float score = c * proj.minionSlots; if (score > bestScore) { bestScore = score; bestProj = t; }
+        }
+        Item icon = new(ItemID.SlimeStaff);
+        if (bestProj >= 0)
+        {
+            foreach (var kv in ContentSamples.ItemsByType)
+            {
+                var it = kv.Value; if (it == null) continue; if (it.summon || it.DamageType == DamageClass.Summon) { if (it.shoot == bestProj) { icon = new Item(it.type); break; } }
+            }
+        }
+        var pos = new Vector2(rect.X + 15, rect.Y + 15); ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.8f, 32f, Color.White);
+        var tp = new Vector2(rect.X + 52, rect.Y + 4); Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+    }
+
+    private static void DrawStat_Sentries(SpriteBatch sb, Rectangle rect, Player player)
+    {
+        var tex = Ass.StatPanel;
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
+        sb.Draw(tex.Value, rect, Color.White);
+
+        int cur = 0;
+        for (int i = 0; i < Main.maxProjectiles; i++)
+        {
+            var pr = Main.projectile[i];
+            if (pr.active && pr.owner == player.whoAmI && pr.sentry)
+                cur++;
+        }
+        int max = player.maxTurrets;
+
+        // Icon: Queen Spider Staff (any sentry icon)
+        var pos = new Vector2(rect.X + 15, rect.Y + 15);
+        ItemSlot.DrawItemIcon(new Item(ItemID.QueenSpiderStaff), 31, sb, pos, 0.8f, 32f, Color.White);
+
+        string t = $"{cur}/{max}";
+        var tp = new Vector2(rect.X + 52, rect.Y + 4);
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+    }
     private static void DrawStat_Defense(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
         var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_Defense");
-        rect = new(rect.X, rect.Y + tex.Height() + 4, tex.Width(), tex.Height());
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        string defenseText = $"{player.statDefense}";
+        // Draw defense text
+        var defenseText = $"{player.statDefense}";
         var snippets = ChatManager.ParseMessage(defenseText, Color.White).ToArray();
-        Vector2 textSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, defenseText, Vector2.One);
-        float textWidth = textSize.X;
-        Vector2 pos = new(rect.X + 52, rect.Y + 4);
+        var pos = new Vector2(rect.X + 52, rect.Y + 4);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
     }
+
     private static void DrawStat_HP(SpriteBatch sb, Rectangle rect, Player player)
     {
+        // Draw background
         var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_HP");
-        Rectangle rect2 = new((int)rect.X, rect.Y, (int)tex.Width(), (int)tex.Height());
+        var rect2 = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect2, Color.White);
 
-        string lifeText = $"{player.statLife}/{player.statLifeMax2}";
+        // Draw HP text
+        var lifeText = $"{player.statLife}/{player.statLifeMax2}";
         var snippets = ChatManager.ParseMessage(lifeText, Color.White).ToArray();
-        Vector2 textSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, lifeText, Vector2.One);
-        float textWidth = textSize.X;
-        Vector2 pos = new(rect.X + 32, rect.Y + 4);
+        var pos = new Vector2(rect2.X + 32, rect2.Y + 4);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
     }
+
     private static void DrawStat_Mana(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
         var tex = Ass.StatPanel;
-        rect = new(rect.X + rect.X / 2 - 54, rect.Y, tex.Width(), tex.Height());
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
         // Draw mana texture
         var manaTex = TextureAssets.Mana;
-        Rectangle manaRect = new(rect.X + 4, rect.Y + 2, manaTex.Width(), manaTex.Height());
+        var manaRect = new Rectangle(rect.X + 4, rect.Y + 2, manaTex.Width(), manaTex.Height());
         sb.Draw(TextureAssets.Mana.Value, manaRect, Color.White);
-
+        
         // Draw mana text
-        string manaText = $"{player.statMana}/{player.statManaMax2}";
+        var manaText = $"{player.statMana}/{player.statManaMax2}";
         var size = FontAssets.MouseText.Value.MeasureString(manaText);
-        Vector2 textPos = new Vector2(rect.X + rect.Width - size.X - 5, rect.Y + 5);
+        var textPos = new Vector2(rect.X + rect.Width - size.X - 5, rect.Y + 5);
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, manaText, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
+
     private static void DrawStat_DeathCount(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
         var tex = Ass.StatPanel;
-        rect = new(rect.X + rect.X / 2 - 54, rect.Y + tex.Height() + 4, tex.Width(), tex.Height());
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        // Draw item
-        Item item = new(321);
-        var manaTex = TextureAssets.Mana;
-        Vector2 pos = new(rect.X + 15, rect.Y + 15);
+        // Draw plat
+        var item = new Item(ItemID.Tombstone);
+        var pos = new Vector2(rect.X + 15, rect.Y + 15);
         ItemSlot.DrawItemIcon(item, 31, sb, pos, 0.8f, 32f, Color.White);
 
-        // Draw mana
-        string deathCount = player.numberOfDeathsPVE.ToString();
+        // Draw death count
+        var deathCount = player.numberOfDeathsPVE.ToString();
         var size = FontAssets.MouseText.Value.MeasureString(deathCount);
-        Vector2 textPos = new Vector2(rect.X + 32, rect.Y + 4);
+        var textPos = new Vector2(rect.X + 52, rect.Y + 4);
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, deathCount, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
-    #endregion
+    private static void DrawStat_Coins(SpriteBatch sb, Rectangle rect, Player player)
+    {
+        // Draw background
+        var tex = Ass.StatPanel;
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
+        sb.Draw(tex.Value, rect, Color.White);
+
+        long total = 0; 
+        for (int i = 50; i <= 53; i++) { 
+            var it = player.inventory[i]; 
+            if (it.IsAir) continue; 
+            if (it.type == ItemID.PlatinumCoin) 
+                total += it.stack * 1_000_000L; 
+            else if (it.type == ItemID.GoldCoin)
+                total += it.stack * 10_000L; 
+            else if (it.type == ItemID.SilverCoin) 
+                total += it.stack * 100L; 
+            else if (it.type == ItemID.CopperCoin) 
+                total += it.stack; 
+        }
+
+        long rem = total; 
+        int p = (int)(rem / 1_000_000L); 
+        rem %= 1_000_000L; 
+        int g = (int)(rem / 10_000L); 
+        rem %= 10_000L; 
+        int s = (int)(rem / 100L); 
+        int c = (int)(rem % 100L);
+
+        var font = FontAssets.MouseText.Value; 
+        var pos = new Vector2(rect.X+6, rect.Y + 6); 
+        int iconSize = 32; 
+        float scale = 1.0f; 
+        float dx = 28f;
+
+        if (p > 99)
+        {
+            dx = 40f;
+        }
+
+        ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos, scale, iconSize, Color.White); 
+        Utils.DrawBorderStringFourWay(sb, font, p.ToString() ?? p.ToString() ?? p.ToString().ToString(), pos.X-5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+        pos.X += dx; 
+        ItemSlot.DrawItemIcon(new Item(ItemID.GoldCoin), 31, sb, pos, scale, iconSize, Color.White); 
+        Utils.DrawBorderStringFourWay(sb, font, g.ToString(), pos.X -8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+        pos.X += dx; 
+        ItemSlot.DrawItemIcon(new Item(ItemID.SilverCoin), 31, sb, pos, scale, iconSize, Color.White); 
+        Utils.DrawBorderStringFourWay(sb, font, s.ToString(), pos.X -8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+        pos.X += dx;
+
+        if (p <= 99)
+        {
+            ItemSlot.DrawItemIcon(new Item(ItemID.CopperCoin), 31, sb, pos, scale, iconSize, Color.White);
+            Utils.DrawBorderStringFourWay(sb, font, c.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+        }
+    }
+    private static void DrawStat_Ammo(SpriteBatch sb, Rectangle rect, Player player)
+    {
+        // Draw background
+        var tex = Ass.StatPanel;
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
+        sb.Draw(tex.Value, rect, Color.White);
+
+        // Summarize stacks for each ammo slot and draw the one with the most
+        int highestStack = 0;
+        Item highestStackItem = new(ItemID.WoodenArrow);
+        for (int i = 54; i <= 57; i++)
+        {
+            var item = player.inventory[i];
+            if (item.IsAir) continue;
+
+            if (item.stack > highestStack)
+            {
+                highestStack = item.stack;
+                highestStackItem = item;
+            }
+        }
+
+        // Draw item
+        var pos = new Vector2(rect.X + 15, rect.Y + 15);
+        ItemSlot.DrawItemIcon(highestStackItem, 31, sb, pos, 0.8f, 32f, Color.White);
+
+        // Draw ammo count
+        string highestAmmoStack = highestStack.ToString();
+        var size = FontAssets.MouseText.Value.MeasureString(highestAmmoStack);
+        var textPos = new Vector2(rect.X + 52, rect.Y + 4);
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, highestAmmoStack, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+    }
+    #endregion Stats
 
     #region Helpers
     private static void DrawPlayerText(SpriteBatch sb, Rectangle rect, Player player)
@@ -151,20 +305,26 @@ public static class PlayerInfoDrawer
 
     private static void DrawPlayer(SpriteBatch sb, Vector2 pos, Player player)
     {
-        Vector2 uiCenter = pos + new Vector2(90, 200);
+        // Restart spritebatch to make player draw on top
+        sb.End();
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
 
-        using (new Main.CurrentPlayerOverride(player))
-        {
-            player.bodyFrame.Y = player.legFrame.Y = player.headFrame.Y = 0;
-            player.heldProj = -1;
-            player.itemAnimation = 0;
-            player.itemTime = 0;
-            player.mount?.Dismount(player);
-            player.PlayerFrame();
-            Vector2 worldDrawPos = uiCenter + Main.screenPosition;
+        // Make player walk
+        //int frame = (int)(Main.GlobalTimeWrappedHourly / 0.07f) % 14 + 6;
+        //int y = frame * 56;
+        //player.bodyFrame.Y = player.legFrame.Y = player.headFrame.Y = y;
 
-            Main.PlayerRenderer.DrawPlayer(Main.Camera, player, worldDrawPos, 0f, Vector2.Zero);
-        }
+        // Make player stand still and be boring
+        //player.direction = 1; // force to face right
+        player.heldProj = -1;
+        player.itemAnimation = 0;
+        player.itemTime = 0;
+        player.PlayerFrame();
+        //player.WingFrame(false);
+
+        // Draw player
+        pos += Main.screenPosition + new Vector2(100, 88);
+        Main.PlayerRenderer.DrawPlayer(Main.Camera, player, pos, 0f, Vector2.Zero, scale: 1.2f);
     }
 
     private static void DrawSurfaceBackground(SpriteBatch sb, Rectangle rect)
@@ -195,8 +355,8 @@ public static class PlayerInfoDrawer
 
     private static void DrawPanel(Texture2D texture, int edgeWidth, int edgeShove, SpriteBatch spriteBatch, Vector2 position, float width, Color color)
     {
-        spriteBatch.Draw(
-            texture, new Vector2(position.X + edgeWidth, position.Y), new Rectangle(edgeWidth + edgeShove, 0, texture.Width - (edgeWidth + edgeShove) * 2, texture.Height),
+        spriteBatch.Draw(texture, 
+            new Vector2(position.X + edgeWidth, position.Y), new Rectangle(edgeWidth + edgeShove, 0, texture.Width - (edgeWidth + edgeShove) * 2, texture.Height),
             color,
             0f,
             Vector2.Zero,
@@ -237,7 +397,7 @@ public static class PlayerInfoDrawer
             s.Draw(tex, new Rectangle(x1, y1, w - corner * 2, h - corner * 2), new Rectangle(corner, corner, bar, bar), col);
         }
 
-        DrawNineSlice(sb, BG.Value, rect, new Color(63, 82, 151) * 0.70f);
+        DrawNineSlice(sb, BG.Value, rect, new Color(63, 82, 151) * 1.0f);
         DrawNineSlice(sb, Border.Value, rect, Color.Black);
     }
 

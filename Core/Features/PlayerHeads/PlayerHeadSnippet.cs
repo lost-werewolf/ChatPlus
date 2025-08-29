@@ -44,7 +44,7 @@ public class PlayerHeadSnippet : TextSnippet
         Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, new Vector2(x, y), 1f, headScale * scale, Color.White);
         PlayerHeadFlipHook.shouldFlipHeadDraw = false;
 
-        PlayerInfoDrawer.Draw(Main.spriteBatch, player);
+        //PlayerInfoDrawer.Draw(Main.spriteBatch, player); // debug
 
         return true;
     }
