@@ -42,7 +42,10 @@ public static class PlayerInfoDrawer
         DrawSeparatorBorder(sb, rect);
         DrawSurfaceBackground(sb, rect);
         DrawPlayer(sb, pos, player);
-        //DrawTeamText(sb, cursor, player);
+        if (Main.netMode != NetmodeID.SinglePlayer)
+        {
+            DrawTeamText(sb, cursor, player);
+        }
         cursor += new Vector2(0, 110);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
 
@@ -72,11 +75,50 @@ public static class PlayerInfoDrawer
 
         // Draw row 5
         int rowY5 = (int)cursor.Y + rowHeight * 4 + 6 * 4;
+        DrawStat_HeldItem(sb, new Rectangle(leftColumn, rowY5, panelWidth, rowHeight), player);
+        DrawStat_DPS(sb, new Rectangle(rightColumn, rowY5, panelWidth, rowHeight), player);
     }
 
 
     #region Stats
-    private static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_HeldItem(SpriteBatch sb, Rectangle rect, Player player)
+    {
+        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
+
+        Item held = player.HeldItem;
+        if (held == null || held.IsAir)
+            held = new Item(ItemID.None);
+
+        var pos = new Vector2(rect.X + 15, rect.Y + 15);
+        ItemSlot.DrawItemIcon(held, 31, sb, pos, 0.8f, 32f, Color.White);
+
+        string t = held.IsAir ? "(none)" : held.Name;
+        if (t.Length > 8) t = t.Substring(0, 8) + "...";
+        var tp = new Vector2(rect.X + 10, rect.Y + 4);
+        if (t.Length <= 7)
+        {
+            tp += new Vector2(16, 0);
+        }
+
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+    }
+    public static void DrawStat_DPS(SpriteBatch sb, Rectangle rect, Player player)
+    {
+        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
+
+        // DPS meter uses a 60 tick rolling window in vanilla
+        int dps = player.dpsDamage;
+        string t = $"{dps}";
+
+        // Icon: DPS Meter
+        var pos = new Vector2(rect.X + 15, rect.Y + 15);
+        ItemSlot.DrawItemIcon(new Item(ItemID.DPSMeter), 31, sb, pos, 0.8f, 32f, Color.White);
+
+        var tp = new Vector2(rect.X + 52, rect.Y + 4);
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+    }
+
+    public static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)
     {
         var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
         int max = player.maxMinions; int cur = (int)Math.Round(player.slotsMinions); int bestProj = -1; float bestScore = 0f; var owned = player.ownedProjectileCounts; int limit = owned.Length;
@@ -96,30 +138,30 @@ public static class PlayerInfoDrawer
         var tp = new Vector2(rect.X + 52, rect.Y + 4); Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
 
-    private static void DrawStat_Sentries(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_Sentries(SpriteBatch sb, Rectangle rect, Player player)
     {
-        var tex = Ass.StatPanel;
-        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
-        sb.Draw(tex.Value, rect, Color.White);
-
-        int cur = 0;
-        for (int i = 0; i < Main.maxProjectiles; i++)
+        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
+        int max = player.maxTurrets; int cur = 0; int bestProj = -1; int bestCount = 0;
+        for (int t = 0; t < player.ownedProjectileCounts.Length; t++)
         {
-            var pr = Main.projectile[i];
-            if (pr.active && pr.owner == player.whoAmI && pr.sentry)
-                cur++;
+            int c = player.ownedProjectileCounts[t]; if (c <= 0) continue;
+            var proj = ContentSamples.ProjectilesByType[t]; if (!proj.sentry) continue;
+            cur += c;
+            if (c > bestCount) { bestCount = c; bestProj = t; }
         }
-        int max = player.maxTurrets;
-
-        // Icon: Queen Spider Staff (any sentry icon)
-        var pos = new Vector2(rect.X + 15, rect.Y + 15);
-        ItemSlot.DrawItemIcon(new Item(ItemID.QueenSpiderStaff), 31, sb, pos, 0.8f, 32f, Color.White);
-
-        string t = $"{cur}/{max}";
-        var tp = new Vector2(rect.X + 52, rect.Y + 4);
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+        Item icon = new(ItemID.QueenSpiderStaff); // fallback
+        if (bestProj >= 0)
+        {
+            foreach (var kv in ContentSamples.ItemsByType)
+            {
+                var it = kv.Value; if (it == null) continue;
+                if (it.summon || it.DamageType == DamageClass.Summon) { if (it.shoot == bestProj) { icon = new Item(it.type); break; } }
+            }
+        }
+        var pos = new Vector2(rect.X + 15, rect.Y + 15); ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.8f, 32f, Color.White);
+        var tp = new Vector2(rect.X + 52, rect.Y + 4); Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
-    private static void DrawStat_Defense(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_Defense(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
         var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_Defense");
@@ -133,7 +175,7 @@ public static class PlayerInfoDrawer
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
     }
 
-    private static void DrawStat_HP(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_HP(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
         var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_HP");
@@ -147,7 +189,7 @@ public static class PlayerInfoDrawer
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
     }
 
-    private static void DrawStat_Mana(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_Mana(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
         var tex = Ass.StatPanel;
@@ -166,7 +208,7 @@ public static class PlayerInfoDrawer
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, manaText, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
 
-    private static void DrawStat_DeathCount(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_DeathCount(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
         var tex = Ass.StatPanel;
@@ -184,7 +226,7 @@ public static class PlayerInfoDrawer
         var textPos = new Vector2(rect.X + 52, rect.Y + 4);
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, deathCount, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
-    private static void DrawStat_Coins(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_Coins(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
         var tex = Ass.StatPanel;
@@ -240,7 +282,7 @@ public static class PlayerInfoDrawer
             Utils.DrawBorderStringFourWay(sb, font, c.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
         }
     }
-    private static void DrawStat_Ammo(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_Ammo(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
         var tex = Ass.StatPanel;
@@ -285,7 +327,7 @@ public static class PlayerInfoDrawer
         Vector2 pos = new(rect.X + (rect.Width - textWidth) / 2f, rect.Y + 6);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
     }
-    private static void DrawTeamText(SpriteBatch sb, Vector2 pos, Player player)
+    public static void DrawTeamText(SpriteBatch sb, Vector2 pos, Player player)
     {
         string teamText = player.team switch
         {
@@ -303,7 +345,7 @@ public static class PlayerInfoDrawer
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, new Vector2(0.7f), out _);
     }
 
-    private static void DrawPlayer(SpriteBatch sb, Vector2 pos, Player player)
+    public static void DrawPlayer(SpriteBatch sb, Vector2 pos, Player player)
     {
         // Restart spritebatch to make player draw on top
         sb.End();
@@ -315,7 +357,6 @@ public static class PlayerInfoDrawer
         //player.bodyFrame.Y = player.legFrame.Y = player.headFrame.Y = y;
 
         // Make player stand still and be boring
-        //player.direction = 1; // force to face right
         player.heldProj = -1;
         player.itemAnimation = 0;
         player.itemTime = 0;
@@ -327,7 +368,7 @@ public static class PlayerInfoDrawer
         Main.PlayerRenderer.DrawPlayer(Main.Camera, player, pos, 0f, Vector2.Zero, scale: 1.2f);
     }
 
-    private static void DrawSurfaceBackground(SpriteBatch sb, Rectangle rect)
+    public static void DrawSurfaceBackground(SpriteBatch sb, Rectangle rect)
     {
         var tex = Main.Assets.Request<Texture2D>("Images/MapBG1").Value;
         int deflate = 4;
@@ -342,7 +383,7 @@ public static class PlayerInfoDrawer
     #endregion
 
     #region Panels & Separators
-    private static void DrawSeparatorBorder(SpriteBatch sb, Rectangle rect, int edgeWidth = 2)
+    public static void DrawSeparatorBorder(SpriteBatch sb, Rectangle rect, int edgeWidth = 2)
     {
         var tex = Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1").Value;
         Color color = new Color(89, 116, 213, 255) * 0.9f;
@@ -353,7 +394,7 @@ public static class PlayerInfoDrawer
         DrawPanelVertical(tex, edgeWidth, 0, sb, new Vector2(rect.Right - edgeWidth, rect.Y), rect.Height, color);
     }
 
-    private static void DrawPanel(Texture2D texture, int edgeWidth, int edgeShove, SpriteBatch spriteBatch, Vector2 position, float width, Color color)
+    public static void DrawPanel(Texture2D texture, int edgeWidth, int edgeShove, SpriteBatch spriteBatch, Vector2 position, float width, Color color)
     {
         spriteBatch.Draw(texture, 
             new Vector2(position.X + edgeWidth, position.Y), new Rectangle(edgeWidth + edgeShove, 0, texture.Width - (edgeWidth + edgeShove) * 2, texture.Height),
@@ -365,13 +406,13 @@ public static class PlayerInfoDrawer
             0f);
     }
 
-    private static void DrawPanelVertical(Texture2D texture,int edgeWidth,int edgeShove,SpriteBatch spriteBatch,Vector2 position, float height,Color color)
+    public static void DrawPanelVertical(Texture2D texture,int edgeWidth,int edgeShove,SpriteBatch spriteBatch,Vector2 position, float height,Color color)
     {
         spriteBatch.Draw(texture,new Rectangle((int)position.X, (int)position.Y + edgeWidth, edgeWidth, (int)height - edgeWidth * 2),
             new Rectangle(texture.Width / 2, 0, 1, texture.Height),color);
     }
 
-    private static void DrawFullBGPanel(SpriteBatch sb, Rectangle rect)
+    public static void DrawFullBGPanel(SpriteBatch sb, Rectangle rect)
     {
         var BG = Main.Assets.Request<Texture2D>("Images/UI/PanelBackground");
         var Border = Main.Assets.Request<Texture2D>("Images/UI/PanelBorder");
@@ -401,13 +442,12 @@ public static class PlayerInfoDrawer
         DrawNineSlice(sb, Border.Value, rect, Color.Black);
     }
 
-    private static void DrawHorizontalSeparator(SpriteBatch sb, Vector2 pos, float width, int edgeWidth = 2)
+    public static void DrawHorizontalSeparator(SpriteBatch sb, Vector2 pos, float width, int edgeWidth = 2)
     {
         var tex = Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1").Value;
         Color color = new Color(89, 116, 213, 255) * 0.9f;
         DrawPanel(tex, edgeWidth, 0, sb, pos, width, color);
     }
     #endregion
-
     private static void DrawDebugRect(Rectangle r) => Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, r, Color.Red * 0.5f);
 }

@@ -31,8 +31,7 @@ public class ModIconPanel : BasePanel<ModIcon>
     public void OpenModInfoForSelectedMod()
     {
         // Need the selected ModIcon from the connected BasePanel<ModIcon>
-        if (ConnectedPanel is BasePanel<Features.ModIcons.ModIcon> modPanel &&
-            modPanel.TryGetSelected(out var entry))
+        if (TryGetSelected(out var entry))
         {
             var mod = entry.mod;
             if (ModInfoState.instance == null)

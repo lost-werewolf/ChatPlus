@@ -9,11 +9,9 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
-using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
-using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 {
@@ -90,43 +88,41 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             int y0 = bgRect.Y;
 
             // Draw background
-            DrawSeparatorBorder(sb, bgRect);
-            DrawSurfaceBackground(sb, bgRect);
+            PlayerInfoDrawer.DrawSeparatorBorder(sb, bgRect);
+            PlayerInfoDrawer.DrawSurfaceBackground(sb, bgRect);
 
             // Draw player
             var playerPos = new Vector2(bgRect.X + bgRect.Width * 0.5f - 100f, bgRect.Y + 50);
-            DrawPlayer(sb, playerPos, player);
+            PlayerInfoDrawer.DrawPlayer(sb, playerPos, player);
 
             // Stats header
             Vector2 statsHeaderPos = new(leftColumn, y0-4);
-            var bar = TextureAssets.MagicPixel.Value;
             Utils.DrawBorderStringBig(sb, "Stats", statsHeaderPos, Color.White, scale: 0.5f);
 
-            // Row 1
+            // Bounds
             Rectangle hpBounds = new(leftColumn, y0 + rowHeight + 6, panelWidth, rowHeight);
             Rectangle manaBounds = new(rightColumn, y0 + rowHeight + 6, panelWidth, rowHeight);
-
-            // Row 2
             Rectangle defBounds = new(leftColumn, y0 + rowHeight*2 + 12, panelWidth, rowHeight);
             Rectangle deathBounds = new(rightColumn, y0 + rowHeight*2 + 12, panelWidth, rowHeight);
-
-            // Row 3
             Rectangle coinBounds = new(leftColumn, y0 + rowHeight * 3 + 18, panelWidth, rowHeight);
             Rectangle ammoBounds = new(rightColumn, y0 + rowHeight * 3 + 18, panelWidth, rowHeight);
-
-            // Row 4
             Rectangle minionBounds = new(leftColumn, y0 + rowHeight * 4 + 24, panelWidth, rowHeight);
             Rectangle sentryBounds = new(rightColumn, y0 + rowHeight * 4 + 24, panelWidth, rowHeight);
+            Rectangle heldItemBounds = new(leftColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
+            Rectangle dpsBounds = new(rightColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
+
 
             // Draw stats
-            DrawStat_HP(sb, hpBounds, player);
-            DrawStat_Mana(sb, manaBounds, player);
-            DrawStat_Defense(sb, defBounds, player);
-            DrawStat_DeathCount(sb, deathBounds, player);
-            DrawStat_Coins(sb, coinBounds, player);
-            DrawStat_Ammo(sb, ammoBounds, player);
-            DrawStat_Minions(sb, minionBounds, player);
-            DrawStat_Sentries(sb, sentryBounds, player);
+            PlayerInfoDrawer.DrawStat_HP(sb, hpBounds, player);
+            PlayerInfoDrawer.DrawStat_Mana(sb, manaBounds, player);
+            PlayerInfoDrawer.DrawStat_Defense(sb, defBounds, player);
+            PlayerInfoDrawer.DrawStat_DeathCount(sb, deathBounds, player);
+            PlayerInfoDrawer.DrawStat_Coins(sb, coinBounds, player);
+            PlayerInfoDrawer.DrawStat_Ammo(sb, ammoBounds, player);
+            PlayerInfoDrawer.DrawStat_Minions(sb, minionBounds, player);
+            PlayerInfoDrawer.DrawStat_Sentries(sb, sentryBounds, player);
+            PlayerInfoDrawer.DrawStat_HeldItem(sb, heldItemBounds, player);
+            PlayerInfoDrawer.DrawStat_DPS(sb, dpsBounds, player);
 
             // Draw inventory
             DrawInventory(sb, bgRect, player);
@@ -139,7 +135,7 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             }
             Vector2 accessoriesPos = new(armorPos.X, armorPos.Y+3*44);
 
-            DrawArmor(sb, armorPos, player);
+            DrawArmor2(sb, armorPos, player);
             DrawAccessories(sb, accessoriesPos, player);
 
             // Handle hovers
@@ -152,51 +148,38 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             if (ammoBounds.Contains(p)) UICommon.TooltipMouseText("Ammo");
             if (minionBounds.Contains(p)) UICommon.TooltipMouseText("Minions (Current / Max)");
             if (sentryBounds.Contains(p)) UICommon.TooltipMouseText("Sentries (Current / Max)");
+            if (heldItemBounds.Contains(p)) UICommon.TooltipMouseText("Held Item");
+            if (dpsBounds.Contains(p)) UICommon.TooltipMouseText("Damage Per Second");
         }
 
-        private static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)
+        private static void DrawArmor2(SpriteBatch sb, Vector2 topLeft, Player player)
         {
-            var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
-            int max = player.maxMinions; int cur = (int)Math.Round(player.slotsMinions); int bestProj = -1; float bestScore = 0f; var owned = player.ownedProjectileCounts; int limit = owned.Length;
-            for (int t = 0; t < limit; t++)
+            var font = FontAssets.MouseText.Value; int size = 40, pad = 4; const string title = "Armor"; var hs = font.MeasureString(title); float hy = topLeft.Y - hs.Y - 10f; Utils.DrawBorderStringBig(sb, title, new Vector2(topLeft.X, hy), Color.White, 0.52f);
+            float old = Main.inventoryScale; Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
+            for (int r = 0; r < 3; r++)
             {
-                int c = owned[t]; if (c <= 0) continue; var proj = ContentSamples.ProjectilesByType[t]; if (!proj.minion) continue; if (!(proj.minionSlots > 0f)) continue; float score = c * proj.minionSlots; if (score > bestScore) { bestScore = score; bestProj = t; }
+                int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
+                ItemSlot.Draw(sb, player.dye, ItemSlot.Context.EquipDye, r, new Vector2(x0, y));
+                ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, new Vector2(x1, y));
+                ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmor, r, new Vector2(x2, y));
             }
-            Item icon = new(ItemID.SlimeStaff);
-            if (bestProj >= 0)
-            {
-                foreach (var kv in ContentSamples.ItemsByType)
-                {
-                    var it = kv.Value; if (it == null) continue; if (it.summon || it.DamageType == DamageClass.Summon) { if (it.shoot == bestProj) { icon = new Item(it.type); break; } }
-                }
-            }
-            var pos = new Vector2(rect.X + 15, rect.Y + 15); ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.8f, 32f, Color.White);
-            var tp = new Vector2(rect.X + 52, rect.Y + 4); Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+            Main.inventoryScale = old;
         }
 
-        private static void DrawStat_Sentries(SpriteBatch sb, Rectangle rect, Player player)
+        private static void DrawArmor(SpriteBatch sb, Vector2 topLeft, Player player)
         {
-            var tex = Ass.StatPanel;
-            rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
-            sb.Draw(tex.Value, rect, Color.White);
-
-            int cur = 0;
-            for (int i = 0; i < Main.maxProjectiles; i++)
+            var font = FontAssets.MouseText.Value; int size = 40, pad = 4; const string title = "Armor"; var hs = font.MeasureString(title); float hy = topLeft.Y - hs.Y - 10f; Utils.DrawBorderStringBig(sb, title, new Vector2(topLeft.X, hy), Color.White, 0.52f);
+            float old = Main.inventoryScale; Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
+            for (int r = 0; r < 3; r++)
             {
-                var pr = Main.projectile[i];
-                if (pr.active && pr.owner == player.whoAmI && pr.sentry)
-                    cur++;
+                int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
+                DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y);
+                DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, x1, y);
+                DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmor, r, x2, y);
             }
-            int max = player.maxTurrets;
-
-            // Icon: Queen Spider Staff (any sentry icon)
-            var pos = new Vector2(rect.X + 15, rect.Y + 15);
-            ItemSlot.DrawItemIcon(new Item(ItemID.QueenSpiderStaff), 31, sb, pos, 0.8f, 32f, Color.White);
-
-            string t = $"{cur}/{max}";
-            var tp = new Vector2(rect.X + 52, rect.Y + 4);
-            Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+            Main.inventoryScale = old;
         }
+
 
         private static void DrawInventory(SpriteBatch sb, Rectangle bgRect, Player player)
         {
@@ -281,19 +264,7 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             Main.inventoryScale = old;
         }
 
-        private static void DrawArmor(SpriteBatch sb, Vector2 topLeft, Player player)
-        {
-            var font = FontAssets.MouseText.Value; int size = 40, pad = 4; const string title = "Armor"; var hs = font.MeasureString(title); float hy = topLeft.Y - hs.Y - 10f; Utils.DrawBorderStringBig(sb, title, new Vector2(topLeft.X, hy), Color.White, 0.52f);
-            float old = Main.inventoryScale; Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
-            for (int r = 0; r < 3; r++)
-            {
-                int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
-                DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y);
-                DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, x1, y);
-                DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmor, r, x2, y);
-            }
-            Main.inventoryScale = old;
-        }
+        
 
         private static void DrawAccessories(SpriteBatch sb, Vector2 topLeft, Player player)
         {
@@ -324,107 +295,6 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
         {
             IngameFancyUI.Close();
             if (_returnSnapshot.HasValue) { ChatSession.Restore(_returnSnapshot.Value); _returnSnapshot = null; }
-        }
-
-        private static void DrawStat_Defense(SpriteBatch sb, Rectangle rect, Player player)
-        {
-            var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_Defense"); rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
-            var defenseText = $"{player.statDefense}"; var snippets = ChatManager.ParseMessage(defenseText, Color.White).ToArray(); var pos = new Vector2(rect.X + 52, rect.Y + 4);
-            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
-        }
-
-        private static void DrawStat_HP(SpriteBatch sb, Rectangle rect, Player player)
-        {
-            var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_HP"); var rect2 = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect2, Color.White);
-            var lifeText = $"{player.statLife}/{player.statLifeMax2}"; var snippets = ChatManager.ParseMessage(lifeText, Color.White).ToArray(); var pos = new Vector2(rect2.X + 32, rect2.Y + 4);
-            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
-        }
-
-        private static void DrawStat_Mana(SpriteBatch sb, Rectangle rect, Player player)
-        {
-            var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
-            var manaTex = TextureAssets.Mana; var manaRect = new Rectangle(rect.X + 4, rect.Y + 2, manaTex.Width(), manaTex.Height()); sb.Draw(TextureAssets.Mana.Value, manaRect, Color.White);
-            var manaText = $"{player.statMana}/{player.statManaMax2}"; var size = FontAssets.MouseText.Value.MeasureString(manaText); var textPos = new Vector2(rect.X + rect.Width - size.X - 5, rect.Y + 5);
-            Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, manaText, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
-        }
-
-        private static void DrawStat_DeathCount(SpriteBatch sb, Rectangle rect, Player player)
-        {
-            var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
-            var item = new Item(ItemID.Tombstone); var pos = new Vector2(rect.X + 15, rect.Y + 15); ItemSlot.DrawItemIcon(item, 31, sb, pos, 0.8f, 32f, Color.White);
-            var deathCount = player.numberOfDeathsPVE.ToString(); var size = FontAssets.MouseText.Value.MeasureString(deathCount); var textPos = new Vector2(rect.X + 52, rect.Y + 4);
-            Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, deathCount, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
-        }
-
-        private static void DrawStat_Coins(SpriteBatch sb, Rectangle rect, Player player)
-        {
-            var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
-            long total = 0; for (int i = 50; i <= 53; i++) { var it = player.inventory[i]; if (it.IsAir) continue; if (it.type == ItemID.PlatinumCoin) total += it.stack * 1_000_000L; else if (it.type == ItemID.GoldCoin) total += it.stack * 10_000L; else if (it.type == ItemID.SilverCoin) total += it.stack * 100L; else if (it.type == ItemID.CopperCoin) total += it.stack; }
-            long rem = total; int p = (int)(rem / 1_000_000L); rem %= 1_000_000L; int g = (int)(rem / 10_000L); rem %= 10_000L; int s = (int)(rem / 100L); int c = (int)(rem % 100L);
-            var font = FontAssets.MouseText.Value; var pos = new Vector2(rect.X + 6, rect.Y + 6); int icon = 32; float sc = 1f; float dx = p > 99 ? 40f : 28f;
-            ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos, sc, icon, Color.White); Utils.DrawBorderStringFourWay(sb, font, p.ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, sc);
-            pos.X += dx; ItemSlot.DrawItemIcon(new Item(ItemID.GoldCoin), 31, sb, pos, sc, icon, Color.White); Utils.DrawBorderStringFourWay(sb, font, g.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, sc);
-            pos.X += dx; ItemSlot.DrawItemIcon(new Item(ItemID.SilverCoin), 31, sb, pos, sc, icon, Color.White); Utils.DrawBorderStringFourWay(sb, font, s.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, sc);
-            if (p <= 99) { pos.X += dx; ItemSlot.DrawItemIcon(new Item(ItemID.CopperCoin), 31, sb, pos, sc, icon, Color.White); Utils.DrawBorderStringFourWay(sb, font, c.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, sc); }
-        }
-
-        private static void DrawStat_Ammo(SpriteBatch sb, Rectangle rect, Player player)
-        {
-            var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
-            int highestStack = 0; Item highest = new(ItemID.WoodenArrow); for (int i = 54; i <= 57; i++) { var it = player.inventory[i]; if (it.IsAir) continue; if (it.stack > highestStack) { highestStack = it.stack; highest = it; } }
-            var pos = new Vector2(rect.X + 15, rect.Y + 15); ItemSlot.DrawItemIcon(highest, 31, sb, pos, 0.8f, 32f, Color.White);
-            var t = highestStack.ToString(); var size = FontAssets.MouseText.Value.MeasureString(t); var textPos = new Vector2(rect.X + 52, rect.Y + 4);
-            Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
-        }
-
-        private static void DrawPlayer(SpriteBatch sb, Vector2 pos, Player player)
-        {
-            // Restart spritebatch to make player draw on top
-            sb.End();
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
-
-            // Make player walk
-            int frame = (int)(Main.GlobalTimeWrappedHourly / 0.07f) % 14 + 6;
-            int y = frame * 56;
-            player.bodyFrame.Y = player.legFrame.Y = player.headFrame.Y = y;
-
-            // Make player stand still and be boring
-            //player.direction = 1; // force to face right
-            player.heldProj = -1;
-            player.itemAnimation = 0;
-            player.itemTime = 0;
-            player.PlayerFrame();
-            //player.WingFrame(false);
-
-            // Draw player
-            pos += Main.screenPosition + new Vector2(100, 88);
-            Main.PlayerRenderer.DrawPlayer(Main.Camera, player, pos, 0f, Vector2.Zero, scale: 1.0f);
-        }
-
-        private static void DrawSurfaceBackground(SpriteBatch sb, Rectangle rect)
-        {
-            var tex = Main.Assets.Request<Texture2D>("Images/MapBG1").Value; 
-            int d = 4; 
-            rect = new Rectangle(rect.X + d, rect.Y + d, rect.Width - d * 2, rect.Height - d * 2); 
-            sb.Draw(tex, rect, Color.White);
-        }
-
-        private static void DrawSeparatorBorder(SpriteBatch sb, Rectangle rect, int edgeWidth = 2)
-        {
-            var tex = Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1").Value; var color = new Color(89, 116, 213, 255) * 0.9f;
-            DrawPanel(tex, edgeWidth, 0, sb, new Vector2(rect.X, rect.Y), rect.Width, color); 
-            DrawPanel(tex, edgeWidth, 0, sb, new Vector2(rect.X, rect.Bottom - edgeWidth), rect.Width, color);
-            DrawPanelVertical(tex, edgeWidth, 0, sb, new Vector2(rect.X, rect.Y), rect.Height, color); DrawPanelVertical(tex, edgeWidth, 0, sb, new Vector2(rect.Right - edgeWidth, rect.Y), rect.Height, color);
-        }
-
-        private static void DrawPanel(Texture2D texture, int edgeWidth, int edgeShove, SpriteBatch spriteBatch, Vector2 position, float width, Color color)
-        {
-            spriteBatch.Draw(texture, new Vector2(position.X + edgeWidth, position.Y), new Rectangle(edgeWidth + edgeShove, 0, texture.Width - (edgeWidth + edgeShove) * 2, texture.Height), color, 0f, Vector2.Zero, new Vector2((width - (edgeWidth * 2)) / (float)(texture.Width - (edgeWidth + edgeShove) * 2), 1f), SpriteEffects.None, 0f);
-        }
-
-        private static void DrawPanelVertical(Texture2D texture, int edgeWidth, int edgeShove, SpriteBatch spriteBatch, Vector2 position, float height, Color color)
-        {
-            spriteBatch.Draw(texture, new Rectangle((int)position.X, (int)position.Y + edgeWidth, edgeWidth, (int)height - edgeWidth * 2), new Rectangle(texture.Width / 2, 0, 1, texture.Height), color);
         }
     }
 }

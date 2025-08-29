@@ -1,7 +1,10 @@
+using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 using ChatPlus.Core.UI;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.PlayerHeads;
@@ -39,5 +42,15 @@ public class PlayerHeadElement : BaseElement<PlayerHead>
         // mod icon display name
         TextSnippet[] snip = [new TextSnippet(Data.PlayerName)];
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32, 4), 0f, Vector2.Zero, Vector2.One, out _);
+
+        Rectangle bounds = new((int)pos.X - 34, (int)pos.Y, (int)26, (int)26);
+        if (bounds.Contains(Main.MouseScreen.ToPoint()))
+        {
+            Player player = Main.player[Data.PlayerIndex];
+            if (player?.active == true)
+            {
+                PlayerInfoDrawer.Draw(Main.spriteBatch, player);
+            }
+        }
     }
 }

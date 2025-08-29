@@ -1,7 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using ChatPlus.Core.Features.ModIcons.ModInfo;
+using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 using ChatPlus.Core.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using ReLogic.Graphics;
@@ -9,6 +12,7 @@ using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
+using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.ModIcons;
@@ -66,6 +70,30 @@ public sealed class ModIconSnippet : TextSnippet
             Utils.DrawBorderString(sb, initials, center + new Vector2(0, 4f), Color.White, 0.8f * scale, 0.5f, 0.5f);
         }
         return true;
+    }
+
+    public override void OnClick()
+    {
+        base.OnClick();
+
+        var plr = Main.player[_playerIndex];
+        if (plr == null || !plr.active) return;
+
+        var state = ModInfoState.instance;
+        if (state == null)
+        {
+            Main.NewText("Player info UI not available.", Color.Orange);
+            return;
+        }
+
+        // Snapshot current chat so the info UI can restore it later
+        var snap = ChatSession.Capture();                 // <- your existing helper
+
+        state.SetPlayer(_playerIndex, plr.name);          // tell the UI which player to show
+        state.SetReturnSnapshot(snap);                    // so Back can restore chat/session
+
+        Main.drawingPlayerChat = false;                   // hide chat while the modal is open (optional)
+        IngameFancyUI.OpenUIState(state);                 // open the "view more" UI
     }
 
     public override float GetStringLength(DynamicSpriteFont font) => BaseIconSize;

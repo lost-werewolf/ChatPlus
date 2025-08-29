@@ -74,27 +74,18 @@ public class ChatScrollList : UIElement
 
     private void Sync()
     {
-        int total = GetTotalLines();
-        float lineHeight = 21f;
-        float viewHeight = GetInnerDimensions().Height;
-        int show = GetShowCount() ?? Math.Max(1, (int)(viewHeight / lineHeight));
-        show = Math.Clamp(show, 1, Math.Max(1, total));
+        int total = GetTotalLines(); float lineHeight = 21f; float viewHeight = GetInnerDimensions().Height;
+        int show = GetShowCount() ?? Math.Max(1, (int)(viewHeight / lineHeight)); show = Math.Clamp(show, 1, Math.Max(1, total));
 
-        float contentHeight = total * lineHeight;
-        scrollbar.SetView(viewHeight, contentHeight);
+        float contentHeight = total * lineHeight; scrollbar.SetView(viewHeight, contentHeight);
 
         if (total != lastTotalLines)
         {
-            // stay at bottom only if we were already there
-            if (total > lastTotalLines && (GetStartChatLine() == 0))
-                scrollbar.GoToBottom();
-
+            if (total > lastTotalLines && GetStartChatLine() == 0) scrollbar.GoToBottom();
             ViewPosition = MathHelper.Clamp(ViewPosition, 0f, Math.Max(0f, contentHeight - viewHeight));
         }
 
-        // Only drive vanilla when mouse is actually controlling (dragging or scrolled this frame while hovering)
-        bool mouseActive = (scrollbar?.IsDragging == true) ||
-                           (IsMouseHovering && PlayerInput.ScrollWheelDeltaForUI != 0);
+        bool mouseActive = (scrollbar?.IsDragging == true) || (IsMouseHovering && PlayerInput.ScrollWheelDeltaForUI != 0);
         bool followMonitor = !mouseActive;
 
         if (followMonitor)
@@ -107,7 +98,8 @@ public class ChatScrollList : UIElement
         {
             int topIndex = (int)Math.Floor(ViewPosition / lineHeight);
             int startIndex = Math.Clamp(total - show - topIndex, 0, Math.Max(0, total - show));
-            SetStartChatLine(startIndex);
+            if (startIndex != GetStartChatLine()) 
+                SetStartChatLine(startIndex);
         }
 
         lastTotalLines = total;
@@ -150,12 +142,16 @@ public class ChatScrollList : UIElement
 
     private static void SetStartChatLine(int value)
     {
-        var startChatLine = Main.chatMonitor?.GetType().GetField("_startChatLine", BindingFlags.Instance | BindingFlags.NonPublic);
-        startChatLine?.SetValue(Main.chatMonitor, value);
+        var monitorType = Main.chatMonitor?.GetType(); if (monitorType == null) return;
+        var startField = monitorType.GetField("_startChatLine", BindingFlags.Instance | BindingFlags.NonPublic); if (startField == null) return;
 
-        // Set recalculate to true to force update
-        var recalculate = Main.chatMonitor?.GetType()?.GetField("_recalculateOnNextUpdate", BindingFlags.Instance | BindingFlags.NonPublic);
-        recalculate?.SetValue(Main.chatMonitor, true);
+        int current = (int)startField.GetValue(Main.chatMonitor);
+        if (current == value) return;
+
+        startField.SetValue(Main.chatMonitor, value);
+
+        var recalcField = monitorType.GetField("_recalculateOnNextUpdate", BindingFlags.Instance | BindingFlags.NonPublic);
+        recalcField?.SetValue(Main.chatMonitor, true);
     }
 
     public void Clear()
