@@ -1,6 +1,4 @@
-﻿using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.ModIcons;
-using ChatPlus.Core.Helpers;
+﻿using ChatPlus.Core.Features.ModIcons;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -9,7 +7,6 @@ using Terraria.GameContent;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ChatPlus.Common.Configs.ConfigElements;
 
@@ -50,7 +47,7 @@ public class ModIconsConfigElement : ConfigElement<bool>
     {
         // position
         var dims = GetDimensions();
-        Vector2 pos = new(dims.X+150, dims.Y);
+        Vector2 pos = new(dims.X+151, dims.Y);
 
         // mod icon tag
         string tag = ModIconTagHandler.GenerateTag("ChatPlus");

@@ -1,0 +1,40 @@
+﻿using System.Text.RegularExpressions;
+using Terraria.UI.Chat;
+
+namespace ChatPlus.Core.Features.Links;
+internal class LinkTagHandler : ITagHandler
+{
+    public static string GenerateTag(string linkText)
+    { 
+        return $"[l:{linkText}]";
+    }
+
+    public static bool ContainsLink(string text)
+    {
+        return Regex.IsMatch(text, @"(https?://|www\.)\S+\.\S+", RegexOptions.IgnoreCase);
+    }
+
+    public static bool TryGetLink(string input, out string link)
+    {
+        var match = Regex.Match(input, @"(https?://|www\.)\S+\.\S+", RegexOptions.IgnoreCase);
+        if (match.Success)
+        {
+            link = match.Value;
+            return true;
+        }
+        link = null;
+        return false;
+    }
+
+    public TextSnippet Parse(string text, Color baseColor = default, string options = null)
+    {
+        if (ContainsLink(text))
+        {
+            return new LinkSnippet(new TextSnippet(text, baseColor));
+        }
+        else
+        {
+            return new TextSnippet(text);
+        }
+    }
+}

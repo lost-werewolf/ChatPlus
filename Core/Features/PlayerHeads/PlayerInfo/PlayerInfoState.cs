@@ -127,15 +127,18 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             // Draw inventory
             DrawInventory(sb, bgRect, player);
 
-            // Draw accessories
-            Vector2 armorPos = new(leftColumn-200, y0+3*44+120-44*5);
-            if (Main.screenWidth < 1000)
-            {
-                armorPos += new Vector2(225, 225);
-            }
-            Vector2 accessoriesPos = new(armorPos.X, armorPos.Y+3*44);
+            // Draw buffs
+            if (HasAnyBuff(player))
+                Utils.DrawBorderStringBig(sb, "Buffs", new Vector2(bgRect.X, bgRect.Y+476), Color.White, 0.52f);
+            DrawBuffs(sb, bgRect,player);
 
-            DrawArmor2(sb, armorPos, player);
+            // Draw accessories
+            Vector2 armorPos = new(leftColumn - 200 + (Main.screenWidth < 1000 ? 225 : 0),y0 + 3 * 44 + 120 - 44 * 5 + (Main.screenWidth < 1000 ? 225 : 0));
+            Vector2 accessoriesPos = new(armorPos.X, armorPos.Y + 3 * 44);
+            Utils.DrawBorderStringBig(sb, "Accessories", new Vector2(armorPos.X, armorPos.Y-36), Color.White, 0.52f);
+
+            DrawArmor(sb, armorPos, player);
+            //DrawArmor2(sb, armorPos, player);
             DrawAccessories(sb, accessoriesPos, player);
 
             // Handle hovers
@@ -151,11 +154,23 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             if (heldItemBounds.Contains(p)) UICommon.TooltipMouseText("Held Item");
             if (dpsBounds.Contains(p)) UICommon.TooltipMouseText("Damage Per Second");
         }
+        private static bool HasAnyBuff(Player p) { for (int i = 0; i < p.buffType.Length; i++) if (p.buffType[i] > 0 && p.buffTime[i] > 0) return true; return false; }
 
-        private static void DrawArmor2(SpriteBatch sb, Vector2 topLeft, Player player)
+
+        private static void DrawArmor(SpriteBatch sb, Vector2 topLeft, Player player)
         {
-            var font = FontAssets.MouseText.Value; int size = 40, pad = 4; const string title = "Armor"; var hs = font.MeasureString(title); float hy = topLeft.Y - hs.Y - 10f; Utils.DrawBorderStringBig(sb, title, new Vector2(topLeft.X, hy), Color.White, 0.52f);
+            var font = FontAssets.MouseText.Value; 
+            int size = 40, pad = 4; 
             float old = Main.inventoryScale; Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
+
+            for (int r = 0; r < 3; r++)
+            {
+                int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
+                DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y, player);
+                DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, x1, y, player);
+                DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmor, r, x2, y, player);
+            }
+            
             for (int r = 0; r < 3; r++)
             {
                 int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
@@ -166,20 +181,33 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             Main.inventoryScale = old;
         }
 
-        private static void DrawArmor(SpriteBatch sb, Vector2 topLeft, Player player)
+        private static void DrawBuffs(SpriteBatch sb, Rectangle bgRect, Player player)
         {
-            var font = FontAssets.MouseText.Value; int size = 40, pad = 4; const string title = "Armor"; var hs = font.MeasureString(title); float hy = topLeft.Y - hs.Y - 10f; Utils.DrawBorderStringBig(sb, title, new Vector2(topLeft.X, hy), Color.White, 0.52f);
-            float old = Main.inventoryScale; Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
-            for (int r = 0; r < 3; r++)
+            int size = 32, pad = 6, perRow = 10; var start = new Vector2(bgRect.X, bgRect.Bottom + 52 + 5 * (40 + 4) + 35); var font = FontAssets.MouseText.Value;
+            int n = 0;
+            for (int i = 0; i < player.buffType.Length; i++)
             {
-                int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
-                DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y);
-                DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, x1, y);
-                DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmor, r, x2, y);
+                int id = player.buffType[i]; if (id <= 0) continue; if (!player.HasBuff(id)) continue;
+                int row = n / perRow; int col = n % perRow; var r = new Rectangle((int)(start.X + col * (size + pad)), (int)(start.Y + row * (size + pad)), size, size);
+                sb.Draw(TextureAssets.Buff[id].Value, r, Color.White);
+                int t = player.buffTime[i];
+                if (t > 2)
+                {
+                    int s = t / 60; string label;
+                    if (s >= 3600) { label = (s / 3600).ToString() + ":" + ((s % 3600) / 60).ToString("00"); }
+                    else if (s >= 60) { label = (s / 60).ToString() + ":" + (s % 60).ToString("00"); }
+                    else { label = s.ToString(); }
+                    var ls = font.MeasureString(label); Utils.DrawBorderString(sb, label, new Vector2(r.Right - ls.X + 1, r.Bottom - ls.Y + 1), Color.White, 0.7f, 0f, 0f);
+                }
+                bool hover = r.Contains(Main.MouseScreen.ToPoint()) && !PlayerInput.IgnoreMouseInterface;
+                if (hover)
+                {
+                    UICommon.TooltipMouseText(Lang.GetBuffName(id)); Main.LocalPlayer.mouseInterface = true;
+                    if (Main.mouseRight && Main.mouseRightRelease && !Main.debuff[id]) { player.DelBuff(i); Main.mouseRightRelease = false; }
+                }
+                n++;
             }
-            Main.inventoryScale = old;
         }
-
 
         private static void DrawInventory(SpriteBatch sb, Rectangle bgRect, Player player)
         {
@@ -187,6 +215,9 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
             bool TryEquipFromInventory(Player p, int invIndex)
             {
+                // we can only equip items from ourself
+                if (player != Main.LocalPlayer) return false; 
+
                 ref Item it = ref p.inventory[invIndex]; if (it.IsAir) return false;
 
                 if (it.accessory)
@@ -203,7 +234,6 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
                 if (equip >= 0)
                 {
                     int target = it.defense > 0 ? equip : vanity;
-                    if (target < 0) target = equip;
                     if (p.armor[target].IsAir) { p.armor[target] = it.Clone(); it.TurnToAir(); return true; }
                     var sw = p.armor[target]; p.armor[target] = it; p.inventory[invIndex] = sw; return true;
                 }
@@ -228,7 +258,7 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             }
         }
 
-        private static void DrawLoaderSlot(Item[] items, int context, int slot, int x, int y)
+        private static void DrawLoaderSlot(Item[] items, int context, int slot, int x, int y, Player player)
         {
             float old = Main.inventoryScale;
             Main.inventoryScale = 40f / TextureAssets.InventoryBack.Width();
@@ -247,10 +277,10 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
                 if (Main.mouseLeft && Main.mouseLeftRelease)
                 {
-                    ItemSlot.LeftClick(items, context, slot);
+                    //ItemSlot.LeftClick(items, context, slot);
                     Main.mouseLeftRelease = false;
                 }
-                if (Main.mouseRight && Main.mouseRightRelease)
+                if (Main.mouseRight && Main.mouseRightRelease && player == Main.LocalPlayer)
                 {
                     ItemSlot.RightClick(items, context, slot);
                     Main.mouseRightRelease = false;
@@ -264,7 +294,6 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             Main.inventoryScale = old;
         }
 
-        
 
         private static void DrawAccessories(SpriteBatch sb, Vector2 topLeft, Player player)
         {
@@ -285,9 +314,9 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
                 int x2 = (int)topLeft.X + 2 * (size + pad);
                 int y = (int)topLeft.Y + r * (size + pad);
 
-                DrawLoaderSlot(player.dye, 12, dyeIndex, x0, y);
-                DrawLoaderSlot(player.armor, 11, vanityIndex, x1, y);
-                DrawLoaderSlot(player.armor, 10, equipIndex, x2, y);
+                DrawLoaderSlot(player.dye, 12, dyeIndex, x0, y, player);
+                DrawLoaderSlot(player.armor, 11, vanityIndex, x1, y, player);
+                DrawLoaderSlot(player.armor, 10, equipIndex, x2, y, player);
             }
         }
 

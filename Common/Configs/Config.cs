@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using AdvancedChatFeatures.Common.Configs;
 using ChatPlus.Common.Configs.ConfigElements;
 using ChatPlus.Core.Helpers;
+using Newtonsoft.Json;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
@@ -41,7 +43,12 @@ namespace ChatPlus.Common.Configs
         [DefaultValue(10f)]
         public float AutocompleteItemCount = 10f;
 
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [DefaultValue(true)]
+        public bool ShowPlayerPreviewWhenHovering = true;
+
         [Header("ChatFormat")]
+
         [CustomModConfigItem(typeof(ModIconsConfigElement))]
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
@@ -52,21 +59,12 @@ namespace ChatPlus.Common.Configs
         [DefaultValue(true)]
         public bool PlayerIcons = true;
 
-        [CustomModConfigItem(typeof(PlayerColorsConfigElement))]
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [DefaultValue(true)]
-        public bool PlayerColors = true;
+        [Header("PlayerFormat")]
 
         [BackgroundColor(255, 192, 8)]
-        [CustomModConfigItem(typeof(PlayerFormatConfigElement))]
-        [OptionStrings(["<PlayerName>", "PlayerName:"])]
-        [DefaultValue("<PlayerName>")]
-        public string PlayerFormat { get; set; } = "<PlayerName>";
-
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [CustomModConfigItem(typeof(EnableLinksConfigElement))]
-        [DefaultValue(true)]
-        public bool ShowLinks = true;
+        [CustomModConfigItem(typeof(PlayerColorConfigElement))]
+        [DefaultValue("FFFFFF")]
+        public string PlayerColor;
 
         public override void OnChanged()
         {

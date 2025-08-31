@@ -68,7 +68,7 @@ namespace ChatPlus.Core.UI
 
             // Style
             OverflowHidden = true;
-            BackgroundColor = ColorHelper.DarkBlue * 1.0f;
+            BackgroundColor = new Color(33,43,79) * 1.0f;
             SetPadding(0);
 
             // Initialize elements

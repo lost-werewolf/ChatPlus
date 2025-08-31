@@ -4,6 +4,7 @@ using System.Security.Policy;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
@@ -39,7 +40,7 @@ public sealed class ModIconTagHandler : ITagHandler
         {
             tex = ModContent.Request<Texture2D>(normalPath).Value;
         }
-        else if (internalName == "ModLoader")
+        else if (internalName.Equals("ModLoader", StringComparison.OrdinalIgnoreCase))
         {
             tex = Ass.tModLoaderIcon.Value;
         }

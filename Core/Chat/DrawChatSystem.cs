@@ -203,7 +203,7 @@ namespace ChatPlus.Core.Chat
                 20
             );
 
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, ColorHelper.Blue * 0.5f);
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, new Color(17,85,204) * 0.5f);
 
             static Vector2 MeasureSnippets(string s)
             {

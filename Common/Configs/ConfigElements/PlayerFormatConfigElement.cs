@@ -30,14 +30,12 @@ namespace AdvancedChatFeatures.Common.Configs
         {
             TextDisplayFunction = () => "Player Format";
             base.OnInitialize();
-            Height.Set(80, 0);
             Recalculate();
         }
 
         public override void Draw(SpriteBatch sb)
         {
             TextDisplayFunction = () => "Player Format";
-
             base.Draw(sb);
 
             if (Main.LocalPlayer == null) return;
@@ -46,7 +44,7 @@ namespace AdvancedChatFeatures.Common.Configs
             string current = getValue != null ? getValue() : (string)MemberInfo.GetValue(Item) ?? "<PlayerName>";
 
             // expose it to runtime (adjust the property name if yours differs)
-            Conf.C.PlayerFormat = current;
+            //Conf.C.PlayerFormat = current;
 
             // preview
             string name = string.IsNullOrEmpty(Main.LocalPlayer.name) ? "PlayerName" : Main.LocalPlayer.name;
@@ -54,7 +52,7 @@ namespace AdvancedChatFeatures.Common.Configs
             var dims = GetDimensions();
             var scale = new Vector2(0.8f);
             var size = ChatManager.GetStringSize(FontAssets.MouseText.Value, preview, scale);
-            var pos = new Vector2(dims.X + 8 + 150f, dims.Y + (dims.Height - size.Y) * 0.5f + 2f);
+            var pos = new Vector2(dims.X + 158f, dims.Y + (dims.Height - size.Y) * 0.5f + 5f);
 
             ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, preview, pos, Color.White, 0f, Vector2.Zero, scale);
         }

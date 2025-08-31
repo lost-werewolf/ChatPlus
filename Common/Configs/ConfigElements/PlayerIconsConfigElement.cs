@@ -1,5 +1,4 @@
-﻿using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.PlayerHeads;
+﻿using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,7 +8,6 @@ using Terraria.GameContent;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using static Terraria.ModLoader.BackupIO;
 
 namespace ChatPlus.Common.Configs.ConfigElements;
 
@@ -50,7 +48,7 @@ public class PlayerIconsConfigElement : ConfigElement<bool>
     {
         // Get pos
         var dims = GetDimensions();
-        Vector2 pos = new(dims.X+150+13, dims.Y+12);
+        Vector2 pos = new(dims.X+162, dims.Y+12);
 
         // Get this player
         var player = Main.LocalPlayer;

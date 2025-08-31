@@ -11,14 +11,12 @@ namespace ChatPlus.Core.Helpers
     public static class Ass
     {
         // Add assets here
-        public static Asset<Texture2D> ConfigButton;
-        public static Asset<Texture2D> FilterButton;
-        public static Asset<Texture2D> TerrariaIcon;
-        public static Asset<Texture2D> tModLoaderIcon;
-
         public static Asset<Texture2D> Hitbox;
         public static Asset<Texture2D> GuideHead;
         public static Asset<Texture2D> StatPanel;
+        public static Asset<Texture2D> SmallPanelHighlight;
+        public static Asset<Texture2D> TerrariaIcon;
+        public static Asset<Texture2D> tModLoaderIcon;
 
         // This bool automatically initializes all specified assets
         public static bool Initialized { get; set; }

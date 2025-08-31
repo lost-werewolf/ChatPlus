@@ -16,6 +16,7 @@ Configs: {
 		Headers: {
 			Config: Config
 			ChatFormat: Chat Format
+			PlayerFormat: Player Format
 		}
 
 		Autocomplete: {
@@ -70,23 +71,23 @@ Configs: {
 		}
 
 		ModIcons: {
-			Label: Mod Icons
-			Tooltip: A mod icon before every chat sent by a mod.
+			Label: Mod Icon
+			Tooltip: Adds a mod icon before every chat sent by a mod.
 		}
 
 		PlayerIcons: {
-			Label: Player Icons
-			Tooltip: A player head before every chat sent by a player.
+			Label: Player Head
+			Tooltip: Adds a player head before every chat sent by a player.
 		}
 
-		PlayerColors: {
-			Label: Player Colors
-			Tooltip: Assigns every player a color.
+		PlayerColor: {
+			Label: Player Color
+			Tooltip: ""
 		}
 
-		PlayerFormat: {
-			Label: Player Format
-			Tooltip: Sets the prefix and suffix around your name.
+		ShowPlayerPreviewWhenHovering: {
+			Label: Show Player Preview When Hovering
+			Tooltip: Shows a preview of a player and their stats when hovering a player head.
 		}
 	}
 }

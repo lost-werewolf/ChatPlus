@@ -1,3 +1,4 @@
+using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
@@ -47,7 +48,7 @@ public class PlayerHeadElement : BaseElement<PlayerHead>
         if (bounds.Contains(Main.MouseScreen.ToPoint()))
         {
             Player player = Main.player[Data.PlayerIndex];
-            if (player?.active == true)
+            if (player?.active == true && Conf.C.ShowPlayerPreviewWhenHovering)
             {
                 PlayerInfoDrawer.Draw(Main.spriteBatch, player);
             }

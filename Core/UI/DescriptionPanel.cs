@@ -44,19 +44,12 @@ namespace ChatPlus.Core.UI
             // Size
             Width.Set(320, 0);
             Height.Set(60, 0);
-
-            // Style
-            BackgroundColor = ColorHelper.DarkBlue * 1.0f;
-
-            // Position
+            BackgroundColor = new Color(33,43,79) * 1.0f;
             VAlign = 1f;
             Left.Set(190, 0);
 
             // Text
-            text = new(initialText ?? string.Empty, 0.9f, false)
-            {
-                HAlign = 0.0f
-            };
+            text = new(initialText ?? string.Empty, 0.9f, false);
 
             Append(text);
         }

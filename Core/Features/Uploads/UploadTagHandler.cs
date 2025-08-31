@@ -1,6 +1,7 @@
 ﻿// UploadTagHandler.cs
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using ChatPlus.Core.Features.Uploads.Netcode;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -52,6 +53,12 @@ namespace ChatPlus.Core.Features.Uploads
 
             // If no tag was found, return the regular snippet
             return new TextSnippet(text ?? string.Empty);
+        }
+
+        // helper
+        public static bool ContainsUploadTag(string text)
+        {
+            return Regex.IsMatch(text, @"\[u:[^\]]+\]", RegexOptions.IgnoreCase);
         }
     }
 }

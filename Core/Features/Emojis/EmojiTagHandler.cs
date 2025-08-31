@@ -34,19 +34,18 @@ namespace ChatPlus.Core.Features.Emojis
 
         TextSnippet ITagHandler.Parse(string text, Color baseColor, string options)
         {
-            string key = text ?? string.Empty;
-            if (Registry.TryGetValue(key, out var texture))
+            if (Registry.TryGetValue(text, out var texture))
             {
                 return new EmojiSnippet(texture)
                 {
-                    Text = GenerateEmojiTag(key),
+                    Text = GenerateEmojiTag(text),
                     Color = Color.White
                 };
             }
             else
             {
                 // If no uploadedTexture is found, return the original text as a fallback
-                return new TextSnippet(key);
+                return new TextSnippet(text);
             }
         }
         public static string GenerateEmojiTag(string key) => $"[e:{key}]";

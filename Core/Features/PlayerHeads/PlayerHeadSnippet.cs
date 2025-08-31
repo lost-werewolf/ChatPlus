@@ -1,3 +1,4 @@
+using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 using ChatPlus.Core.Helpers;
@@ -65,7 +66,7 @@ public class PlayerHeadSnippet : TextSnippet
         }
 
         // Snapshot current chat so the info UI can restore it later
-        var snap = ChatSession.Capture();                 // <- your existing helper
+        var snap = ChatSession.Capture();                
 
         state.SetPlayer(_playerIndex, plr.name);          // tell the UI which player to show
         state.SetReturnSnapshot(snap);                    // so Back can restore chat/session
@@ -79,7 +80,7 @@ public class PlayerHeadSnippet : TextSnippet
         if (_playerIndex >= 0 && _playerIndex < Main.maxPlayers)
         {
             Player player = Main.player[_playerIndex];
-            if (player?.active == true)
+            if (player?.active == true && Conf.C.ShowPlayerPreviewWhenHovering)
             {
                 PlayerInfoDrawer.Draw(Main.spriteBatch, player);
             }

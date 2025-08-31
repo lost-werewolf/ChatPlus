@@ -42,7 +42,7 @@ public static class StateManager
         {
             if (ui.CurrentState != state)
             {
-                CloseOthers(ui);     // <- ensure exclusivity
+                CloseOthers(ui);     // ensure exclusivity
                 ui.SetState(state);
             }
             ui.Update(gameTime);

@@ -238,4 +238,21 @@ Bugs:
 
 New features:
 1. Hover player icon to see quick stats
+[DONE] Add buffs to more info
+
+~---~
+Low prio:
+[todo] Fix mod info opening
+[todo] Fix steam workshop button
+[todo] Add left right buttons to scroll players
+
+Todo:
+[todo] Fix scrollwheel bug causing all parsing to be removed
+[todo] Fix bugs like cant move items, right click, or draw right stuff in MoreInfoState
+
+Todo 13:00-14:00
+[todo] Fix links triple line drawing
+[todo] Fix player drawing is too dark
+[todo] Implement player color
+
 

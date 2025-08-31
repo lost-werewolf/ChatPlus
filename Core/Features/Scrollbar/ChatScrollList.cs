@@ -41,10 +41,20 @@ public class ChatScrollList : UIElement
     public override void ScrollWheel(UIScrollWheelEvent evt)
     {
         if (scrollbar == null) return;
-        // Terraria uses 120 per notch; scroll a few lines per notch.
-        const float linesPerNotch = 3f;
-        ViewPosition -= (evt.ScrollWheelValue / 120f) * (linesPerNotch * 21f);
-        Sync();
+        PlayerInput.LockVanillaMouseScroll("ChatPlus/ChatScroll");
+        const float line = 21f; const float linesPerNotch = 3f;
+        float notches = evt.ScrollWheelValue / 120f;
+        ViewPosition -= notches * linesPerNotch * line;
+
+        int total = GetTotalLines();
+        float viewH = GetInnerDimensions().Height;
+        int show = GetShowCount() ?? (int)(viewH / line); if (show < 1) show = 1; if (show > total) show = total;
+
+        int topIndex = (int)Math.Floor(ViewPosition / line); if (topIndex < 0) topIndex = 0;
+        int maxTop = Math.Max(0, total - show); if (topIndex > maxTop) topIndex = maxTop;
+
+        int startIndex = Math.Max(0, total - show - topIndex);
+        int cur = GetStartChatLine(); if (startIndex != cur) SetStartChatLine(startIndex);
     }
 
     public override void Update(GameTime gameTime)
@@ -142,16 +152,11 @@ public class ChatScrollList : UIElement
 
     private static void SetStartChatLine(int value)
     {
-        var monitorType = Main.chatMonitor?.GetType(); if (monitorType == null) return;
-        var startField = monitorType.GetField("_startChatLine", BindingFlags.Instance | BindingFlags.NonPublic); if (startField == null) return;
-
-        int current = (int)startField.GetValue(Main.chatMonitor);
-        if (current == value) return;
-
-        startField.SetValue(Main.chatMonitor, value);
-
-        var recalcField = monitorType.GetField("_recalculateOnNextUpdate", BindingFlags.Instance | BindingFlags.NonPublic);
-        recalcField?.SetValue(Main.chatMonitor, true);
+        var t = Main.chatMonitor?.GetType(); if (t == null) return;
+        var f = t.GetField("_startChatLine", BindingFlags.Instance | BindingFlags.NonPublic); if (f == null) return;
+        int cur = (int)f.GetValue(Main.chatMonitor); if (cur == value) return;
+        f.SetValue(Main.chatMonitor, value); 
+        // do NOT touch _recalculateOnNextUpdate here
     }
 
     public void Clear()

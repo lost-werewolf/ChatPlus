@@ -8,6 +8,9 @@
 		<!-- Ignore warning -->
 		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Include="Common\Configs\ConfigElements\PlayerColorConfigElement.cs" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1" />

@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
@@ -11,6 +12,7 @@ using ReLogic.Graphics;
 using Terraria;
 using Terraria.GameContent.Bestiary;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Core;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
@@ -43,9 +45,10 @@ public sealed class ModIconSnippet : TextSnippet
 
         if (modName.Equals("Terraria", StringComparison.OrdinalIgnoreCase))
         {
-            var sheet = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Tags_Shadow", AssetRequestMode.ImmediateLoad);
-            var frame = BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions.Biomes.Surface._filterIconFrame;
-            //sb.Draw(sheet.Value, dest, sheet.Frame(16, 5, frame.X, frame.Y), Color.White);
+            if (Ass.TerrariaIcon?.Value != null)
+            {
+                sb.Draw(Ass.TerrariaIcon.Value, dest, Color.White);
+            }
             return true;
         }
         else if (modName.Equals("ModLoader", StringComparison.OrdinalIgnoreCase))
@@ -76,24 +79,47 @@ public sealed class ModIconSnippet : TextSnippet
     {
         base.OnClick();
 
-        var plr = Main.player[_playerIndex];
-        if (plr == null || !plr.active) return;
-
         var state = ModInfoState.instance;
         if (state == null)
         {
-            Main.NewText("Player info UI not available.", Color.Orange);
+            Main.NewText("Mod info UI not available.", Color.Orange);
             return;
         }
 
-        // Snapshot current chat so the info UI can restore it later
-        var snap = ChatSession.Capture();                 // <- your existing helper
+        if (!ModLoader.TryGetMod(modName, out var mod))
+        {
+            Main.NewText($"Mod \"{modName}\" not found.", Color.Orange);
+            return;
+        }
 
-        state.SetPlayer(_playerIndex, plr.name);          // tell the UI which player to show
-        state.SetReturnSnapshot(snap);                    // so Back can restore chat/session
+        string displayName = mod.DisplayName ?? mod.Name ?? "Unknown Mod";
+        string internalName = mod.Name ?? displayName;
+        string version = mod.Version?.ToString() ?? "Unknown";
+        string description = GetDescriptionForMod(mod) + "\nVersion: " + version;
 
-        Main.drawingPlayerChat = false;                   // hide chat while the modal is open (optional)
-        IngameFancyUI.OpenUIState(state);                 // open the "view more" UI
+        var snap = ChatSession.Capture();
+        state.SetModInfo(description, displayName, internalName);
+        state.SetReturnSnapshot(snap);
+
+        Main.drawingPlayerChat = false;
+        IngameFancyUI.OpenUIState(state);
+    }
+
+    private string GetDescriptionForMod(Mod mod)
+    {
+        if (mod == null) return "No description available.";
+
+        // Find the matching LocalMod
+        IReadOnlyList<LocalMod> all = ModOrganizer.FindAllMods();
+        LocalMod localMod = all?.FirstOrDefault(m => m != null && string.Equals(m.Name, mod.Name, StringComparison.OrdinalIgnoreCase));
+
+        // Get description
+        string desc = localMod?.properties?.description;
+        if (!string.IsNullOrWhiteSpace(desc))
+            return desc;
+
+        return "";
+        //return $"No description provided.\n\nVersion: {version}\nAuthor: {author}";
     }
 
     public override float GetStringLength(DynamicSpriteFont font) => BaseIconSize;
@@ -136,42 +162,61 @@ public sealed class ModIconSnippet : TextSnippet
     {
         try
         {
-            var trace = new StackTrace();
-            var frames = trace.GetFrames();
+            var frames = new StackTrace().GetFrames();
             if (frames == null) return null;
-            var terrariaAssembly = typeof(Main).Assembly;
-            var loaderAssembly = typeof(ModLoader).Assembly;
+
+            var terrariaAsm = typeof(Main).Assembly;
+            var loaderAsm = typeof(ModLoader).Assembly;
+            var chatPlusAsm = typeof(ModIconSnippet).Assembly;
+
             var pivot = -1;
-            for (int k = 0; k < frames.Length; k++)
+            for (int i = 0; i < frames.Length; i++)
             {
-                var method = frames[k].GetMethod();
-                if (method == null) continue;
-                var name = method.Name;
-                if (name.IndexOf("NewText", StringComparison.Ordinal) >= 0 || name.IndexOf("AddNewMessage", StringComparison.Ordinal) >= 0) { pivot = k; break; }
+                var m = frames[i].GetMethod();
+                if (m == null) continue;
+                var n = m.Name;
+                if (n.IndexOf("NewText", StringComparison.Ordinal) >= 0 || n.IndexOf("AddNewMessage", StringComparison.Ordinal) >= 0)
+                {
+                    pivot = i;
+                    break;
+                }
             }
             if (pivot < 0) return null;
-            Type chosenType = null;
-            for (int k = pivot + 1; k < frames.Length; k++)
+
+            for (int i = pivot + 1; i < frames.Length; i++)
             {
-                var method = frames[k].GetMethod();
-                if (method == null) continue;
-                var type = method.DeclaringType;
-                if (type == null || type.Namespace == null) continue;
-                var asm = type.Assembly;
-                if (asm == terrariaAssembly || asm == loaderAssembly) continue;
-                chosenType = type;
-                break;
+                var m = frames[i].GetMethod();
+                if (m == null) continue;
+
+                var t = m.DeclaringType;
+                if (t == null) continue;
+
+                var asm = t.Assembly;
+                var ns = t.Namespace ?? string.Empty;
+
+                // Skip engine, loader, and our own code
+                if (asm == terrariaAsm) continue;
+                if (asm == chatPlusAsm) continue;
+                if (ns.StartsWith("ChatPlus.", StringComparison.OrdinalIgnoreCase)) continue;
+
+                // If the caller is tModLoader (e.g., /playing), treat as ModLoader
+                if (asm == loaderAsm)
+                {
+                    if (ns.StartsWith("Terraria.ModLoader", StringComparison.OrdinalIgnoreCase)) return "ModLoader";
+                    continue;
+                }
+
+                var mod = ModLoader.Mods.FirstOrDefault(z => z != null && z.Code == asm);
+                //if (mod.Name == "DragonLens") return "ModLoader";
+                if (mod != null) return mod.Name;
             }
-            if (chosenType == null) return "Terraria";
-            var mod = ModLoader.Mods.FirstOrDefault(z => z.Name != "ModLoader" && z.Code == chosenType.Assembly);
-            if (mod.Name == "DragonLens" || mod.Name == "CheatSheet")
-                return null;
-            if (mod == null) return "Terraria";
-            return mod.Name;
+
+            return "ModLoader";
         }
         catch
         {
             return null;
         }
     }
+
 }

@@ -256,32 +256,41 @@ public static class PlayerInfoDrawer
         int c = (int)(rem % 100L);
 
         var font = FontAssets.MouseText.Value; 
-        var pos = new Vector2(rect.X+6, rect.Y + 6); 
+        var pos = new Vector2(rect.X+6, rect.Y + 8); 
         int iconSize = 32; 
-        float scale = 1.0f; 
+        float scale = 0.8f; 
         float dx = 28f;
-
-        if (p > 99)
-        {
-            dx = 40f;
-        }
-
-        ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos, scale, iconSize, Color.White); 
-        Utils.DrawBorderStringFourWay(sb, font, p.ToString() ?? p.ToString() ?? p.ToString().ToString(), pos.X-5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
-        pos.X += dx; 
-        ItemSlot.DrawItemIcon(new Item(ItemID.GoldCoin), 31, sb, pos, scale, iconSize, Color.White); 
-        Utils.DrawBorderStringFourWay(sb, font, g.ToString(), pos.X -8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
-        pos.X += dx; 
-        ItemSlot.DrawItemIcon(new Item(ItemID.SilverCoin), 31, sb, pos, scale, iconSize, Color.White); 
-        Utils.DrawBorderStringFourWay(sb, font, s.ToString(), pos.X -8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
-        pos.X += dx;
 
         if (p <= 99)
         {
+            ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos, scale, iconSize, Color.White);
+            Utils.DrawBorderStringFourWay(sb, font, p.ToString() ?? p.ToString() ?? p.ToString().ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+            pos.X += dx;
+            ItemSlot.DrawItemIcon(new Item(ItemID.GoldCoin), 31, sb, pos, scale, iconSize, Color.White);
+            Utils.DrawBorderStringFourWay(sb, font, g.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+            pos.X += dx;
+            ItemSlot.DrawItemIcon(new Item(ItemID.SilverCoin), 31, sb, pos, scale, iconSize, Color.White);
+            Utils.DrawBorderStringFourWay(sb, font, s.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+            pos.X += dx;
             ItemSlot.DrawItemIcon(new Item(ItemID.CopperCoin), 31, sb, pos, scale, iconSize, Color.White);
             Utils.DrawBorderStringFourWay(sb, font, c.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
         }
+        else
+        {
+            pos.X += 4;
+            scale = 0.9f;
+            ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos + new Vector2(11,0), scale, iconSize, Color.White);
+            Utils.DrawBorderStringFourWay(sb, font, p.ToString() ?? p.ToString() ?? p.ToString().ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+            pos.X += dx+14;
+            ItemSlot.DrawItemIcon(new Item(ItemID.GoldCoin), 31, sb, pos, scale, iconSize, Color.White);
+            Utils.DrawBorderStringFourWay(sb, font, g.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+            pos.X += dx;
+            ItemSlot.DrawItemIcon(new Item(ItemID.SilverCoin), 31, sb, pos, scale, iconSize, Color.White);
+            Utils.DrawBorderStringFourWay(sb, font, s.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+            pos.X += dx;
+        }
     }
+
     public static void DrawStat_Ammo(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
@@ -332,40 +341,31 @@ public static class PlayerInfoDrawer
         string teamText = player.team switch
         {
             0 => "[c/ffffff:No team]",
-            1 => "[c/DA3B3B:(Team\nRed)]",
-            2 => "[c/3bda55:(Team\nGreen)]",
-            3 => "[c/3b95da:(Team\nBlue)]",
-            4 => "[c/f2dd64:(Team\nYellow)]",
-            5 => "[c/e064f2:(Team\nPink)]",
+            1 => "[c/DA3B3B:(Team Red)]",
+            2 => "[c/3bda55:(Team Green)]",
+            3 => "[c/3b95da:(Team Blue)]",
+            4 => "[c/f2dd64:(Team Yellow)]",
+            5 => "[c/e064f2:(Team Pink)]",
             _ => "(Unknown)"
         };
 
         var snippets = ChatManager.ParseMessage(teamText, Color.White).ToArray();
         pos += new Vector2(7, 5);
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, new Vector2(0.7f), out _);
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, new Vector2(1.0f), out _);
     }
 
     public static void DrawPlayer(SpriteBatch sb, Vector2 pos, Player player)
     {
-        // Restart spritebatch to make player draw on top
-        sb.End();
-        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
+        sb.End(); sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
+        player.heldProj = -1; player.itemAnimation = 0; player.itemTime = 0; player.PlayerFrame();
+        var drawPosition = pos + Main.screenPosition + new Vector2(100, 88); float scale = 1.2f;
+        Main.PlayerRenderer.DrawPlayer(Main.Camera, player, drawPosition, 0f, Vector2.Zero, 0f, scale);
 
-        // Make player walk
-        //int frame = (int)(Main.GlobalTimeWrappedHourly / 0.07f) % 14 + 6;
-        //int y = frame * 56;
-        //player.bodyFrame.Y = player.legFrame.Y = player.headFrame.Y = y;
+        sb.End(); sb.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
+        Main.PlayerRenderer.DrawPlayer(Main.Camera, player, drawPosition, 0f, Vector2.Zero, 0f, scale);
+        Main.PlayerRenderer.DrawPlayer(Main.Camera, player, drawPosition, 0f, Vector2.Zero, 0f, scale);
 
-        // Make player stand still and be boring
-        player.heldProj = -1;
-        player.itemAnimation = 0;
-        player.itemTime = 0;
-        player.PlayerFrame();
-        //player.WingFrame(false);
-
-        // Draw player
-        pos += Main.screenPosition + new Vector2(100, 88);
-        Main.PlayerRenderer.DrawPlayer(Main.Camera, player, pos, 0f, Vector2.Zero, scale: 1.2f);
+        sb.End(); sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
     }
 
     public static void DrawSurfaceBackground(SpriteBatch sb, Rectangle rect)

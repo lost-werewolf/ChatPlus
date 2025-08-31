@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using ChatPlus.Core.Features.Links;
+using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using MonoMod.RuntimeDetour;
 using Terraria;
@@ -184,16 +185,12 @@ namespace ChatPlus.Common.Compat
                 var t = snip.Text?.Trim();
                 if (string.IsNullOrEmpty(t)) continue;
 
-                if (IsWholeLink(t) && snip is not LinkSnippet)
+                if (LinkTagHandler.ContainsLink(t) && snip is not LinkSnippet)
                 {
                     line[i] = new LinkSnippet(snip);
                 }
             }
         }
-
-        private static bool IsWholeLink(string text) { return Regex.IsMatch(text, @"^(https?://|www\.)\S+\.\S+$", RegexOptions.IgnoreCase); }
-
-        private static bool HasUpload(string s) => Regex.IsMatch(s, @"\[u:[^\]]+\]", RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Adds 8 empty text snippets to a message if it contains an upload.
@@ -201,7 +198,7 @@ namespace ChatPlus.Common.Compat
         // Adds 8 padding lines (counted for spacing) that we’ll skip drawing in RenderChat
         private void ModifyUploadSnippetHook(object self, string text, bool force, Color c, int widthLimit)
         {
-            if (!HasUpload(text)) return;
+            if (!UploadTagHandler.ContainsUploadTag(text)) return;
 
             var parsedList = GetParsedList(self);
             for (int i = 0; i < 8; i++)
