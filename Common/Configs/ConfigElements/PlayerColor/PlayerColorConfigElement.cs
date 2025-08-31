@@ -37,12 +37,15 @@ public class PlayerColorConfigElement : ConfigElement<string>
         hsl = Main.rgbToHsl(c);
         lastHex = ColorToHex(c);
         Value = lastHex;
+
+        MinHeight.Set(100, 0);
+        Height.Set(100, 0);
     }
 
     public override void OnInitialize()
     {
-        MinHeight.Set(30 * 4, 0); // 4 heights
-        Height.Set(30*4, 0); // 4 heights
+        MinHeight.Set(100, 0);
+        Height.Set(100, 0);
 
         // Make buttons
         copyButton = MakeButton("Copy", 0, Copy);
@@ -50,20 +53,9 @@ public class PlayerColorConfigElement : ConfigElement<string>
         randomizeButton = MakeButton("Randomize", 36*2, Randomize);
 
         // Make sliders
-        hueSlider = MakeHslSlider(HSLSliderId.Hue, 30);
-        saturationSlider = MakeHslSlider(HSLSliderId.Saturation, 60);
-        luminanceSlider = MakeHslSlider(HSLSliderId.Luminance, 90);
-    }
-
-    private CustomColoredImageButton MakeButton(string assetName, float left, Action onClick)
-    {
-        var btn = new CustomColoredImageButton(
-            texture: Main.Assets.Request<Texture2D>($"Images/UI/CharCreation/{assetName}"),
-            tooltip: assetName);
-        btn.OnLeftMouseDown += (_, _) => onClick();
-        btn.Left.Set(300+left, 0);
-        Append(btn);
-        return btn;
+        hueSlider = MakeHslSlider(HSLSliderId.Hue, 0);
+        saturationSlider = MakeHslSlider(HSLSliderId.Saturation, 30);
+        luminanceSlider = MakeHslSlider(HSLSliderId.Luminance, 60);
     }
 
     private void Copy()
@@ -98,6 +90,18 @@ public class PlayerColorConfigElement : ConfigElement<string>
         }
     }
 
+    private CustomColoredImageButton MakeButton(string assetName, float left, Action onClick)
+    {
+        var btn = new CustomColoredImageButton(
+            texture: Main.Assets.Request<Texture2D>($"Images/UI/CharCreation/{assetName}"),
+            tooltip: assetName);
+        btn.OnLeftMouseDown += (_, _) => onClick();
+        btn.Top.Set(34, 0);
+        btn.Left.Set(155 + left, 0);
+        Append(btn);
+        return btn;
+    }
+
     public override void Draw(SpriteBatch sb)
     {
         base.Draw(sb);
@@ -106,26 +110,26 @@ public class PlayerColorConfigElement : ConfigElement<string>
         Color color = Main.hslToRgb(hsl);
 
         // Draw player name
-        string name = "PlayerName";
+        string name = "PlayerName:";
         if (Main.LocalPlayer != null) 
-            name = Main.LocalPlayer.name;
-        Vector2 playerNamePos = new(area.X + 158, area.Y+8);
+            name = Main.LocalPlayer.name + ":";
+        Vector2 playerNamePos = new(area.X + 158, area.Y+72);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, name, playerNamePos, color, 0f, Vector2.Zero, baseScale: new Vector2(0.8f));
         
         // Draw preview box
-        var boxSize = 30;
-        var box = new Rectangle((int)area.X+430, area.Y, boxSize, boxSize);
-        Color c = Color.Black; //box outline color
-        sb.Draw(TextureAssets.MagicPixel.Value, box, color);
-        sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X, box.Y, box.Width, 1), c);
-        sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X, box.Bottom - 1, box.Width, 1), c);
-        sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X, box.Y, 1, box.Height), c);
-        sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.Right - 1, box.Y, 1, box.Height), c);
+        //var boxSize = 30;
+        //var box = new Rectangle((int)area.X+430, area.Y, boxSize, boxSize);
+        //Color c = Color.Black; //box outline color
+        //sb.Draw(TextureAssets.MagicPixel.Value, box, color);
+        //sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X, box.Y, box.Width, 1), c);
+        //sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X, box.Bottom - 1, box.Width, 1), c);
+        //sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X, box.Y, 1, box.Height), c);
+        //sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.Right - 1, box.Y, 1, box.Height), c);
 
         // Draw hex text
         string hexText = "#" + CurrentHex();
-        Vector2 hexTextPos = new(box.X+38, area.Y+8);
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, hexText, hexTextPos, Color.White, 0f, Vector2.Zero, new Vector2(0.8f));
+        Vector2 hexTextPos = new(area.X+155, area.Y+6);
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, hexText, hexTextPos, Color.White, 0f, Vector2.Zero, new Vector2(1.0f));
     }
 
     private CustomColoredSlider MakeHslSlider(HSLSliderId id, int top)

@@ -284,6 +284,10 @@ namespace ChatPlus.Core.UI
         {
             base.Update(gt);
 
+            // TODO
+            OverflowHidden = false;
+            list.OverflowHidden = false;
+
             // Sizing and position
             int itemCount = 10;
             if (Conf.C != null)

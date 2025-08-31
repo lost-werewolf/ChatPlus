@@ -39,16 +39,17 @@ namespace ChatPlus.Core.Chat
 
         private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
         {
-            bool hasUpload = drawingPlayerChat && HasUpload(Main.chatText);
-            if (!hasUpload) { orig(self, drawingPlayerChat); return; }
+            if (!drawingPlayerChat && HasUpload(Main.chatText)) 
+            {
+                orig(self, drawingPlayerChat); 
+                return; 
+            }
 
             var sb = Main.spriteBatch;
             sb.End();
             var lifted = Main.UIScaleMatrix * Matrix.CreateTranslation(0f, -147, 0f);
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, lifted);
+            sb.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, lifted);
             orig(self, true);
-            sb.End();
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
         }
 
         private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)

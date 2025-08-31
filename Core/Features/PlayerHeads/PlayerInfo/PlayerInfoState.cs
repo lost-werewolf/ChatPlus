@@ -89,11 +89,11 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
             // Draw background
             PlayerInfoDrawer.DrawSeparatorBorder(sb, bgRect);
-            PlayerInfoDrawer.DrawSurfaceBackground(sb, bgRect);
+            PlayerInfoDrawer.DrawMapFullscreenBackground(sb, bgRect);
 
             // Draw player
             var playerPos = new Vector2(bgRect.X + bgRect.Width * 0.5f - 100f, bgRect.Y + 50);
-            PlayerInfoDrawer.DrawPlayer(sb, playerPos, player);
+            PlayerInfoDrawer.DrawPlayer(sb, playerPos, player, 1.8f);
 
             // Stats header
             Vector2 statsHeaderPos = new(leftColumn, y0-4);
@@ -109,7 +109,7 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             Rectangle minionBounds = new(leftColumn, y0 + rowHeight * 4 + 24, panelWidth, rowHeight);
             Rectangle sentryBounds = new(rightColumn, y0 + rowHeight * 4 + 24, panelWidth, rowHeight);
             Rectangle heldItemBounds = new(leftColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
-            Rectangle dpsBounds = new(rightColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
+            Rectangle lastCreateHitBounds = new(rightColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
 
 
             // Draw stats
@@ -122,7 +122,7 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             PlayerInfoDrawer.DrawStat_Minions(sb, minionBounds, player);
             PlayerInfoDrawer.DrawStat_Sentries(sb, sentryBounds, player);
             PlayerInfoDrawer.DrawStat_HeldItem(sb, heldItemBounds, player);
-            PlayerInfoDrawer.DrawStat_DPS(sb, dpsBounds, player);
+            PlayerInfoDrawer.DrawStat_LastCreatureHit(sb, lastCreateHitBounds, player);
 
             // Draw inventory
             DrawInventory(sb, bgRect, player);
@@ -149,13 +149,12 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             if (deathBounds.Contains(p)) UICommon.TooltipMouseText("Deaths");
             if (coinBounds.Contains(p)) UICommon.TooltipMouseText("Coins");
             if (ammoBounds.Contains(p)) UICommon.TooltipMouseText("Ammo");
-            if (minionBounds.Contains(p)) UICommon.TooltipMouseText("Minions (Current / Max)");
-            if (sentryBounds.Contains(p)) UICommon.TooltipMouseText("Sentries (Current / Max)");
+            if (minionBounds.Contains(p)) UICommon.TooltipMouseText("Minions");
+            if (sentryBounds.Contains(p)) UICommon.TooltipMouseText("Sentries");
             if (heldItemBounds.Contains(p)) UICommon.TooltipMouseText("Held Item");
-            if (dpsBounds.Contains(p)) UICommon.TooltipMouseText("Damage Per Second");
+            if (lastCreateHitBounds.Contains(p)) UICommon.TooltipMouseText("Last Creature Hit");
         }
         private static bool HasAnyBuff(Player p) { for (int i = 0; i < p.buffType.Length; i++) if (p.buffType[i] > 0 && p.buffTime[i] > 0) return true; return false; }
-
 
         private static void DrawArmor(SpriteBatch sb, Vector2 topLeft, Player player)
         {

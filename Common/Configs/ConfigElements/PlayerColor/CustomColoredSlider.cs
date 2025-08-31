@@ -52,49 +52,35 @@ public class CustomColoredSlider : UISliderBase
     protected override void DrawSelf(SpriteBatch spriteBatch)
     {
         UISliderBase.CurrentAimedSlider = null;
-        if (!Main.mouseLeft)
-        {
-            UISliderBase.CurrentLockedSlider = null;
-        }
+        if (!Main.mouseLeft) UISliderBase.CurrentLockedSlider = null;
 
         int usageLevel = GetUsageLevel();
-        float num = 8f;
         base.DrawSelf(spriteBatch);
-        CalculatedStyle dimensions = GetDimensions();
-        Vector2 vector = new Vector2(dimensions.X, dimensions.Y);
-        bool flag = false;
-        bool flag2 = base.IsMouseHovering;
-        if (usageLevel == 2)
-        {
-            flag2 = false;
-        }
 
-        if (usageLevel == 1)
-        {
-            flag2 = true;
-        }
+        CalculatedStyle dims = GetDimensions();
 
-        Vector2 vector2 = vector + new Vector2(0f, 2f);
-        Color.Lerp(flag ? Color.Gold : (flag2 ? Color.White : Color.Silver), Color.White, flag2 ? 0.5f : 0f);
-        new Vector2(0.8f);
-        vector2.X += 8f;
-        vector2.Y += num;
-        vector2.X -= 17f;
-        TextureAssets.ColorBar.Frame();
-        vector2 = new Vector2(dimensions.X + dimensions.Width - 10f, dimensions.Y + 10f + num);
+        // Fill the entire element width (minus a tiny margin) by scaling the color bar texture
+        float leftPadding = 340f;
+        float rightPadding = 15f;
+        float topPadding = 10f;
+
+        Texture2D barTex = TextureAssets.ColorBar.Value;
+        float availableWidth = Math.Max(1f, dims.Width - leftPadding - rightPadding);
+        float drawScale = availableWidth / barTex.Width * 1f;
+
+        // Right-anchored as expected by DrawValueBar (it subtracts the scaled width internally)
+        Vector2 barRightAnchor = new Vector2(dims.X + dims.Width - rightPadding, dims.Y + topPadding + 8f);
+
         bool wasInBar;
-        float obj = DrawValueBar(spriteBatch, vector2, 1f, _getStatusTextAct(), usageLevel, out wasInBar, _blipFunc);
+        float sliderValue = DrawValueBar(spriteBatch, barRightAnchor, drawScale, _getStatusTextAct(), usageLevel, out wasInBar, _blipFunc);
+
         if (UISliderBase.CurrentLockedSlider == this || wasInBar)
         {
             UISliderBase.CurrentAimedSlider = this;
             if (PlayerInput.Triggers.Current.MouseLeft && !PlayerInput.UsingGamepad && UISliderBase.CurrentLockedSlider == this)
             {
-                _slideKeyboardAction(obj);
-                if (!_soundedUsage)
-                {
-                    SoundEngine.PlaySound(12);
-                }
-
+                _slideKeyboardAction(sliderValue);
+                if (!_soundedUsage) SoundEngine.PlaySound(12);
                 _soundedUsage = true;
             }
             else
@@ -104,14 +90,10 @@ public class CustomColoredSlider : UISliderBase
         }
 
         if (UISliderBase.CurrentAimedSlider != null && UISliderBase.CurrentLockedSlider == null)
-        {
             UISliderBase.CurrentLockedSlider = UISliderBase.CurrentAimedSlider;
-        }
 
-        if (_isReallyMouseOvered)
-        {
+        if (_isReallyMouseOvered && _slideGamepadAction != null)
             _slideGamepadAction();
-        }
     }
 
     public float DrawValueBar(SpriteBatch sb, Vector2 drawPosition, float drawScale, float sliderPosition, int lockMode, out bool wasInBar, Func<float, Color> blipColorFunc)

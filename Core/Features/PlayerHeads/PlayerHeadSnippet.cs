@@ -4,6 +4,7 @@ using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.Chat;
 using Terraria.GameContent;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
@@ -24,31 +25,50 @@ public class PlayerHeadSnippet : TextSnippet
         CheckForHover = true;
     }
 
-    public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch spriteBatch, Vector2 position = default, Color color = default, float scale = 1f)
+    public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch sb,
+    Vector2 position = default, Color color = default, float scale = 1f)
     {
         const float box = 26f;
-        const float line = 20f;
-        const float headScale = 0.75f;
+        scale = 0.75f;
 
-        size = new Vector2(box * scale, box * scale);
+        size = new Vector2(box * scale + 9f, box * scale);
+
         if (justCheckingString || color == Color.Black) return true;
 
         if (_playerIndex < 0 || _playerIndex >= Main.maxPlayers) return true;
-        var player = Main.player[_playerIndex];
+        Player player = Main.player[_playerIndex];
         if (player == null || !player.active) return true;
 
-        float headPx = line * headScale * scale;
-        float x = position.X + 8;
-        float y = position.Y + 8; // same baseline lift as mod icon, centered in box
-
+        // draw head
+        sb.End();
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+        var pos = new Vector2(position.X + 8f, position.Y + 8f);
         PlayerHeadFlipHook.shouldFlipHeadDraw = player.direction == -1;
-        Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, new Vector2(x, y), 1f, headScale * scale, Color.White);
+        Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, pos, 1f, scale, Color.White);
         PlayerHeadFlipHook.shouldFlipHeadDraw = false;
 
-        //PlayerInfoDrawer.Draw(Main.spriteBatch, player); // debug
+        // hover
+        int width = (int)size.X;
+        int nameWidth = (int)FontAssets.MouseText.Value.MeasureString(player.name).X;
+        width += nameWidth + 10;
+        var hoverRect = new Rectangle((int)position.X, (int)position.Y, width, (int)size.Y);
+        if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
+        {
+            if (Conf.C.ShowPlayerPreviewWhenHovering)
+                PlayerInfoDrawer.Draw(Main.spriteBatch, player);
+
+            if (Main.mouseLeft && Main.mouseLeftRelease)
+                OnClick();
+        }
+
+        // debug
+        //hoverRect.X = 110;
+        //hoverRect.Width = nameWidth;
+        //sb.Draw(TextureAssets.MagicPixel.Value, hoverRect, Color.Red * 0.25f);
 
         return true;
     }
+
 
     public override void OnClick()
     {

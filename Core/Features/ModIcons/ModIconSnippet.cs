@@ -43,6 +43,8 @@ public sealed class ModIconSnippet : TextSnippet
 
         var dest = new Rectangle((int)pos.X, (int)(pos.Y - 1), (int)px, (int)px);
 
+        sb.End();
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
         if (modName.Equals("Terraria", StringComparison.OrdinalIgnoreCase))
         {
             if (Ass.TerrariaIcon?.Value != null)
@@ -127,6 +129,8 @@ public sealed class ModIconSnippet : TextSnippet
 
     public override void OnHover()
     {
+        Main.LocalPlayer.mouseInterface = true;
+
         //Main.instance.MouseText(GetDisplayName(modName));
         UICommon.TooltipMouseText(modName);
     }

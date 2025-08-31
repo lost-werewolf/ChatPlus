@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.GameContent;
-using Terraria.Graphics;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
-
-public static class PlayerInfoDrawer
+namespace ChatPlus.Core.Features.ModIcons.ModInfo;
+public static class ModInfoDrawer
 {
     /// <summary>
-    /// Draws a big tooltip panel with player info, pokémon style.
+    /// Draws a big tooltip panel with mod info, pokémon style.
     /// </summary>
-    public static void Draw(SpriteBatch sb, Player player)
+    public static void Draw(SpriteBatch sb, Mod mod)
     {
         // Dimensions
         const int panelWidth = 96;
@@ -29,30 +28,20 @@ public static class PlayerInfoDrawer
         const int W = panelWidth * 2 + gutter + side * 2;
         const int rowHeight = 31;
         var pos = Main.MouseScreen + new Vector2(20, 20);
-        //pos = new(270, 650); // debug
+        //pos = new(300, 300); // debug
         pos.X = Math.Clamp(pos.X, 0, Main.screenWidth - W);
         pos.Y = Math.Clamp(pos.Y, 0, Main.screenHeight - H);
         var rect = new Rectangle((int)pos.X, (int)pos.Y, W, H);
 
-        // Draw BG panel
+        // Draw background and player
         DrawFullBGPanel(sb, rect);
-        DrawHeaderText(sb, rect, player);
+        DrawModNameText(sb, rect, mod);
         var cursor = pos + new Vector2(side, 32);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
         cursor += new Vector2(0, 10);
         rect = new Rectangle((int)cursor.X, (int)cursor.Y, W - side * 2, 100);
         DrawSeparatorBorder(sb, rect);
-
-        // Draw background
-        DrawMapFullscreenBackground(sb, rect);
-
-        // Draw player
-        DrawPlayer(sb, pos, player);
-
-        if (Main.netMode != NetmodeID.SinglePlayer)
-        {
-            DrawTeamText(sb, cursor, player);
-        }
+        DrawSurfaceBackground(sb, rect);
         cursor += new Vector2(0, 110);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
 
@@ -62,110 +51,30 @@ public static class PlayerInfoDrawer
         int rightColumn = leftColumn + panelWidth + gutter;
 
         // Draw row 1
-        DrawStat_HP(sb, new Rectangle(leftColumn, (int)cursor.Y, panelWidth, rowHeight), player);
-        DrawStat_Mana(sb, new Rectangle(rightColumn, (int)cursor.Y, panelWidth, rowHeight), player);
+        //DrawStat_HP(sb, new Rectangle(leftColumn, (int)cursor.Y, panelWidth, rowHeight), player);
+        //DrawStat_Mana(sb, new Rectangle(rightColumn, (int)cursor.Y, panelWidth, rowHeight), player);
 
-        // Draw row 2
-        int rowY2 = (int)cursor.Y + rowHeight + 6;
-        DrawStat_Defense(sb, new Rectangle(leftColumn, rowY2, panelWidth, rowHeight), player);
-        DrawStat_DeathCount(sb, new Rectangle(rightColumn, rowY2, panelWidth, rowHeight), player);
+        //// Draw row 2
+        //int rowY2 = (int)cursor.Y + rowHeight + 6;
+        //DrawStat_Defense(sb, new Rectangle(leftColumn, rowY2, panelWidth, rowHeight), player);
+        //DrawStat_DeathCount(sb, new Rectangle(rightColumn, rowY2, panelWidth, rowHeight), player);
 
-        // Draw row 3
-        int rowY3 = (int)cursor.Y + rowHeight * 2 + 6*2;
-        DrawStat_Coins(sb, new Rectangle(leftColumn, rowY3, panelWidth, rowHeight), player);
-        DrawStat_Ammo(sb, new Rectangle(rightColumn, rowY3, panelWidth, rowHeight), player);
+        //// Draw row 3
+        //int rowY3 = (int)cursor.Y + rowHeight * 2 + 6 * 2;
+        //DrawStat_Coins(sb, new Rectangle(leftColumn, rowY3, panelWidth, rowHeight), player);
+        //DrawStat_Ammo(sb, new Rectangle(rightColumn, rowY3, panelWidth, rowHeight), player);
 
-        // Draw row 4
-        int rowY4 = (int)cursor.Y + rowHeight * 3 + 6 * 3;
-        DrawStat_Minions(sb, new Rectangle(leftColumn, rowY4, panelWidth, rowHeight), player);
-        DrawStat_Sentries(sb, new Rectangle(rightColumn, rowY4, panelWidth, rowHeight), player);
+        //// Draw row 4
+        //int rowY4 = (int)cursor.Y + rowHeight * 3 + 6 * 3;
+        //DrawStat_Minions(sb, new Rectangle(leftColumn, rowY4, panelWidth, rowHeight), player);
+        //DrawStat_Sentries(sb, new Rectangle(rightColumn, rowY4, panelWidth, rowHeight), player);
 
-        // Draw row 5
-        int rowY5 = (int)cursor.Y + rowHeight * 4 + 6 * 4;
-        DrawStat_HeldItem(sb, new Rectangle(leftColumn, rowY5, panelWidth, rowHeight), player);
-        DrawStat_LastCreatureHit(sb, new Rectangle(rightColumn, rowY5, panelWidth, rowHeight), player);
+        //// Draw row 5
+        //int rowY5 = (int)cursor.Y + rowHeight * 4 + 6 * 4;
+        //DrawStat_HeldItem(sb, new Rectangle(leftColumn, rowY5, panelWidth, rowHeight), player);
+        //DrawStat_LastCreatureHit(sb, new Rectangle(rightColumn, rowY5, panelWidth, rowHeight), player);
     }
 
-    public static void DrawPlayer(SpriteBatch sb, Vector2 uiPos, Player player, float scale = 1.2f)
-    {
-        sb.End();
-        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
-
-        // Draw player
-        PreviewFullBrightPlayer.ForceFullBrightOnce = true;
-        try
-        {
-            Vector2 offset = new(100, 90);
-            Vector2 worldDrawPos = uiPos + Main.screenPosition + offset;
-            Main.PlayerRenderer.DrawPlayer(Main.Camera, player, worldDrawPos, 0f, Vector2.Zero, 0f, scale);
-        }
-        finally
-        {
-            PreviewFullBrightPlayer.ForceFullBrightOnce = false;
-        }
-    }
-
-    public static void DrawMapFullscreenBackground(SpriteBatch sb, Rectangle rect)
-    {
-        var player = Main.LocalPlayer;
-        if (player == null || !player.active) return;
-
-        var screenPos = Main.screenPosition;
-        var tile = Main.tile[(int)(player.Center.X / 16f), (int)(player.Center.Y / 16f)];
-        if (tile == null) return;
-
-        int wall = tile.wall;
-        int bgIndex = -1;
-        Color color = Color.White;
-
-        if (screenPos.Y > (Main.maxTilesY - 232) * 16)
-            bgIndex = 2;
-        else if (player.ZoneDungeon)
-            bgIndex = 4;
-        else if (wall == 87)
-            bgIndex = 13;
-        else if (screenPos.Y > Main.worldSurface * 16.0)
-        {
-            bgIndex = wall switch
-            {
-                86 or 108 => 15,
-                180 or 184 => 16,
-                178 or 183 => 17,
-                62 or 263 => 18,
-                _ => player.ZoneGlowshroom ? 20 :
-                     player.ZoneCorrupt ? (player.ZoneDesert ? 39 : (player.ZoneSnow ? 33 : 22)) :
-                     player.ZoneCrimson ? (player.ZoneDesert ? 40 : (player.ZoneSnow ? 34 : 23)) :
-                     player.ZoneHallow ? (player.ZoneDesert ? 41 : (player.ZoneSnow ? 35 : 21)) :
-                     player.ZoneSnow ? 3 :
-                     player.ZoneJungle ? 12 :
-                     player.ZoneDesert ? 14 :
-                     player.ZoneRockLayerHeight ? 31 : 1
-            };
-        }
-        else if (player.ZoneGlowshroom)
-            bgIndex = 19;
-        else
-        {
-            color = Main.ColorOfTheSkies;
-            int midTileX = (int)((screenPos.X + Main.screenWidth / 2f) / 16f);
-
-            if (player.ZoneSkyHeight) bgIndex = 32;
-            else if (player.ZoneCorrupt) bgIndex = player.ZoneDesert ? 36 : 5;
-            else if (player.ZoneCrimson) bgIndex = player.ZoneDesert ? 37 : 6;
-            else if (player.ZoneHallow) bgIndex = player.ZoneDesert ? 38 : 7;
-            else if (screenPos.Y / 16f < Main.worldSurface + 10.0 && (midTileX < 380 || midTileX > Main.maxTilesX - 380))
-                bgIndex = 10;
-            else if (player.ZoneSnow) bgIndex = 11;
-            else if (player.ZoneJungle) bgIndex = 8;
-            else if (player.ZoneDesert) bgIndex = 9;
-            else if (Main.bloodMoon) { bgIndex = 25; color *= 2f; }
-            else if (player.ZoneGraveyard) bgIndex = 26;
-        }
-
-        var asset = bgIndex >= 0 && bgIndex < TextureAssets.MapBGs.Length ? TextureAssets.MapBGs[bgIndex] : TextureAssets.MapBGs[0];
-
-        sb.Draw(asset.Value, rect, color);
-    }
 
     #region Stats
     public static void DrawStat_HeldItem(SpriteBatch sb, Rectangle rect, Player player)
@@ -189,20 +98,17 @@ public static class PlayerInfoDrawer
 
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
-    public static void DrawStat_LastCreatureHit(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_DPS(SpriteBatch sb, Rectangle rect, Player player)
     {
-        var tex = Ass.StatPanel; 
-        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); 
-        sb.Draw(tex.Value, rect, Color.White);
+        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
 
-        // Get last creature hit
-        int bannerID = player.lastCreatureHit;
-        int netID = Item.BannerToNPC(bannerID);
-        string t = Lang.GetNPCNameValue(netID);
+        // DPS meter uses a 60 tick rolling window in vanilla
+        int dps = player.dpsDamage;
+        string t = $"{dps}";
 
-        // Icon: 
+        // Icon: DPS Meter
         var pos = new Vector2(rect.X + 15, rect.Y + 15);
-        ItemSlot.DrawItemIcon(new Item(ItemID.EaterMask), 31, sb, pos, 0.8f, 32f, Color.White);
+        ItemSlot.DrawItemIcon(new Item(ItemID.DPSMeter), 31, sb, pos, 0.8f, 32f, Color.White);
 
         var tp = new Vector2(rect.X + 52, rect.Y + 4);
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
@@ -290,7 +196,7 @@ public static class PlayerInfoDrawer
         var manaTex = TextureAssets.Mana;
         var manaRect = new Rectangle(rect.X + 4, rect.Y + 2, manaTex.Width(), manaTex.Height());
         sb.Draw(TextureAssets.Mana.Value, manaRect, Color.White);
-        
+
         // Draw mana text
         var manaText = $"{player.statMana}/{player.statManaMax2}";
         var size = FontAssets.MouseText.Value.MeasureString(manaText);
@@ -318,42 +224,33 @@ public static class PlayerInfoDrawer
     }
     public static void DrawStat_Coins(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background stat panel
+        // Draw background
         var tex = Ass.StatPanel;
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        // Count total
-        long CountCoins(Item[] items, params int[] excludeSlots)
+        long total = 0;
+        for (int i = 50; i <= 53; i++)
         {
-            if (items == null) return 0;
-            long sum = 0;
-            bool Excluded(int i) { foreach (var e in excludeSlots) if (i == e) return true; return false; }
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (Excluded(i)) continue;
-                var it = items[i];
-                if (it == null || it.IsAir) continue;
-                switch (it.type)
-                {
-                    case ItemID.PlatinumCoin: sum += (long)it.stack * 1_000_000L; break;
-                    case ItemID.GoldCoin: sum += (long)it.stack * 10_000L; break;
-                    case ItemID.SilverCoin: sum += (long)it.stack * 100L; break;
-                    case ItemID.CopperCoin: sum += it.stack; break;
-                }
-            }
-            return sum;
+            var it = player.inventory[i];
+            if (it.IsAir) continue;
+            if (it.type == ItemID.PlatinumCoin)
+                total += it.stack * 1_000_000L;
+            else if (it.type == ItemID.GoldCoin)
+                total += it.stack * 10_000L;
+            else if (it.type == ItemID.SilverCoin)
+                total += it.stack * 100L;
+            else if (it.type == ItemID.CopperCoin)
+                total += it.stack;
         }
 
-        long total =
-            CountCoins(player.inventory, 58, 57, 56, 55, 54) +
-            CountCoins(player.bank?.item) +
-            CountCoins(player.bank2?.item) +
-            CountCoins(player.bank3?.item) +
-            CountCoins(player.bank4?.item);
-
-        int[] coins = Utils.CoinsSplit(total);
-        int c = coins[0], s = coins[1], g = coins[2], p = coins[3];
+        long rem = total;
+        int p = (int)(rem / 1_000_000L);
+        rem %= 1_000_000L;
+        int g = (int)(rem / 10_000L);
+        rem %= 10_000L;
+        int s = (int)(rem / 100L);
+        int c = (int)(rem % 100L);
 
         var font = FontAssets.MouseText.Value;
         var pos = new Vector2(rect.X + 6, rect.Y + 8);
@@ -363,9 +260,8 @@ public static class PlayerInfoDrawer
 
         if (p <= 99)
         {
-            // Draw total for poor player
             ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos, scale, iconSize, Color.White);
-            Utils.DrawBorderStringFourWay(sb, font, p.ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+            Utils.DrawBorderStringFourWay(sb, font, p.ToString() ?? p.ToString() ?? p.ToString().ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
             pos.X += dx;
             ItemSlot.DrawItemIcon(new Item(ItemID.GoldCoin), 31, sb, pos, scale, iconSize, Color.White);
             Utils.DrawBorderStringFourWay(sb, font, g.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
@@ -378,19 +274,19 @@ public static class PlayerInfoDrawer
         }
         else
         {
-            // Draw total for rich player
-            pos.X += 4; scale = 0.8f;
+            pos.X += 4;
+            scale = 0.9f;
             ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos + new Vector2(11, 0), scale, iconSize, Color.White);
-            Utils.DrawBorderStringFourWay(sb, font, p.ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+            Utils.DrawBorderStringFourWay(sb, font, p.ToString() ?? p.ToString() ?? p.ToString().ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
             pos.X += dx + 14;
             ItemSlot.DrawItemIcon(new Item(ItemID.GoldCoin), 31, sb, pos, scale, iconSize, Color.White);
             Utils.DrawBorderStringFourWay(sb, font, g.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
             pos.X += dx;
             ItemSlot.DrawItemIcon(new Item(ItemID.SilverCoin), 31, sb, pos, scale, iconSize, Color.White);
             Utils.DrawBorderStringFourWay(sb, font, s.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
+            pos.X += dx;
         }
     }
-
 
     public static void DrawStat_Ammo(SpriteBatch sb, Rectangle rect, Player player)
     {
@@ -427,32 +323,15 @@ public static class PlayerInfoDrawer
     #endregion Stats
 
     #region Helpers
-    private static void DrawHeaderText(SpriteBatch sb, Rectangle rect, Player player)
+    private static void DrawModNameText(SpriteBatch sb, Rectangle rect, Mod mod)
     {
-        string playerText = $"Player: {player.name}";
+        string playerText = $"Mod: {mod.DisplayNameClean}";
 
         var snippets = ChatManager.ParseMessage(playerText, Color.White).ToArray();
         Vector2 textSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, playerText, Vector2.One);
         float textWidth = textSize.X;
         Vector2 pos = new(rect.X + (rect.Width - textWidth) / 2f, rect.Y + 6);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
-    }
-    public static void DrawTeamText(SpriteBatch sb, Vector2 pos, Player player)
-    {
-        string teamText = player.team switch
-        {
-            0 => "[c/ffffff:No team]",
-            1 => "[c/DA3B3B:(Team Red)]",
-            2 => "[c/3bda55:(Team Green)]",
-            3 => "[c/3b95da:(Team Blue)]",
-            4 => "[c/f2dd64:(Team Yellow)]",
-            5 => "[c/e064f2:(Team Pink)]",
-            _ => "(Unknown)"
-        };
-
-        var snippets = ChatManager.ParseMessage(teamText, Color.White).ToArray();
-        pos += new Vector2(7, 5);
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, new Vector2(1.0f), out _);
     }
 
     public static void DrawSurfaceBackground(SpriteBatch sb, Rectangle rect)
@@ -483,7 +362,7 @@ public static class PlayerInfoDrawer
 
     public static void DrawPanel(Texture2D texture, int edgeWidth, int edgeShove, SpriteBatch spriteBatch, Vector2 position, float width, Color color)
     {
-        spriteBatch.Draw(texture, 
+        spriteBatch.Draw(texture,
             new Vector2(position.X + edgeWidth, position.Y), new Rectangle(edgeWidth + edgeShove, 0, texture.Width - (edgeWidth + edgeShove) * 2, texture.Height),
             color,
             0f,
@@ -493,10 +372,10 @@ public static class PlayerInfoDrawer
             0f);
     }
 
-    public static void DrawPanelVertical(Texture2D texture,int edgeWidth,int edgeShove,SpriteBatch spriteBatch,Vector2 position, float height,Color color)
+    public static void DrawPanelVertical(Texture2D texture, int edgeWidth, int edgeShove, SpriteBatch spriteBatch, Vector2 position, float height, Color color)
     {
-        spriteBatch.Draw(texture,new Rectangle((int)position.X, (int)position.Y + edgeWidth, edgeWidth, (int)height - edgeWidth * 2),
-            new Rectangle(texture.Width / 2, 0, 1, texture.Height),color);
+        spriteBatch.Draw(texture, new Rectangle((int)position.X, (int)position.Y + edgeWidth, edgeWidth, (int)height - edgeWidth * 2),
+            new Rectangle(texture.Width / 2, 0, 1, texture.Height), color);
     }
 
     public static void DrawFullBGPanel(SpriteBatch sb, Rectangle rect)
@@ -538,3 +417,4 @@ public static class PlayerInfoDrawer
     #endregion
     private static void DrawDebugRect(Rectangle r) => Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, r, Color.Red * 0.5f);
 }
+
