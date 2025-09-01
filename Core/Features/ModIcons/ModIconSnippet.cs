@@ -83,7 +83,7 @@ public sealed class ModIconSnippet : TextSnippet
     {
         base.OnClick();
 
-        var state = ModInfoState.instance;
+        var state = ModInfoState.Instance;
         if (state == null)
         {
             Main.NewText("Mod info UI not available.", Color.Orange);

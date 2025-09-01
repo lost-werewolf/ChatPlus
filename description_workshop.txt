@@ -4,8 +4,8 @@
 1. [b]Emojis😎 and Images📷[/b]: Access thousands of emojis directly in chat!
 2. [b]Images[/b]: Upload and send your own images!
 3. [b]Links🔗[/b]: Links you type in chat become clickable.
-5. [b]Autocomplete🏷️[/b]: Type any command OR tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
-5. [b]Autocomplete Tags And Commands🏷️[/b]: Type any tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
+4. [b]Autocomplete🏷️[/b]: Type any command OR tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
+5. [b]Player Stats[/b]: A player stats previewer shows when hovering a player icon.
 6. [b]More✍️[/b]: A better text editor, customizable scrollbar, and much more!
 
 [h3] 🤝Credits [/h3] 

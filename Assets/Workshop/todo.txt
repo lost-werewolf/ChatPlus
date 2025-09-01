@@ -255,6 +255,7 @@ Todo:
 [done] Add left right buttons to scroll players
 [done] Implement player color and assigning
 [done] Fix player and mod icon hover to go above all other interface layers
+[done] Add example links
 
 ~~~~
 Mod icon drawer:
@@ -268,6 +269,5 @@ Row 5: author
 Todo:
 [todo] Fix initial opening state doesnt show right header
 [todo] Add example images
-[todo] Add example links
 [todo] Fix steam workshop click
 [todo] Finish mod info state

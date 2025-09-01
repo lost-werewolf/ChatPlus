@@ -34,7 +34,7 @@ public class ModIconPanel : BasePanel<ModIcon>
         if (TryGetSelected(out var entry))
         {
             var mod = entry.mod;
-            if (ModInfoState.instance == null)
+            if (ModInfoState.Instance == null)
             {
                 Main.NewText("Mod info UI not available.", Color.Orange);
                 return;
@@ -46,7 +46,7 @@ public class ModIconPanel : BasePanel<ModIcon>
             string description = GetDescriptionForMod(mod) + "\nVersion: " + version;
 
             // Populate and open ModInfoState
-            var s = ModInfoState.instance;
+            var s = ModInfoState.Instance;
 
             // 1) Snapshot current chat
             var snap = ChatSession.Capture();

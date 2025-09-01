@@ -1,291 +1,129 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reflection;
-using ChatPlus.Core.Helpers;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Core;
-using Terraria.ModLoader.UI;
-using Terraria.Social.Steam;
+using Terraria.ModLoader.UI; // UICommon + UI extensions
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.ModIcons.ModInfo;
-
-public class ModInfoState : UIState, ILoadable
+namespace ChatPlus.Core.Features.ModIcons.ModInfo
 {
-    // public names
-    public static ModInfoState instance;
-    public string CurrentModDescription = "";
-    public string modDisplayName;
-    public UITextPanel<string> titlePanel;
-
-    private string modInternalName;
-    private string workshopURL;
-
-    // elements
-    private UIPanel descriptionContainer;
-    private UIElement messageBox;
-    private UIScrollbar scrollbar;
-
-    private static Type messageBoxType;
-    private static MethodInfo setTextMethod;
-    private static MethodInfo setScrollbarMethod;
-
-    public void Load(Mod mod)
+    // Minimal Mod Info UI (workshop/delete removed)
+    public class ModInfoState : UIState, ILoadable
     {
-        instance = this;
+        public static ModInfoState Instance; // for easy access
 
-        // Get reflection info once during loading
-        Assembly assembly = typeof(UICommon).Assembly;
-        messageBoxType = assembly.GetType("Terraria.ModLoader.UI.UIMessageBox");
-        setTextMethod = messageBoxType?.GetMethod("SetText");
-        setScrollbarMethod = messageBoxType?.GetMethod("SetScrollbar");
-    }
+        public string CurrentModDescription = string.Empty;
+        public string modDisplayName = string.Empty;
+        private string modInternalName = string.Empty;
 
-    public void Unload()
-    {
-        instance = null;
-    }
+        private UIElement _messageBox; // reflected message box (scrollable)
+        private static Type _messageBoxType;
+        private static MethodInfo _setTextMethod;
 
-    public override void OnInitialize()
-    {
-        // Main container
-        UIElement uiContainer = new UIElement
+        private UITextPanel<string> _titlePanel;
+        private ChatSession.Snapshot? _returnSnapshot;
+
+        public void Load(Mod mod)
         {
-            Width = { Percent = 0.8f },
-            MaxWidth = new StyleDimension(800f, 0f),
-            Top = { Pixels = 220f },
-            Height = { Pixels = -220f, Percent = 1f },
-            HAlign = 0.5f
-        };
-        Append(uiContainer);
-
-        // Main panel
-        UIPanel panel = new UIPanel
-        {
-            Width = { Percent = 1f },
-            Height = { Pixels = -110f, Percent = 1f },
-            BackgroundColor = UICommon.MainPanelBackground
-        };
-        uiContainer.Append(panel);
-
-        // Create a container for our message box
-        descriptionContainer = new UIPanel
-        {
-            Width = { Pixels = -25f, Percent = 1f },
-            Height = { Percent = 1f },
-            BackgroundColor = Color.Transparent,
-            BorderColor = Color.Transparent
-        };
-        panel.Append(descriptionContainer);
-
-        // Create UIMessageBox using reflection
-        if (messageBoxType != null)
-        {
-            // Create instance with constructor(string)
-            messageBox = (UIElement)Activator.CreateInstance(
-                messageBoxType,
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                null,
-                [""],
-                null
-            );
-
-            // Configure the message box
-            messageBox.Width.Set(0, 1f);
-            messageBox.Height.Set(0, 1f);
-
-            // Add to container
-            descriptionContainer.Append(messageBox);
+            Instance = this;
+            var asm = typeof(UICommon).Assembly; // tML UI assembly
+            _messageBoxType = asm.GetType("Terraria.ModLoader.UI.UIMessageBox");
+            _setTextMethod = _messageBoxType?.GetMethod("SetText");
         }
 
-        // Scrollbar
-        scrollbar = new UIScrollbar
+        public void Unload() => Instance = null;
+
+        public override void OnInitialize()
         {
-            Height = { Pixels = -12f, Percent = 1f },
-            VAlign = 0.5f,
-            HAlign = 1f
-        }.WithView(100f, 1000f);
-        panel.Append(scrollbar);
-
-        // Connect scrollbar to message box using reflection
-        if (messageBox != null && setScrollbarMethod != null)
-        {
-            setScrollbarMethod.Invoke(messageBox, [scrollbar]);
-        }
-
-        // Title panel
-        titlePanel = new UITextPanel<string>($"Mod Info: {modDisplayName}", 0.8f, true)
-        {
-            HAlign = 0.5f,
-            Top = { Pixels = -35f },
-            BackgroundColor = UICommon.DefaultUIBlue
-        }.WithPadding(15f);
-        uiContainer.Append(titlePanel);
-
-        // Back button
-        // Container for buttons
-        var bottomContainer = new UIElement
-        {
-            Width = { Percent = 1f },
-            Height = { Pixels = 40f },
-            VAlign = 1f,
-            Top = { Pixels = -60f }
-        };
-        uiContainer.Append(bottomContainer);
-
-        var backButton = new UITextPanel<string>(Language.GetText("UI.Back").Value)
-        {
-            Width = { Percent = 0.333f },
-            Height = { Pixels = 40f }
-        }.WithFadedMouseOver();
-        backButton.OnLeftClick += BackButton_OnLeftClick;
-        bottomContainer.Append(backButton);
-
-        var steamButton = new UITextPanel<string>("Steam Workshop")
-        {
-            Width = { Percent = 0.333f },
-            Height = { Pixels = 40f },
-            Left = { Percent = 0.333f },
-        }.WithFadedMouseOver();
-        steamButton.OnLeftClick += SteamButton_OnLeftClick;
-        bottomContainer.Append(steamButton);
-
-        var deleteButton = new UITextPanel<string>("Delete")
-        {
-            Width = { Percent = 0.333f },
-            Height = { Pixels = 40f },
-            Left = { Percent = 0.666f }
-        }.WithFadedMouseOver();
-        deleteButton.OnLeftClick += DeleteButton_OnLeftClick;
-        bottomContainer.Append(deleteButton);
-    }
-
-    // Add this method to find the workshop ID
-    private void GetAndSetWorkshopURL()
-    {
-        Log.Info("Finding workshop ID for mod: " + modInternalName);
-
-        if (modInternalName == "ModLoader") return;
-
-        // Get the Mod instance for the current mod
-        // This only works for enabled mods.
-        LocalMod[] mods = ModOrganizer.FindAllMods();
-        LocalMod mod = Array.Find(mods, m => m.Name.Equals(modInternalName, StringComparison.OrdinalIgnoreCase));
-        //LocalMod localMod = ModHelper.GetLocalMod(modInternalName);
-
-        TmodFile modFile = mod.modFile;
-
-        if (mod != null)
-        {
-            // Use the correct signature for GetPublishIdLocal
-            if (WorkshopHelper.GetPublishIdLocal(modFile, out ulong publishId))
+            var root = new UIElement
             {
-                Log.Info("Found publish ID: " + publishId);
-                // Set the workshop URL using the publish ID
-                workshopURL = $"https://steamcommunity.com/sharedfiles/filedetails/?id={publishId}";
+                Width = { Percent = 0.8f },
+                MaxWidth = new StyleDimension(800f, 0f),
+                Top = { Pixels = 220f },
+                Height = { Pixels = -220f, Percent = 1f },
+                HAlign = 0.5f
+            };
+            Append(root);
+
+            var panel = new UIPanel
+            {
+                Width = { Percent = 1f },
+                Height = { Pixels = -110f, Percent = 1f },
+                BackgroundColor = UICommon.MainPanelBackground
+            };
+            root.Append(panel);
+
+            if (_messageBoxType != null)
+            {
+                _messageBox = (UIElement)Activator.CreateInstance(
+                    _messageBoxType,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                    null,
+                    new object[] { string.Empty },
+                    null);
+                _messageBox.Width.Set(-20f, 1f);
+                _messageBox.Height.Set(0, 1f);
+                panel.Append(_messageBox);
             }
-            else
+
+            _titlePanel = new UITextPanel<string>("Mod Info", 0.8f, true)
             {
-                // Set a default message if not found
-                workshopURL = null;
+                HAlign = 0.5f,
+                Top = { Pixels = -35f },
+                BackgroundColor = UICommon.DefaultUIBlue
+            }.WithPadding(15f);
+            root.Append(_titlePanel);
+
+            var bottom = new UIElement
+            {
+                Width = { Percent = 1f },
+                Height = { Pixels = 40f },
+                VAlign = 1f,
+                Top = { Pixels = -60f }
+            };
+            root.Append(bottom);
+
+            var backButton = new UITextPanel<string>(Language.GetText("UI.Back").Value)
+            {
+                Width = { Percent = 1f },
+                Height = { Pixels = 40f }
+            }.WithFadedMouseOver();
+            backButton.OnLeftClick += BackButton_OnLeftClick;
+            bottom.Append(backButton);
+        }
+
+        public override void OnActivate()
+        {
+            ApplyCurrentDescription();
+            _titlePanel?.SetText($"Mod Info: {modDisplayName}");
+        }
+
+        public void SetModInfo(string description, string displayName, string internalName)
+        {
+            CurrentModDescription = description ?? string.Empty;
+            modDisplayName = displayName ?? internalName ?? string.Empty;
+            modInternalName = internalName ?? displayName ?? string.Empty;
+            ApplyCurrentDescription();
+        }
+
+        public void SetReturnSnapshot(ChatSession.Snapshot snap) => _returnSnapshot = snap;
+
+        private void ApplyCurrentDescription()
+        {
+            if (_messageBox != null && _setTextMethod != null)
+                _setTextMethod.Invoke(_messageBox, new object[] { CurrentModDescription });
+        }
+
+        private void BackButton_OnLeftClick(UIMouseEvent evt, UIElement listeningElement)
+        {
+            IngameFancyUI.Close();
+            if (_returnSnapshot.HasValue)
+            {
+                ChatSession.Restore(_returnSnapshot.Value);
+                _returnSnapshot = null;
             }
-        }
-        else
-        {
-            workshopURL = null;
-        }
-    }
-
-    public override void OnActivate()
-    {
-        // Set the text using reflection when the UI is activated
-        if (messageBox != null && setTextMethod != null)
-        {
-            setTextMethod.Invoke(messageBox, [CurrentModDescription]);
-        }
-
-        // Update the header text UITitlePanel
-        if (titlePanel != null)
-        {
-            titlePanel.SetText($"Mod Info: {modDisplayName}");
-        }
-
-        // Try to find the workshop ID for this mod
-        GetAndSetWorkshopURL();
-    }
-
-    private void DeleteButton_OnLeftClick(UIMouseEvent evt, UIElement listeningElement)
-    {
-        // Get the mod
-        LocalMod[] mods = ModOrganizer.FindAllMods();
-        LocalMod mod = Array.Find(mods, m => m.Name.Equals(modInternalName, StringComparison.OrdinalIgnoreCase));
-
-        // check if null, return
-        if (mod == null)
-        {
-            Log.Error("Failed to find mod: " + modDisplayName);
-            Main.NewText($"Failed to find mod: {modDisplayName}", Color.Orange);
-            return;
-        }
-
-        // Delete the mod
-        ModOrganizer.DeleteMod(mod);
-
-        // TODO update the UIList of mods. Call FilterItem
-        //MainSystem sys = ModContent.GetInstance<MainSystem>();
-        //RebuildModLists(sys.mainState.modsPanel); 
-
-        // now we close the panel and write to Main.newText
-        IngameFancyUI.Close();
-        Main.NewText($"Deleted mod: {modDisplayName}", Color.Orange);
-    }
-
-    private void SteamButton_OnLeftClick(UIMouseEvent evt, UIElement listeningElement)
-    {
-        if (string.IsNullOrEmpty(workshopURL))
-        {
-            Main.NewText($"Failed to open workshop page for {modDisplayName}.", Color.Orange);
-            return;
-        }
-
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = workshopURL,
-                UseShellExecute = true
-            });
-        }
-        catch (Exception ex)
-        {
-            Main.NewText($"Failed to open workshop page: {ex.Message}", Color.Red);
-        }
-        Main.NewText("Opening Steam Workshop page for " + modDisplayName, Color.Green);
-    }
-
-    // Update ModInfoIcon to pass the modName:
-    public void SetModInfo(string description, string displayName, string internalName)
-    {
-        CurrentModDescription = description;
-        modDisplayName = displayName;
-        modInternalName = internalName;
-    }
-
-    private ChatSession.Snapshot? _returnSnapshot;
-
-    public void SetReturnSnapshot(ChatSession.Snapshot snap) => _returnSnapshot = snap;
-
-    // existing back button handler
-    private void BackButton_OnLeftClick(UIMouseEvent evt, UIElement listeningElement)
-    {
-        Terraria.UI.IngameFancyUI.Close();
-        if (_returnSnapshot.HasValue)
-        {
-            ChatSession.Restore(_returnSnapshot.Value);
-            _returnSnapshot = null;
         }
     }
 }

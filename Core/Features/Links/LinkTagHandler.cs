@@ -34,6 +34,7 @@ internal class LinkTagHandler : ITagHandler
         }
         else
         {
+            //return new LinkSnippet(new TextSnippet(text, baseColor));
             return new TextSnippet(text);
         }
     }

@@ -12,13 +12,13 @@ internal class LinkInitializer : ModSystem
     {
         ChatManager.Register<LinkTagHandler>(["l", "link"]);
 
-        // Example curated links (could later be configurable)
+        // Example links
         Links.Clear();
         Add("Terraria Wiki", "https://terraria.wiki.gg");
         Add("tModLoader GitHub", "https://github.com/tModLoader/tModLoader");
         Add("tML Discord", "https://discord.gg/tmodloader");
         Add("Steam Workshop", "https://steamcommunity.com/app/1281930/workshop/");
-        Add("ChatPlus Source", "https://github.com/"); // placeholder
+        Add("ChatPlus Source", "https://github.com/emyhrberg"); // placeholder
     }
 
     private static void Add(string display, string url)

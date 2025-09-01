@@ -35,16 +35,16 @@ public class LinkElement : BaseElement<LinkEntry>
             1f);
 
         // Display text
-        string txt = Data.Display;
-        TextSnippet[] snips = [new TextSnippet(txt)];
-        ChatManager.DrawColorCodedStringWithShadow(
-            sb,
-            FontAssets.MouseText.Value,
-            snips,
-            pos + new Microsoft.Xna.Framework.Vector2(150, 4),
-            0f,
-            Microsoft.Xna.Framework.Vector2.Zero,
-            Microsoft.Xna.Framework.Vector2.One,
-            out _);
+        //string txt = Data.Display;
+        //TextSnippet[] snips = [new TextSnippet(txt)];
+        //ChatManager.DrawColorCodedStringWithShadow(
+        //    sb,
+        //    FontAssets.MouseText.Value,
+        //    snips,
+        //    pos + new Microsoft.Xna.Framework.Vector2(150, 4),
+        //    0f,
+        //    Microsoft.Xna.Framework.Vector2.Zero,
+        //    Microsoft.Xna.Framework.Vector2.One,
+        //    out _);
     }
 }

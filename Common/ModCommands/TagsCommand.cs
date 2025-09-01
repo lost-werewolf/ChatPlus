@@ -26,6 +26,7 @@ namespace ChatPlus.Common.ModCommands
             Main.NewText("Emojis        [e");
             Main.NewText("Glyphs        [g");
             Main.NewText("Items          [i");
+            Main.NewText("Links          [l");
             Main.NewText("Mods          [m");
             Main.NewText("Players        [p");
             Main.NewText("Uploads       [u");
