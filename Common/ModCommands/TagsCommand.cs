@@ -1,7 +1,5 @@
-using System.Reflection;
-using ChatPlus.Core.Features.Scrollbar;
+using System.Linq;
 using Terraria;
-using Terraria.GameContent.UI.Chat;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
@@ -9,28 +7,38 @@ namespace ChatPlus.Common.ModCommands
 {
     public class TagsCommand : ModCommand
     {
-        public override string Command => "tags";
-        public override string Description => "Shows all tags available in Chat+.";
+        public static LocalizedText UsageText { get; private set; }
+        public static LocalizedText DescriptionText { get; private set; }
+        public static LocalizedText HeaderText { get; private set; }
+        public static LocalizedText[] TagTexts { get; private set; }
+
+        public override void SetStaticDefaults()
+        {
+            string key = $"Commands.{nameof(TagsCommand)}.";
+
+            UsageText = Mod.GetLocalization($"{key}Usage");
+            DescriptionText = Mod.GetLocalization($"{key}Description");
+            HeaderText = Mod.GetLocalization($"{key}TagsHeader");
+
+            TagTexts = Enumerable.Range(0, 9).Select(i => Mod.GetLocalization($"{key}Tag_{i}")).ToArray();
+        }
+
         public override CommandType Type => CommandType.Chat;
+        public override string Command => "tags";
+        public override string Usage => UsageText.Value;
+
+        public override string Description => DescriptionText.Value;
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            SendTagsToMainNewText();
-        }
+            // Header
+            Main.NewText(HeaderText.Format("[c/fff014:", "]"));
 
-        private void SendTagsToMainNewText()
-        {
-            Main.NewText(Language.GetTextValue("Mods.ChatPlus.TagsHeader", "[c/fff014:Tags:]"));
-
-            Main.NewText(Language.GetTextValue("Mods.ChatPlus.TagCommands", "/   Commands"));
-            Main.NewText(Language.GetTextValue("Mods.ChatPlus.TagColors", "[c   Colors"));
-            Main.NewText(Language.GetTextValue("Mods.ChatPlus.TagEmojis", "[e   Emojis"));
-            Main.NewText(Language.GetTextValue("Mods.ChatPlus.TagGlyphs", "[g   Glyphs"));
-            Main.NewText(Language.GetTextValue("Mods.ChatPlus.TagItems", "[i   Items"));
-            Main.NewText(Language.GetTextValue("Mods.ChatPlus.TagLinks", "[l   Links"));
-            Main.NewText(Language.GetTextValue("Mods.ChatPlus.TagMods", "[m   Mods"));
-            Main.NewText(Language.GetTextValue("Mods.ChatPlus.TagPlayers", "[p   Players"));
-            Main.NewText(Language.GetTextValue("Mods.ChatPlus.TagUploads", "[u   Uploads"));
+            // Each tag line
+            foreach (var tagText in TagTexts)
+            {
+                Main.NewText(tagText.Value);
+            }
         }
     }
 }

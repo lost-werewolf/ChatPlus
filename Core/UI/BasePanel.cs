@@ -56,6 +56,10 @@ namespace ChatPlus.Core.UI
 
         // Header
         private bool showingHeader;
+        private void DismissHeader()
+        {
+            if (showingHeader) showingHeader = false;
+        }
 
         // Holding keys
         private double repeatTimer;
@@ -115,6 +119,7 @@ namespace ChatPlus.Core.UI
                 {
                     if (items[i].IsMouseHovering)
                     {
+                        DismissHeader();              
                         SetSelectedIndex(i);
                         return;
                     }
@@ -458,6 +463,8 @@ namespace ChatPlus.Core.UI
                 freezeCommandFilter = false;
                 frozenCommandText = null;
 
+                DismissHeader();
+
                 int prevIndex = currentIndex;
                 PopulatePanel();
 
@@ -535,6 +542,7 @@ namespace ChatPlus.Core.UI
             // Tap key
             if (JustPressed(Keys.Up))
             {
+                DismissHeader();
                 if (this is CommandPanel)
                 {
                     if (!freezeCommandFilter) frozenCommandText = Main.chatText;
@@ -556,6 +564,7 @@ namespace ChatPlus.Core.UI
             }
             else if (JustPressed(Keys.Down))
             {
+                DismissHeader();
                 if (this is CommandPanel)
                 {
                     if (!freezeCommandFilter) frozenCommandText = Main.chatText;
@@ -587,6 +596,7 @@ namespace ChatPlus.Core.UI
 
                     if (Main.keyState.IsKeyDown(Keys.Up))
                     {
+                        DismissHeader();
                         SetSelectedIndex(currentIndex - 1);
                         if (this is CommandPanel && items.Count > 0)
                         {
@@ -596,6 +606,7 @@ namespace ChatPlus.Core.UI
                     }
                     else if (Main.keyState.IsKeyDown(Keys.Down))
                     {
+                        DismissHeader();
                         SetSelectedIndex(currentIndex + 1);
                         if (this is CommandPanel && items.Count > 0)
                         {

@@ -37,7 +37,7 @@ public sealed class ModIconSnippet : TextSnippet
     public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch sb,
                                     Vector2 pos = default, Color color = default, float scale = 1f)
     {
-        const float BaseIconSize = 26f;
+        const float BaseIconSize = 24f;
         float px = BaseIconSize * Math.Max(0f, scale);
         size = new Vector2(px, px);
 
@@ -64,7 +64,7 @@ public sealed class ModIconSnippet : TextSnippet
         // debug force draw info overlay
         //if (ModLoader.TryGetMod("ModLoader", out Mod test)) HoveredModOverlay.Set(test);
 
-        var dest = new Rectangle((int)pos.X-1, (int)(pos.Y - 1), (int)px, (int)px);
+        var dest = new Rectangle((int)pos.X-1, (int)(pos.Y - 2), (int)px, (int)px);
 
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);

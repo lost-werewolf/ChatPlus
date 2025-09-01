@@ -12,8 +12,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Core.Features.PlayerIcons
-.PlayerInfo;
+namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 
 public static class PlayerInfoDrawer
 {
@@ -107,7 +106,7 @@ public static class PlayerInfoDrawer
             // Draw player
             pos += Main.screenPosition + new Vector2(100, 90);
 
-            Log.Info(player.wings);
+            // Celestial starboard (45) sucks
             if (player.wings == 45) player.wings = 0;
             
             Main.PlayerRenderer.DrawPlayer(Main.Camera,player,pos,player.fullRotation,player.fullRotationOrigin,0f,scale);

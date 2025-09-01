@@ -53,8 +53,8 @@ public class PlayerIconSnippet : TextSnippet
 
         // hover
         int width = (int)size.X;
-        int nameWidth = (int)FontAssets.MouseText.Value.MeasureString(player.name).X;
-        width += nameWidth + 10;
+        //int nameWidth = (int)FontAssets.MouseText.Value.MeasureString(player.name).X;
+        //width += nameWidth + 10;
         var hoverRect = new Rectangle((int)pos.X - 10, (int)pos.Y - 6, width + 3, (int)size.Y + 3);
         
         // to debug; comment below line out!
