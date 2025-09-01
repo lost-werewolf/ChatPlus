@@ -1,16 +1,17 @@
-﻿Chat+ is a massive overhaul to Terraria's chat system; making it look better, smarter and more fun with player icons, mod icons, emojis, images, links, a scrollbar, a better text editor, and more!
+﻿[h1] Chat+ [/h1] 
+Chat+ is a massive overhaul to Terraria's chat system; making it look better, smarter and more fun with player icons, mod icons, emojis, images, links, a scrollbar, new text editor, and more!
 
 [h3] ✨ What’s New? [/h3] 
-1. [b]Emojis😎 and Images📷[/b]: Access thousands of emojis directly in chat!
+1. [b]Emojis😎📷[/b]: Access thousands of emojis directly in chat!
 2. [b]Images[/b]: Upload and send your own images!
 3. [b]Links🔗[/b]: Links you type in chat become clickable.
 4. [b]Autocomplete🏷️[/b]: Type any command OR tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
-5. [b]Player Stats[/b]: A player stats previewer shows when hovering a player icon.
+5. [b]Player Stats[/b]: A player stat previewer is available when hovering over player icons.
 6. [b]More✍️[/b]: A better text editor, customizable scrollbar, and much more!
 
 [h3] 🤝Credits [/h3] 
 - Thanks to thraaks for making the icon!
 
 [h3] ❤️ Support the Project [/h3]
-[url=https://github.com/emyhrberg/ChatPlus] GitHub [/url] | [url=https://discord.gg/JWbYUktRPV] Discord [/url] | [url=https://ko-fi.com/erkyy] Ko-Fi [/url][quote=tModLoader ChatPlus]
+[url=https://github.com/emyhrberg/ChatPlus] GitHub (source code) [/url] | [url=https://discord.gg/JWbYUktRPV] Discord [/url] | [url=https://ko-fi.com/erkyy] Ko-Fi [/url][quote=tModLoader ChatPlus]
 Developed By Erky[/quote]

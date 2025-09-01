@@ -1,3 +1,4 @@
+using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -44,6 +45,11 @@ namespace ChatPlus.Core.UI
                     panel.InsertSelectedTag();
                 }
             }
+        }
+
+        public override void RightClick(UIMouseEvent evt)
+        {
+            base.RightClick(evt);
         }
 
         public override void Update(GameTime gameTime)

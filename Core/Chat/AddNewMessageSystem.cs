@@ -5,7 +5,8 @@ using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerHeads;
+using ChatPlus.Core.Features.PlayerIcons
+;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Terraria;
@@ -38,7 +39,7 @@ internal class AddNewMessageSystem : ModSystem
     private void ModifyNewMessage(On_RemadeChatMonitor.orig_AddNewMessage orig, RemadeChatMonitor self, string text, Color color, int widthLimitInPixels)
     {
         // Modify original text!
-        Log.Info(text);
+        //Log.Info(text);
         string resultText = text;
 
         /// 1. Set show count from config
@@ -62,7 +63,7 @@ internal class AddNewMessageSystem : ModSystem
         // 3. Add player icon
         if (!string.IsNullOrEmpty(senderName))
         {
-            string playerTag = PlayerHeadTagHandler.GenerateTag(senderName);
+            string playerTag = PlayerIconTagHandler.GenerateTag(senderName);
             resultText = playerTag + " " + resultText;
         }
 

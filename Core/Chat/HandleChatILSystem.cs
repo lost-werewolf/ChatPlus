@@ -41,8 +41,6 @@ namespace ChatPlus.Core.Chat
                 {
                     c.Index += 2;
 
-                    //Log.Info("virt");
-
                     // Set linesOffset = 0 if any chatScrollState is active.
                     // This effectively stops lines scrolling if any chatScrollState is active.
                     c.EmitDelegate<Func<int, int>>(v => StateManager.IsAnyStateActive() ? 0 : v);
@@ -73,7 +71,7 @@ namespace ChatPlus.Core.Chat
                 //                // return to the start of the ESC block
                 //                c.Index = oldIndex;
 
-                //                var mi = typeof(HandleChatILSystem).GetMethodNewTextMultilineMethod(nameof(IsAnyStateActive));
+                //                var mi = typeof(HandleChatILSystem).GetWeaponHook(nameof(IsAnyStateActive));
 
                 //                c.EmitCall(mi);          // push bool result
                 //                c.EmitBrtrue(afterEscBlock);

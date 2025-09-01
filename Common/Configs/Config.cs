@@ -32,7 +32,6 @@ namespace ChatPlus.Common.Configs
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
         public bool Scrollbar = true;
-        
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [Range(10f, 20f)]
@@ -48,27 +47,29 @@ namespace ChatPlus.Common.Configs
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
+        public bool ShowModPreviewWhenHovering = true;
+
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [DefaultValue(true)]
         public bool ShowPlayerPreviewWhenHovering = true;
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
-        public bool ShowModPreviewWhenHovering = true;
+        public bool ShowUploadPreviewWhenHovering = true;
 
         [Header("ChatFormat")]
 
         [CustomModConfigItem(typeof(ModIconsConfigElement))]
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]
         public bool ModIcons = true;
 
         [CustomModConfigItem(typeof(PlayerIconsConfigElement))]
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]
         public bool PlayerIcons = true;
 
         [Header("PlayerFormat")]
-
-        [BackgroundColor(255, 192, 8)]
         [CustomModConfigItem(typeof(PlayerColorConfigElement))]
         [DefaultValue("FFFFFF")]
         public string PlayerColor = "FFFFFF";

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
+using ChatPlus.Core.Features.PlayerIcons
+.PlayerInfo;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
@@ -51,21 +52,28 @@ namespace ChatPlus.Core.Chat
             int oldH = Main.screenHeight;
             try
             {
-                float ui = Main.UIScaleMatrix.M11;                 
+                float ui = Main.UIScaleMatrix.M11;
                 if (ui <= 0f) ui = 1f;
                 int delta = (int)Math.Round(147f / ui);
 
                 Main.screenHeight = Math.Max(0, oldH - delta);
-                orig(self, drawingPlayerChat);                    
+                orig(self, drawingPlayerChat);
             }
             finally
             {
-                Main.screenHeight = oldH;                          
+                Main.screenHeight = oldH;
             }
         }
 
         private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
         {
+            // debug player draw
+            //PlayerInfoDrawer.DrawPlayer(Main.spriteBatch, new Vector2(710, 400), Main.LocalPlayer);
+
+
+            // debug
+            Log.Info(PlayerInfoState.instance == null);
+
             if (!Main.drawingPlayerChat) { orig(self); return; }
 
             PlayerInput.WritingText = true;

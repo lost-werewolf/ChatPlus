@@ -5,25 +5,26 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.PlayerHeads;
+namespace ChatPlus.Core.Features.PlayerIcons
+;
 
 [Autoload(Side = ModSide.Client)]
-public class PlayerHeadSystem : ModSystem
+public class PlayerIconSystem : ModSystem
 {
     public UserInterface ui;
-    public PlayerHeadState state;
+    public PlayerIconState state;
 
     public override void Load()
     {
         ui = new UserInterface();
-        state = new PlayerHeadState();
+        state = new PlayerIconState();
         ui.SetState(null);
     }
 
     public override void Unload()
     {
         ui = new UserInterface();
-        state = new PlayerHeadState();
+        state = new PlayerIconState();
         ui.SetState(null);
     }
 

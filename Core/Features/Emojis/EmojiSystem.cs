@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -36,6 +37,7 @@ namespace ChatPlus.Core.Features.Emojis
                 {
                     if (ui?.CurrentState != null)
                         ui.Draw(Main.spriteBatch, new GameTime());
+
                     return true;
                 },
                 InterfaceScaleType.UI

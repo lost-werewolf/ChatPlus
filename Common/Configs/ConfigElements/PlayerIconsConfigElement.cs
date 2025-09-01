@@ -1,4 +1,5 @@
-﻿using ChatPlus.Core.Features.PlayerHeads;
+﻿using ChatPlus.Core.Features.PlayerIcons
+;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -46,25 +47,36 @@ public class PlayerIconsConfigElement : ConfigElement<bool>
 
     private void DrawPlayerIcon(SpriteBatch sb)
     {
-        // Get pos
         var dims = GetDimensions();
-        Vector2 pos = new(dims.X+162, dims.Y+12);
+        Vector2 pos = new(dims.X + 162, dims.Y + 12);
 
-        // Get this player
         var player = Main.LocalPlayer;
-        if (player == null)
+
+        // Fallback if player not ready
+        if (player == null || !player.active || player.name == "" || Main.gameMenu)
         {
-            // custom draw guide if no player was found (e.g player is in main menu).
             var guide = Ass.AuthorIcon.Value;
-            Rectangle guideRect = new((int)pos.X, (int)pos.Y, 40, 40);
+            Rectangle guideRect = new((int)pos.X - 8, (int)pos.Y - 7, 22, 22);
             sb.Draw(guide, guideRect, Color.White);
             return;
         }
 
-        // Draw player head
-        PlayerHeadFlipHook.shouldFlipHeadDraw = player.direction == -1;
-        Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, pos, 1f, 0.75f, Color.White);
-        PlayerHeadFlipHook.shouldFlipHeadDraw = false;
+        try
+        {
+            MapHeadRendererHook.shouldFlipHeadDraw = player.direction == -1;
+            Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, pos, 1f, 0.75f, Color.White);
+        }
+        catch
+        {
+            // If anything goes wrong, still fallback to guide
+            var guide = Ass.AuthorIcon.Value;
+            Rectangle guideRect = new((int)pos.X, (int)pos.Y, 22, 22);
+            sb.Draw(guide, guideRect, Color.White);
+        }
+        finally
+        {
+            MapHeadRendererHook.shouldFlipHeadDraw = false;
+        }
     }
 
     private void DrawToggleTexture(SpriteBatch sb)

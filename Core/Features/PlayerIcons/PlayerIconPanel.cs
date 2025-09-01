@@ -1,24 +1,26 @@
 using System;
 using System.Collections.Generic;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
-using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
+using ChatPlus.Core.Features.PlayerIcons
+.PlayerInfo;
 using ChatPlus.Core.UI;
 using Terraria;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.PlayerHeads;
+namespace ChatPlus.Core.Features.PlayerIcons
+;
 
-public class PlayerHeadPanel : BasePanel<PlayerHead>
+public class PlayerIconPanel : BasePanel<PlayerIcon>
 {
-    protected override IEnumerable<PlayerHead> GetSource() => PlayerHeadInitializer.PlayerIcons;
-    protected override BaseElement<PlayerHead> BuildElement(PlayerHead data) => new PlayerHeadElement(data);
-    protected override string GetDescription(PlayerHead data) => data.PlayerName + "\nClick to view more";
-    protected override string GetTag(PlayerHead data) => data.Tag;
+    protected override IEnumerable<PlayerIcon> GetSource() => PlayerIconManager.PlayerIcons;
+    protected override BaseElement<PlayerIcon> BuildElement(PlayerIcon data) => new PlayerIconElement(data);
+    protected override string GetDescription(PlayerIcon data) => data.PlayerName + "\nClick to view more";
+    protected override string GetTag(PlayerIcon data) => data.Tag;
 
     public override void Update(Microsoft.Xna.Framework.GameTime gt)
     {
         // Refresh population each frame in case players join/leave
-        if (items.Count != PlayerHeadInitializer.PlayerIcons.Count)
+        if (items.Count != PlayerIconManager.PlayerIcons.Count)
             PopulatePanel();
 
         base.Update(gt);

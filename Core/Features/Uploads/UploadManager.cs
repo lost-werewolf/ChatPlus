@@ -11,7 +11,7 @@ using Terraria.UI.Chat;
 namespace ChatPlus.Core.Features.Uploads
 {
     [Autoload(Side = ModSide.Client)]
-    internal class UploadInitializer : ModSystem
+    internal class UploadManager : ModSystem
     {
         public static List<Upload> Uploads { get; private set; } = [];
 

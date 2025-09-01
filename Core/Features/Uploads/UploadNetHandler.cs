@@ -164,7 +164,7 @@ namespace ChatPlus.Core.Features.Uploads
         {
             bytes = null;
 
-            Upload upload = UploadInitializer.Uploads
+            Upload upload = UploadManager.Uploads
                 .FirstOrDefault(u =>
                     string.Equals(Path.GetFileNameWithoutExtension(u.FileName), key, StringComparison.OrdinalIgnoreCase));
 

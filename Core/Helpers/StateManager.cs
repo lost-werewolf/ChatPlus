@@ -6,7 +6,8 @@ using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.ModIcons;
-using ChatPlus.Core.Features.PlayerHeads;
+using ChatPlus.Core.Features.PlayerIcons
+;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
@@ -62,10 +63,10 @@ public static class StateManager
         var emojiSys = ModContent.GetInstance<EmojiSystem>();
         var glyphSys = ModContent.GetInstance<GlyphSystem>();
         var itemSys = ModContent.GetInstance<ItemSystem>();
-        var modIconSys = ModContent.GetInstance<ModIconSystem>();
-        var playerHeadSys = ModContent.GetInstance<PlayerHeadSystem>();
-        var uploadSys = ModContent.GetInstance<UploadSystem>();
         var linkSys = ModContent.GetInstance<LinkSystem>();
+        var modIconSys = ModContent.GetInstance<ModIconSystem>();
+        var playerIconSys = ModContent.GetInstance<PlayerIconSystem>();
+        var uploadSys = ModContent.GetInstance<UploadSystem>();
 
         return cmdSys?.ui?.CurrentState != null ||
                colorSys?.ui?.CurrentState != null ||
@@ -73,7 +74,7 @@ public static class StateManager
                glyphSys?.ui?.CurrentState != null ||
                itemSys?.ui?.CurrentState != null ||
                modIconSys?.ui?.CurrentState != null ||
-               playerHeadSys?.ui?.CurrentState != null ||
+               playerIconSys?.ui?.CurrentState != null ||
                uploadSys?.ui?.CurrentState != null ||
                linkSys?.ui?.CurrentState != null;
     }
@@ -92,7 +93,7 @@ public static class StateManager
         var glyphSys = ModContent.GetInstance<GlyphSystem>();
         var itemSys = ModContent.GetInstance<ItemSystem>();
         var modIconSys = ModContent.GetInstance<ModIconSystem>();
-        var playerHeadSys = ModContent.GetInstance<PlayerHeadSystem>();
+        var playerIconSys = ModContent.GetInstance<PlayerIconSystem>();
         var uploadSys = ModContent.GetInstance<UploadSystem>();
         var linkSys = ModContent.GetInstance<LinkSystem>();
 
@@ -102,7 +103,7 @@ public static class StateManager
         Close(glyphSys?.ui);
         Close(itemSys?.ui);
         Close(modIconSys?.ui);
-        Close(playerHeadSys?.ui);
+        Close(playerIconSys?.ui);
         Close(uploadSys?.ui);
         Close(linkSys?.ui);
     }

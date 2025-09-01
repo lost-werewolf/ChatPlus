@@ -1,10 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ChatPlus.Core.Helpers;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.ModLoader;
 using Terraria.GameContent;
+using Terraria.ModLoader;
 
-namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
+namespace ChatPlus.Core.Features.PlayerIcons
+.PlayerInfo;
 
 public class PreviewFullBrightPlayer : ModPlayer
 {
@@ -15,16 +17,12 @@ public class PreviewFullBrightPlayer : ModPlayer
         if (!ForceFullBrightOnce)
             return;
 
-        // kill shadow/stealth dimming
         drawInfo.shadow = 0f;
         drawInfo.stealth = 1f;
 
         var p = drawInfo.drawPlayer;
-
-        // ignore world lighting entirely
         p.socialIgnoreLight = true;
 
-        // overwrite everything with full-bright base colors
         drawInfo.colorEyeWhites = Color.White;
         drawInfo.colorEyes = p.eyeColor;
         drawInfo.colorHair = p.GetHairColor(useLighting: false);

@@ -1,22 +1,25 @@
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
-using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
+using ChatPlus.Core.Features.PlayerIcons
+.PlayerInfo;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Core.Features.PlayerHeads;
+namespace ChatPlus.Core.Features.PlayerIcons
+;
 
 /// <summary>
 /// Inline snippet that draws a player's head icon.
 /// </summary>
-public class PlayerHeadSnippet : TextSnippet
+public class PlayerIconSnippet : TextSnippet
 {
     private readonly int _playerIndex;
 
-    public PlayerHeadSnippet(int idx)
+    public PlayerIconSnippet(int idx)
     {
         _playerIndex = idx;
         CheckForHover = true;
@@ -28,7 +31,7 @@ public class PlayerHeadSnippet : TextSnippet
         const float box = 26f;
         scale = 0.75f;
 
-        size = new Vector2(box * scale + 1, box * scale);
+        size = new Vector2(box * scale + 6.5f, box * scale);
 
         if (justCheckingString || color == Color.Black) return true;
 
@@ -40,23 +43,27 @@ public class PlayerHeadSnippet : TextSnippet
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
         pos = new Vector2(pos.X + 8f, pos.Y + 8f);
-        PlayerHeadFlipHook.shouldFlipHeadDraw = player.direction == -1;
+        MapHeadRendererHook.shouldFlipHeadDraw = player.direction == -1;
         Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, pos, 1f, scale, Color.White);
-        PlayerHeadFlipHook.shouldFlipHeadDraw = false;
+        MapHeadRendererHook.shouldFlipHeadDraw = false;
 
-        // debug
+        //// debug
         //Rectangle debugRect = new((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
         //sb.Draw(TextureAssets.MagicPixel.Value, debugRect, Color.Red * 0.25f);
 
         // hover
         int width = (int)size.X;
-        //int nameWidth = (int)FontAssets.MouseText.Value.MeasureString(player.name).X;
-        //width += nameWidth + 10;
+        int nameWidth = (int)FontAssets.MouseText.Value.MeasureString(player.name).X;
+        width += nameWidth + 10;
         var hoverRect = new Rectangle((int)pos.X - 10, (int)pos.Y - 6, width + 3, (int)size.Y + 3);
-        if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
+        
+        // to debug; comment below line out!
+        //if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
         {
             if (!Conf.C.ShowPlayerPreviewWhenHovering) return false;
-            
+
+            Main.LocalPlayer.mouseInterface = true;
+
             HoveredPlayerOverlay.Set(_playerIndex);
 
             if (Main.mouseLeft && Main.mouseLeftRelease)
@@ -75,6 +82,8 @@ public class PlayerHeadSnippet : TextSnippet
     public override void OnClick()
     {
         base.OnClick();
+
+        Main.LocalPlayer.mouseInterface = true;
 
         if (_playerIndex < 0 || _playerIndex >= Main.maxPlayers) return;
         var plr = Main.player[_playerIndex];

@@ -4,18 +4,20 @@ using System.Diagnostics;
 using System.Linq;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
+using ChatPlus.Core.Features.PlayerIcons
+.PlayerInfo;
 using ChatPlus.Core.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using ReLogic.Graphics;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static Terraria.Localization.NetworkText;
 
 namespace ChatPlus.Core.Features.ModIcons;
 
@@ -35,14 +37,34 @@ public sealed class ModIconSnippet : TextSnippet
     public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch sb,
                                     Vector2 pos = default, Color color = default, float scale = 1f)
     {
-        const float BaseIconSize = 22f;
+        const float BaseIconSize = 26f;
         float px = BaseIconSize * Math.Max(0f, scale);
         size = new Vector2(px, px);
 
         if (justCheckingString || color == Color.Black)
             return true;
 
-        var dest = new Rectangle((int)pos.X, (int)(pos.Y - 1), (int)px, (int)px);
+        // hover
+        var hoverRect = new Rectangle((int)pos.X - 5, (int)pos.Y - 4, 32, (int)size.Y + 5);
+        if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
+        {
+            if (!Conf.C.ShowModPreviewWhenHovering) return false;
+
+            if (ModLoader.TryGetMod(modName, out Mod mod))
+            {
+                HoveredModOverlay.Set(mod);
+            }
+
+            if (Main.mouseLeft && Main.mouseLeftRelease)
+                OnClick();
+        }
+        // hover debug
+        //sb.Draw(TextureAssets.MagicPixel.Value, hoverRect, Color.Red * 0.25f);
+
+        // debug force draw info overlay
+        //if (ModLoader.TryGetMod("ModLoader", out Mod test)) HoveredModOverlay.Set(test);
+
+        var dest = new Rectangle((int)pos.X-1, (int)(pos.Y - 1), (int)px, (int)px);
 
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
@@ -76,6 +98,7 @@ public sealed class ModIconSnippet : TextSnippet
             Vector2 center = dest.Center.ToVector2();
             Utils.DrawBorderString(sb, initials, center + new Vector2(0, 4f), Color.White, 0.8f * scale, 0.5f, 0.5f);
         }
+
         return true;
     }
 
@@ -99,7 +122,7 @@ public sealed class ModIconSnippet : TextSnippet
         string displayName = mod.DisplayName ?? mod.Name ?? "Unknown Mod";
         string internalName = mod.Name ?? displayName;
         string version = mod.Version?.ToString() ?? "Unknown";
-        string description = GetDescriptionForMod(mod) + "\nVersion: " + version;
+        string description = GetDescriptionForMod(mod);
 
         var snap = ChatSession.Capture();
         state.SetModInfo(description, displayName, internalName);
@@ -121,7 +144,6 @@ public sealed class ModIconSnippet : TextSnippet
             return desc;
 
         return "";
-        //return $"No description provided.\n\nVersion: {version}\nAuthor: {author}";
     }
 
     public override float GetStringLength(DynamicSpriteFont font) => BaseIconSize;
@@ -145,8 +167,8 @@ public sealed class ModIconSnippet : TextSnippet
         if (!ModLoader.TryGetMod(name, out var mod))
             return false;
 
-        // Priority: icon_small.rawimg -> icon.png
-        if (mod.FileExists("icon_small.rawimg"))
+        // Priority: icon_small.* -> icon.*
+        if (mod.FileExists("icon_small.png") || mod.FileExists("icon_small.rawimg"))
         {
             tex = mod.Assets.Request<Texture2D>("icon_small", AssetRequestMode.ImmediateLoad).Value;
             return tex != null;
@@ -258,9 +280,8 @@ public sealed class ModIconSnippet : TextSnippet
                 var ns = t.Namespace ?? string.Empty;
 
                 // Skip engine, loader, and our own code
-                if (asm == terrariaAsm) continue;
+                //if (asm == terrariaAsm) continue;
                 if (asm == chatPlusAsm) continue;
-                if (ns.StartsWith("ChatPlus.", StringComparison.OrdinalIgnoreCase)) continue;
 
                 // If the caller is tModLoader (e.g., /playing), treat as ModLoader
                 if (asm == loaderAsm)

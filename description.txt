@@ -1,15 +1,10 @@
-﻿Chat+ is a massive overhaul to Terraria's chat system—making it look better, smarter, and more fun with player icons, mod icons, emojis, images, links, a scrollbar, a better text editor, and more!
+﻿[c/FFFF00:Summary]
+    Chat+ is a massive overhaul to Terraria's chat system - making it look better, easier and more fun with player icons, mod icons, emojis, images, links, scrollbar, better text editor, and more!
 
-✨ What’s New?
-
-    Emojis 😎 and Images 📷 – Access thousands of emojis directly in chat.
-
+[c/00FF88:✨ What’s New?]
+    Emojis – Access thousands of emojis directly in chat.
     Images – Upload and send your own images.
-
-    Links 🔗 – Links you type in chat become clickable.
-
-    Autocomplete 🏷️ – Type any command or tag prefix to autocomplete 
-
-    Player Stats – A player stats previewer shows when hovering over a player icon.
-
-    More ✍️ – A better text editor, customizable scrollbar, and much more.
+    Links – Links you type in chat become clickable.
+    Autocomplete – Type any command or tag prefix to autocomplete 
+    Player Stats – A player stat previewer is available when hovering over player icons.
+    More – A better text editor, customizable scrollbar, and much more.

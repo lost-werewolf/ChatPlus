@@ -29,6 +29,7 @@ Configs: {
 				[e for emojis
 				[g for glyphs
 				[i for items
+				[l for link examples
 				[m for mod icons
 				[p for player icons
 				[u for uploads
@@ -41,7 +42,7 @@ Configs: {
 		}
 
 		BetterTextEditor: {
-			Label: Better Text Editor
+			Label: Text Editor
 			Tooltip:
 				'''
 				Improves the chat box with the following shortcuts:
@@ -76,7 +77,7 @@ Configs: {
 		}
 
 		PlayerIcons: {
-			Label: Player Head
+			Label: Player Icon
 			Tooltip: Adds a player head before every chat sent by a player.
 		}
 
@@ -87,11 +88,16 @@ Configs: {
 
 		ShowPlayerPreviewWhenHovering: {
 			Label: Show Player Preview When Hovering
-			Tooltip: Shows a preview of a player and their stats when hovering a player head.
+			Tooltip: Shows a preview of a player and their stats when hovering a player icon. Click the player to view more stats.
 		}
 
 		ShowModPreviewWhenHovering: {
 			Label: Show Mod Preview When Hovering
+			Tooltip: Shows a preview of a mod and its stats when hovering a mod icon. Click the mod to view more.
+		}
+
+		ShowUploadPreviewWhenHovering: {
+			Label: Show Upload Preview When Hovering
 			Tooltip: ""
 		}
 	}

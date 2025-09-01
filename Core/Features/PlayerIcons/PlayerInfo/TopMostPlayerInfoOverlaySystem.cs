@@ -4,7 +4,8 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
+namespace ChatPlus.Core.Features.PlayerIcons
+.PlayerInfo;
 
 /// <summary>
 /// Draws the hovered player info panel absolutely last (above every other interface layer).

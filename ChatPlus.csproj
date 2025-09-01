@@ -8,17 +8,10 @@
 		<!-- Ignore warning -->
 		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 	</PropertyGroup>
-	<ItemGroup>
-	  <None Include="Common\Configs\ConfigElements\PlayerColorConfigElement.cs" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1" />
 		<Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Core\NewFolder\" />
 	</ItemGroup>
 
 	<!-- References -->

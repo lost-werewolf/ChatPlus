@@ -1,7 +1,8 @@
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.Colors;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
+using ChatPlus.Core.Features.PlayerIcons
+.PlayerInfo;
 using ChatPlus.Core.Helpers;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,11 +11,12 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Core.Features.PlayerHeads;
+namespace ChatPlus.Core.Features.PlayerIcons
+;
 
-public class PlayerHeadElement : BaseElement<PlayerHead>
+public class PlayerIconElement : BaseElement<PlayerIcon>
 {
-    public PlayerHeadElement(PlayerHead data) : base(data)
+    public PlayerIconElement(PlayerIcon data) : base(data)
     {
         Height.Set(30, 0); // consistent row height
         Width.Set(0, 1);
@@ -29,8 +31,8 @@ public class PlayerHeadElement : BaseElement<PlayerHead>
         string tag = Data.Tag;
 
         // Draw player head
-        ChatManager.DrawColorCodedStringWithShadow(sb,FontAssets.MouseText.Value,tag,
-            pos + new Vector2(5, 5),Color.White,0f, Vector2.Zero, new Vector2(1.05f),-1f,1f);
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, tag,
+            pos + new Vector2(5, 5), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
 
         // Draw outline
         pos += new Vector2(32, 4);

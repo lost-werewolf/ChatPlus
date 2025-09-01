@@ -1,12 +1,8 @@
 using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.ModIcons.ModInfo;
-using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.ModLoader;
-using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.ModIcons;
@@ -27,12 +23,12 @@ public class ModIconElement : BaseElement<ModIcon>
 
         // mod icon tag
         string tag = Data.Tag;
-        float scale = 1.25f; // 150% bigger
+        float scale = 1.00f; // 150% bigger
         ChatManager.DrawColorCodedStringWithShadow(
             sb,
             FontAssets.MouseText.Value,
             tag,
-            pos + new Microsoft.Xna.Framework.Vector2(3, 2),
+            pos + new Microsoft.Xna.Framework.Vector2(3, 3),
             Color.White,
             0f,            // rotation
             Vector2.Zero,  // origin
@@ -55,6 +51,6 @@ public class ModIconElement : BaseElement<ModIcon>
         }
 
         // debug
-        //sb.Draw(TextureAssets.MagicPixel.Value, bounds, Color.Red);
+        //sb.Draw(TextureAssets.MagicPixel.Value, bounds, Color.Red*0.5f);
     }
 }

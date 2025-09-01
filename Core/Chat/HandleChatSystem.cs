@@ -99,7 +99,6 @@ namespace ChatPlus.Core.Chat
 
         private static bool _armCaretAfterAltInsert;
         private static int _lenBeforeAltInsert = -1;
-        private static int _prevChatLen;
 
         private string GetInputText(On_Main.orig_GetInputText orig, string oldString, bool allowMultiLine = false)
         {

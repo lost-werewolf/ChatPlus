@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
@@ -107,7 +108,11 @@ public abstract class DraggablePanel : UIPanel
 
     public override void LeftMouseDown(UIMouseEvent evt)
     {
+        bool leftShiftDown = Main.keyState.IsKeyDown(Keys.LeftShift);
+
+        if (leftShiftDown) return;
         if (IsAnyScrollbarHovering()) return;
+
         mouseDownPos = evt.MousePosition;
         base.LeftMouseDown(evt);
         dragging = false; // will become true after threshold
@@ -143,7 +148,8 @@ public abstract class DraggablePanel : UIPanel
         ModContent.GetInstance<Features.Glyphs.GlyphSystem>()?.state,
         ModContent.GetInstance<Features.Items.ItemSystem>()?.state,
         ModContent.GetInstance<Features.ModIcons.ModIconSystem>()?.state,
-        ModContent.GetInstance<Features.PlayerHeads.PlayerHeadSystem>()?.state,
+        ModContent.GetInstance<Features.PlayerIcons
+.PlayerIconSystem>()?.state,
         ModContent.GetInstance<Features.Uploads.UploadSystem>()?.state
         };
 

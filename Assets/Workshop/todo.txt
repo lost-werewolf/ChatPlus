@@ -265,9 +265,15 @@ Row 3: Last updated (1 hour ago, 14 days ago), etc
 Row 4: Version
 Row 5: author
 
-~~~~~
-Todo:
-[todo] Fix initial opening state doesnt show right header
-[todo] Add example images
-[todo] Fix steam workshop click
-[todo] Finish mod info state
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[skip] Add example images
+[skip] Fix steam workshop click
+[done] Finish mod info state
+[done] Fix initial opening state doesnt show right header
+[done] Fix tml icon
+[done] Fix chat icons
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[todo] Draw player compat for weaponOut

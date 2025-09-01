@@ -15,7 +15,7 @@ namespace ChatPlus.Core.Features.Uploads
     public class UploadPanel : BasePanel<Upload>
     {
         protected override BaseElement<Upload> BuildElement(Upload data) => new UploadElement(data);
-        protected override IEnumerable<Upload> GetSource() => UploadInitializer.Uploads;
+        protected override IEnumerable<Upload> GetSource() => UploadManager.Uploads;
         protected override string GetDescription(Upload data) => data.FileName;
         protected override string GetTag(Upload data) => data.Tag;
 
@@ -61,7 +61,7 @@ namespace ChatPlus.Core.Features.Uploads
                 UploadTagHandler.Register(key, texture);
                 string tag = UploadTagHandler.GenerateTag(key);
 
-                UploadInitializer.AddNewUpload(
+                UploadManager.AddNewUpload(
                     new Upload(
                         Tag: tag,
                         FileName: fileName,

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
+namespace ChatPlus.Core.Features.PlayerIcons
+.PlayerInfo;
+
 internal class BossHitSystem : ModPlayer
 {
     public static int LastNPCHit;

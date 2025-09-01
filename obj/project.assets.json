@@ -15,9 +15,6 @@
           "build/Krafs.Publicizer.props": {},
           "build/Krafs.Publicizer.targets": {}
         }
-      },
-      "tModLoader.CodeAssist/0.1.5": {
-        "type": "package"
       }
     }
   },
@@ -39,28 +36,11 @@
         "krafs.publicizer.2.2.1.nupkg.sha512",
         "krafs.publicizer.nuspec"
       ]
-    },
-    "tModLoader.CodeAssist/0.1.5": {
-      "sha512": "Sg/jKEg/z5eN+Cdi3/9CU4JfJwvXHVH+UDJf4Lipo26uTa+guLLJXH1XDJNPShTFwKK8jMUYbthINP4QhsgHSA==",
-      "type": "package",
-      "path": "tmodloader.codeassist/0.1.5",
-      "hasTools": true,
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "NugetIcon.png",
-        "analyzers/dotnet/cs/tModLoader.CodeAssist.dll",
-        "tmodloader.codeassist.0.1.5.nupkg.sha512",
-        "tmodloader.codeassist.nuspec",
-        "tools/install.ps1",
-        "tools/uninstall.ps1"
-      ]
     }
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "Krafs.Publicizer >= 2.2.1",
-      "tModLoader.CodeAssist >= 0.1.*"
+      "Krafs.Publicizer >= 2.2.1"
     ]
   },
   "packageFolders": {
@@ -117,10 +97,6 @@
             "suppressParent": "None",
             "target": "Package",
             "version": "[2.2.1, )"
-          },
-          "tModLoader.CodeAssist": {
-            "target": "Package",
-            "version": "[0.1.*, )"
           }
         },
         "imports": [

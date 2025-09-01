@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "/8t3/aRpWs4=",
+  "dgSpecHash": "lCnp2OkoLJQ=",
   "success": true,
   "projectFilePath": "C:\\Users\\erikm\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\ChatPlus\\ChatPlus.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\erikm\\.nuget\\packages\\krafs.publicizer\\2.2.1\\krafs.publicizer.2.2.1.nupkg.sha512",
-    "C:\\Users\\erikm\\.nuget\\packages\\tmodloader.codeassist\\0.1.5\\tmodloader.codeassist.0.1.5.nupkg.sha512"
+    "C:\\Users\\erikm\\.nuget\\packages\\krafs.publicizer\\2.2.1\\krafs.publicizer.2.2.1.nupkg.sha512"
   ],
   "logs": []
 }

@@ -1,8 +1,11 @@
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ChatPlus.Core.Features.Uploads
 {
@@ -11,7 +14,6 @@ namespace ChatPlus.Core.Features.Uploads
         public Upload Element;
 
         private UIText img;
-        private UIText imgTagName;
 
         public UploadElement(Upload data) : base(data)
         {
@@ -31,12 +33,22 @@ namespace ChatPlus.Core.Features.Uploads
             Height.Set(60, 0);
             base.Draw(sb);
 
+            var dims = GetDimensions();
+            Vector2 pos = dims.Position();
+
+            // Draw image
             img._textScale = 0.3f;
             img.Left.Set(5, 0);
             img.Top.Set(8, 0);
 
-            var dims = GetDimensions();
-            Vector2 pos = dims.Position();
+            // Draw image hover tooltip
+            Rectangle bounds = new((int)pos.X, (int)pos.Y, (int)60, (int)60);
+            if (bounds.Contains(Main.MouseScreen.ToPoint()))
+            {
+                UICommon.TooltipMouseText($"Shift+click to delete {Data.FileName}");
+            }
+            // debug
+            //sb.Draw(TextureAssets.MagicPixel.Value, bounds, Color.Red*0.5f);
 
             // Draw file name
             TextSnippet[] snip = [new TextSnippet(Data.Tag)];

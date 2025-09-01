@@ -6,9 +6,11 @@ using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.ModIcons;
-using ChatPlus.Core.Features.PlayerHeads;
+using ChatPlus.Core.Features.PlayerIcons
+;
 using ChatPlus.Core.Features.Uploads;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
@@ -47,9 +49,9 @@ namespace ChatPlus.Core.UI
                 else if (typeof(TData) == typeof(ColorItem)) initialText = "[c/FFF014:Colors]";
                 else if (typeof(TData) == typeof(Emoji)) initialText = "[c/FFF014:Emojis]";
                 else if (typeof(TData) == typeof(Glyph)) initialText = "[c/FFF014:Glyphs]";
-                else if (typeof(TData) == typeof(Item)) initialText = "[c/FFF014:Items]";
+                else if (typeof(TData) == typeof(Features.Items.Item)) initialText = "[c/FFF014:Items]";
                 else if (typeof(TData) == typeof(ModIcon)) initialText = "[c/FFF014:Mods]";
-                else if (typeof(TData) == typeof(PlayerHead)) initialText = "[c/FFF014:Players]";
+                else if (typeof(TData) == typeof(PlayerIcon)) initialText = "[c/FFF014:Players]";
                 else if (typeof(TData) == typeof(Upload)) initialText = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
                 else if (typeof(TData) == typeof(LinkEntry)) initialText = "[c/FFF014:Links]";
                 else initialText = string.Empty;
@@ -70,6 +72,7 @@ namespace ChatPlus.Core.UI
             if (typeof(TData) == typeof(Upload) && ConnectedPanel is UploadPanel up)
             {
                 up.UploadImage();
+                up.PopulatePanel();
                 return;
             }
 
@@ -81,7 +84,7 @@ namespace ChatPlus.Core.UI
             }
 
             // Players: open the “view more” page
-            if (typeof(TData) == typeof(PlayerHead) && ConnectedPanel is PlayerHeadPanel ph)
+            if (typeof(TData) == typeof(PlayerIcon) && ConnectedPanel is PlayerIconPanel ph)
             {
                 ph.OpenPlayerInfoForSelected();
                 return;
@@ -170,8 +173,14 @@ namespace ChatPlus.Core.UI
         {
             if (typeof(TData) == typeof(Upload))
             {
+                // Lock panel height
+                MinHeight.Set(62, 0);
+                MaxHeight.Set(62, 0);
                 Height.Set(62, 0);
-                text.VAlign = 0f;
+
+                text.VAlign = 0f;            // disable auto vertical alignment
+                text.Top.Set(0, 0);          // now this will stick
+                text.Recalculate();           // re-compute layout of 'text'
             }
 
             base.Draw(sb);

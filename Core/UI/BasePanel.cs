@@ -10,7 +10,8 @@ using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerHeads;
+using ChatPlus.Core.Features.PlayerIcons
+;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
@@ -52,6 +53,9 @@ namespace ChatPlus.Core.UI
         // Commands
         private static bool freezeCommandFilter;
         private static string frozenCommandText;
+
+        // Header
+        private bool showingHeader;
 
         // Holding keys
         private double repeatTimer;
@@ -101,16 +105,56 @@ namespace ChatPlus.Core.UI
 
         public override void LeftClick(UIMouseEvent evt)
         {
-            base.LeftClick(evt);
+            bool leftShiftDown = Main.keyState.IsKeyDown(Keys.LeftShift);
 
-            for (int i = 0; i < items.Count; i++)
+            if (!leftShiftDown)
             {
-                if (items[i].IsMouseHovering)
+                base.LeftClick(evt);
+
+                for (int i = 0; i < items.Count; i++)
                 {
-                    SetSelectedIndex(i);
-                    return;
+                    if (items[i].IsMouseHovering)
+                    {
+                        SetSelectedIndex(i);
+                        return;
+                    }
                 }
             }
+            else
+            {
+                // Remove upload element entirely!
+                int indexToDelete = -1;
+
+                for (int i = 0; i < items.Count; i++)
+                {
+                    if (items[i].IsMouseHovering && items[i].Data is Upload)
+                    {
+                        indexToDelete = i;
+                        break;
+                    }
+                }
+
+                if (indexToDelete >= 0 && indexToDelete < items.Count)
+                {
+                    var element = items[indexToDelete];
+                    if (element.Data is Upload upload)
+                    {
+                        // remove from underlying storage
+                        UploadManager.Uploads.Remove(upload); // or however uploads are stored
+
+                        items.RemoveAt(indexToDelete);
+                        element.Remove();
+
+                        Recalculate();
+                        PopulatePanel();
+                    }
+                }
+            }
+        }
+
+        public override void RightClick(UIMouseEvent evt)
+        {
+            base.RightClick(evt);
         }
 
         public void ClearPanel()
@@ -157,17 +201,29 @@ namespace ChatPlus.Core.UI
                 if (!initialized)
                 {
                     initialized = true;
-                    SetSelectedIndex(0);
+
                     if (ConnectedPanel is DescriptionPanel<TData> d)
-                    {
                         d.GetText().VAlign = 0.5f;
-                    }
+
+                    showingHeader = true;
+
+                    // Set the header explicitly
                     SetInitialHeader(ConnectedPanel);
                     ConnectedPanel.Height.Set(40, 0);
+
+                    // Also select the first item
+                    if (items.Count > 0)
+                    {
+                        currentIndex = 0;
+                        SetSelectedIndex(0);
+                    }
                 }
                 else
                 {
-                    // normal behavior on refresh/search
+                    // Normal behavior on refresh/search
+                    if (currentIndex < 0)
+                        currentIndex = 0;
+
                     SetSelectedIndex(Math.Clamp(currentIndex, 0, items.Count - 1));
                 }
             }
@@ -196,7 +252,7 @@ namespace ChatPlus.Core.UI
                 case DescriptionPanel<ModIcon> d:
                     d.SetText("[c/FFF014:Mods]");
                     break;
-                case DescriptionPanel<PlayerHead> d:
+                case DescriptionPanel<PlayerIcon> d:
                     d.SetText("[c/FFF014:Players]");
                     break;
                 case DescriptionPanel<Upload> d:
@@ -232,7 +288,7 @@ namespace ChatPlus.Core.UI
                 this is GlyphPanel ? "[g" :
                 this is ItemPanel ? "[i" :
                 this is ModIconPanel ? "[m" :
-                this is PlayerHeadPanel ? "[p" :
+                this is PlayerIconPanel ? "[p" :
                 this is UploadPanel ? "[u" :
                 this is LinkPanel ? "[l" : string.Empty;
 
@@ -354,6 +410,8 @@ namespace ChatPlus.Core.UI
             // 🔹 Update description panel
             if (ConnectedPanel is DescriptionPanel<TData> descPanel)
             {
+                if (showingHeader) return;
+
                 // Skip updating upload description panel
                 if (typeof(TData) == typeof(Upload))
                 {
@@ -390,13 +448,25 @@ namespace ChatPlus.Core.UI
                 if (!JustPressed(key))
                     continue;
 
-                if (key == Keys.Tab || key == Keys.Up || key == Keys.Down || key == Keys.LeftControl) return;
+                if (key == Keys.Tab ||
+                    key == Keys.Up ||
+                    key == Keys.Down ||
+                    key == Keys.LeftControl || key == Keys.LeftShift)
+                    return;
 
                 // Any non-Tab/Up/Down key: resume normal filtering
                 freezeCommandFilter = false;
                 frozenCommandText = null;
 
+                int prevIndex = currentIndex;
                 PopulatePanel();
+
+                // ensure something is still selected
+                if (items.Count > 0)
+                {
+                    int newIndex = Math.Clamp(prevIndex, 0, items.Count - 1);
+                    SetSelectedIndex(newIndex);
+                }
             }
         }
 
@@ -436,7 +506,7 @@ namespace ChatPlus.Core.UI
                 GlyphPanel => "[g",
                 ItemPanel => "[i",
                 ModIconPanel => "[m",
-                PlayerHeadPanel => "[p",
+                PlayerIconPanel => "[p",
                 UploadPanel => "[u",
                 LinkPanel => "[l",
                 _ => "[e"

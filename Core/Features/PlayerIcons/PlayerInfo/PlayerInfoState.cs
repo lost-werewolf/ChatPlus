@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Reflection;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -13,7 +15,8 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
+namespace ChatPlus.Core.Features.PlayerIcons
+.PlayerInfo
 {
     public class PlayerInfoState : UIState, ILoadable
     {
@@ -74,8 +77,8 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             uiContainer.Append(titlePanel);
 
             _bottom = new UIElement { Width = { Percent = 1f }, Height = { Pixels = 40f }, VAlign = 1f, Top = { Pixels = -60f } };
-            _bottom.PaddingLeft = 0f;   
-            _bottom.PaddingRight = 0f;  
+            _bottom.PaddingLeft = 0f;
+            _bottom.PaddingRight = 0f;
             uiContainer.Append(_bottom);
 
             _backBtn = new UITextPanel<string>("Back") { Height = { Pixels = 40f } }.WithFadedMouseOver();
@@ -85,12 +88,18 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             _currentPlayerIndex = _whoAmI >= 0 ? _whoAmI : Main.myPlayer;
             SetPlayerFromIndex(_currentPlayerIndex);
         }
+        public static bool Active { get; private set; }
+
         public override void OnActivate()
         {
             base.OnActivate();
-            _currentPlayerIndex = (_whoAmI >= 0 && _whoAmI < Main.maxPlayers) ? _whoAmI : Main.myPlayer;
-            SetPlayerFromIndex(_currentPlayerIndex);
-            RefreshNavButtons(); // ensure correct for SP/MP and active players
+            Active = true;
+        }
+
+        public override void OnDeactivate()
+        {
+            base.OnDeactivate();
+            Active = false;
         }
 
         public override void Update(GameTime gameTime)
@@ -130,9 +139,9 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
                 _backBtn.Left.Set(0f, 0f);
                 _backBtn.Width.Set(0f, 1f);
 
-                _backBtn.Recalculate();   
-                _bottom.Recalculate();   
-                Recalculate();            
+                _backBtn.Recalculate();
+                _bottom.Recalculate();
+                Recalculate();
                 return;
             }
 
@@ -204,10 +213,10 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
         public void SetReturnSnapshot(ChatSession.Snapshot snap) => _returnSnapshot = snap;
 
-        public void SetPlayer(int whoAmI, string nameOverride = null) 
-        { 
-            _whoAmI = whoAmI; 
-            _playerName = nameOverride ?? Main.player?[whoAmI]?.name ?? $"Player {whoAmI}"; 
+        public void SetPlayer(int whoAmI, string nameOverride = null)
+        {
+            _whoAmI = whoAmI;
+            _playerName = nameOverride ?? Main.player?[whoAmI]?.name ?? $"Player {whoAmI}";
         }
 
         public override void Draw(SpriteBatch sb)
@@ -216,17 +225,23 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             var player = _whoAmI >= 0 && _whoAmI < Main.maxPlayers ? Main.player[_whoAmI] : null;
             if (player == null || !player.active) return;
 
+            // debug
+            Log.Info(PlayerInfoState.instance == null);
+
             // Dimensions
             int panelWidth = 96, gutter = 10, rowHeight = 31;
             int containerW = Math.Min((int)(Main.screenWidth * 0.8f), 1000);
             int containerLeft = (Main.screenWidth - containerW) / 2, top = 120;
             int bgW = 436;
             int bgH = 200;
-            var bgRect = new Rectangle(containerLeft+42, top+42, bgW, bgH);
-            int leftColumn = containerLeft + containerW - (panelWidth * 2 + gutter)-70;
+            var bgRect = new Rectangle(containerLeft + 42, top + 42, bgW, bgH);
+            int leftColumn = containerLeft + containerW - (panelWidth * 2 + gutter) - 60;
             int rightColumn = leftColumn + panelWidth + gutter;
             int y0 = bgRect.Y;
             Vector2 cursor = new Vector2(bgRect.X, bgRect.Y); // start at top left
+            bool smallWidth = Main.screenWidth < 1200;
+            if (Main.screenWidth < 940)
+                bgRect.Width = bgW - 110;
 
             // Draw background
             PlayerInfoDrawer.DrawSeparatorBorder(sb, bgRect);
@@ -245,14 +260,20 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             PlayerInfoDrawer.DrawPlayer(sb, playerPos, player, 1.8f);
 
             // Stats header
-            Vector2 statsHeaderPos = new(leftColumn, y0-4);
-            Utils.DrawBorderStringBig(sb, "Stats", statsHeaderPos, Color.White, scale: 0.5f);
+            Vector2 statsHeaderPos = new(leftColumn, y0 - 4);
+            if (!smallWidth)
+                Utils.DrawBorderStringBig(sb, "Stats", statsHeaderPos, Color.White, scale: 0.5f);
+            if (smallWidth)
+            {
+                y0 -= 30;
+            }
+
 
             // Bounds
             Rectangle hpBounds = new(leftColumn, y0 + rowHeight + 6, panelWidth, rowHeight);
             Rectangle manaBounds = new(rightColumn, y0 + rowHeight + 6, panelWidth, rowHeight);
-            Rectangle defBounds = new(leftColumn, y0 + rowHeight*2 + 12, panelWidth, rowHeight);
-            Rectangle deathBounds = new(rightColumn, y0 + rowHeight*2 + 12, panelWidth, rowHeight);
+            Rectangle defBounds = new(leftColumn, y0 + rowHeight * 2 + 12, panelWidth, rowHeight);
+            Rectangle deathBounds = new(rightColumn, y0 + rowHeight * 2 + 12, panelWidth, rowHeight);
             Rectangle coinBounds = new(leftColumn, y0 + rowHeight * 3 + 18, panelWidth, rowHeight);
             Rectangle ammoBounds = new(rightColumn, y0 + rowHeight * 3 + 18, panelWidth, rowHeight);
             Rectangle minionBounds = new(leftColumn, y0 + rowHeight * 4 + 24, panelWidth, rowHeight);
@@ -278,13 +299,26 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
             // Draw buffs
             if (HasAnyBuff(player))
-                Utils.DrawBorderStringBig(sb, "Buffs", new Vector2(bgRect.X, bgRect.Y+476), Color.White, 0.52f);
-            DrawBuffs(sb, bgRect,player);
+                Utils.DrawBorderStringBig(sb, "Buffs", new Vector2(bgRect.X, bgRect.Y + 476), Color.White, 0.52f);
+            DrawBuffs(sb, bgRect, player);
 
             // Draw accessories
-            Vector2 armorPos = new(leftColumn - 200 + (Main.screenWidth < 1000 ? 225 : 0),y0 + 3 * 44 + 120 - 44 * 5 + (Main.screenWidth < 1000 ? 225 : 0));
+            int xOffset = 0;
+            int yOffset = 0;
+            if (smallWidth)
+            {
+                xOffset = 275;
+                yOffset = 250;
+            }
+
+            Vector2 armorPos = new(
+                x: leftColumn - 200 + xOffset,
+                y: y0 + 3 * 44 + 120 - 44 * 5 + yOffset);
             Vector2 accessoriesPos = new(armorPos.X, armorPos.Y + 3 * 44);
-            Utils.DrawBorderStringBig(sb, "Accessories", new Vector2(armorPos.X, armorPos.Y-36), Color.White, 0.52f);
+            if (smallWidth)
+                accessoriesPos.Y = armorPos.Y + 3 * 40;
+
+            Utils.DrawBorderStringBig(sb, "Accessories", new Vector2(armorPos.X, armorPos.Y - 36), Color.White, 0.52f);
 
             DrawArmor(sb, armorPos, player);
             DrawAccessories(sb, accessoriesPos, player);
@@ -306,8 +340,11 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
         private static void DrawArmor(SpriteBatch sb, Vector2 topLeft, Player player)
         {
-            var font = FontAssets.MouseText.Value; 
-            int size = 40, pad = 4; 
+            var font = FontAssets.MouseText.Value;
+            int size = 40, pad = 4;
+            bool smallWidth = Main.screenWidth < 1200;
+            if (smallWidth)
+                size = 36;
             float old = Main.inventoryScale; Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
 
             for (int r = 0; r < 3; r++)
@@ -357,22 +394,48 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
         private static void DrawInventory(SpriteBatch sb, Rectangle bgRect, Player player)
         {
-            int size = 40, pad = 4; 
-            var start = new Vector2(bgRect.X, bgRect.Bottom + 52); 
+            int size = 40, pad = 4;
+            bool smallWidth = Main.screenWidth < 1200;
+            if (smallWidth)
+                size = 36;
+            var start = new Vector2(bgRect.X, bgRect.Bottom + 52);
             Utils.DrawBorderStringBig(sb, "Inventory", new Vector2(start.X + 2, start.Y - 35), Color.White, 0.5f);
             bool TryEquipFromInventory(Player p, int invIndex)
             {
                 // we can only equip items from ourself
-                if (player != Main.LocalPlayer) return false; 
+                if (player != Main.LocalPlayer) return false;
 
                 ref Item it = ref p.inventory[invIndex]; if (it.IsAir) return false;
 
                 if (it.accessory)
                 {
-                    int begin = 3; int end = Math.Min(10, p.armor.Length); int empty = -1;
-                    for (int s = begin; s < end; s++) { if (p.armor[s].type == it.type) return false; if (empty < 0 && p.armor[s].IsAir) empty = s; }
-                    if (empty >= 0) { p.armor[empty] = it.Clone(); it.TurnToAir(); return true; }
-                    for (int s = begin; s < end; s++) { var tmp = p.armor[s]; p.armor[s] = it; p.inventory[invIndex] = tmp; return true; }
+                    int begin = 3;
+                    int end = Math.Min(10, p.armor.Length);
+                    int empty = -1;
+                    for (int s = begin; s < end; s++)
+                    {
+                        if (p.armor[s].type == it.type)
+                            return false;
+
+                        if (empty < 0 && p.armor[s].IsAir)
+                            empty = s;
+                    }
+                    if (empty >= 0)
+                    {
+                        p.armor[empty] = it.Clone();
+                        it.TurnToAir();
+                        return true;
+                    }
+                    for (int s = begin; s < end; s++)
+                    {
+                        if (!p.armor[s].IsAir)
+                        {
+                            var tmp = p.armor[s];
+                            p.armor[s] = it;
+                            p.inventory[invIndex] = tmp;
+                            return true;
+                        }
+                    }
                     return false;
                 }
 
@@ -390,7 +453,7 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
             for (int i = 0; i < 50; i++)
             {
-                int row = i / 10, col = i % 10; 
+                int row = i / 10, col = i % 10;
                 var r = new Rectangle((int)(start.X + col * (size + pad)), (int)(start.Y + row * (size + pad)), size, size);
                 var item = player.inventory[i];
 
@@ -413,11 +476,11 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
                         }
                     }
                 }
-                if (i < 10) 
-                { 
-                    string label = i == 9 ? "0" : (i + 1).ToString(); 
-                    Vector2 numberPos = new(r.Right - 35f, r.Bottom - 38f); 
-                    Utils.DrawBorderString(sb, label, numberPos, Color.White, 0.75f, 0f, 0f); 
+                if (i < 10)
+                {
+                    string label = i == 9 ? "0" : (i + 1).ToString();
+                    Vector2 numberPos = new(r.Right - 35f, r.Bottom - 38f);
+                    Utils.DrawBorderString(sb, label, numberPos, Color.White, 0.75f, 0f, 0f);
                 }
             }
         }
@@ -426,6 +489,9 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
         {
             float old = Main.inventoryScale;
             Main.inventoryScale = 40f / TextureAssets.InventoryBack.Width();
+            bool smallWidth = Main.screenWidth < 1200;
+            if (smallWidth)
+                Main.inventoryScale = 36f / TextureAssets.InventoryBack.Width();
 
             int w = (int)(TextureAssets.InventoryBack.Width() * Main.inventoryScale);
             int h = (int)(TextureAssets.InventoryBack.Height() * Main.inventoryScale);
@@ -460,28 +526,58 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
         private static void DrawAccessories(SpriteBatch sb, Vector2 topLeft, Player player)
         {
-            var bar = TextureAssets.MagicPixel.Value;
-            var font = FontAssets.MouseText.Value;
+            var scrollbar = instance?._scrollbar;
 
-            int size = 40, pad = 4;
+            int size = 40;
+            int pad = 4;
+            bool smallWidth = Main.screenWidth < 1200;
+            if (smallWidth)
+                size = 36;
+
             int rows = Math.Min(7, Math.Min(player.dye.Length - 3, Math.Min(player.armor.Length - 3, player.armor.Length - 13)));
+            int rowStep = size + pad;
+            int totalHeight = rows * rowStep;
+
+            int viewportBottom = Main.screenHeight - 80;
+            int viewportHeight = Math.Clamp(viewportBottom - (int)topLeft.Y, rowStep, totalHeight);
+
+            if (scrollbar != null)
+            {
+                scrollbar.Left.Set(topLeft.X + 3 * rowStep + 4, 0f);
+                scrollbar.Top.Set(topLeft.Y, 0f);
+                scrollbar.Height.Set(viewportHeight, 0f);
+                scrollbar.Recalculate();
+                scrollbar.SetView(viewportHeight, totalHeight);
+            }
+
+            float scroll = scrollbar?.ViewPosition ?? 0f;
+
+            var vpRect = new Rectangle((int)topLeft.X, (int)topLeft.Y, 3 * rowStep, viewportHeight);
+            if (vpRect.Contains(Main.MouseScreen.ToPoint()))
+                Main.LocalPlayer.mouseInterface = true;
 
             for (int r = 0; r < rows; r++)
             {
-                int dyeIndex = 3 + r;  
-                int vanityIndex = 13 + r;  
+                int y = (int)topLeft.Y + r * rowStep - (int)scroll;
+                if (y + size < topLeft.Y)
+                    continue;
+                if (y > topLeft.Y + viewportHeight)
+                    break;
+
+                int dyeIndex = 3 + r;
+                int vanityIndex = 13 + r;
                 int equipIndex = 3 + r;
 
-                int x0 = (int)topLeft.X + 0 * (size + pad);
-                int x1 = (int)topLeft.X + 1 * (size + pad);
-                int x2 = (int)topLeft.X + 2 * (size + pad);
-                int y = (int)topLeft.Y + r * (size + pad);
+                int x0 = (int)topLeft.X + 0 * rowStep;
+                int x1 = (int)topLeft.X + 1 * rowStep;
+                int x2 = (int)topLeft.X + 2 * rowStep;
 
                 DrawLoaderSlot(player.dye, 12, dyeIndex, x0, y, player);
                 DrawLoaderSlot(player.armor, 11, vanityIndex, x1, y, player);
                 DrawLoaderSlot(player.armor, 10, equipIndex, x2, y, player);
             }
         }
+
 
         private void Back_OnLeftClick(UIMouseEvent evt, UIElement listeningElement)
         {

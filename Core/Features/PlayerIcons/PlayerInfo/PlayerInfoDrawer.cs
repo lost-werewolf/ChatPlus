@@ -12,7 +12,8 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
+namespace ChatPlus.Core.Features.PlayerIcons
+.PlayerInfo;
 
 public static class PlayerInfoDrawer
 {
@@ -33,7 +34,7 @@ public static class PlayerInfoDrawer
         const int W = panelWidth * 2 + gutter + side * 2;
         const int rowHeight = 31;
         var pos = Main.MouseScreen + new Vector2(20, 20);
-        //pos = new(270, 650); // debug
+        //pos = new(300, 400); // debug
         pos.X = Math.Clamp(pos.X, 0, Main.screenWidth - W);
         pos.Y = Math.Clamp(pos.Y, 0, Main.screenHeight - H);
         var rect = new Rectangle((int)pos.X, (int)pos.Y, W, H);
@@ -50,7 +51,6 @@ public static class PlayerInfoDrawer
 
         // Draw background
         DrawMapFullscreenBackground(sb, rect);
-
 
         // Draw player
         DrawPlayer(sb, pos, player);
@@ -77,7 +77,7 @@ public static class PlayerInfoDrawer
         DrawStat_DeathCount(sb, new Rectangle(rightColumn, rowY2, panelWidth, rowHeight), player);
 
         // Draw row 3
-        int rowY3 = (int)cursor.Y + rowHeight * 2 + 6*2;
+        int rowY3 = (int)cursor.Y + rowHeight * 2 + 6 * 2;
         DrawStat_Coins(sb, new Rectangle(leftColumn, rowY3, panelWidth, rowHeight), player);
         DrawStat_Ammo(sb, new Rectangle(rightColumn, rowY3, panelWidth, rowHeight), player);
 
@@ -96,17 +96,19 @@ public static class PlayerInfoDrawer
                  DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
     }
 
-    public static void DrawPlayer(SpriteBatch sb, Vector2 uiPos, Player player, float scale = 1.2f)
+    public static void DrawPlayer(SpriteBatch sb, Vector2 pos, Player player, float scale = 1.2f)
     {
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
 
-        // Draw player
         PreviewFullBrightPlayer.ForceFullBrightOnce = true;
         try
         {
+            // Position
             Vector2 offset = new(100, 90);
-            Vector2 worldDrawPos = uiPos + Main.screenPosition + offset;
+            Vector2 worldDrawPos = pos + Main.screenPosition + offset;
+
+            // Draw player
             Main.PlayerRenderer.DrawPlayer(Main.Camera, player, worldDrawPos, 0f, Vector2.Zero, 0f, scale);
         }
         finally
@@ -261,7 +263,7 @@ public static class PlayerInfoDrawer
             tp += new Vector2(16, 0);
 
         // Draw npc name
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, creatureName, tp.X, tp.Y,Color.White, Color.Black, Vector2.Zero, 1f);
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, creatureName, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
 
     public static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)
@@ -346,7 +348,7 @@ public static class PlayerInfoDrawer
         var manaTex = TextureAssets.Mana;
         var manaRect = new Rectangle(rect.X + 4, rect.Y + 2, manaTex.Width(), manaTex.Height());
         sb.Draw(TextureAssets.Mana.Value, manaRect, Color.White);
-        
+
         // Draw mana creatureName
         var manaText = $"{player.statMana}/{player.statManaMax2}";
         var size = FontAssets.MouseText.Value.MeasureString(manaText);
@@ -548,7 +550,7 @@ public static class PlayerInfoDrawer
 
     public static void DrawPanel(Texture2D texture, int edgeWidth, int edgeShove, SpriteBatch spriteBatch, Vector2 position, float width, Color color)
     {
-        spriteBatch.Draw(texture, 
+        spriteBatch.Draw(texture,
             new Vector2(position.X + edgeWidth, position.Y), new Rectangle(edgeWidth + edgeShove, 0, texture.Width - (edgeWidth + edgeShove) * 2, texture.Height),
             color,
             0f,
@@ -558,10 +560,10 @@ public static class PlayerInfoDrawer
             0f);
     }
 
-    public static void DrawPanelVertical(Texture2D texture,int edgeWidth,int edgeShove,SpriteBatch spriteBatch,Vector2 position, float height,Color color)
+    public static void DrawPanelVertical(Texture2D texture, int edgeWidth, int edgeShove, SpriteBatch spriteBatch, Vector2 position, float height, Color color)
     {
-        spriteBatch.Draw(texture,new Rectangle((int)position.X, (int)position.Y + edgeWidth, edgeWidth, (int)height - edgeWidth * 2),
-            new Rectangle(texture.Width / 2, 0, 1, texture.Height),color);
+        spriteBatch.Draw(texture, new Rectangle((int)position.X, (int)position.Y + edgeWidth, edgeWidth, (int)height - edgeWidth * 2),
+            new Rectangle(texture.Width / 2, 0, 1, texture.Height), color);
     }
 
     public static void DrawFullBGPanel(SpriteBatch sb, Rectangle rect)

@@ -43,7 +43,7 @@ public class ModIconPanel : BasePanel<ModIcon>
             string internalName = mod?.Name ?? displayName;
 
             string version = mod?.Version?.ToString() ?? "Unknown";
-            string description = GetDescriptionForMod(mod) + "\nVersion: " + version;
+            string description = GetDescriptionForMod(mod);
 
             // Populate and open ModInfoState
             var s = ModInfoState.Instance;
@@ -77,6 +77,5 @@ public class ModIconPanel : BasePanel<ModIcon>
             return desc;
 
         return "";
-        //return $"No description provided.\n\nVersion: {version}\nAuthor: {author}";
     }
 }
