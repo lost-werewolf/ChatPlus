@@ -7,11 +7,11 @@ using ChatPlus.Core.Features.Commands;
 using ChatPlus.Core.Features.Emojis;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
+using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Features.Uploads;
-using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -70,7 +70,7 @@ namespace ChatPlus.Core.UI
 
             // Style
             OverflowHidden = true;
-            BackgroundColor = new Color(33,43,79) * 1.0f;
+            BackgroundColor = new Color(33, 43, 79) * 1.0f;
             SetPadding(0);
 
             // Initialize elements
