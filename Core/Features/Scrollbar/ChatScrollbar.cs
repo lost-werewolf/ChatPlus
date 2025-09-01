@@ -1,4 +1,5 @@
 ﻿using System;
+using ChatPlus.Common.Compat;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -139,6 +140,10 @@ public class ChatScrollbar : UIElement
 
         Left.Set(50, 0);
         Top.Set(top, 0f);
+        if (ModReloaderSystem.Found)
+        {
+            Left.Set(100, 0);
+        }
         Height.Set(h+30, 0f);
 
         if (IsMouseHovering) Main.LocalPlayer.mouseInterface = true;

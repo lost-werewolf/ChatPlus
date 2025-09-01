@@ -276,3 +276,6 @@ Row 5: author
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+[done] Disable preview when boss is alive
+[todo] Move chat box for Mod Reloader
+[todo] Fix ExampleMod stack source

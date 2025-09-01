@@ -102,6 +102,11 @@ Configs: {
 			Label: Show Upload Preview When Hovering
 			Tooltip: ""
 		}
+
+		DisableHoverWhenBossIsAlive: {
+			Label: Disable Hover When Boss Is Alive
+			Tooltip: ""
+		}
 	}
 }
 

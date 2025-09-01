@@ -68,6 +68,7 @@ internal class AddNewMessageSystem : ModSystem
         string mod = ModIconSnippet.GetModSource();
         if (Conf.C.ModIcons && mod != null && string.IsNullOrEmpty(senderName) && !text.StartsWith("[m:"))
         {
+            Log.Info(mod);
             string modTag = ModIconTagHandler.GenerateTag(mod);
             resultText = modTag + " " + resultText;
         }

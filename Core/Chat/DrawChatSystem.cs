@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using ChatPlus.Common.Compat;
 using ChatPlus.Core.Features.Uploads;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -37,6 +40,9 @@ namespace ChatPlus.Core.Chat
 
         private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
         {
+            ModReloaderSystem.ChatOffsetX = 45;
+            ModReloaderSystem.ChatOffsetY = 0;
+
             bool hasUpload = drawingPlayerChat && UploadTagHandler.ContainsUploadTag(Main.chatText);
             if (!hasUpload)
             {
@@ -73,19 +79,27 @@ namespace ChatPlus.Core.Chat
             if (++Main.instance.textBlinkerCount >= 20) { Main.instance.textBlinkerState = 1 - Main.instance.textBlinkerState; Main.instance.textBlinkerCount = 0; }
 
             bool hasUpload = UploadTagHandler.ContainsUploadTag(Main.chatText);
-            int height = hasUpload ? 147 + 21 : 32;
+            int height = hasUpload ? 147 + 21 : 32; // 147 height + 21 input line height
 
-            DrawChatbox(height);
+            int xOffset = 0;
+            int yOffset = 0;
+            if (ModReloaderSystem.Found)
+            {
+                xOffset = 50;
+                yOffset = 0;
+            }
+            
+            DrawChatbox(height, xOffset, yOffset);
 
             if (!hasUpload)
             {
-                DrawInputLine(height, 0, false);
-                DrawSelectionRectangle(height, Main.screenHeight - height, 0);
+                DrawInputLine(height, hasUpload, xOffset, yOffset);
+                DrawSelectionRectangle(height, xOffset, yOffset);
             }
             else
             {
                 int textOffsetX = DrawUploadAndGetTextOffset(height);
-                DrawInputLine(height, textOffsetX, true);
+                DrawInputLine(height, hasUpload, xOffset, yOffset);
             }
 
             Main.chatMonitor.DrawChat(true);
@@ -115,15 +129,15 @@ namespace ChatPlus.Core.Chat
             return UploadTagHandler.TryGet(key, out tex);
         }
 
-        private static void DrawChatbox(int height)
+        private static void DrawChatbox(int height, int xOffset=0, int yOffset=0)
         {
             int w = Main.screenWidth - 300;
-            int x = 78;
-            int y = Main.screenHeight - 4 - height;
+            int y = Main.screenHeight - 4 - height + yOffset;
+            int x = 78 + xOffset;
             DrawNineSlice(x, y, w, height, TextureAssets.TextBack.Value, new Color(100, 100, 100, 100));
         }
 
-        private static void DrawInputLine(int height, int textOffsetX, bool hasUpload)
+        private static void DrawInputLine(int height, bool hasUpload, int xOffset=0, int yOffset = 0)
         {
             int baseX = 88;
             int baseY = Main.screenHeight - height;
@@ -137,7 +151,7 @@ namespace ChatPlus.Core.Chat
             var snips = ChatManager.ParseMessage(cleaned, Color.White).ToArray();
             ChatManager.DrawColorCodedStringWithShadow(
                 Main.spriteBatch, FontAssets.MouseText.Value,
-                snips, new Vector2(baseX + textOffsetX, baseY),
+                snips, new Vector2(baseX + xOffset, baseY + yOffset),
                 0f, Vector2.Zero, Vector2.One, out _
             );
 
@@ -159,12 +173,12 @@ namespace ChatPlus.Core.Chat
                 var before = ChatManager.ParseMessage(cleaned.Substring(0, caretClean), Color.White).ToArray();
                 Vector2 beforeSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, before, Vector2.One);
 
-                int caretX = baseX + textOffsetX + (int)beforeSize.X;
-                Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(caretX, baseY + 2, 1, 17), Color.White);
+                int caretX = baseX + xOffset + (int)beforeSize.X;
+                Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(caretX, baseY + 2+yOffset, 1, 17), Color.White);
             }
         }
 
-        private void DrawSelectionRectangle(int height, int baselineY, int textOffsetX)
+        private void DrawSelectionRectangle(int height, int xOffset=0, int yOffset=0)
         {
             var sel = HandleChatSystem.GetSelection();
             if (sel == null) return;
@@ -207,8 +221,8 @@ namespace ChatPlus.Core.Chat
             Vector2 midSize = MeasureSnippets(cleaned.Substring(adjStart, adjEnd - adjStart));
 
             var rect = new Rectangle(
-                88 + textOffsetX + (int)System.Math.Floor(preSize.X),
-                baselineY,
+                88 + xOffset + (int)System.Math.Floor(preSize.X),
+                Main.screenHeight-height+yOffset,
                 (int)System.Math.Ceiling(midSize.X),
                 20
             );

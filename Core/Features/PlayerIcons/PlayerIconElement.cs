@@ -1,24 +1,18 @@
 using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.Colors;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerIcons
-.PlayerInfo;
-using ChatPlus.Core.Helpers;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Core.Features.PlayerIcons
-;
+namespace ChatPlus.Core.Features.PlayerIcons;
 
 public class PlayerIconElement : BaseElement<PlayerIcon>
 {
     public PlayerIconElement(PlayerIcon data) : base(data)
     {
-        Height.Set(30, 0); // consistent row height
+        Height.Set(30, 0);
         Width.Set(0, 1);
     }
 
@@ -32,7 +26,7 @@ public class PlayerIconElement : BaseElement<PlayerIcon>
 
         // Draw player head
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, tag,
-            pos + new Vector2(5, 5), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
+            pos + new Vector2(12, 5), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
 
         // Draw outline
         pos += new Vector2(32, 4);

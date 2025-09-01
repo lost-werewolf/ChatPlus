@@ -52,6 +52,10 @@ namespace ChatPlus.Common.Configs
         [DefaultValue(true)]
         public bool ShowUploadPreviewWhenHovering = true;
 
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [DefaultValue(true)]
+        public bool DisableHoverWhenBossIsAlive = true;
+
         [Header("ChatFormat")]
 
         [CustomModConfigItem(typeof(ModIconsConfigElement))]
