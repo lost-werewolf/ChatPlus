@@ -1,36 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 
-namespace ChatPlus.Core.Features.PlayerIcons
-.PlayerInfo;
+namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 
 internal class BossHitSystem : ModPlayer
 {
-    public static int LastNPCHit;
+    private static int LastNPCHit;
+    public static int GetLastNPCHit()
+    {
+        if (LastNPCHit < 0 || LastNPCHit >= Main.maxNPCs)
+            return -1;
+        NPC npc = Main.npc[LastNPCHit];
+        if (npc == null || !npc.active)
+            return -1;
+        return LastNPCHit;
+    }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         //Main.NewText(target.FullName);
         if (target != null && target.active)
             BossHitSystem.LastNPCHit = target.whoAmI;
-    }
-
-    public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
-    {
-        //Main.NewText(target.FullName);
-
-        base.OnHitNPCWithItem(item, target, hit, damageDone);
-    }
-
-    public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
-    {
-        //Main.NewText(target.FullName);
-
-        base.OnHitNPCWithProj(proj, target, hit, damageDone);
     }
 }

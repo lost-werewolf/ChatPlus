@@ -6,11 +6,11 @@ using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.Colors
 {
-    public class ColorElement : BaseElement<ColorItem>
+    public class ColorElement : BaseElement<ColorEntry>
     {
-        public ColorItem color;
+        public ColorEntry color;
 
-        public ColorElement(ColorItem color) : base(color)
+        public ColorElement(ColorEntry color) : base(color)
         {
             this.color = color;
             Height.Set(30, 0);

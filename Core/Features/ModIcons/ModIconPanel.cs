@@ -13,7 +13,7 @@ namespace ChatPlus.Core.Features.ModIcons;
 
 public class ModIconPanel : BasePanel<ModIcon>
 {
-    protected override IEnumerable<ModIcon> GetSource() => ModIconInitializer.ModIcons;
+    protected override IEnumerable<ModIcon> GetSource() => ModIconManager.ModIcons;
     protected override BaseElement<ModIcon> BuildElement(ModIcon data) => new ModIconElement(data);
     protected override string GetDescription(ModIcon data)
     {

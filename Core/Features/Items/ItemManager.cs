@@ -4,9 +4,9 @@ using Terraria.ModLoader;
 
 namespace ChatPlus.Core.Features.Items
 {
-    internal class ItemInitializer : ModSystem
+    internal class ItemManager : ModSystem
     {
-        public static List<Item> Items { get; private set; } = [];
+        public static List<ItemEntry> Items { get; private set; } = [];
 
         public override void PostSetupContent()
         {
@@ -17,7 +17,7 @@ namespace ChatPlus.Core.Features.Items
         {
             Items.Clear();
 
-            var payload = new List<Item>(ItemLoader.ItemCount);
+            var payload = new List<ItemEntry>(ItemLoader.ItemCount);
 
             for (int i = 1; i < ItemLoader.ItemCount; i++)
             {
@@ -31,7 +31,7 @@ namespace ChatPlus.Core.Features.Items
                         continue;
 
                     string tag = $"[i:{i}]"; // chat icon tag
-                    payload.Add(new Item(
+                    payload.Add(new ItemEntry(
                         ID: i,
                         Tag: tag,
                         DisplayName: t.Name

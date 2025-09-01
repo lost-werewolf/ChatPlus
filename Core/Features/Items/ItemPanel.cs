@@ -5,18 +5,18 @@ using Microsoft.Xna.Framework;
 
 namespace ChatPlus.Core.Features.Items
 {
-    public class ItemPanel : BasePanel<Item>
+    public class ItemPanel : BasePanel<ItemEntry>
     {
-        protected override BaseElement<Item> BuildElement(Item data) => new ItemElement(data);
+        protected override BaseElement<ItemEntry> BuildElement(ItemEntry data) => new ItemElement(data);
 
-        protected override IEnumerable<Item> GetSource() => ItemInitializer.Items.OrderBy(i => i.ID);
+        protected override IEnumerable<ItemEntry> GetSource() => ItemManager.Items.OrderBy(i => i.ID);
 
-        protected override string GetDescription(Item data)
+        protected override string GetDescription(ItemEntry data)
         {
             return $"{data.DisplayName}";
         }
 
-        protected override string GetTag(Item data) => data.Tag;
+        protected override string GetTag(ItemEntry data) => data.Tag;
 
         public override void Update(GameTime gt)
         {

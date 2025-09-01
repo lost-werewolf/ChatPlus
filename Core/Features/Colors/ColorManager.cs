@@ -3,9 +3,9 @@ using Terraria.ModLoader;
 
 namespace ChatPlus.Core.Features.Colors
 {
-    internal class ColorInitializer : ModSystem
+    internal class ColorManager : ModSystem
     {
-        public static List<ColorItem> Colors { get; private set; } = [];
+        public static List<ColorEntry> Colors { get; private set; } = [];
 
         public override void PostSetupContent()
         {
@@ -15,7 +15,7 @@ namespace ChatPlus.Core.Features.Colors
             {
                 // e.g. [c/32FF82:Your text]
                 string tagPrefix = $"[c/{hex.TrimStart('#')}:";
-                Colors.Add(new ColorItem(tagPrefix, hex, name, description));
+                Colors.Add(new ColorEntry(tagPrefix, hex, name, description));
             }
 
             // Status message colors

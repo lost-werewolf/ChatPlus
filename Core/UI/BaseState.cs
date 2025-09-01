@@ -18,11 +18,5 @@ public class BaseState<TData> : UIState
         panel.ConnectedPanel = description;
         description.ConnectedPanel = panel;
     }
-
-    public override void OnActivate()
-    {
-        base.OnActivate();
-        Panel.ResetInit();
-    }
 }
 

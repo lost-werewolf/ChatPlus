@@ -26,7 +26,7 @@ namespace ChatPlus.Core.Chat
         /// <summary>
         /// Does 2 things:
         /// 1. Skip scrolling with up/down arrow keys when any of my states are open
-        /// 2. Skip closing the chat when escape is pressed when any of my states are open
+        /// (not yet) 2. Skip closing the chat when escape is pressed when any of my states are open
         /// </summary>
         private void ModifyToggleChat(ILContext il)
         {

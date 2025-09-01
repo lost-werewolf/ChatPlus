@@ -1,4 +1,5 @@
 using System.Linq;
+using ChatPlus.Core.Features.ModIcons;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -20,7 +21,7 @@ namespace ChatPlus.Common.ModCommands
             DescriptionText = Mod.GetLocalization($"{key}Description");
             HeaderText = Mod.GetLocalization($"{key}TagsHeader");
 
-            TagTexts = Enumerable.Range(0, 9).Select(i => Mod.GetLocalization($"{key}Tag_{i}")).ToArray();
+            TagTexts = Enumerable.Range(0, 8).Select(i => Mod.GetLocalization($"{key}Tag_{i}")).ToArray();
         }
 
         public override CommandType Type => CommandType.Chat;
@@ -31,13 +32,18 @@ namespace ChatPlus.Common.ModCommands
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            // Header
-            Main.NewText(HeaderText.Format("[c/fff014:", "]"));
-
-            // Each tag line
-            foreach (var tagText in TagTexts)
+            if (ModLoader.TryGetMod("ChatPlus", out Mod chatPlus))
             {
-                Main.NewText(tagText.Value);
+                string tag = ModIconTagHandler.GenerateTag(chatPlus.Name);
+
+                // Header
+                Main.NewText(HeaderText.Format(tag + " " + "[c/fff014:", "]"));
+
+                // Each tag line
+                foreach (var tagText in TagTexts)
+                {
+                    Main.NewText(tag + " " + tagText.Value, Color.White);
+                }
             }
         }
     }

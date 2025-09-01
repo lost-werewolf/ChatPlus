@@ -10,13 +10,11 @@ using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerIcons
-;
+using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using MonoMod.Core.Utils;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
@@ -49,17 +47,6 @@ namespace ChatPlus.Core.UI
 
         // Navigation
         protected int currentIndex = 0; // first item
-
-        // Commands
-        private static bool freezeCommandFilter;
-        private static string frozenCommandText;
-
-        // Header
-        private bool showingHeader;
-        private void DismissHeader()
-        {
-            if (showingHeader) showingHeader = false;
-        }
 
         // Holding keys
         private double repeatTimer;
@@ -102,9 +89,6 @@ namespace ChatPlus.Core.UI
 
             Append(list);
             Append(scrollbar);
-
-            // Populate the panel with items
-            //PopulatePanel();
         }
 
         public override void LeftClick(UIMouseEvent evt)
@@ -119,7 +103,6 @@ namespace ChatPlus.Core.UI
                 {
                     if (items[i].IsMouseHovering)
                     {
-                        DismissHeader();              
                         SetSelectedIndex(i);
                         return;
                     }
@@ -127,39 +110,37 @@ namespace ChatPlus.Core.UI
             }
             else
             {
-                // Remove upload element entirely!
-                int indexToDelete = -1;
-
-                for (int i = 0; i < items.Count; i++)
-                {
-                    if (items[i].IsMouseHovering && items[i].Data is Upload)
-                    {
-                        indexToDelete = i;
-                        break;
-                    }
-                }
-
-                if (indexToDelete >= 0 && indexToDelete < items.Count)
-                {
-                    var element = items[indexToDelete];
-                    if (element.Data is Upload upload)
-                    {
-                        // remove from underlying storage
-                        UploadManager.Uploads.Remove(upload); // or however uploads are stored
-
-                        items.RemoveAt(indexToDelete);
-                        element.Remove();
-
-                        Recalculate();
-                        PopulatePanel();
-                    }
-                }
+                RemoveUploadElement();
             }
         }
 
-        public override void RightClick(UIMouseEvent evt)
+        private void RemoveUploadElement()
         {
-            base.RightClick(evt);
+            int indexToDelete = -1;
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (items[i].IsMouseHovering && items[i].Data is Upload)
+                {
+                    indexToDelete = i;
+                    break;
+                }
+            }
+
+            if (indexToDelete >= 0 && indexToDelete < items.Count)
+            {
+                var element = items[indexToDelete];
+                if (element.Data is Upload upload)
+                {
+                    UploadManager.Uploads.Remove(upload);
+
+                    items.RemoveAt(indexToDelete);
+                    element.Remove();
+
+                    Recalculate();
+                    PopulatePanel();
+                }
+            }
         }
 
         public void ClearPanel()
@@ -167,9 +148,6 @@ namespace ChatPlus.Core.UI
             items.Clear();
             list.Clear();
         }
-
-        private bool initialized;
-        public void ResetInit() => initialized = false;
 
         public void PopulatePanel()
         {
@@ -189,89 +167,6 @@ namespace ChatPlus.Core.UI
                 fastList.Add(element);
             }
             list.AddRange(fastList);
-
-            if (fastList.Count == 0)
-            {
-                if (ConnectedPanel is DescriptionPanel<TData> descPanel)
-                {
-                    descPanel.SetText("No entries found.");
-                    descPanel.Height.Set(40, 0);
-                    descPanel.GetText().VAlign = 0.5f;
-                    descPanel.GetText().Top.Set(0, 0);
-                }
-                currentIndex = -1;
-            }
-            else
-            {
-                if (!initialized)
-                {
-                    initialized = true;
-
-                    if (ConnectedPanel is DescriptionPanel<TData> d)
-                        d.GetText().VAlign = 0.5f;
-
-                    showingHeader = true;
-
-                    // Set the header explicitly
-                    SetInitialHeader(ConnectedPanel);
-                    ConnectedPanel.Height.Set(40, 0);
-
-                    // Also select the first item
-                    if (items.Count > 0)
-                    {
-                        currentIndex = 0;
-                        SetSelectedIndex(0);
-                    }
-                }
-                else
-                {
-                    // Normal behavior on refresh/search
-                    if (currentIndex < 0)
-                        currentIndex = 0;
-
-                    SetSelectedIndex(Math.Clamp(currentIndex, 0, items.Count - 1));
-                }
-            }
-        }
-
-        private void SetInitialHeader(object panel)
-        {
-            switch (panel)
-            {
-                case DescriptionPanel<Command> d:
-                    d.SetText("[c/FFF014:Commands]");
-                    break;
-                case DescriptionPanel<ColorItem> d:
-                    d.SetText("[c/FFF014:Colors]");
-                    //d.SetText("[c/FF0000:C][c/DD0033:o][c/BB0066:l][c/990099:o][c/7700CC:r][c/5500FF:s]");
-                    break;
-                case DescriptionPanel<Emoji> d:
-                    d.SetText("[c/FFF014:Emojis]");
-                    break;
-                case DescriptionPanel<Glyph> d:
-                    d.SetText("[c/FFF014:Glyphs]");
-                    break;
-                case DescriptionPanel<Features.Items.Item> d:
-                    d.SetText("[c/FFF014:Items]");
-                    break;
-                case DescriptionPanel<ModIcon> d:
-                    d.SetText("[c/FFF014:Mods]");
-                    break;
-                case DescriptionPanel<PlayerIcon> d:
-                    d.SetText("[c/FFF014:Players]");
-                    break;
-                case DescriptionPanel<Upload> d:
-                    string t = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
-                    d.SetText(t);
-                    break;
-                case DescriptionPanel<LinkEntry> d:
-                    d.SetText("[c/FFF014:Links]");
-                    break;
-                default:
-                    if (panel is UIElement u)
-                        Log.Info($"No header defined for {u.GetType()}");
-                    break;
-            }
         }
 
         #region Filter
@@ -281,8 +176,6 @@ namespace ChatPlus.Core.UI
 
             // Use frozen text while navigating commands with Up/Down so we don't re-filter to a single item
             string text = Main.chatText ?? string.Empty;
-            if (this is CommandPanel && freezeCommandFilter && !string.IsNullOrEmpty(frozenCommandText))
-                text = frozenCommandText;
 
             if (text.Length == 0) return true;
 
@@ -334,7 +227,7 @@ namespace ChatPlus.Core.UI
                 return false;
             }
 
-            if (this is ItemPanel && data is Features.Items.Item item)
+            if (this is ItemPanel && data is ItemEntry item)
             {
                 if (tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
                 if ((item.DisplayName ?? string.Empty).IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
@@ -351,9 +244,9 @@ namespace ChatPlus.Core.UI
         {
             base.Update(gt);
 
-            // TODO
-            OverflowHidden = false;
-            list.OverflowHidden = false;
+            // debug TODO
+            //OverflowHidden = false;
+            //list.OverflowHidden = false;
 
             // Sizing and position
             int itemCount = 10;
@@ -415,8 +308,6 @@ namespace ChatPlus.Core.UI
             // 🔹 Update description panel
             if (ConnectedPanel is DescriptionPanel<TData> descPanel)
             {
-                if (showingHeader) return;
-
                 // Skip updating upload description panel
                 if (typeof(TData) == typeof(Upload))
                 {
@@ -445,7 +336,6 @@ namespace ChatPlus.Core.UI
                 }
             }
         }
-
         private void HandleKeyPressed()
         {
             foreach (Keys key in Enum.GetValues(typeof(Keys)))
@@ -458,12 +348,6 @@ namespace ChatPlus.Core.UI
                     key == Keys.Down ||
                     key == Keys.LeftControl || key == Keys.LeftShift)
                     return;
-
-                // Any non-Tab/Up/Down key: resume normal filtering
-                freezeCommandFilter = false;
-                frozenCommandText = null;
-
-                DismissHeader();
 
                 int prevIndex = currentIndex;
                 PopulatePanel();
@@ -542,45 +426,13 @@ namespace ChatPlus.Core.UI
             // Tap key
             if (JustPressed(Keys.Up))
             {
-                DismissHeader();
-                if (this is CommandPanel)
-                {
-                    if (!freezeCommandFilter) frozenCommandText = Main.chatText;
-                    freezeCommandFilter = true;
-
-                    SetSelectedIndex(currentIndex - 1);
-                    if (items.Count > 0)
-                    {
-                        Main.chatText = GetTag(items[currentIndex].Data);
-                        HandleChatSystem.SetCaretPos(Main.chatText.Length);
-                    }
-                }
-                else
-                {
-                    SetSelectedIndex(currentIndex - 1);
-                }
+                SetSelectedIndex(currentIndex - 1);
                 heldKey = Keys.Up;
                 repeatTimer = 0.35;
             }
             else if (JustPressed(Keys.Down))
             {
-                DismissHeader();
-                if (this is CommandPanel)
-                {
-                    if (!freezeCommandFilter) frozenCommandText = Main.chatText;
-                    freezeCommandFilter = true;
-
-                    SetSelectedIndex(currentIndex + 1);
-                    if (items.Count > 0)
-                    {
-                        Main.chatText = GetTag(items[currentIndex].Data);
-                        HandleChatSystem.SetCaretPos(Main.chatText.Length);
-                    }
-                }
-                else
-                {
-                    SetSelectedIndex(currentIndex + 1);
-                }
+                SetSelectedIndex(currentIndex + 1);
                 heldKey = Keys.Down;
                 repeatTimer = 0.35;
             }
@@ -596,23 +448,11 @@ namespace ChatPlus.Core.UI
 
                     if (Main.keyState.IsKeyDown(Keys.Up))
                     {
-                        DismissHeader();
                         SetSelectedIndex(currentIndex - 1);
-                        if (this is CommandPanel && items.Count > 0)
-                        {
-                            Main.chatText = GetTag(items[currentIndex].Data);
-                            HandleChatSystem.SetCaretPos(Main.chatText.Length);
-                        }
                     }
                     else if (Main.keyState.IsKeyDown(Keys.Down))
                     {
-                        DismissHeader();
                         SetSelectedIndex(currentIndex + 1);
-                        if (this is CommandPanel && items.Count > 0)
-                        {
-                            Main.chatText = GetTag(items[currentIndex].Data);
-                            HandleChatSystem.SetCaretPos(Main.chatText.Length);
-                        }
                     }
                 }
             }

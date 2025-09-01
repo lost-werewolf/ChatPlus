@@ -1,14 +1,10 @@
 ﻿using System;
 using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.ModIcons.ModInfo;
-using ChatPlus.Core.Helpers;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
-using static Terraria.Localization.NetworkText;
 
 namespace ChatPlus.Core.Chat
 {

@@ -8,10 +8,10 @@ using Terraria.UI.Chat;
 namespace ChatPlus.Core.Features.Items
 {
     // Shows an item color with its [i:ID] tag and name
-    public class ItemElement : BaseElement<Item>
+    public class ItemElement : BaseElement<ItemEntry>
     {
-        public Item item;
-        public ItemElement(Item item) : base(item)
+        public ItemEntry item;
+        public ItemElement(ItemEntry item) : base(item)
         {
             this.item = item;
             Height.Set(30, 0);

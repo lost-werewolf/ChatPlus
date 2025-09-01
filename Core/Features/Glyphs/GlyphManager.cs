@@ -4,7 +4,7 @@ using Terraria.ModLoader;
 
 namespace ChatPlus.Core.Features.Glyphs
 {
-    internal class GlyphInitializer : ModSystem
+    internal class GlyphManager : ModSystem
     {
         public static List<Glyph> Glyphs { get; private set; } = [];
 

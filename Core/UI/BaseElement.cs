@@ -30,8 +30,7 @@ namespace ChatPlus.Core.UI
         {
             base.LeftClick(evt);
 
-            // Walk up until we find the panel
-            // (which is 3 steps, usually from InnerList -> List -> EmojiPanel
+            // Walk up until we find the panel, usually 3 steps: from InnerList -> List -> EmojiPanel
             UIElement parent = Parent;
             while (parent != null && parent is not BasePanel<TData>)
                 parent = parent.Parent;
@@ -45,16 +44,6 @@ namespace ChatPlus.Core.UI
                     panel.InsertSelectedTag();
                 }
             }
-        }
-
-        public override void RightClick(UIMouseEvent evt)
-        {
-            base.RightClick(evt);
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            base.Update(gameTime);
         }
 
         public override void Draw(SpriteBatch sb)

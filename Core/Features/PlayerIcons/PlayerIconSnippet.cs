@@ -30,8 +30,9 @@ public class PlayerIconSnippet : TextSnippet
     {
         const float box = 26f;
         scale = 0.75f;
+        pos.X -= 7f;
 
-        size = new Vector2(box * scale + 6.5f, box * scale);
+        size = new Vector2(box * scale - 3.5f, box * scale);
 
         if (justCheckingString || color == Color.Black) return true;
 

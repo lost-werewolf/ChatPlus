@@ -1,4 +1,5 @@
 using System.Reflection;
+using ChatPlus.Core.Features.ModIcons;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -38,7 +39,11 @@ namespace ChatPlus.Common.ModCommands
             clearMethod?.Invoke(Main.chatMonitor, null);
 
             // Show localized confirmation message
-            Main.NewTextMultiline(ClearedText.Value, c: Color.Green);
+            if (ModLoader.TryGetMod("ChatPlus", out Mod chatPlus))
+            {
+                string tag = ModIconTagHandler.GenerateTag(chatPlus.Name);
+                Main.NewTextMultiline(tag + " " + ClearedText.Value, c: Color.Green);
+            }
         }
     }
 }

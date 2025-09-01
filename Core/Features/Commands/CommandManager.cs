@@ -7,7 +7,7 @@ using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.Commands
 {
-    internal class CommandInitializer : ModSystem
+    internal class CommandManager : ModSystem
     {
         public static List<Command> Commands { get; private set; } = [];
 

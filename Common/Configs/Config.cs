@@ -1,17 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
-using AdvancedChatFeatures.Common.Configs;
 using ChatPlus.Common.Configs.ConfigElements;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Helpers;
-using Newtonsoft.Json;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
-using Terraria.UI;
 
 namespace ChatPlus.Common.Configs
 {

@@ -7,7 +7,7 @@ namespace ChatPlus.Core.Features.Commands
     public class CommandPanel : BasePanel<Command>
     {
         // Properties
-        protected override IEnumerable<Command> GetSource() => CommandInitializer.Commands;
+        protected override IEnumerable<Command> GetSource() => CommandManager.Commands;
         protected override BaseElement<Command> BuildElement(Command data) => new CommandElement(data);
         protected override string GetDescription(Command data) => data.Description;
         protected override string GetTag(Command data) => data.Name;

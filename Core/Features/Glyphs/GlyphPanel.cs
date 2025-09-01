@@ -11,7 +11,7 @@ namespace ChatPlus.Core.Features.Glyphs
             new GlyphElement(data);
 
         protected override IEnumerable<Glyph> GetSource() =>
-            GlyphInitializer.Glyphs;
+            GlyphManager.Glyphs;
 
         protected override string GetDescription(Glyph data)
             => data.Description;

@@ -4,7 +4,7 @@ using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.Links;
 
-internal class LinkInitializer : ModSystem
+internal class LinkManager : ModSystem
 {
     public static readonly List<LinkEntry> Links = new();
 

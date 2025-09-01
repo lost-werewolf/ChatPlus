@@ -19,11 +19,6 @@ namespace ChatPlus.Core.Features.Colors
             state = new ColorState();
             ui.SetState(null);
         }
-
-        public override void Unload()
-        {
-        }
-
         public override void UpdateUI(GameTime gameTime)
         {
             StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[c");

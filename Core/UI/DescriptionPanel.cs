@@ -46,10 +46,10 @@ namespace ChatPlus.Core.UI
             if (string.IsNullOrEmpty(initialText))
             {
                 if (typeof(TData) == typeof(Command)) initialText = "[c/FFF014:Commands]";
-                else if (typeof(TData) == typeof(ColorItem)) initialText = "[c/FFF014:Colors]";
+                else if (typeof(TData) == typeof(ColorEntry)) initialText = "[c/FFF014:Colors]";
                 else if (typeof(TData) == typeof(Emoji)) initialText = "[c/FFF014:Emojis]";
                 else if (typeof(TData) == typeof(Glyph)) initialText = "[c/FFF014:Glyphs]";
-                else if (typeof(TData) == typeof(Features.Items.Item)) initialText = "[c/FFF014:Items]";
+                else if (typeof(TData) == typeof(Features.Items.ItemEntry)) initialText = "[c/FFF014:Items]";
                 else if (typeof(TData) == typeof(ModIcon)) initialText = "[c/FFF014:Mods]";
                 else if (typeof(TData) == typeof(PlayerIcon)) initialText = "[c/FFF014:Players]";
                 else if (typeof(TData) == typeof(Upload)) initialText = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";

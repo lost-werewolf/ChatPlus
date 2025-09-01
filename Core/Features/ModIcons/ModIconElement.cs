@@ -23,12 +23,12 @@ public class ModIconElement : BaseElement<ModIcon>
 
         // mod icon tag
         string tag = Data.Tag;
-        float scale = 1.00f; // 150% bigger
+        float scale = 1.0f; // 150% bigger
         ChatManager.DrawColorCodedStringWithShadow(
             sb,
             FontAssets.MouseText.Value,
             tag,
-            pos + new Microsoft.Xna.Framework.Vector2(3, 3),
+            pos + new Vector2(13, 5),
             Color.White,
             0f,            // rotation
             Vector2.Zero,  // origin
@@ -38,8 +38,8 @@ public class ModIconElement : BaseElement<ModIcon>
         );
 
         // mod icon display name
-        TextSnippet[] snip = [new TextSnippet(Data.mod.DisplayName)];
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32, 4), 0f, Vector2.Zero, Vector2.One, out _);
+        TextSnippet[] snip = [new TextSnippet(Data.Tag)];
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(40, 4), 0f, Vector2.Zero, Vector2.One, out _);
 
         // tag hover tooltip of mod name
         Rectangle bounds = new((int)pos.X - 30, (int)pos.Y, (int)30, (int)30);

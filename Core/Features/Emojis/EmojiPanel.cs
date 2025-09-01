@@ -10,7 +10,7 @@ namespace ChatPlus.Core.Features.Emojis
     {
         protected override BaseElement<Emoji> BuildElement(Emoji data) => new EmojiElement(data);
 
-        protected override IEnumerable<Emoji> GetSource() => EmojiInitializer.Emojis;
+        protected override IEnumerable<Emoji> GetSource() => EmojiManager.Emojis;
 
         protected override string GetDescription(Emoji data) => data.Description;
 

@@ -9,7 +9,7 @@ using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.Emojis
 {
-    internal class EmojiInitializer : ModSystem
+    internal class EmojiManager : ModSystem
     {
         public static List<Emoji> Emojis { get; private set; } = new();
         public static Dictionary<string, List<string>> EmojiMap { get; private set; } = new(StringComparer.OrdinalIgnoreCase);

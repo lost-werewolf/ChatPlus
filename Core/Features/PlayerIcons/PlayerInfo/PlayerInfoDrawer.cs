@@ -218,7 +218,7 @@ public static class PlayerInfoDrawer
 
         if (netID <= 0 && player.lastCreatureHit >= 0)
         {
-            NPC npc = Main.npc[BossHitSystem.LastNPCHit];
+            NPC npc = Main.npc[BossHitSystem.GetLastNPCHit()];
             if (npc != null && npc.active)
                 netID = npc.type;
         }

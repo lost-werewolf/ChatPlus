@@ -3,11 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
-using Terraria.Audio;
-using Terraria.ID;
-using Terraria.ModLoader.UI;
 using Terraria.UI;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ChatPlus.Core.Features.Scrollbar;
 
@@ -141,8 +137,9 @@ public class ChatScrollbar : UIElement
         float h = show * line;
         float top = Main.screenHeight - (h + 37f); // keep bottom edge at screenHeight-37
 
+        Left.Set(50, 0);
         Top.Set(top, 0f);
-        Height.Set(h, 0f);
+        Height.Set(h+30, 0f);
 
         if (IsMouseHovering) Main.LocalPlayer.mouseInterface = true;
 

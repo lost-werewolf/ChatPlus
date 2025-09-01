@@ -5,7 +5,7 @@ using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.ModIcons;
 
-internal class ModIconInitializer : ModSystem
+internal class ModIconManager : ModSystem
 {
     public static List<ModIcon> ModIcons { get; private set; } = [];
 

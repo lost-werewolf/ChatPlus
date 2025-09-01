@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using ChatPlus.Common.Configs.ConfigElements.PlayerColor;
 using ChatPlus.Core.Features.PlayerColors;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.OS;
@@ -49,9 +50,9 @@ public class PlayerColorConfigElement : ConfigElement<string>
         Height.Set(100, 0);
 
         // Make buttons
-        copyButton = MakeButton("Copy", 0, Copy);
-        pasteButton = MakeButton("Paste", 36, Paste);
-        randomizeButton = MakeButton("Randomize", 36*2, Randomize);
+        copyButton = MakeButton("Copy", Loc.Get("ConfigPlayerColor.Copy"), 0, Copy);
+        pasteButton = MakeButton("Paste", Loc.Get("ConfigPlayerColor.Paste"), 36, Paste);
+        randomizeButton = MakeButton("Randomize", Loc.Get("ConfigPlayerColor.Randomize"), 36*2, Randomize);
 
         // Make sliders
         hueSlider = MakeHslSlider(HSLSliderId.Hue, 0);
@@ -118,11 +119,11 @@ public class PlayerColorConfigElement : ConfigElement<string>
         }
     }
 
-    private CustomColoredImageButton MakeButton(string assetName, float left, Action onClick)
+    private CustomColoredImageButton MakeButton(string assetName, string tooltip, float left, Action onClick)
     {
         var btn = new CustomColoredImageButton(
             texture: Main.Assets.Request<Texture2D>($"Images/UI/CharCreation/{assetName}"),
-            tooltip: assetName);
+            tooltip: tooltip);
         btn.OnLeftMouseDown += (_, _) => onClick();
         btn.Top.Set(34, 0);
         btn.Left.Set(155 + left, 0);

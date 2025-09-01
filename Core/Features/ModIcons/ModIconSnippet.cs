@@ -39,7 +39,8 @@ public sealed class ModIconSnippet : TextSnippet
     {
         const float BaseIconSize = 24f;
         float px = BaseIconSize * Math.Max(0f, scale);
-        size = new Vector2(px, px);
+        size = new Vector2(px-8, px);
+        pos.X -= 8f;
 
         if (justCheckingString || color == Color.Black)
             return true;
@@ -64,7 +65,7 @@ public sealed class ModIconSnippet : TextSnippet
         // debug force draw info overlay
         //if (ModLoader.TryGetMod("ModLoader", out Mod test)) HoveredModOverlay.Set(test);
 
-        var dest = new Rectangle((int)pos.X-1, (int)(pos.Y - 2), (int)px, (int)px);
+        var dest = new Rectangle((int)pos.X, (int)(pos.Y - 2), (int)px, (int)px);
 
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
@@ -248,58 +249,58 @@ public sealed class ModIconSnippet : TextSnippet
         try
         {
             var frames = new StackTrace().GetFrames();
-            if (frames == null) return null;
+            if (frames == null || frames.Length == 0)
+            {
+                return "ModLoader";
+            }
 
-            var terrariaAsm = typeof(Main).Assembly;
-            var loaderAsm = typeof(ModLoader).Assembly;
-            var chatPlusAsm = typeof(ModIconSnippet).Assembly;
-
-            var pivot = -1;
+            int pivot = -1;
             for (int i = 0; i < frames.Length; i++)
             {
                 var m = frames[i].GetMethod();
                 if (m == null) continue;
-                var n = m.Name;
-                if (n.IndexOf("NewText", StringComparison.Ordinal) >= 0 || n.IndexOf("AddNewMessage", StringComparison.Ordinal) >= 0)
+
+                string n = m.Name;
+                if (n.Contains("NewText") || n.Contains("AddNewMessage"))
                 {
                     pivot = i;
                     break;
                 }
             }
-            if (pivot < 0) return null;
 
-            for (int i = pivot + 1; i < frames.Length; i++)
+            int start = pivot >= 0 ? pivot + 1 : 0;
+
+            for (int i = start; i < frames.Length; i++)
             {
-                var m = frames[i].GetMethod();
-                if (m == null) continue;
+                var method = frames[i].GetMethod();
+                var type = method?.DeclaringType;
+                if (type == null) continue;
 
-                var t = m.DeclaringType;
-                if (t == null) continue;
+                var assembly = type.Assembly;
+                if (assembly == null) continue;
 
-                var asm = t.Assembly;
-                var ns = t.Namespace ?? string.Empty;
-
-                // Skip engine, loader, and our own code
-                //if (asm == terrariaAsm) continue;
-                if (asm == chatPlusAsm) continue;
-
-                // If the caller is tModLoader (e.g., /playing), treat as ModLoader
-                if (asm == loaderAsm)
+                // if the caller is this mod’s assembly, return "ChatPlus"
+                if (assembly == typeof(ModIconSnippet).Assembly)
                 {
-                    if (ns.StartsWith("Terraria.ModLoader", StringComparison.OrdinalIgnoreCase)) return "ModLoader";
-                    continue;
+                    return "ChatPlus";
                 }
 
-                var mod = ModLoader.Mods.FirstOrDefault(z => z != null && z.Code == asm);
-                if (mod.Name == "DragonLens") return "Terraria";
-                if (mod != null) return mod.Name;
+                var mod = ModLoader.Mods.FirstOrDefault(z => z != null && z.Code == assembly);
+                if (mod == null) continue;
+
+                if (mod.Name == "DragonLens")
+                {
+                    return "Terraria";
+                }
+
+                return mod.Name;
             }
 
             return "ModLoader";
         }
         catch
         {
-            return null;
+            return "ModLoader";
         }
     }
 

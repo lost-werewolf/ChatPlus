@@ -1,12 +1,14 @@
 Keybinds: {
-	"Open Command Window.DisplayName": Open  Command  Window
-	"Open Emoji Window.DisplayName": Open  Emoji  Window
-	"Open Glyph Window.DisplayName": Open  Glyph  Window
-	"Open Item Window.DisplayName": Open  Item  Window
-	"Open Color Window.DisplayName": Open  Color  Window
-	"Open Upload Window.DisplayName": Open  Upload  Window
+	"Open Command Window.DisplayName": Open Command Window
+	"Open Emoji Window.DisplayName": Open Emoji Window
+	"Open Glyph Window.DisplayName": Open Glyph  Window
+	"Open Item Window.DisplayName": Open Item Window
+	"Open Color Window.DisplayName": Open Color Window
+	"Open Upload Window.DisplayName": Open Upload Window
 	"DEBUG: Write Lines.DisplayName": D E B U G:  Write  Lines
 	"DEBUG: Write Chat Line Count.DisplayName": D E B U G:  Write  Chat  Line  Count
+	"Open Mod Window.DisplayName": Open  Mod  Window
+	"Open Player Window.DisplayName": Open  Player  Window
 }
 
 Configs: {
@@ -103,25 +105,30 @@ Configs: {
 	}
 }
 
+ConfigPlayerColor: {
+	Copy: Copy
+	Paste: Paste
+	Randomize: Randomize
+}
+
 Commands: {
 	TagsCommand: {
 		Usage: /tags
 		Description: Shows all tags available in Chat+.
 		TagsHeader: "{0}Tags:{1}"
-		Tag_0: Commands    /
-		Tag_1: Colors      [c
-		Tag_2: Emojis      [e
-		Tag_3: Glyphs      [g
-		Tag_4: Items       [i
-		Tag_5: Links       [l
-		Tag_6: Mods        [m
-		Tag_7: Players     [p
-		Tag_8: Uploads     [u
+		Tag_0: Colors      [c
+		Tag_1: Emojis      [e
+		Tag_2: Glyphs      [g
+		Tag_3: Items        [i
+		Tag_4: Links        [l
+		Tag_5: Mods        [m
+		Tag_6: Players      [p
+		Tag_7: Uploads      [u
 	}
 
 	ChatClearCommand: {
-		Usage: Mods.ChatPlus.Commands.ChatClearCommand.Usage
-		Description: Mods.ChatPlus.Commands.ChatClearCommand.Description
-		Cleared: Mods.ChatPlus.Commands.ChatClearCommand.Cleared
+		Usage: /clear
+		Description: Clears all chat messages.
+		Cleared: Chat cleared!
 	}
 }

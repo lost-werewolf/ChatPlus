@@ -5,14 +5,12 @@ using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerIcons
-;
+using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
-using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Chat;
 
@@ -39,7 +37,6 @@ internal class AddNewMessageSystem : ModSystem
     private void ModifyNewMessage(On_RemadeChatMonitor.orig_AddNewMessage orig, RemadeChatMonitor self, string text, Color color, int widthLimitInPixels)
     {
         // Modify original text!
-        //Log.Info(text);
         string resultText = text;
 
         /// 1. Set show count from config
@@ -67,9 +64,9 @@ internal class AddNewMessageSystem : ModSystem
             resultText = playerTag + " " + resultText;
         }
 
-        // 4. Add mod icons
+        // 4. Add mod icon
         string mod = ModIconSnippet.GetModSource();
-        if (Conf.C.ModIcons && mod != null && string.IsNullOrEmpty(senderName))
+        if (Conf.C.ModIcons && mod != null && string.IsNullOrEmpty(senderName) && !text.StartsWith("[m:"))
         {
             string modTag = ModIconTagHandler.GenerateTag(mod);
             resultText = modTag + " " + resultText;
@@ -82,7 +79,7 @@ internal class AddNewMessageSystem : ModSystem
             resultText = resultText.Replace(linkText, linkTag);
         }
 
-        // 6. Replace the name tag with color tag using synced table; fallback to white/deterministic if not present yet
+        // 6. Replace the name tag with color tag using synced table; fallback to white
         if (!string.IsNullOrEmpty(senderName) && !string.IsNullOrEmpty(nameTagFull))
         {
             string hex = "FFFFFF";
@@ -100,7 +97,7 @@ internal class AddNewMessageSystem : ModSystem
             }
             else
             {
-                // Fallback so messages format immediately even if SyncSingle/All hasn't arrived yet
+                // Fallback
                 hex = PlayerColorHandler.HexFromName(senderName);
             }
 

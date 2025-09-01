@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using ChatPlus.Core.Features.PlayerIcons
-.PlayerInfo;
 using ChatPlus.Core.Features.Uploads;
-using ChatPlus.Core.Helpers;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
