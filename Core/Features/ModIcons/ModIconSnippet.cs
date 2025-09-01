@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
-using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 using ChatPlus.Core.Helpers;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using ReLogic.Graphics;
 using Terraria;
-using Terraria.GameContent.Bestiary;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using static Terraria.Localization.NetworkText;
 
 namespace ChatPlus.Core.Features.ModIcons;
 
@@ -29,6 +29,7 @@ public sealed class ModIconSnippet : TextSnippet
         this.modName = modName ?? string.Empty;
         Text = string.Empty;
         Color = Color.White;
+        CheckForHover = true; // enable OnHover callback so overlay can draw
     }
 
     public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch sb,
@@ -49,7 +50,7 @@ public sealed class ModIconSnippet : TextSnippet
         {
             if (Ass.TerrariaIcon?.Value != null)
             {
-                dest = new Rectangle((int)pos.X+2, (int)(pos.Y - 1), (int)20, (int)24);
+                dest = new Rectangle((int)pos.X + 2, (int)(pos.Y - 1), (int)20, (int)24);
                 sb.Draw(Ass.TerrariaIcon.Value, dest, Color.White);
             }
             return true;
@@ -68,7 +69,7 @@ public sealed class ModIconSnippet : TextSnippet
         }
 
         // Fallback: draw two-letter initials centered
-        string initials = GetDisplayName(modName);
+        string initials = ModHelper.GetDisplayName(modName);
         if (!string.IsNullOrWhiteSpace(initials))
         {
             initials = initials.Length >= 2 ? initials[..2] : initials;
@@ -112,9 +113,7 @@ public sealed class ModIconSnippet : TextSnippet
     {
         if (mod == null) return "No description available.";
 
-        // Find the matching LocalMod
-        IReadOnlyList<LocalMod> all = ModOrganizer.FindAllMods();
-        LocalMod localMod = all?.FirstOrDefault(m => m != null && string.Equals(m.Name, mod.Name, StringComparison.OrdinalIgnoreCase));
+        LocalMod localMod = ModHelper.GetLocalMod(mod);
 
         // Get description
         string desc = localMod?.properties?.description;
@@ -132,8 +131,11 @@ public sealed class ModIconSnippet : TextSnippet
     {
         Main.LocalPlayer.mouseInterface = true;
 
-        //Main.instance.MouseText(GetDisplayName(modName));
-        UICommon.TooltipMouseText(modName);
+        if (ModLoader.TryGetMod(modName, out Mod mod))
+        {
+            if (!Conf.C.ShowModPreviewWhenHovering) return;
+            HoveredModOverlay.Set(mod);
+        }
     }
 
     private static bool TryGetModIcon(string name, out Texture2D tex)
@@ -158,10 +160,7 @@ public sealed class ModIconSnippet : TextSnippet
 
         return false;
     }
-    private static string GetDisplayName(string name)
-    {
-        return ModLoader.TryGetMod(name, out var mod) ? (mod.DisplayName ?? name) : name;
-    }
+
 
     public static string GetCallingName()
     {

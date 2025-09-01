@@ -11,6 +11,7 @@ using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -202,6 +203,9 @@ namespace ChatPlus.Core.UI
                     string t = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
                     d.SetText(t);
                     break;
+                case DescriptionPanel<LinkEntry> d:
+                    d.SetText("[c/FFF014:Links]");
+                    break;
                 default:
                     if (panel is UIElement u)
                         Log.Info($"No header defined for {u.GetType()}");
@@ -229,7 +233,8 @@ namespace ChatPlus.Core.UI
                 this is ItemPanel ? "[i" :
                 this is ModIconPanel ? "[m" :
                 this is PlayerHeadPanel ? "[p" :
-                this is UploadPanel ? "[u" : string.Empty;
+                this is UploadPanel ? "[u" :
+                this is LinkPanel ? "[l" : string.Empty;
 
             if (prefix.Length == 0)
                 return tag.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
@@ -433,6 +438,7 @@ namespace ChatPlus.Core.UI
                 ModIconPanel => "[m",
                 PlayerHeadPanel => "[p",
                 UploadPanel => "[u",
+                LinkPanel => "[l",
                 _ => "[e"
             };
 

@@ -1,10 +1,14 @@
 ﻿using System;
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Helpers;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
 using Terraria;
+using Terraria.GameInput;
 using Terraria.ModLoader;
+using static Terraria.Localization.NetworkText;
 
 namespace ChatPlus.Core.Chat
 {
@@ -64,10 +68,7 @@ namespace ChatPlus.Core.Chat
         {
             orig();
 
-            if (!Conf.C.BetterTextEditor)
-                return;
-
-            bool active = StateManager.IsAnyStateActive();
+            if (!Conf.C.BetterTextEditor) return;
 
             if (!Main.drawingPlayerChat)
             {
@@ -78,7 +79,27 @@ namespace ChatPlus.Core.Chat
             {
                 caretPos = Main.chatText.Length;
             }
+
+            int curLen = Main.chatText?.Length ?? 0;
+
+            if (_armCaretAfterAltInsert && curLen > _lenBeforeAltInsert)
+            {
+                caretPos = curLen;
+                selectAll = false;
+                selectionAnchor = -1;
+
+                PlayerInput.WritingText = true;
+                Main.instance.textBlinkerCount = 0;
+                Main.instance.textBlinkerState = 1;
+
+                _armCaretAfterAltInsert = false;
+                _lenBeforeAltInsert = -1;
+            }
         }
+
+        private static bool _armCaretAfterAltInsert;
+        private static int _lenBeforeAltInsert = -1;
+        private static int _prevChatLen;
 
         private string GetInputText(On_Main.orig_GetInputText orig, string oldString, bool allowMultiLine = false)
         {

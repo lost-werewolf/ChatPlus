@@ -16,9 +16,11 @@ public abstract class DraggablePanel : UIPanel
     private static bool sharedInitialized;
 
     private bool dragging;
+    private bool pendingDrag; // mouse down occurred but threshold not yet exceeded
     private Vector2 dragOffset;
     private const float dragThreshold = 3f;
     private Vector2 mouseDownPos;
+    public bool IsDragging => dragging;
 
     public DraggablePanel ConnectedPanel { get; set; }
     protected virtual float SharedYOffset => 0f;
@@ -55,10 +57,15 @@ public abstract class DraggablePanel : UIPanel
             }
         }
 
-        if (!dragging) return;
+        // Determine if we should enter dragging after surpassing threshold
+        if (pendingDrag && !dragging)
+        {
+            float moved = Vector2.Distance(new Vector2(Main.mouseX, Main.mouseY), mouseDownPos);
+            if (moved > dragThreshold)
+                dragging = true;
+        }
 
-        float moved = Vector2.Distance(new Vector2(Main.mouseX, Main.mouseY), mouseDownPos);
-        if (moved <= dragThreshold) return;
+        if (!dragging) return;
 
         var r = GetDimensions().ToRectangle();
         float oldX = Left.Pixels;
@@ -103,7 +110,8 @@ public abstract class DraggablePanel : UIPanel
         if (IsAnyScrollbarHovering()) return;
         mouseDownPos = evt.MousePosition;
         base.LeftMouseDown(evt);
-        dragging = true;
+        dragging = false; // will become true after threshold
+        pendingDrag = true;
         dragOffset = evt.MousePosition - new Vector2(Left.Pixels, Top.Pixels);
     }
 
@@ -111,6 +119,7 @@ public abstract class DraggablePanel : UIPanel
     {
         base.LeftMouseUp(evt);
         dragging = false;
+        pendingDrag = false;
 
         // Persist only X; Y stays whatever each panel’s layout dictates.
         sharedPos = new Vector2(Left.Pixels, sharedPos.Y);
@@ -125,9 +134,9 @@ public abstract class DraggablePanel : UIPanel
     }
 
     private static bool IsAnyScrollbarHovering()
-{
-    var states = new object[]
     {
+        var states = new object[]
+        {
         ModContent.GetInstance<Features.Commands.CommandSystem>()?.state,
         ModContent.GetInstance<Features.Colors.ColorSystem>()?.state,
         ModContent.GetInstance<Features.Emojis.EmojiSystem>()?.state,
@@ -136,14 +145,14 @@ public abstract class DraggablePanel : UIPanel
         ModContent.GetInstance<Features.ModIcons.ModIconSystem>()?.state,
         ModContent.GetInstance<Features.PlayerHeads.PlayerHeadSystem>()?.state,
         ModContent.GetInstance<Features.Uploads.UploadSystem>()?.state
-    };
+        };
 
-    foreach (var s in states)
-    {
-        if (s is BaseState<dynamic> baseState && baseState.Panel?.scrollbar?.IsMouseHovering == true)
-            return true;
+        foreach (var s in states)
+        {
+            if (s is BaseState<dynamic> baseState && baseState.Panel?.scrollbar?.IsMouseHovering == true)
+                return true;
+        }
+        return false;
     }
-    return false;
-}
 
 }

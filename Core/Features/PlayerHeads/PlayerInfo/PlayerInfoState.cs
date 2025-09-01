@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
-using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -75,6 +74,8 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             uiContainer.Append(titlePanel);
 
             _bottom = new UIElement { Width = { Percent = 1f }, Height = { Pixels = 40f }, VAlign = 1f, Top = { Pixels = -60f } };
+            _bottom.PaddingLeft = 0f;   
+            _bottom.PaddingRight = 0f;  
             uiContainer.Append(_bottom);
 
             _backBtn = new UITextPanel<string>("Back") { Height = { Pixels = 40f } }.WithFadedMouseOver();
@@ -102,10 +103,9 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
         {
             const float NAV_W = 36f;
 
-            var active = GetActivePlayerIndices();           // sorted by index (whoAmI)
+            var active = GetActivePlayerIndices();
             bool multi = Main.netMode != NetmodeID.SinglePlayer && active.Length > 1;
 
-            // Ensure arrow instances exist when needed
             if (multi)
             {
                 if (_prevBtn == null)
@@ -116,29 +116,32 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
                 }
                 if (_nextBtn == null)
                 {
-                    _nextBtn = new UITextPanel<string>(">", 1.0f, false) { Width = { Pixels = NAV_W }, Height = { Pixels = 40f }, HAlign = 1f }.WithFadedMouseOver();
+                    _nextBtn = new UITextPanel<string>(">", 1.0f, false) { Width = { Pixels = NAV_W }, Height = { Pixels = 40f } }.WithFadedMouseOver();
+                    _nextBtn.HAlign = 1f;                 // make it stick to the right edge
+                    _nextBtn.Left.Set(0f, 0f);            // no extra offset
                     _nextBtn.OnLeftClick += (_, __) => CyclePlayer(+1);
                 }
             }
 
-            // If not multiplayer or only one player: remove arrows and stretch Back
             if (!multi)
             {
                 if (_prevBtn?.Parent != null) _prevBtn.Remove();
                 if (_nextBtn?.Parent != null) _nextBtn.Remove();
                 _backBtn.Left.Set(0f, 0f);
                 _backBtn.Width.Set(0f, 1f);
+
+                _backBtn.Recalculate();   
+                _bottom.Recalculate();   
+                Recalculate();            
                 return;
             }
 
-            // We are in MP with 2+ active players:
             int pos = Array.IndexOf(active, _currentPlayerIndex);
-            if (pos < 0) pos = Array.BinarySearch(active, Main.myPlayer) >= 0 ? Array.BinarySearch(active, Main.myPlayer) : 0;
+            if (pos < 0) pos = 0;
 
             bool hasPrev = pos > 0;
             bool hasNext = pos < active.Length - 1;
 
-            // Add/remove the arrow elements based on availability
             if (hasPrev)
             {
                 if (_prevBtn.Parent == null) _bottom.Append(_prevBtn);
@@ -151,11 +154,17 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             }
             else if (_nextBtn?.Parent != null) _nextBtn.Remove();
 
-            // Lay out Back to fill remaining space
             float leftW = hasPrev ? NAV_W : 0f;
             float rightW = hasNext ? NAV_W : 0f;
+
             _backBtn.Left.Set(leftW, 0f);
             _backBtn.Width.Set(-(leftW + rightW), 1f);
+
+            _prevBtn?.Recalculate();
+            _nextBtn?.Recalculate();
+            _backBtn.Recalculate();
+            _bottom.Recalculate();
+            Recalculate();
         }
 
         private void CyclePlayer(int dir)
@@ -169,7 +178,6 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             if (dir < 0 && pos > 0) SetPlayerFromIndex(list[pos - 1]);
             else if (dir > 0 && pos < list.Length - 1) SetPlayerFromIndex(list[pos + 1]);
         }
-
         private void SetPlayerFromIndex(int idx)
         {
             if (idx < 0 || idx >= Main.maxPlayers) return;
@@ -177,6 +185,8 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             if (p == null || !p.active) return;
 
             _currentPlayerIndex = idx;
+            _whoAmI = idx; // <-- critical: keep Draw() in sync
+
             _playerName = p.name;
             titlePanel?.SetText($"Player: {_playerName}");
         }
@@ -223,12 +233,12 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             PlayerInfoDrawer.DrawMapFullscreenBackground(sb, bgRect);
 
             // Draw top left info
-            //if (Main.netMode != NetmodeID.SinglePlayer)
-            //{
-                //PlayerInfoDrawer.DrawTeamText(sb, cursor, player);
-                //cursor += new Vector2(0, 21);
-                //PlayerInfoDrawer.DrawPlayerID(sb, cursor, player);
-            //}
+            if (Main.netMode != NetmodeID.SinglePlayer)
+            {
+                PlayerInfoDrawer.DrawTeamText(sb, cursor, player);
+                cursor += new Vector2(0, 21);
+                PlayerInfoDrawer.DrawPlayerID(sb, cursor, player);
+            }
 
             // Draw player
             var playerPos = new Vector2(bgRect.X + bgRect.Width * 0.5f - 100f, bgRect.Y + 50);
@@ -347,8 +357,9 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
         private static void DrawInventory(SpriteBatch sb, Rectangle bgRect, Player player)
         {
-            var back = TextureAssets.InventoryBack.Value; var font = FontAssets.MouseText.Value; int size = 40, pad = 4; var start = new Vector2(bgRect.X, bgRect.Bottom + 52); Utils.DrawBorderStringBig(sb, "Inventory", new Vector2(start.X + 2, start.Y - 35), Color.White, 0.5f);
-
+            int size = 40, pad = 4; 
+            var start = new Vector2(bgRect.X, bgRect.Bottom + 52); 
+            Utils.DrawBorderStringBig(sb, "Inventory", new Vector2(start.X + 2, start.Y - 35), Color.White, 0.5f);
             bool TryEquipFromInventory(Player p, int invIndex)
             {
                 // we can only equip items from ourself
@@ -379,18 +390,35 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
             for (int i = 0; i < 50; i++)
             {
-                int row = i / 10, col = i % 10; var r = new Rectangle((int)(start.X + col * (size + pad)), (int)(start.Y + row * (size + pad)), size, size); sb.Draw(back, r, Color.White);
-                var it = player.inventory[i];
-                if (!it.IsAir)
+                int row = i / 10, col = i % 10; 
+                var r = new Rectangle((int)(start.X + col * (size + pad)), (int)(start.Y + row * (size + pad)), size, size);
+                var item = player.inventory[i];
+
+                // Draw special InvBack for held item
+                if (item == player.HeldItem)
+                    sb.Draw(TextureAssets.InventoryBack14.Value, r, Color.White);
+                else
+                    sb.Draw(TextureAssets.InventoryBack.Value, r, Color.White);
+
+                if (!item.IsAir)
                 {
-                    ItemSlot.DrawItemIcon(it, 31, sb, r.Center(), 0.9f, size - 6, Color.White);
+                    ItemSlot.DrawItemIcon(item, 31, sb, r.Center(), 0.9f, size - 6, Color.White);
                     if (r.Contains(Main.MouseScreen.ToPoint()))
                     {
-                        UICommon.TooltipMouseText(""); Main.LocalPlayer.mouseInterface = true; Main.HoverItem = it.Clone(); Main.hoverItemName = it.Name;
-                        if (Main.mouseRight && Main.mouseRightRelease && !PlayerInput.IgnoreMouseInterface) { if (TryEquipFromInventory(player, i)) Main.mouseRightRelease = false; }
+                        UICommon.TooltipMouseText(""); Main.LocalPlayer.mouseInterface = true; Main.HoverItem = item.Clone();
+                        Main.hoverItemName = item.Name;
+                        if (Main.mouseRight && Main.mouseRightRelease && !PlayerInput.IgnoreMouseInterface)
+                        {
+                            if (TryEquipFromInventory(player, i)) Main.mouseRightRelease = false;
+                        }
                     }
                 }
-                if (i < 10) { string label = i == 9 ? "0" : (i + 1).ToString(); var ls = font.MeasureString(label); var lp = new Vector2(r.Right - ls.X - 28f, r.Bottom - ls.Y - 12f); Utils.DrawBorderString(sb, label, lp, Color.White, 0.75f, 0f, 0f); }
+                if (i < 10) 
+                { 
+                    string label = i == 9 ? "0" : (i + 1).ToString(); 
+                    Vector2 numberPos = new(r.Right - 35f, r.Bottom - 38f); 
+                    Utils.DrawBorderString(sb, label, numberPos, Color.White, 0.75f, 0f, 0f); 
+                }
             }
         }
 

@@ -7,6 +7,7 @@ using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.PlayerHeads;
@@ -36,13 +37,13 @@ public class PlayerHeadElement : BaseElement<PlayerHead>
         ChatManager.DrawColorCodedStringShadow(sb, FontAssets.MouseText.Value, snip, pos, Color.Black, 0f, Vector2.Zero, Vector2.One);
 
         // Draw player name in synced color
-        //string hex = "FFFFFF";
-        //if (AssignPlayerColorsSystem.PlayerColors.TryGetValue(Data.PlayerIndex, out var syncedHex))
-        //    hex = syncedHex ?? "FFFFFF";
+        string hex = "FFFFFF";
+        if (AssignPlayerColorsSystem.PlayerColors.TryGetValue(Data.PlayerIndex, out var syncedHex))
+            hex = syncedHex ?? "FFFFFF";
 
-        //var coloredSnips = ChatManager.ParseMessage($"[c/{hex}:{Data.PlayerName}:]", Color.White).ToArray();
-        //ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, coloredSnips,
-        //    pos, 0f, Vector2.Zero, Vector2.One, out _, 500f);
+        var coloredSnips = ChatManager.ParseMessage($"[c/{hex}:{Data.PlayerName}:]", Color.White).ToArray();
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, coloredSnips,
+            pos, 0f, Vector2.Zero, Vector2.One, out _, 500f);
 
         // hover click action handler
         Rectangle bounds = new((int)pos.X - 34, (int)pos.Y, (int)26, (int)26);
@@ -52,7 +53,6 @@ public class PlayerHeadElement : BaseElement<PlayerHead>
 
             if (player?.active == true && Conf.C.ShowPlayerPreviewWhenHovering)
             {
-                PlayerInfoDrawer.Draw(sb, player);
             }
         }
     }

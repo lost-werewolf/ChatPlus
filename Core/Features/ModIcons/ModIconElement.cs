@@ -1,7 +1,11 @@
+using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.ModIcons.ModInfo;
+using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
 
@@ -28,7 +32,7 @@ public class ModIconElement : BaseElement<ModIcon>
             sb,
             FontAssets.MouseText.Value,
             tag,
-            pos + new Microsoft.Xna.Framework.Vector2(3,2),
+            pos + new Microsoft.Xna.Framework.Vector2(3, 2),
             Color.White,
             0f,            // rotation
             Vector2.Zero,  // origin
@@ -42,11 +46,15 @@ public class ModIconElement : BaseElement<ModIcon>
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32, 4), 0f, Vector2.Zero, Vector2.One, out _);
 
         // tag hover tooltip of mod name
-        Rectangle bounds = new((int)pos.X-34, (int)pos.Y, (int)26, (int)26);
-        //sb.Draw(TextureAssets.MagicPixel.Value, bounds, Color.Red);
+        Rectangle bounds = new((int)pos.X - 30, (int)pos.Y, (int)30, (int)30);
+
         if (bounds.Contains(Main.MouseScreen.ToPoint()))
         {
-            UICommon.TooltipMouseText(Data.mod.DisplayName);
+            if (!Conf.C.ShowModPreviewWhenHovering) return;
+            HoveredModOverlay.Set(Data.mod);
         }
+
+        // debug
+        //sb.Draw(TextureAssets.MagicPixel.Value, bounds, Color.Red);
     }
 }

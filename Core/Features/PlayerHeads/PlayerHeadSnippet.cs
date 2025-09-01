@@ -1,12 +1,9 @@
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
-using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Chat;
-using Terraria.GameContent;
-using Terraria.ModLoader.UI;
+using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -26,12 +23,12 @@ public class PlayerHeadSnippet : TextSnippet
     }
 
     public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch sb,
-    Vector2 position = default, Color color = default, float scale = 1f)
+    Vector2 pos = default, Color color = default, float scale = 1f)
     {
         const float box = 26f;
         scale = 0.75f;
 
-        size = new Vector2(box * scale + 9f, box * scale);
+        size = new Vector2(box * scale + 1, box * scale);
 
         if (justCheckingString || color == Color.Black) return true;
 
@@ -42,20 +39,25 @@ public class PlayerHeadSnippet : TextSnippet
         // draw head
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
-        var pos = new Vector2(position.X + 8f, position.Y + 8f);
+        pos = new Vector2(pos.X + 8f, pos.Y + 8f);
         PlayerHeadFlipHook.shouldFlipHeadDraw = player.direction == -1;
         Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, pos, 1f, scale, Color.White);
         PlayerHeadFlipHook.shouldFlipHeadDraw = false;
 
+        // debug
+        //Rectangle debugRect = new((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
+        //sb.Draw(TextureAssets.MagicPixel.Value, debugRect, Color.Red * 0.25f);
+
         // hover
         int width = (int)size.X;
-        int nameWidth = (int)FontAssets.MouseText.Value.MeasureString(player.name).X;
-        width += nameWidth + 10;
-        var hoverRect = new Rectangle((int)position.X, (int)position.Y, width, (int)size.Y);
+        //int nameWidth = (int)FontAssets.MouseText.Value.MeasureString(player.name).X;
+        //width += nameWidth + 10;
+        var hoverRect = new Rectangle((int)pos.X - 10, (int)pos.Y - 6, width + 3, (int)size.Y + 3);
         if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
         {
-            //if (Conf.C.ShowPlayerPreviewWhenHovering)
-                //PlayerInfoDrawer.Draw(sb, player);
+            if (!Conf.C.ShowPlayerPreviewWhenHovering) return false;
+            
+            HoveredPlayerOverlay.Set(_playerIndex);
 
             if (Main.mouseLeft && Main.mouseLeftRelease)
                 OnClick();
@@ -86,7 +88,7 @@ public class PlayerHeadSnippet : TextSnippet
         }
 
         // Snapshot current chat so the info UI can restore it later
-        var snap = ChatSession.Capture();                
+        var snap = ChatSession.Capture();
 
         state.SetPlayer(_playerIndex, plr.name);          // tell the UI which player to show
         state.SetReturnSnapshot(snap);                    // so Back can restore chat/session
@@ -101,11 +103,9 @@ public class PlayerHeadSnippet : TextSnippet
 
         if (_playerIndex >= 0 && _playerIndex < Main.maxPlayers)
         {
-            Player player = Main.player[_playerIndex];
-            if (player?.active == true && Conf.C.ShowPlayerPreviewWhenHovering)
-            {
-                PlayerInfoDrawer.Draw(Main.spriteBatch, player);
-            }
+            if (!Conf.C.ShowPlayerPreviewWhenHovering) return;
+
+            HoveredPlayerOverlay.Set(_playerIndex);
         }
     }
 }

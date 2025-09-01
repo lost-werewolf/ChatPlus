@@ -66,9 +66,6 @@ namespace ChatPlus.Core.Chat
 
         private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
         {
-            // Debug player draw info
-            //PlayerInfoDrawer.Draw(Main.spriteBatch, Main.LocalPlayer);
-
             if (!Main.drawingPlayerChat) { orig(self); return; }
 
             PlayerInput.WritingText = true;

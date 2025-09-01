@@ -21,13 +21,13 @@ namespace ChatPlus.Common.ModCommands
         {
             Main.NewText("[c/fff014:Tags:]");
 
-            Main.NewText("Commands      /");
+            Main.NewText("Commands   /");
             Main.NewText("Colors        [c");
             Main.NewText("Emojis        [e");
             Main.NewText("Glyphs        [g");
-            Main.NewText("Items         [i");
+            Main.NewText("Items          [i");
             Main.NewText("Mods          [m");
-            Main.NewText("Players       [p");
+            Main.NewText("Players        [p");
             Main.NewText("Uploads       [u");
         }
     }

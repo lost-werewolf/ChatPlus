@@ -1,8 +1,4 @@
-﻿using System;
-using System.Buffers.Text;
-using System.Diagnostics;
-using ChatPlus.Core.Helpers;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
@@ -24,7 +20,7 @@ public class LinkSnippet : TextSnippet
         }
         else
         {
-            return new Color(32, 160, 255); 
+            return new Color(32, 160, 255);
         }
     }
 

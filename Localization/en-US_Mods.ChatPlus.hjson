@@ -89,5 +89,10 @@ Configs: {
 			Label: Show Player Preview When Hovering
 			Tooltip: Shows a preview of a player and their stats when hovering a player head.
 		}
+
+		ShowModPreviewWhenHovering: {
+			Label: Show Mod Preview When Hovering
+			Tooltip: ""
+		}
 	}
 }

@@ -1,12 +1,16 @@
+using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria.UI;
-
-namespace ChatPlus.Core.Features.PlayerHeads;
+using Terraria;
 
 public class PlayerHeadState : BaseState<PlayerHead>
 {
-    public PlayerHeadState() : base(new PlayerHeadPanel(), new DescriptionPanel<PlayerHead>())
+    public PlayerHeadState() : base(new PlayerHeadPanel(), new DescriptionPanel<PlayerHead>()) { }
+
+    private Player hoveredPlayer;
+
+    public override void Draw(SpriteBatch spriteBatch)
     {
+        base.Draw(spriteBatch);
     }
 }

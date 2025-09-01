@@ -55,7 +55,7 @@ public class PlayerIconsConfigElement : ConfigElement<bool>
         if (player == null)
         {
             // custom draw guide if no player was found (e.g player is in main menu).
-            var guide = Ass.GuideHead.Value;
+            var guide = Ass.AuthorIcon.Value;
             Rectangle guideRect = new((int)pos.X, (int)pos.Y, 40, 40);
             sb.Draw(guide, guideRect, Color.White);
             return;

@@ -251,8 +251,23 @@ Done:
 
 ~---~
 Todo:
-[todo] Fix mod info open tooltip preview panel with mod side and more, click to open info state
-[todo] Fix steam workshop click
-[todo] Add left right buttons to scroll players
-[todo] Implement player color and assigning
+[done] Fix mod info open tooltip preview panel with mod side and more, click to open info state
+[done] Add left right buttons to scroll players
+[done] Implement player color and assigning
+[done] Fix player and mod icon hover to go above all other interface layers
 
+~~~~
+Mod icon drawer:
+Row 1: Side (client/both)
+Row 2: File size
+Row 3: Last updated (1 hour ago, 14 days ago), etc
+Row 4: Version
+Row 5: author
+
+~~~~~
+Todo:
+[todo] Fix initial opening state doesnt show right header
+[todo] Add example images
+[todo] Add example links
+[todo] Fix steam workshop click
+[todo] Finish mod info state

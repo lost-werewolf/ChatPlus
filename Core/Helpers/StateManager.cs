@@ -7,6 +7,7 @@ using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -64,6 +65,7 @@ public static class StateManager
         var modIconSys = ModContent.GetInstance<ModIconSystem>();
         var playerHeadSys = ModContent.GetInstance<PlayerHeadSystem>();
         var uploadSys = ModContent.GetInstance<UploadSystem>();
+    var linkSys = ModContent.GetInstance<LinkSystem>();
 
         return cmdSys?.ui?.CurrentState != null ||
                colorSys?.ui?.CurrentState != null ||
@@ -72,7 +74,8 @@ public static class StateManager
                itemSys?.ui?.CurrentState != null ||
                modIconSys?.ui?.CurrentState != null ||
                playerHeadSys?.ui?.CurrentState != null ||
-               uploadSys?.ui?.CurrentState != null;
+               uploadSys?.ui?.CurrentState != null ||
+               linkSys?.ui?.CurrentState != null;
     }
 
     public static void CloseOthers(UserInterface keep)
@@ -91,6 +94,7 @@ public static class StateManager
         var modIconSys = ModContent.GetInstance<ModIconSystem>();
         var playerHeadSys = ModContent.GetInstance<PlayerHeadSystem>();
         var uploadSys = ModContent.GetInstance<UploadSystem>();
+    var linkSys = ModContent.GetInstance<LinkSystem>();
 
         Close(cmdSys?.ui);
         Close(colorSys?.ui);
@@ -100,5 +104,6 @@ public static class StateManager
         Close(modIconSys?.ui);
         Close(playerHeadSys?.ui);
         Close(uploadSys?.ui);
+    Close(linkSys?.ui);
     }
 }

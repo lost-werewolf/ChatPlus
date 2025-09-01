@@ -59,8 +59,6 @@ internal class AddNewMessageSystem : ModSystem
             if (m.Success) senderName = m.Groups["name"].Value;
         }
 
-        Log.Info($"raw='{text}' sender='{senderName ?? "<null>"}'");
-
         // 3. Add player icon
         if (!string.IsNullOrEmpty(senderName))
         {
@@ -98,18 +96,15 @@ internal class AddNewMessageSystem : ModSystem
             if (who >= 0 && AssignPlayerColorsSystem.PlayerColors.TryGetValue(who, out var syncedHex))
             {
                 hex = string.IsNullOrWhiteSpace(syncedHex) ? "FFFFFF" : syncedHex.ToUpperInvariant();
-                Log.Info($"[AddNewMessage] using synced color who={who} name='{senderName}' hex={hex}");
             }
             else
             {
                 // Fallback so messages format immediately even if SyncSingle/All hasn't arrived yet
                 hex = PlayerColorHandler.HexFromName(senderName);
-                Log.Info($"[AddNewMessage] fallback color (no sync yet) name='{senderName}' hex={hex}");
             }
 
             string colored = $"[c/{hex}:{senderName}:]";
             resultText = resultText.Replace(nameTagFull, colored);
-            Log.Info($"[AddNewMessage] rewrote name tag -> {colored}");
         }
 
         orig(self, resultText, color, widthLimitInPixels);

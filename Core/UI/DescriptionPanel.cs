@@ -1,25 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using ChatPlus.Common.Configs;
+﻿using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.Colors;
+using ChatPlus.Core.Features.Commands;
+using ChatPlus.Core.Features.Emojis;
+using ChatPlus.Core.Features.Glyphs;
+using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.ModIcons;
-using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Features.PlayerHeads;
-using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 using ChatPlus.Core.Features.Uploads;
-using ChatPlus.Core.Helpers;
+using ChatPlus.Core.Features.Links;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader;
-using Terraria.ModLoader.Core;
 using Terraria.UI;
-using Terraria.Utilities.FileBrowser;
-using static nativefiledialog;
 
 namespace ChatPlus.Core.UI
 {
@@ -44,18 +36,36 @@ namespace ChatPlus.Core.UI
             // Size
             Width.Set(320, 0);
             Height.Set(60, 0);
-            BackgroundColor = new Color(33,43,79) * 1.0f;
+            BackgroundColor = new Color(33, 43, 79) * 1.0f;
             VAlign = 1f;
             Left.Set(190, 0);
 
-            // Text
-            text = new(initialText ?? string.Empty, 0.9f, false);
+            // Provide immediate default header so first open frame isn't blank.
+            if (string.IsNullOrEmpty(initialText))
+            {
+                if (typeof(TData) == typeof(Command)) initialText = "[c/FFF014:Commands]";
+                else if (typeof(TData) == typeof(ColorItem)) initialText = "[c/FFF014:Colors]";
+                else if (typeof(TData) == typeof(Emoji)) initialText = "[c/FFF014:Emojis]";
+                else if (typeof(TData) == typeof(Glyph)) initialText = "[c/FFF014:Glyphs]";
+                else if (typeof(TData) == typeof(Item)) initialText = "[c/FFF014:Items]";
+                else if (typeof(TData) == typeof(ModIcon)) initialText = "[c/FFF014:Mods]";
+                else if (typeof(TData) == typeof(PlayerHead)) initialText = "[c/FFF014:Players]";
+                else if (typeof(TData) == typeof(Upload)) initialText = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
+                else if (typeof(TData) == typeof(LinkEntry)) initialText = "[c/FFF014:Links]";
+                else initialText = string.Empty;
+            }
+
+            // Text element
+            text = new(initialText, 0.9f, false);
 
             Append(text);
         }
 
         public override void LeftClick(UIMouseEvent evt)
         {
+            if (IsDragging)
+                return;
+
             // Uploads
             if (typeof(TData) == typeof(Upload) && ConnectedPanel is UploadPanel up)
             {
@@ -77,9 +87,12 @@ namespace ChatPlus.Core.UI
                 return;
             }
         }
-        
+
         public override void RightClick(UIMouseEvent evt)
         {
+            if (IsDragging)
+                return;
+
             // Uploads
             if (typeof(TData) == typeof(Upload) && ConnectedPanel is UploadPanel up)
             {
@@ -96,7 +109,7 @@ namespace ChatPlus.Core.UI
             // Special case: uploads
             if (typeof(TData) == typeof(Upload))
             {
-                string t ="[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
+                string t = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
                 text.SetText(t);
                 text.VAlign = 0f;
                 Height.Set(62, 0);

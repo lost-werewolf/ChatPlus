@@ -21,7 +21,6 @@ public class ModInfoState : UIState, ILoadable
     public string modDisplayName;
     public UITextPanel<string> titlePanel;
 
-    // Add these fields to your ModInfoState class:
     private string modInternalName;
     private string workshopURL;
 
@@ -30,7 +29,6 @@ public class ModInfoState : UIState, ILoadable
     private UIElement messageBox;
     private UIScrollbar scrollbar;
 
-    // Store reflection info to avoid looking it up repeatedly
     private static Type messageBoxType;
     private static MethodInfo setTextMethod;
     private static MethodInfo setScrollbarMethod;
@@ -176,6 +174,8 @@ public class ModInfoState : UIState, ILoadable
         // This only works for enabled mods.
         LocalMod[] mods = ModOrganizer.FindAllMods();
         LocalMod mod = Array.Find(mods, m => m.Name.Equals(modInternalName, StringComparison.OrdinalIgnoreCase));
+        //LocalMod localMod = ModHelper.GetLocalMod(modInternalName);
+
         TmodFile modFile = mod.modFile;
 
         if (mod != null)

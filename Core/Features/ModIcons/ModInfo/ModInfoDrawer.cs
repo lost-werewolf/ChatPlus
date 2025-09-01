@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Core;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -20,6 +23,8 @@ public static class ModInfoDrawer
     /// </summary>
     public static void Draw(SpriteBatch sb, Mod mod)
     {
+        if (mod == null) return;
+
         // Dimensions
         const int panelWidth = 96;
         const int gutter = 10;
@@ -28,7 +33,7 @@ public static class ModInfoDrawer
         const int W = panelWidth * 2 + gutter + side * 2;
         const int rowHeight = 31;
         var pos = Main.MouseScreen + new Vector2(20, 20);
-        //pos = new(300, 300); // debug
+        //textPos = new(300, 300); // debug
         pos.X = Math.Clamp(pos.X, 0, Main.screenWidth - W);
         pos.Y = Math.Clamp(pos.Y, 0, Main.screenHeight - H);
         var rect = new Rectangle((int)pos.X, (int)pos.Y, W, H);
@@ -36,295 +41,173 @@ public static class ModInfoDrawer
         // Draw background and player
         DrawFullBGPanel(sb, rect);
         DrawModNameText(sb, rect, mod);
-        var cursor = pos + new Vector2(side, 32);
+        Vector2 cursor = pos + new Vector2(side, 32);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
-        cursor += new Vector2(0, 10);
-        rect = new Rectangle((int)cursor.X, (int)cursor.Y, W - side * 2, 100);
-        DrawSeparatorBorder(sb, rect);
-        DrawSurfaceBackground(sb, rect);
-        cursor += new Vector2(0, 110);
+        cursor += new Vector2(-side, 10);
+        rect = new Rectangle((W-100)/2, (int)cursor.Y, 100, 100);
+        //DrawSeparatorBorder(sb, texRect);
+        DrawBigModIcon(sb, cursor, W, mod);
+        cursor += new Vector2(7, 110);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
 
         // Draw stats rows
-        cursor += new Vector2(0, 10);
-        int leftColumn = (int)cursor.X;
-        int rightColumn = leftColumn + panelWidth + gutter;
+        cursor += new Vector2(0, 14);
+        int left = (int)cursor.X;
 
-        // Draw row 1
-        //DrawStat_HP(sb, new Rectangle(leftColumn, (int)cursor.Y, panelWidth, rowHeight), player);
-        //DrawStat_Mana(sb, new Rectangle(rightColumn, (int)cursor.Y, panelWidth, rowHeight), player);
-
-        //// Draw row 2
-        //int rowY2 = (int)cursor.Y + rowHeight + 6;
-        //DrawStat_Defense(sb, new Rectangle(leftColumn, rowY2, panelWidth, rowHeight), player);
-        //DrawStat_DeathCount(sb, new Rectangle(rightColumn, rowY2, panelWidth, rowHeight), player);
-
-        //// Draw row 3
-        //int rowY3 = (int)cursor.Y + rowHeight * 2 + 6 * 2;
-        //DrawStat_Coins(sb, new Rectangle(leftColumn, rowY3, panelWidth, rowHeight), player);
-        //DrawStat_Ammo(sb, new Rectangle(rightColumn, rowY3, panelWidth, rowHeight), player);
-
-        //// Draw row 4
-        //int rowY4 = (int)cursor.Y + rowHeight * 3 + 6 * 3;
-        //DrawStat_Minions(sb, new Rectangle(leftColumn, rowY4, panelWidth, rowHeight), player);
-        //DrawStat_Sentries(sb, new Rectangle(rightColumn, rowY4, panelWidth, rowHeight), player);
-
-        //// Draw row 5
-        //int rowY5 = (int)cursor.Y + rowHeight * 4 + 6 * 4;
-        //DrawStat_HeldItem(sb, new Rectangle(leftColumn, rowY5, panelWidth, rowHeight), player);
-        //DrawStat_LastCreatureHit(sb, new Rectangle(rightColumn, rowY5, panelWidth, rowHeight), player);
+        // Draw rows
+        DrawStat_ModSide(sb, new Rectangle(left, (int)cursor.Y, panelWidth, rowHeight), mod);
+        DrawStat_FileSize(sb, new Rectangle(left, (int)cursor.Y + (rowHeight + 6) * 1, panelWidth, rowHeight), mod);
+        DrawStat_LastUpdated(sb, new Rectangle(left, (int)cursor.Y + (rowHeight + 6) * 2, panelWidth, rowHeight), mod);
+        DrawStat_Version(sb, new Rectangle(left, (int)cursor.Y + (rowHeight + 6) * 3, panelWidth, rowHeight), mod);
+        DrawStat_Author(sb, new Rectangle(left, (int)cursor.Y + (rowHeight + 6) * 4, panelWidth, rowHeight), mod);
     }
-
+    private static readonly Dictionary<string, string> _authorCache = new(StringComparer.OrdinalIgnoreCase);
 
     #region Stats
-    public static void DrawStat_HeldItem(SpriteBatch sb, Rectangle rect, Player player)
+
+    public static void DrawStat_ModSide(SpriteBatch sb, Rectangle rect, Mod mod)
     {
-        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
+        var statPanelTexture = Ass.StatPanel;
+        var rect2 = new Rectangle(rect.X, rect.Y, statPanelTexture.Width() * 2+7, statPanelTexture.Height());
+        sb.Draw(statPanelTexture.Value, rect2, Color.White);
 
-        Item held = player.HeldItem;
-        if (held == null || held.IsAir)
-            held = new Item(ItemID.None);
+        var sideTex = Ass.ServerIcon;
+        if (mod.Side.ToString().Equals("Client", StringComparison.InvariantCultureIgnoreCase))
+            sideTex = Ass.ClientIcon;
 
-        var pos = new Vector2(rect.X + 15, rect.Y + 15);
-        ItemSlot.DrawItemIcon(held, 31, sb, pos, 0.8f, 32f, Color.White);
-
-        string t = held.IsAir ? "(none)" : held.Name;
-        if (t.Length > 8) t = t.Substring(0, 8) + "...";
-        var tp = new Vector2(rect.X + 10, rect.Y + 4);
-        if (t.Length <= 7)
-        {
-            tp += new Vector2(16, 0);
-        }
-
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
-    }
-    public static void DrawStat_DPS(SpriteBatch sb, Rectangle rect, Player player)
-    {
-        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
-
-        // DPS meter uses a 60 tick rolling window in vanilla
-        int dps = player.dpsDamage;
-        string t = $"{dps}";
-
-        // Icon: DPS Meter
-        var pos = new Vector2(rect.X + 15, rect.Y + 15);
-        ItemSlot.DrawItemIcon(new Item(ItemID.DPSMeter), 31, sb, pos, 0.8f, 32f, Color.White);
-
-        var tp = new Vector2(rect.X + 52, rect.Y + 4);
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+        sb.Draw(sideTex.Value, new Vector2(rect.X+2, rect.Y + 5), Color.White);
+        Utils.DrawBorderString(sb, $"Side: {mod.Side}", new Vector2(rect2.X + 28, rect2.Y + 5), Color.White);
     }
 
-    public static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_Author(SpriteBatch sb, Rectangle rect, Mod mod)
     {
-        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
-        int max = player.maxMinions; int cur = (int)Math.Round(player.slotsMinions); int bestProj = -1; float bestScore = 0f; var owned = player.ownedProjectileCounts; int limit = owned.Length;
-        for (int t = 0; t < limit; t++)
+        var statPanelTexture = Ass.StatPanel;
+        var rect2 = new Rectangle(rect.X, rect.Y, statPanelTexture.Width() * 2 + 7, statPanelTexture.Height());
+        sb.Draw(statPanelTexture.Value, rect2, Color.White);
+
+        // icon
+        sb.Draw(Ass.AuthorIcon.Value, new Vector2(rect.X, rect.Y + 5), Color.White);
+        //sb.Draw(Ass.FileSizeIcon.Value, new Vector2(rect.X, rect.Y - 2), null, Color.White, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
+
+
+        // Resolve + cache author from build properties (no mod.Author in tML)
+        if (!_authorCache.TryGetValue(mod.Name, out var authorText))
         {
-            int c = owned[t]; if (c <= 0) continue; var proj = ContentSamples.ProjectilesByType[t]; if (!proj.minion) continue; if (!(proj.minionSlots > 0f)) continue; float score = c * proj.minionSlots; if (score > bestScore) { bestScore = score; bestProj = t; }
-        }
-        Item icon = new(ItemID.SlimeStaff);
-        if (bestProj >= 0)
-        {
-            foreach (var kv in ContentSamples.ItemsByType)
+            try
             {
-                var it = kv.Value; if (it == null) continue; if (it.summon || it.DamageType == DamageClass.Summon) { if (it.shoot == bestProj) { icon = new Item(it.type); break; } }
+                var localMod = ModHelper.GetLocalMod(mod); // your helper; returns LocalMod
+                authorText = localMod?.properties?.author;
+                if (string.IsNullOrWhiteSpace(authorText))
+                    authorText = "Unknown";
             }
-        }
-        var pos = new Vector2(rect.X + 15, rect.Y + 15); ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.8f, 32f, Color.White);
-        var tp = new Vector2(rect.X + 52, rect.Y + 4); Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
-    }
-
-    public static void DrawStat_Sentries(SpriteBatch sb, Rectangle rect, Player player)
-    {
-        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
-        int max = player.maxTurrets; int cur = 0; int bestProj = -1; int bestCount = 0;
-        for (int t = 0; t < player.ownedProjectileCounts.Length; t++)
-        {
-            int c = player.ownedProjectileCounts[t]; if (c <= 0) continue;
-            var proj = ContentSamples.ProjectilesByType[t]; if (!proj.sentry) continue;
-            cur += c;
-            if (c > bestCount) { bestCount = c; bestProj = t; }
-        }
-        Item icon = new(ItemID.QueenSpiderStaff); // fallback
-        if (bestProj >= 0)
-        {
-            foreach (var kv in ContentSamples.ItemsByType)
+            catch
             {
-                var it = kv.Value; if (it == null) continue;
-                if (it.summon || it.DamageType == DamageClass.Summon) { if (it.shoot == bestProj) { icon = new Item(it.type); break; } }
+                authorText = "Unknown";
             }
-        }
-        var pos = new Vector2(rect.X + 15, rect.Y + 15); ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.8f, 32f, Color.White);
-        var tp = new Vector2(rect.X + 52, rect.Y + 4); Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
-    }
-    public static void DrawStat_Defense(SpriteBatch sb, Rectangle rect, Player player)
-    {
-        // Draw background
-        var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_Defense");
-        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
-        sb.Draw(tex.Value, rect, Color.White);
-
-        // Draw defense text
-        var defenseText = $"{player.statDefense}";
-        var snippets = ChatManager.ParseMessage(defenseText, Color.White).ToArray();
-        var pos = new Vector2(rect.X + 52, rect.Y + 4);
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
-    }
-
-    public static void DrawStat_HP(SpriteBatch sb, Rectangle rect, Player player)
-    {
-        // Draw background
-        var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_HP");
-        var rect2 = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
-        sb.Draw(tex.Value, rect2, Color.White);
-
-        // Draw HP text
-        var lifeText = $"{player.statLife}/{player.statLifeMax2}";
-        var snippets = ChatManager.ParseMessage(lifeText, Color.White).ToArray();
-        var pos = new Vector2(rect2.X + 32, rect2.Y + 4);
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
-    }
-
-    public static void DrawStat_Mana(SpriteBatch sb, Rectangle rect, Player player)
-    {
-        // Draw background
-        var tex = Ass.StatPanel;
-        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
-        sb.Draw(tex.Value, rect, Color.White);
-
-        // Draw mana texture
-        var manaTex = TextureAssets.Mana;
-        var manaRect = new Rectangle(rect.X + 4, rect.Y + 2, manaTex.Width(), manaTex.Height());
-        sb.Draw(TextureAssets.Mana.Value, manaRect, Color.White);
-
-        // Draw mana text
-        var manaText = $"{player.statMana}/{player.statManaMax2}";
-        var size = FontAssets.MouseText.Value.MeasureString(manaText);
-        var textPos = new Vector2(rect.X + rect.Width - size.X - 5, rect.Y + 5);
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, manaText, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
-    }
-
-    public static void DrawStat_DeathCount(SpriteBatch sb, Rectangle rect, Player player)
-    {
-        // Draw background
-        var tex = Ass.StatPanel;
-        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
-        sb.Draw(tex.Value, rect, Color.White);
-
-        // Draw plat
-        var item = new Item(ItemID.Tombstone);
-        var pos = new Vector2(rect.X + 15, rect.Y + 15);
-        ItemSlot.DrawItemIcon(item, 31, sb, pos, 0.8f, 32f, Color.White);
-
-        // Draw death count
-        var deathCount = player.numberOfDeathsPVE.ToString();
-        var size = FontAssets.MouseText.Value.MeasureString(deathCount);
-        var textPos = new Vector2(rect.X + 52, rect.Y + 4);
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, deathCount, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
-    }
-    public static void DrawStat_Coins(SpriteBatch sb, Rectangle rect, Player player)
-    {
-        // Draw background
-        var tex = Ass.StatPanel;
-        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
-        sb.Draw(tex.Value, rect, Color.White);
-
-        long total = 0;
-        for (int i = 50; i <= 53; i++)
-        {
-            var it = player.inventory[i];
-            if (it.IsAir) continue;
-            if (it.type == ItemID.PlatinumCoin)
-                total += it.stack * 1_000_000L;
-            else if (it.type == ItemID.GoldCoin)
-                total += it.stack * 10_000L;
-            else if (it.type == ItemID.SilverCoin)
-                total += it.stack * 100L;
-            else if (it.type == ItemID.CopperCoin)
-                total += it.stack;
+            _authorCache[mod.Name] = authorText;
         }
 
-        long rem = total;
-        int p = (int)(rem / 1_000_000L);
-        rem %= 1_000_000L;
-        int g = (int)(rem / 10_000L);
-        rem %= 10_000L;
-        int s = (int)(rem / 100L);
-        int c = (int)(rem % 100L);
+        if (authorText.Length > 9)
+            authorText = authorText.Substring(0, 9) + "...";
 
-        var font = FontAssets.MouseText.Value;
-        var pos = new Vector2(rect.X + 6, rect.Y + 8);
-        int iconSize = 32;
-        float scale = 0.8f;
-        float dx = 28f;
-
-        if (p <= 99)
-        {
-            ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos, scale, iconSize, Color.White);
-            Utils.DrawBorderStringFourWay(sb, font, p.ToString() ?? p.ToString() ?? p.ToString().ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
-            pos.X += dx;
-            ItemSlot.DrawItemIcon(new Item(ItemID.GoldCoin), 31, sb, pos, scale, iconSize, Color.White);
-            Utils.DrawBorderStringFourWay(sb, font, g.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
-            pos.X += dx;
-            ItemSlot.DrawItemIcon(new Item(ItemID.SilverCoin), 31, sb, pos, scale, iconSize, Color.White);
-            Utils.DrawBorderStringFourWay(sb, font, s.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
-            pos.X += dx;
-            ItemSlot.DrawItemIcon(new Item(ItemID.CopperCoin), 31, sb, pos, scale, iconSize, Color.White);
-            Utils.DrawBorderStringFourWay(sb, font, c.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
-        }
-        else
-        {
-            pos.X += 4;
-            scale = 0.9f;
-            ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos + new Vector2(11, 0), scale, iconSize, Color.White);
-            Utils.DrawBorderStringFourWay(sb, font, p.ToString() ?? p.ToString() ?? p.ToString().ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
-            pos.X += dx + 14;
-            ItemSlot.DrawItemIcon(new Item(ItemID.GoldCoin), 31, sb, pos, scale, iconSize, Color.White);
-            Utils.DrawBorderStringFourWay(sb, font, g.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
-            pos.X += dx;
-            ItemSlot.DrawItemIcon(new Item(ItemID.SilverCoin), 31, sb, pos, scale, iconSize, Color.White);
-            Utils.DrawBorderStringFourWay(sb, font, s.ToString(), pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
-            pos.X += dx;
-        }
+        Utils.DrawBorderString(sb, $"Author: {authorText}", new Vector2(rect2.X + 28, rect2.Y + 5), Color.White);
     }
 
-    public static void DrawStat_Ammo(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_FileSize(SpriteBatch sb, Rectangle rect, Mod mod)
     {
-        // Draw background
-        var tex = Ass.StatPanel;
-        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
-        sb.Draw(tex.Value, rect, Color.White);
+        var statPanelTexture = Ass.StatPanel;
+        var rect2 = new Rectangle(rect.X, rect.Y, statPanelTexture.Width() * 2 + 7, statPanelTexture.Height());
+        sb.Draw(statPanelTexture.Value, rect2, Color.White);
 
-        // Summarize stacks for each ammo slot and draw the one with the most
-        int highestStack = 0;
-        Item highestStackItem = new(ItemID.WoodenArrow);
-        for (int i = 54; i <= 57; i++)
-        {
-            var item = player.inventory[i];
-            if (item.IsAir) continue;
+        sb.Draw(Ass.FileSizeIcon.Value, new Vector2(rect.X-5, rect.Y -2), null, Color.White, 0f, Vector2.Zero, 1.5f, SpriteEffects.None, 0f);
 
-            if (item.stack > highestStack)
-            {
-                highestStack = item.stack;
-                highestStackItem = item;
-            }
-        }
-
-        // Draw item
-        var pos = new Vector2(rect.X + 15, rect.Y + 15);
-        ItemSlot.DrawItemIcon(highestStackItem, 31, sb, pos, 0.8f, 32f, Color.White);
-
-        // Draw ammo count
-        string highestAmmoStack = highestStack.ToString();
-        var size = FontAssets.MouseText.Value.MeasureString(highestAmmoStack);
-        var textPos = new Vector2(rect.X + 52, rect.Y + 4);
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, highestAmmoStack, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+        // Uses your ModMetaCache (cached per-mod; no re-scan each frame)
+        var meta = ModMetaCache.Get(mod);
+        string sizeText = meta.size > 0 ? $"{meta.size / 1024f / 1024f:0.00} MB" : "n/a";
+        Utils.DrawBorderString(sb, $"Size: {sizeText}", new Vector2(rect2.X + 28, rect2.Y + 5), Color.White);
     }
+
+    public static void DrawStat_LastUpdated(SpriteBatch sb, Rectangle rect, Mod mod)
+    {
+        var statPanelTexture = Ass.StatPanel;
+        var rect2 = new Rectangle(rect.X, rect.Y, statPanelTexture.Width() * 2 + 7, statPanelTexture.Height());
+        sb.Draw(statPanelTexture.Value, rect2, Color.White);
+
+        var tex = Main.Assets.Request<Texture2D>("Images/UI/VK_Shift").Value;
+        sb.Draw(tex, new Vector2(rect.X-0, rect.Y +1), Color.ForestGreen);
+
+        var (size, lastWriteUtc, path) = ModMetaCache.Get(mod);
+        string ago = lastWriteUtc == DateTime.MinValue
+            ? "n/a"
+            : ToAgoString(lastWriteUtc, DateTime.UtcNow);
+
+        Utils.DrawBorderString(sb, $"Update: {ago}", new Vector2(rect2.X + 28, rect2.Y + 5), Color.White);
+    }
+
+    public static void DrawStat_Version(SpriteBatch sb, Rectangle rect, Mod mod)
+    {
+        var statPanelTexture = Ass.StatPanel;
+        var rect2 = new Rectangle(rect.X, rect.Y, statPanelTexture.Width() * 2 + 7, statPanelTexture.Height());
+        sb.Draw(statPanelTexture.Value, rect2, Color.White);
+
+        //sb.Draw(Ass.VersionIcon.Value, new Vector2(rect.X - 2, rect.Y - 1), Color.White);
+        sb.Draw(Ass.VersionIcon.Value, new Vector2(rect.X+1, rect.Y +3), null, Color.White, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
+
+
+        Utils.DrawBorderString(sb, $"Version: {mod.Version}", new Vector2(rect2.X + 28, rect2.Y + 5), Color.White);
+    }
+
+    private static string ToAgoString(DateTime whenUtc, DateTime nowUtc)
+    {
+        var span = nowUtc - whenUtc;
+        if (span.TotalDays >= 1) return $"{(int)span.TotalDays} days ago";
+        if (span.TotalHours >= 1) return $"{(int)span.TotalHours} hours ago";
+        if (span.TotalMinutes >= 1) return $"{(int)span.TotalMinutes} minutes ago";
+        return "just now";
+    }
+
     #endregion Stats
 
     #region Helpers
+    private static void DrawBigModIcon(SpriteBatch sb, Vector2 pos, int W, Mod mod)
+    {
+        if (mod == null) return;
+
+        Texture2D tex = null;
+
+        if (mod.Name == "ModLoader")
+            tex = Ass.tModLoaderIcon.Value;
+
+        // Priority: icon_workshop
+        if (mod.FileExists("icon_workshop.rawimg"))
+            tex = mod.Assets.Request<Texture2D>("icon_workshop", AssetRequestMode.ImmediateLoad).Value;
+        else if (mod.FileExists("icon.png"))
+            tex = mod.Assets.Request<Texture2D>("icon", AssetRequestMode.ImmediateLoad).Value;
+        else if (mod.FileExists("icon_small.rawimg"))
+            tex = mod.Assets.Request<Texture2D>("icon_small", AssetRequestMode.ImmediateLoad).Value;
+
+        if (tex != null)
+        {
+            float scale = Math.Min(100 / (float)tex.Width, 100 / (float)tex.Height);
+            pos += new Vector2((W-100)/2, 0);
+
+            sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            return;
+        }
+
+        // Fallback: draw two-letter initials centered
+        string initials = mod.Name;
+        if (!string.IsNullOrWhiteSpace(initials))
+        {
+            initials = initials.Length >= 2 ? initials[..2] : initials;
+            Utils.DrawBorderString(sb, initials, pos, Color.White, 0.64f, 0.5f, 0.5f);
+        }
+    }
+
     private static void DrawModNameText(SpriteBatch sb, Rectangle rect, Mod mod)
     {
+        if (mod == null) return;
+
         string playerText = $"Mod: {mod.DisplayNameClean}";
 
         var snippets = ChatManager.ParseMessage(playerText, Color.White).ToArray();
@@ -332,19 +215,6 @@ public static class ModInfoDrawer
         float textWidth = textSize.X;
         Vector2 pos = new(rect.X + (rect.Width - textWidth) / 2f, rect.Y + 6);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
-    }
-
-    public static void DrawSurfaceBackground(SpriteBatch sb, Rectangle rect)
-    {
-        var tex = Main.Assets.Request<Texture2D>("Images/MapBG1").Value;
-        int deflate = 4;
-        rect = new Rectangle(
-            rect.X + deflate,
-            rect.Y + deflate,
-            rect.Width - deflate * 2,
-            rect.Height - deflate * 2
-        );
-        sb.Draw(tex, rect, Color.White);
     }
     #endregion
 

@@ -50,6 +50,10 @@ namespace ChatPlus.Common.Configs
         [DefaultValue(true)]
         public bool ShowPlayerPreviewWhenHovering = true;
 
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [DefaultValue(true)]
+        public bool ShowModPreviewWhenHovering = true;
+
         [Header("ChatFormat")]
 
         [CustomModConfigItem(typeof(ModIconsConfigElement))]
@@ -73,6 +77,8 @@ namespace ChatPlus.Common.Configs
         {
             base.OnChanged();
 
+            if (Conf.C == null) return;
+
             try
             {
                 var hex = (Conf.C.PlayerColor ?? "FFFFFF").Trim().TrimStart('#').ToUpperInvariant();
@@ -81,14 +87,12 @@ namespace ChatPlus.Common.Configs
                 if (Main.LocalPlayer != null)
                 {
                     AssignPlayerColorsSystem.PlayerColors[Main.myPlayer] = hex;
-                    Log.Info($"[AssignPlayerColor] Config changed -> whoAmI={Main.myPlayer} hex={hex}");
                 }
 
                 // In MP, notify server so it can rebroadcast to everyone
                 if (Main.netMode == NetmodeID.MultiplayerClient && Main.LocalPlayer != null)
                 {
                     PlayerColorNetHandler.ClientHello(Main.myPlayer, hex);
-                    Log.Info($"[AssignPlayerColor] Re-announced new config color to server: who={Main.myPlayer} hex={hex}");
                 }
             }
             catch (Exception e)

@@ -11,8 +11,14 @@ namespace ChatPlus.Core.Helpers
     public static class Ass
     {
         // Add assets here
+        public static Asset<Texture2D> AuthorIcon;
+        public static Asset<Texture2D> FileSizeIcon;
+        public static Asset<Texture2D> LastUpdatedIcon;
+        public static Asset<Texture2D> VersionIcon;
+        public static Asset<Texture2D> ClientIcon; // side
+        public static Asset<Texture2D> ServerIcon; // side
+
         public static Asset<Texture2D> Hitbox;
-        public static Asset<Texture2D> GuideHead;
         public static Asset<Texture2D> StatPanel;
         public static Asset<Texture2D> SmallPanelHighlight;
         public static Asset<Texture2D> TerrariaIcon;

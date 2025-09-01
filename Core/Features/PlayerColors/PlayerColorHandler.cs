@@ -27,9 +27,6 @@ public static class PlayerColorHandler
 
     public static Color HexToColor(string tag)
     {
-        if (string.IsNullOrWhiteSpace(tag) || tag.Length < 8 || !tag.StartsWith("[c:", StringComparison.OrdinalIgnoreCase) || !tag.EndsWith("]"))
-            return new Color(0, 0, 0) * 0f;
-
         // Expecting format [c:FF00FF]
         string hex = tag[3..].Replace(":", " ").Trim();
 

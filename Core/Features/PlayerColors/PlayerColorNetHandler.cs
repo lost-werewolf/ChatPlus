@@ -84,11 +84,9 @@ namespace ChatPlus.Core.Features.PlayerColors
 
                                 // pick a not-yet-used color if possible, else any
                                 assigned = list.FirstOrDefault(c => !used.Contains(c)) ?? list[Main.rand.Next(list.Count)];
-                                Log.Info($"[AssignPlayerColor] Server assigned new color for who={who}: {assigned} (requested=FFFFFF)");
                             }
                             else
                             {
-                                Log.Info($"[AssignPlayerColor] Server accepted client color for who={who}: {assigned}");
                             }
 
                             // Register on server
@@ -104,14 +102,14 @@ namespace ChatPlus.Core.Features.PlayerColors
                                 all.Write(SanHex(kv.Value));
                             }
                             all.Send(toClient: who);
-                            Log.Info($"[AssignPlayerColor] Server ->who={who} SyncAll count={map.Count}");
+                            //Log.Info($"[AssignPlayerColor] Server ->who={who} SyncAll count={map.Count}");
 
                             // Broadcast this player's color to everyone
                             var one = Instance.GetPacket((byte)Msg.SyncSingle);
                             one.Write(who);
                             one.Write(assigned);
                             one.Send();
-                            Log.Info($"[AssignPlayerColor] Server broadcast SyncSingle who={who} hex={assigned}");
+                            //Log.Info($"[AssignPlayerColor] Server broadcast SyncSingle who={who} hex={assigned}");
                             break;
                         }
                 }
