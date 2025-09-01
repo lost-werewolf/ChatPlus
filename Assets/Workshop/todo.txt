@@ -214,7 +214,8 @@ Systems:
 3. EmojiSystem: prefix: "[e"
 4. GlyphSystem: prefix: "[g"
 5. ItemSystem: prefix: "[i". 
-6. ModIconSystem: prefix: "[mi" 
+6. ModIconSystem: prefix: "[m" 
+7. PlayerSystem: prefix: "[p
 6. UploadSystem: . prefix: "[u"
 ---
 Fix unintended description panel overlapping for long text descriptions in CommandPanel
@@ -241,18 +242,17 @@ New features:
 [DONE] Add buffs to more info
 
 ~---~
-Low prio:
-[todo] Fix mod info opening
-[todo] Fix steam workshop button
-[todo] Add left right buttons to scroll players
 
+Done:
+[done] Fix bugs like cant move items, right click, or draw right stuff in MoreInfoState
+[done] Fix scrollwheel bug causing all parsing to be removed
+[done] Fix links triple line drawing
+[done] Fix player drawing is too dark
+
+~---~
 Todo:
-[todo] Fix scrollwheel bug causing all parsing to be removed
-[todo] Fix bugs like cant move items, right click, or draw right stuff in MoreInfoState
-
-Todo 13:00-14:00
-[todo] Fix links triple line drawing
-[todo] Fix player drawing is too dark
-[todo] Implement player color
-
+[todo] Fix mod info open tooltip preview panel with mod side and more, click to open info state
+[todo] Fix steam workshop click
+[todo] Add left right buttons to scroll players
+[todo] Implement player color and assigning
 

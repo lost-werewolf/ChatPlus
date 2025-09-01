@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using ChatPlus.Common.Configs.ConfigElements.PlayerColor;
+using ChatPlus.Core.Features.PlayerColors;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.OS;
@@ -35,7 +36,7 @@ public class PlayerColorConfigElement : ConfigElement<string>
         var hex = NormalizeHex(Value);
         if (!TryParseHex(hex, out var c)) c = Color.White;
         hsl = Main.rgbToHsl(c);
-        lastHex = ColorToHex(c);
+        lastHex = PlayerColorHandler.ColorToHex(c);
         Value = lastHex;
 
         MinHeight.Set(100, 0);
@@ -73,9 +74,36 @@ public class PlayerColorConfigElement : ConfigElement<string>
 
     private void Randomize()
     {
-        hsl.X = Main.rand.NextFloat(); 
-        hsl.Y = Main.rand.NextFloat(); 
-        hsl.Z = Main.rand.NextFloat(); 
+        const float SAT_MIN = 0.65f;   // vivid
+        const float SAT_MAX = 0.95f;
+        const float L_MIN = 0.42f;   // avoid too dark
+        const float L_MAX = 0.62f;   // avoid too bright
+        const byte RGB_MIN = 20;      // clamp after HSL->RGB
+        const byte RGB_MAX = 235;
+
+        // try a few times to find something that passes the RGB sanity check
+        for (int attempt = 0; attempt < 6; attempt++)
+        {
+            float h = Main.rand.NextFloat(); // any hue
+
+            // bias saturation toward the higher end (vivid): ease-out curve
+            float sT = Main.rand.NextFloat();
+            float s = MathHelper.Lerp(SAT_MIN, SAT_MAX, 1f - (float)System.Math.Pow(1f - sT, 2f));
+
+            // lightness centered in the middle: triangular distribution
+            float lT = 0.5f * (Main.rand.NextFloat() + Main.rand.NextFloat());
+            float l = MathHelper.Lerp(L_MIN, L_MAX, lT);
+
+            // check the final RGB isn't too dark/bright
+            Color c = Main.hslToRgb(h, s, l);
+            byte lo = (byte)System.Math.Min(c.R, System.Math.Min(c.G, c.B));
+            byte hi = (byte)System.Math.Max(c.R, System.Math.Max(c.G, c.B));
+
+            hsl = new Vector3(h, s, l);
+            if (lo >= RGB_MIN && hi <= RGB_MAX || attempt == 5)
+                break; // accept; last attempt falls back to whatever we got
+        }
+
         PushFromHsl();
     }
 
@@ -110,9 +138,9 @@ public class PlayerColorConfigElement : ConfigElement<string>
         Color color = Main.hslToRgb(hsl);
 
         // Draw player name
-        string name = "PlayerName:";
+        string name = "PlayerName";
         if (Main.LocalPlayer != null) 
-            name = Main.LocalPlayer.name + ":";
+            name = Main.LocalPlayer.name;
         Vector2 playerNamePos = new(area.X + 158, area.Y+72);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, name, playerNamePos, color, 0f, Vector2.Zero, baseScale: new Vector2(0.8f));
         
@@ -150,7 +178,7 @@ public class PlayerColorConfigElement : ConfigElement<string>
     private void PushFromHsl()
     {
         var c = Main.hslToRgb(hsl);
-        var hex = ColorToHex(c);
+        var hex = PlayerColorHandler.ColorToHex(c);
         if (hex != lastHex) { lastHex = hex; Value = hex; }
     }
 
@@ -158,7 +186,7 @@ public class PlayerColorConfigElement : ConfigElement<string>
     {
         if (!TryParseHex(hex, out var c)) return;
         hsl = Main.rgbToHsl(c);
-        var fixedHex = ColorToHex(c);
+        var fixedHex = PlayerColorHandler.ColorToHex(c);
         lastHex = fixedHex;
         Value = fixedHex;
     }
@@ -183,13 +211,5 @@ public class PlayerColorConfigElement : ConfigElement<string>
         return true;
     }
 
-    private string CurrentHex() => ColorToHex(Main.hslToRgb(hsl));
-
-    private static string ColorToHex(Color c)
-    {
-        var r = c.R.ToString("X2", CultureInfo.InvariantCulture);
-        var g = c.G.ToString("X2", CultureInfo.InvariantCulture);
-        var b = c.B.ToString("X2", CultureInfo.InvariantCulture);
-        return string.Concat(r, g, b);
-    }
+    private string CurrentHex() => PlayerColorHandler.ColorToHex(Main.hslToRgb(hsl));
 }

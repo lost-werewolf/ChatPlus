@@ -21,6 +21,10 @@ public static class PlayerInfoDrawer
     /// </summary>
     public static void Draw(SpriteBatch sb, Player player)
     {
+        sb.End();
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+                 DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+
         // Dimensions
         const int panelWidth = 96;
         const int gutter = 10;
@@ -36,6 +40,7 @@ public static class PlayerInfoDrawer
 
         // Draw BG panel
         DrawFullBGPanel(sb, rect);
+
         DrawHeaderText(sb, rect, player);
         var cursor = pos + new Vector2(side, 32);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
@@ -45,6 +50,7 @@ public static class PlayerInfoDrawer
 
         // Draw background
         DrawMapFullscreenBackground(sb, rect);
+
 
         // Draw player
         DrawPlayer(sb, pos, player);
@@ -84,6 +90,10 @@ public static class PlayerInfoDrawer
         int rowY5 = (int)cursor.Y + rowHeight * 4 + 6 * 4;
         DrawStat_HeldItem(sb, new Rectangle(leftColumn, rowY5, panelWidth, rowHeight), player);
         DrawStat_LastCreatureHit(sb, new Rectangle(rightColumn, rowY5, panelWidth, rowHeight), player);
+
+        sb.End(); // restore
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
+                 DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
     }
 
     public static void DrawPlayer(SpriteBatch sb, Vector2 uiPos, Player player, float scale = 1.2f)
@@ -189,23 +199,69 @@ public static class PlayerInfoDrawer
 
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
+
+    private static int frameCounter = 0;
+    private static int frameTimer = 0;
+    private static int _lastValidCreatureNetId = -1;
+
     public static void DrawStat_LastCreatureHit(SpriteBatch sb, Rectangle rect, Player player)
     {
-        var tex = Ass.StatPanel; 
-        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); 
+        // Draw stat panel
+        var tex = Ass.StatPanel;
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        // Get last creature hit
         int bannerID = player.lastCreatureHit;
-        int netID = Item.BannerToNPC(bannerID);
-        string t = Lang.GetNPCNameValue(netID);
+        int netID = bannerID > 0 ? Item.BannerToNPC(bannerID) : 0;
 
-        // Icon: 
-        var pos = new Vector2(rect.X + 15, rect.Y + 15);
-        ItemSlot.DrawItemIcon(new Item(ItemID.EaterMask), 31, sb, pos, 0.8f, 32f, Color.White);
+        if (netID <= 0 && player.lastCreatureHit >= 0)
+        {
+            NPC npc = Main.npc[BossHitSystem.LastNPCHit];
+            if (npc != null && npc.active)
+                netID = npc.type;
+        }
 
-        var tp = new Vector2(rect.X + 52, rect.Y + 4);
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+
+        // only update if valid
+        if (netID > 0 && netID < TextureAssets.Npc.Length && Main.npcFrameCount[netID] > 0)
+            _lastValidCreatureNetId = netID;
+
+        if (_lastValidCreatureNetId <= 0)
+            return; // nothing valid ever yet → don’t draw anything
+
+        // Draw npc
+        Main.instance.LoadNPC(_lastValidCreatureNetId);
+        Texture2D npcTexture = TextureAssets.Npc[_lastValidCreatureNetId].Value;
+        int totalFrames = Main.npcFrameCount[_lastValidCreatureNetId];
+        if (totalFrames <= 0) totalFrames = 1;
+
+        int frameHeight = npcTexture.Height / totalFrames;
+        Rectangle npcDrawRectangle = new Rectangle(0, frameCounter * frameHeight, npcTexture.Width, frameHeight);
+        float scale = 36f / Math.Max(npcTexture.Width, frameHeight);
+        Vector2 drawPos = rect.Center.ToVector2() -
+            new Vector2(npcTexture.Width * scale + 75, frameHeight * scale) / 2f;
+
+        frameTimer++;
+        if (frameTimer > 14)
+        {
+            frameCounter = (frameCounter + 1) % totalFrames;
+            frameTimer = 0;
+        }
+
+        // Draw npc
+        sb.Draw(npcTexture, drawPos, npcDrawRectangle, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+
+        // Get npc name
+        string creatureName = Lang.GetNPCNameValue(_lastValidCreatureNetId);
+        if (creatureName.Length > 8)
+            creatureName = creatureName[..7] + "...";
+
+        var tp = new Vector2(rect.X + 16, rect.Y + 4);
+        if (creatureName.Length <= 7)
+            tp += new Vector2(16, 0);
+
+        // Draw npc name
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, creatureName, tp.X, tp.Y,Color.White, Color.Black, Vector2.Zero, 1f);
     }
 
     public static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)
@@ -258,7 +314,7 @@ public static class PlayerInfoDrawer
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        // Draw defense text
+        // Draw defense creatureName
         var defenseText = $"{player.statDefense}";
         var snippets = ChatManager.ParseMessage(defenseText, Color.White).ToArray();
         var pos = new Vector2(rect.X + 52, rect.Y + 4);
@@ -272,7 +328,7 @@ public static class PlayerInfoDrawer
         var rect2 = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect2, Color.White);
 
-        // Draw HP text
+        // Draw HP creatureName
         var lifeText = $"{player.statLife}/{player.statLifeMax2}";
         var snippets = ChatManager.ParseMessage(lifeText, Color.White).ToArray();
         var pos = new Vector2(rect2.X + 32, rect2.Y + 4);
@@ -291,7 +347,7 @@ public static class PlayerInfoDrawer
         var manaRect = new Rectangle(rect.X + 4, rect.Y + 2, manaTex.Width(), manaTex.Height());
         sb.Draw(TextureAssets.Mana.Value, manaRect, Color.White);
         
-        // Draw mana text
+        // Draw mana creatureName
         var manaText = $"{player.statMana}/{player.statManaMax2}";
         var size = FontAssets.MouseText.Value.MeasureString(manaText);
         var textPos = new Vector2(rect.X + rect.Width - size.X - 5, rect.Y + 5);
@@ -447,10 +503,19 @@ public static class PlayerInfoDrawer
             3 => "[c/3b95da:(Team Blue)]",
             4 => "[c/f2dd64:(Team Yellow)]",
             5 => "[c/e064f2:(Team Pink)]",
-            _ => "(Unknown)"
+            _ => "No team"
         };
 
         var snippets = ChatManager.ParseMessage(teamText, Color.White).ToArray();
+        pos += new Vector2(7, 5);
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, new Vector2(1.0f), out _);
+    }
+
+    public static void DrawPlayerID(SpriteBatch sb, Vector2 pos, Player player)
+    {
+        string ID = "ID: " + player.whoAmI.ToString();
+
+        var snippets = ChatManager.ParseMessage(ID, Color.White).ToArray();
         pos += new Vector2(7, 5);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, new Vector2(1.0f), out _);
     }

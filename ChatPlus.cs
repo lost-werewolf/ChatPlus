@@ -1,5 +1,5 @@
 using System.IO;
-using ChatPlus.Core.Features.Uploads.Netcode;
+using ChatPlus.Core.Netcode;
 using Terraria.ModLoader;
 
 namespace ChatPlus;

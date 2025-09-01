@@ -54,8 +54,8 @@ public class PlayerHeadSnippet : TextSnippet
         var hoverRect = new Rectangle((int)position.X, (int)position.Y, width, (int)size.Y);
         if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
         {
-            if (Conf.C.ShowPlayerPreviewWhenHovering)
-                PlayerInfoDrawer.Draw(Main.spriteBatch, player);
+            //if (Conf.C.ShowPlayerPreviewWhenHovering)
+                //PlayerInfoDrawer.Draw(sb, player);
 
             if (Main.mouseLeft && Main.mouseLeftRelease)
                 OnClick();
@@ -97,6 +97,8 @@ public class PlayerHeadSnippet : TextSnippet
 
     public override void OnHover()
     {
+        Main.LocalPlayer.mouseInterface = true;
+
         if (_playerIndex >= 0 && _playerIndex < Main.maxPlayers)
         {
             Player player = Main.player[_playerIndex];

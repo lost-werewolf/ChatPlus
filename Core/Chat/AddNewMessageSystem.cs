@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
@@ -36,66 +37,81 @@ internal class AddNewMessageSystem : ModSystem
     /// </summary>
     private void ModifyNewMessage(On_RemadeChatMonitor.orig_AddNewMessage orig, RemadeChatMonitor self, string text, Color color, int widthLimitInPixels)
     {
-        // 1. Set show count from config
-        self._showCount = (int)Conf.C.ChatItemCount;
-
-        // 2. Add upload padding
-        if (UploadTagHandler.ContainsUploadTag(text))
-            text += string.Concat(Enumerable.Repeat("\n", 6));
-
+        // Modify original text!
+        Log.Info(text);
         string resultText = text;
 
-        // 3. Add player icons
-        if (ContainsNameTag(text) && Main.LocalPlayer != null)
+        /// 1. Set show count from config
+        self._showCount = (int)Conf.C.ChatItemCount;
+
+        /// 2. Adds upload padding
+        if (UploadTagHandler.ContainsUploadTag(text))
+            resultText += string.Concat(Enumerable.Repeat("\n", 6));
+
+        // Extract sender name from [n:Name]
+        string senderName = null;
+        string nameTagFull = null;
+
+        if (PlayerColorHandler.TryGetNameTag(text, out string nameTag))
         {
-            string playerTag = PlayerHeadTagHandler.GenerateTag(Main.LocalPlayer.name);
-            resultText = playerTag + text;
+            nameTagFull = nameTag;
+            var m = Regex.Match(nameTag, @"\[n:(?<name>[^\]]+)\]", RegexOptions.IgnoreCase);
+            if (m.Success) senderName = m.Groups["name"].Value;
+        }
+
+        Log.Info($"raw='{text}' sender='{senderName ?? "<null>"}'");
+
+        // 3. Add player icon
+        if (!string.IsNullOrEmpty(senderName))
+        {
+            string playerTag = PlayerHeadTagHandler.GenerateTag(senderName);
+            resultText = playerTag + " " + resultText;
         }
 
         // 4. Add mod icons
         string mod = ModIconSnippet.GetModSource();
-        if (Conf.C.ModIcons && mod != null && !ContainsNameTag(text))
+        if (Conf.C.ModIcons && mod != null && string.IsNullOrEmpty(senderName))
         {
             string modTag = ModIconTagHandler.GenerateTag(mod);
-            resultText = modTag + " " + text;
+            resultText = modTag + " " + resultText;
         }
 
-        // 5. Create linkText
+        // 5. Link tag
         if (LinkTagHandler.TryGetLink(text, out string linkText))
         {
             string linkTag = LinkTagHandler.GenerateTag(linkText);
             resultText = resultText.Replace(linkText, linkTag);
         }
 
-        // 6. Add player color
-        if (TryGetNameTag(text, out string playerNameText) && Main.LocalPlayer != null)
+        // 6. Replace the name tag with color tag using synced table; fallback to white/deterministic if not present yet
+        if (!string.IsNullOrEmpty(senderName) && !string.IsNullOrEmpty(nameTagFull))
         {
-            string suffix = "";
-            string prefix = ":";
+            string hex = "FFFFFF";
+            int who = -1;
 
-            // Replace [n:Penguin] with [c/323232:Penguin]
-            string playerNameTextWithColor = $"[c/{Conf.C.PlayerColor}:{suffix}{Main.LocalPlayer.name}{prefix}]";
-            resultText = resultText.Replace(playerNameText, playerNameTextWithColor);
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                var p = Main.player[i];
+                if (p?.active == true && p.name == senderName) { who = i; break; }
+            }
+
+            if (who >= 0 && AssignPlayerColorsSystem.PlayerColors.TryGetValue(who, out var syncedHex))
+            {
+                hex = string.IsNullOrWhiteSpace(syncedHex) ? "FFFFFF" : syncedHex.ToUpperInvariant();
+                Log.Info($"[AddNewMessage] using synced color who={who} name='{senderName}' hex={hex}");
+            }
+            else
+            {
+                // Fallback so messages format immediately even if SyncSingle/All hasn't arrived yet
+                hex = PlayerColorHandler.HexFromName(senderName);
+                Log.Info($"[AddNewMessage] fallback color (no sync yet) name='{senderName}' hex={hex}");
+            }
+
+            string colored = $"[c/{hex}:{senderName}:]";
+            resultText = resultText.Replace(nameTagFull, colored);
+            Log.Info($"[AddNewMessage] rewrote name tag -> {colored}");
         }
-        
-        // Send the message
+
         orig(self, resultText, color, widthLimitInPixels);
-    }
-
-    public static bool TryGetNameTag(string input, out string output)
-    {
-        var match = Regex.Match(input, @"\[n:[^\]]+\]", RegexOptions.IgnoreCase);
-        if (match.Success)
-        {
-            output = match.Value;
-            return true;
-        }
-        output = null;
-        return false;
-    }
-
-    public static bool ContainsNameTag(string text)
-    {
-        return Regex.IsMatch(text, @"\[n:[^\]]+\]", RegexOptions.IgnoreCase);
     }
 }

@@ -1,6 +1,6 @@
 using System.IO;
 using Terraria.ModLoader;
-namespace ChatPlus.Core.Features.Uploads.Netcode
+namespace ChatPlus.Core.Netcode
 {
     // Reference:
     // https://github.com/tModLoader/tModLoader/wiki/intermediate-netcode#good-practice-managing-many-packets

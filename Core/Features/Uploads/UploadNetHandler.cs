@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ChatPlus.Core.Netcode;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ChatPlus.Core.Features.Uploads.Netcode
+namespace ChatPlus.Core.Features.Uploads
 {
     // Streams image files between clients so [u:key] draws in multiplayer.
     internal sealed class UploadNetHandler : BasePacketHandler

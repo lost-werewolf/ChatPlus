@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using ChatPlus.Core.Features.PlayerHeads.PlayerInfo;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
@@ -39,29 +40,43 @@ namespace ChatPlus.Core.Chat
 
         private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
         {
-            if (!drawingPlayerChat && HasUpload(Main.chatText)) 
+            bool hasUpload = drawingPlayerChat && UploadTagHandler.ContainsUploadTag(Main.chatText);
+            if (!hasUpload)
             {
-                orig(self, drawingPlayerChat); 
-                return; 
+                orig(self, drawingPlayerChat);
+                return;
             }
+            PlayerInput.WritingText = false;
 
-            var sb = Main.spriteBatch;
-            sb.End();
-            var lifted = Main.UIScaleMatrix * Matrix.CreateTranslation(0f, -147, 0f);
-            sb.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, lifted);
-            orig(self, true);
+            int oldH = Main.screenHeight;
+            try
+            {
+                float ui = Main.UIScaleMatrix.M11;                 
+                if (ui <= 0f) ui = 1f;
+                int delta = (int)Math.Round(147f / ui);
+
+                Main.screenHeight = Math.Max(0, oldH - delta);
+                orig(self, drawingPlayerChat);                    
+            }
+            finally
+            {
+                Main.screenHeight = oldH;                          
+            }
         }
 
         private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
         {
+            // Debug player draw info
+            //PlayerInfoDrawer.Draw(Main.spriteBatch, Main.LocalPlayer);
+
             if (!Main.drawingPlayerChat) { orig(self); return; }
 
             PlayerInput.WritingText = true;
             Main.instance.HandleIME();
             if (++Main.instance.textBlinkerCount >= 20) { Main.instance.textBlinkerState = 1 - Main.instance.textBlinkerState; Main.instance.textBlinkerCount = 0; }
 
-            bool hasUpload = HasUpload(Main.chatText);
-            int height = hasUpload ? 147+21 : 32;
+            bool hasUpload = UploadTagHandler.ContainsUploadTag(Main.chatText);
+            int height = hasUpload ? 147 + 21 : 32;
 
             DrawChatbox(height);
 
@@ -78,9 +93,6 @@ namespace ChatPlus.Core.Chat
 
             Main.chatMonitor.DrawChat(true);
         }
-
-        private static bool HasUpload(string s) =>
-            !string.IsNullOrEmpty(s) && Regex.IsMatch(s, @"\[u:[^\]]+\]", RegexOptions.IgnoreCase);
 
         private static int DrawUploadAndGetTextOffset(int totalHeight)
         {
@@ -204,7 +216,7 @@ namespace ChatPlus.Core.Chat
                 20
             );
 
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, new Color(17,85,204) * 0.5f);
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, new Color(17, 85, 204) * 0.5f);
 
             static Vector2 MeasureSnippets(string s)
             {

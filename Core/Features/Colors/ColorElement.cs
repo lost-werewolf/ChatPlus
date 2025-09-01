@@ -1,4 +1,5 @@
 using System;
+using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
@@ -32,26 +33,12 @@ namespace ChatPlus.Core.Features.Colors
                 width: 25,
                 height: 25
             );
-            Color previewColor = HexToColor(tag);
+            Color previewColor = PlayerColorHandler.HexToColor(tag);
             sb.Draw(TextureAssets.MagicPixel.Value, previewColorPos, previewColor);
 
             // Render color tag name
             TextSnippet[] colorSnippet = [new TextSnippet(color.Tag.ToString())];
             ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, colorSnippet, pos += new Vector2(32, 4), 0f, Vector2.Zero, Vector2.One, out _);
-        }
-
-        public static Color HexToColor(string tag)
-        {
-            string hex = tag[3..].Replace(":", " ").Trim();
-
-            if (hex.Length == 6) // RRGGBB
-            {
-                byte r = Convert.ToByte(hex[..2], 16);
-                byte g = Convert.ToByte(hex.Substring(2, 2), 16);
-                byte b = Convert.ToByte(hex.Substring(4, 2), 16);
-                return new Color(r, g, b, 255);
-            }
-            return new Color(0, 0, 0) * 0f;
         }
     }
 }

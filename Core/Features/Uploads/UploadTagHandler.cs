@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using ChatPlus.Core.Features.Uploads.Netcode;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;

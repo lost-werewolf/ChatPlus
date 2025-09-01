@@ -9,6 +9,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
@@ -19,17 +20,24 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
     {
         public static PlayerInfoState instance;
 
+        private int _whoAmI;
         private string _playerName = "Unknown";
-        private int _whoAmI = -1;
         private ChatSession.Snapshot? _returnSnapshot;
 
+        private UITextPanel<string> titlePanel;
         private UIElement _messageBox;
         private UIScrollbar _scrollbar;
-        public UITextPanel<string> titlePanel;
 
         private static Type _messageBoxType;
         private static MethodInfo _setTextMethod;
         private static MethodInfo _setScrollbarMethod;
+
+        // bottom
+        private UIElement _bottom;
+        private UITextPanel<string> _backBtn;
+        private UITextPanel<string> _prevBtn;
+        private UITextPanel<string> _nextBtn;
+        private int _currentPlayerIndex;
 
         public void Load(Mod mod)
         {
@@ -41,33 +49,155 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
         }
 
         public void Unload() { instance = null; }
-
         public override void OnInitialize()
         {
-            var uiContainer = new UIElement { Width = { Percent = 0.8f }, MaxWidth = new StyleDimension(1000f, 0f), Top = { Pixels = 120f }, Height = { Pixels = -120f, Percent = 1f }, HAlign = 0.5f }; Append(uiContainer);
-            var panel = new UIPanel { Width = { Percent = 1f }, Height = { Pixels = -110f, Percent = 1f }, BackgroundColor = UICommon.MainPanelBackground }; uiContainer.Append(panel);
-            var body = new UIPanel { Width = { Pixels = -25f, Percent = 1f }, Height = { Percent = 1f }, BackgroundColor = Color.Transparent, BorderColor = Color.Transparent }; panel.Append(body);
+            var uiContainer = new UIElement { Width = { Percent = 0.8f }, MaxWidth = new StyleDimension(1000f, 0f), Top = { Pixels = 120f }, Height = { Pixels = -120f, Percent = 1f }, HAlign = 0.5f };
+            Append(uiContainer);
+
+            var panel = new UIPanel { Width = { Percent = 1f }, Height = { Pixels = -110f, Percent = 1f }, BackgroundColor = UICommon.MainPanelBackground };
+            uiContainer.Append(panel);
+
+            var body = new UIPanel { Width = { Pixels = -25f, Percent = 1f }, Height = { Percent = 1f }, BackgroundColor = Color.Transparent, BorderColor = Color.Transparent };
+            panel.Append(body);
+
             if (_messageBoxType != null)
             {
                 _messageBox = (UIElement)Activator.CreateInstance(_messageBoxType, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new object[] { "" }, null);
                 _messageBox.Width.Set(0, 1f); _messageBox.Height.Set(0, 1f); body.Append(_messageBox);
             }
-            _scrollbar = new UIScrollbar { Height = { Pixels = -12f, Percent = 1f }, VAlign = 0.5f, HAlign = 1f }.WithView(100f, 1000f); panel.Append(_scrollbar);
+
+            _scrollbar = new UIScrollbar { Height = { Pixels = -12f, Percent = 1f }, VAlign = 0.5f, HAlign = 1f }.WithView(100f, 1000f);
+            panel.Append(_scrollbar);
             if (_messageBox != null && _setScrollbarMethod != null) _setScrollbarMethod.Invoke(_messageBox, new object[] { _scrollbar });
-            titlePanel = new UITextPanel<string>($"Player: {_playerName}", 0.8f, true) { HAlign = 0.5f, Top = { Pixels = -35f }, BackgroundColor = UICommon.DefaultUIBlue }.WithPadding(15f); uiContainer.Append(titlePanel);
-            var bottom = new UIElement { Width = { Percent = 1f }, Height = { Pixels = 40f }, VAlign = 1f, Top = { Pixels = -60f } }; uiContainer.Append(bottom);
-            var back = new UITextPanel<string>("Back") { Width = { Percent = 1f }, Height = { Pixels = 40f } }.WithFadedMouseOver(); back.OnLeftClick += Back_OnLeftClick; bottom.Append(back);
+
+            titlePanel = new UITextPanel<string>($"Player: {_playerName}", 0.8f, true)
+            { HAlign = 0.5f, Top = { Pixels = -35f }, BackgroundColor = UICommon.DefaultUIBlue }.WithPadding(15f);
+            uiContainer.Append(titlePanel);
+
+            _bottom = new UIElement { Width = { Percent = 1f }, Height = { Pixels = 40f }, VAlign = 1f, Top = { Pixels = -60f } };
+            uiContainer.Append(_bottom);
+
+            _backBtn = new UITextPanel<string>("Back") { Height = { Pixels = 40f } }.WithFadedMouseOver();
+            _backBtn.OnLeftClick += Back_OnLeftClick;
+            _bottom.Append(_backBtn);
+
+            _currentPlayerIndex = _whoAmI >= 0 ? _whoAmI : Main.myPlayer;
+            SetPlayerFromIndex(_currentPlayerIndex);
+        }
+        public override void OnActivate()
+        {
+            base.OnActivate();
+            _currentPlayerIndex = (_whoAmI >= 0 && _whoAmI < Main.maxPlayers) ? _whoAmI : Main.myPlayer;
+            SetPlayerFromIndex(_currentPlayerIndex);
+            RefreshNavButtons(); // ensure correct for SP/MP and active players
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+            RefreshNavButtons(); // handles SP → MP, players joining/leaving, etc.
+        }
+
+        private void RefreshNavButtons()
+        {
+            const float NAV_W = 36f;
+
+            var active = GetActivePlayerIndices();           // sorted by index (whoAmI)
+            bool multi = Main.netMode != NetmodeID.SinglePlayer && active.Length > 1;
+
+            // Ensure arrow instances exist when needed
+            if (multi)
+            {
+                if (_prevBtn == null)
+                {
+                    _prevBtn = new UITextPanel<string>("<", 1.0f, false) { Width = { Pixels = NAV_W }, Height = { Pixels = 40f } }.WithFadedMouseOver();
+                    _prevBtn.Left.Set(0f, 0f);
+                    _prevBtn.OnLeftClick += (_, __) => CyclePlayer(-1);
+                }
+                if (_nextBtn == null)
+                {
+                    _nextBtn = new UITextPanel<string>(">", 1.0f, false) { Width = { Pixels = NAV_W }, Height = { Pixels = 40f }, HAlign = 1f }.WithFadedMouseOver();
+                    _nextBtn.OnLeftClick += (_, __) => CyclePlayer(+1);
+                }
+            }
+
+            // If not multiplayer or only one player: remove arrows and stretch Back
+            if (!multi)
+            {
+                if (_prevBtn?.Parent != null) _prevBtn.Remove();
+                if (_nextBtn?.Parent != null) _nextBtn.Remove();
+                _backBtn.Left.Set(0f, 0f);
+                _backBtn.Width.Set(0f, 1f);
+                return;
+            }
+
+            // We are in MP with 2+ active players:
+            int pos = Array.IndexOf(active, _currentPlayerIndex);
+            if (pos < 0) pos = Array.BinarySearch(active, Main.myPlayer) >= 0 ? Array.BinarySearch(active, Main.myPlayer) : 0;
+
+            bool hasPrev = pos > 0;
+            bool hasNext = pos < active.Length - 1;
+
+            // Add/remove the arrow elements based on availability
+            if (hasPrev)
+            {
+                if (_prevBtn.Parent == null) _bottom.Append(_prevBtn);
+            }
+            else if (_prevBtn?.Parent != null) _prevBtn.Remove();
+
+            if (hasNext)
+            {
+                if (_nextBtn.Parent == null) _bottom.Append(_nextBtn);
+            }
+            else if (_nextBtn?.Parent != null) _nextBtn.Remove();
+
+            // Lay out Back to fill remaining space
+            float leftW = hasPrev ? NAV_W : 0f;
+            float rightW = hasNext ? NAV_W : 0f;
+            _backBtn.Left.Set(leftW, 0f);
+            _backBtn.Width.Set(-(leftW + rightW), 1f);
+        }
+
+        private void CyclePlayer(int dir)
+        {
+            var list = GetActivePlayerIndices();
+            if (list.Length == 0) return;
+
+            int pos = Array.IndexOf(list, _currentPlayerIndex);
+            if (pos < 0) pos = 0;
+
+            if (dir < 0 && pos > 0) SetPlayerFromIndex(list[pos - 1]);
+            else if (dir > 0 && pos < list.Length - 1) SetPlayerFromIndex(list[pos + 1]);
+        }
+
+        private void SetPlayerFromIndex(int idx)
+        {
+            if (idx < 0 || idx >= Main.maxPlayers) return;
+            var p = Main.player[idx];
+            if (p == null || !p.active) return;
+
+            _currentPlayerIndex = idx;
+            _playerName = p.name;
+            titlePanel?.SetText($"Player: {_playerName}");
+        }
+
+        private static int[] GetActivePlayerIndices()
+        {
+            var list = new List<int>(Main.maxPlayers);
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                var p = Main.player[i];
+                if (p != null && p.active) list.Add(i);
+            }
+            return list.ToArray();
         }
 
         public void SetReturnSnapshot(ChatSession.Snapshot snap) => _returnSnapshot = snap;
 
-        public void SetPlayer(int whoAmI, string nameOverride = null) { _whoAmI = whoAmI; _playerName = nameOverride ?? Main.player?[whoAmI]?.name ?? $"Player {whoAmI}"; }
-
-        public override void OnActivate()
-        {
-            base.OnActivate();
-            titlePanel?.SetText($"Player: {_playerName}");
-            if (_messageBox != null && _setTextMethod != null) _setTextMethod.Invoke(_messageBox, new object[] { "" });
+        public void SetPlayer(int whoAmI, string nameOverride = null) 
+        { 
+            _whoAmI = whoAmI; 
+            _playerName = nameOverride ?? Main.player?[whoAmI]?.name ?? $"Player {whoAmI}"; 
         }
 
         public override void Draw(SpriteBatch sb)
@@ -86,10 +216,19 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             int leftColumn = containerLeft + containerW - (panelWidth * 2 + gutter)-70;
             int rightColumn = leftColumn + panelWidth + gutter;
             int y0 = bgRect.Y;
+            Vector2 cursor = new Vector2(bgRect.X, bgRect.Y); // start at top left
 
             // Draw background
             PlayerInfoDrawer.DrawSeparatorBorder(sb, bgRect);
             PlayerInfoDrawer.DrawMapFullscreenBackground(sb, bgRect);
+
+            // Draw top left info
+            //if (Main.netMode != NetmodeID.SinglePlayer)
+            //{
+                //PlayerInfoDrawer.DrawTeamText(sb, cursor, player);
+                //cursor += new Vector2(0, 21);
+                //PlayerInfoDrawer.DrawPlayerID(sb, cursor, player);
+            //}
 
             // Draw player
             var playerPos = new Vector2(bgRect.X + bgRect.Width * 0.5f - 100f, bgRect.Y + 50);
@@ -138,7 +277,6 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             Utils.DrawBorderStringBig(sb, "Accessories", new Vector2(armorPos.X, armorPos.Y-36), Color.White, 0.52f);
 
             DrawArmor(sb, armorPos, player);
-            //DrawArmor2(sb, armorPos, player);
             DrawAccessories(sb, accessoriesPos, player);
 
             // Handle hovers
@@ -165,14 +303,13 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
             for (int r = 0; r < 3; r++)
             {
                 int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
+
+                // Draw slots that can be clicked on
                 DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y, player);
                 DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, x1, y, player);
                 DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmor, r, x2, y, player);
-            }
-            
-            for (int r = 0; r < 3; r++)
-            {
-                int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
+
+                // Draw slots ON top of the existing ones that are purely visually correct
                 ItemSlot.Draw(sb, player.dye, ItemSlot.Context.EquipDye, r, new Vector2(x0, y));
                 ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, new Vector2(x1, y));
                 ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmor, r, new Vector2(x2, y));
@@ -292,7 +429,6 @@ namespace ChatPlus.Core.Features.PlayerHeads.PlayerInfo
 
             Main.inventoryScale = old;
         }
-
 
         private static void DrawAccessories(SpriteBatch sb, Vector2 topLeft, Player player)
         {

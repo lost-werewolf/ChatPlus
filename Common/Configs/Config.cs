@@ -4,8 +4,11 @@ using System.ComponentModel;
 using System.Reflection;
 using AdvancedChatFeatures.Common.Configs;
 using ChatPlus.Common.Configs.ConfigElements;
+using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Helpers;
 using Newtonsoft.Json;
+using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 using Terraria.UI;
@@ -64,18 +67,36 @@ namespace ChatPlus.Common.Configs
         [BackgroundColor(255, 192, 8)]
         [CustomModConfigItem(typeof(PlayerColorConfigElement))]
         [DefaultValue("FFFFFF")]
-        public string PlayerColor;
+        public string PlayerColor = "FFFFFF";
 
         public override void OnChanged()
         {
             base.OnChanged();
 
-            if (Conf.C == null)
+            try
             {
-                Log.Error("Config is null in OnChanged!");
-                return;
+                var hex = (Conf.C.PlayerColor ?? "FFFFFF").Trim().TrimStart('#').ToUpperInvariant();
+
+                // Update local table immediately
+                if (Main.LocalPlayer != null)
+                {
+                    AssignPlayerColorsSystem.PlayerColors[Main.myPlayer] = hex;
+                    Log.Info($"[AssignPlayerColor] Config changed -> whoAmI={Main.myPlayer} hex={hex}");
+                }
+
+                // In MP, notify server so it can rebroadcast to everyone
+                if (Main.netMode == NetmodeID.MultiplayerClient && Main.LocalPlayer != null)
+                {
+                    PlayerColorNetHandler.ClientHello(Main.myPlayer, hex);
+                    Log.Info($"[AssignPlayerColor] Re-announced new config color to server: who={Main.myPlayer} hex={hex}");
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error($"[AssignPlayerColor] OnChanged exception: {e}");
             }
         }
+
     }
 
     public static class Conf

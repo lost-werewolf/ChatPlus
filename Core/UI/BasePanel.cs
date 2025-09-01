@@ -8,6 +8,7 @@ using ChatPlus.Core.Features.Emojis;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerHeads;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
@@ -372,7 +373,7 @@ namespace ChatPlus.Core.UI
                 // Set color text if description panel is connected to a color panel
                 if (descPanel.ConnectedPanel.GetType() == typeof(ColorPanel))
                 {
-                    descPanel.GetText()._color = ColorElement.HexToColor(tag);
+                    descPanel.GetText()._color = PlayerColorHandler.HexToColor(tag);
                 }
             }
         }
