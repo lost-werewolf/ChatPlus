@@ -148,8 +148,7 @@ public abstract class DraggablePanel : UIPanel
         ModContent.GetInstance<Features.Glyphs.GlyphSystem>()?.state,
         ModContent.GetInstance<Features.Items.ItemSystem>()?.state,
         ModContent.GetInstance<Features.ModIcons.ModIconSystem>()?.state,
-        ModContent.GetInstance<Features.PlayerIcons
-.PlayerIconSystem>()?.state,
+        ModContent.GetInstance<Features.PlayerIcons.PlayerIconSystem>()?.state,
         ModContent.GetInstance<Features.Uploads.UploadSystem>()?.state
         };
 

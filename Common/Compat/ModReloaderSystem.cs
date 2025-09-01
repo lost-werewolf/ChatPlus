@@ -11,7 +11,7 @@ namespace ChatPlus.Common.Compat
         public static float ChatOffsetX = 0;
         public static float ChatOffsetY = 0;
         public static bool Found = false;
-
+        
         public override void Load()
         {
             IL_Main.DrawPlayerChat += InjectChatOffset;

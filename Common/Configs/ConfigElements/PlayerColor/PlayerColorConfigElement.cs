@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using ChatPlus.Common.Configs.ConfigElements.PlayerColor;
 using ChatPlus.Core.Features.PlayerColors;
+using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -126,7 +127,7 @@ public class PlayerColorConfigElement : ConfigElement<string>
             tooltip: tooltip);
         btn.OnLeftMouseDown += (_, _) => onClick();
         btn.Top.Set(34, 0);
-        btn.Left.Set(155 + left, 0);
+        btn.Left.Set(170 + left, 0);
         Append(btn);
         return btn;
     }
@@ -137,28 +138,29 @@ public class PlayerColorConfigElement : ConfigElement<string>
         var dims = GetDimensions();
         Rectangle area = new((int)dims.X, (int)dims.Y, (int)dims.Width, (int)dims.Height);
         Color color = Main.hslToRgb(hsl);
+       
+        // Draw hex text
+        string hexText = "#" + CurrentHex();
+        Vector2 hexTextPos = new(area.X+173, area.Y+6);
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, hexText, hexTextPos, Color.White, 0f, Vector2.Zero, new Vector2(1.0f));
 
         // Draw player name
         string name = "PlayerName";
-        if (Main.LocalPlayer != null) 
+        if (Main.LocalPlayer != null)
             name = Main.LocalPlayer.name;
-        Vector2 playerNamePos = new(area.X + 158, area.Y+72);
+        Vector2 playerNamePos = new(area.X + 173, area.Y + 72);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, name, playerNamePos, color, 0f, Vector2.Zero, baseScale: new Vector2(0.8f));
-        
-        // Draw preview box
-        //var boxSize = 30;
-        //var box = new Rectangle((int)area.X+430, area.Y, boxSize, boxSize);
-        //Color c = Color.Black; //box outline color
-        //sb.Draw(TextureAssets.MagicPixel.Value, box, color);
-        //sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X, box.Y, box.Width, 1), c);
-        //sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X, box.Bottom - 1, box.Width, 1), c);
-        //sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X, box.Y, 1, box.Height), c);
-        //sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.Right - 1, box.Y, 1, box.Height), c);
 
-        // Draw hex text
-        string hexText = "#" + CurrentHex();
-        Vector2 hexTextPos = new(area.X+155, area.Y+6);
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, hexText, hexTextPos, Color.White, 0f, Vector2.Zero, new Vector2(1.0f));
+        // Draw hover
+        Rectangle hoverRect = new(area.X, area.Y, 170, (int) Height.Pixels);
+        bool hovered = hoverRect.Contains(Main.MouseScreen.ToPoint());
+
+        // Show tooltip if hovered
+        if (hovered)
+        {
+            //TooltipFunction = () => "Set your own player color here.";
+        }
+        //else TooltipFunction = null;
     }
 
     private CustomColoredSlider MakeHslSlider(HSLSliderId id, int top)

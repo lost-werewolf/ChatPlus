@@ -68,7 +68,7 @@ namespace ChatPlus.Common.Configs
         [DefaultValue(true)]
         public bool PlayerIcons = true;
 
-        [Header("PlayerFormat")]
+        [BackgroundColor(85, 111, 64)] // Damp Green
         [CustomModConfigItem(typeof(PlayerColorConfigElement))]
         [DefaultValue("FFFFFF")]
         public string PlayerColor = "FFFFFF";

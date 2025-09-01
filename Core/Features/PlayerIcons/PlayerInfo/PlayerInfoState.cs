@@ -29,6 +29,8 @@ public class PlayerInfoState : UIState, ILoadable
     private UIElement _messageBox;
     private UIScrollbar _scrollbar;
 
+    private UIScrollbar accessoriesScrollbar;
+
     private static Type _messageBoxType;
     private static MethodInfo _setTextMethod;
     private static MethodInfo _setScrollbarMethod;
@@ -332,61 +334,6 @@ public class PlayerInfoState : UIState, ILoadable
         if (heldItemBounds.Contains(p)) UICommon.TooltipMouseText("Held Item");
         if (lastCreateHitBounds.Contains(p)) UICommon.TooltipMouseText("Last Creature Hit");
     }
-    private static bool HasAnyBuff(Player p) { for (int i = 0; i < p.buffType.Length; i++) if (p.buffType[i] > 0 && p.buffTime[i] > 0) return true; return false; }
-
-    private static void DrawArmor(SpriteBatch sb, Vector2 topLeft, Player player)
-    {
-        var font = FontAssets.MouseText.Value;
-        int size = 40, pad = 4;
-        bool smallWidth = Main.screenWidth < 1200;
-        if (smallWidth)
-            size = 36;
-        float old = Main.inventoryScale; Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
-
-        for (int r = 0; r < 3; r++)
-        {
-            int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
-
-            // Draw slots that can be clicked on
-            DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y, player);
-            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, x1, y, player);
-            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmor, r, x2, y, player);
-
-            // Draw slots ON top of the existing ones that are purely visually correct
-            ItemSlot.Draw(sb, player.dye, ItemSlot.Context.EquipDye, r, new Vector2(x0, y));
-            ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, new Vector2(x1, y));
-            ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmor, r, new Vector2(x2, y));
-        }
-        Main.inventoryScale = old;
-    }
-
-    private static void DrawBuffs(SpriteBatch sb, Rectangle bgRect, Player player)
-    {
-        int size = 32, pad = 6, perRow = 10; var start = new Vector2(bgRect.X, bgRect.Bottom + 52 + 5 * (40 + 4) + 35); var font = FontAssets.MouseText.Value;
-        int n = 0;
-        for (int i = 0; i < player.buffType.Length; i++)
-        {
-            int id = player.buffType[i]; if (id <= 0) continue; if (!player.HasBuff(id)) continue;
-            int row = n / perRow; int col = n % perRow; var r = new Rectangle((int)(start.X + col * (size + pad)), (int)(start.Y + row * (size + pad)), size, size);
-            sb.Draw(TextureAssets.Buff[id].Value, r, Color.White);
-            int t = player.buffTime[i];
-            if (t > 2)
-            {
-                int s = t / 60; string label;
-                if (s >= 3600) { label = (s / 3600).ToString() + ":" + ((s % 3600) / 60).ToString("00"); }
-                else if (s >= 60) { label = (s / 60).ToString() + ":" + (s % 60).ToString("00"); }
-                else { label = s.ToString(); }
-                var ls = font.MeasureString(label); Utils.DrawBorderString(sb, label, new Vector2(r.Right - ls.X + 1, r.Bottom - ls.Y + 1), Color.White, 0.7f, 0f, 0f);
-            }
-            bool hover = r.Contains(Main.MouseScreen.ToPoint()) && !PlayerInput.IgnoreMouseInterface;
-            if (hover)
-            {
-                UICommon.TooltipMouseText(Lang.GetBuffName(id)); Main.LocalPlayer.mouseInterface = true;
-                if (Main.mouseRight && Main.mouseRightRelease && !Main.debuff[id]) { player.DelBuff(i); Main.mouseRightRelease = false; }
-            }
-            n++;
-        }
-    }
 
     private static void DrawInventory(SpriteBatch sb, Rectangle bgRect, Player player)
     {
@@ -520,45 +467,87 @@ public class PlayerInfoState : UIState, ILoadable
         Main.inventoryScale = old;
     }
 
-    private static void DrawAccessories(SpriteBatch sb, Vector2 topLeft, Player player)
+    private static void DrawArmor(SpriteBatch sb, Vector2 topLeft, Player player)
     {
-        var scrollbar = instance?._scrollbar;
-
-        int size = 40;
-        int pad = 4;
+        var font = FontAssets.MouseText.Value;
+        int size = 40, pad = 4;
         bool smallWidth = Main.screenWidth < 1200;
         if (smallWidth)
             size = 36;
+        float old = Main.inventoryScale; Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
 
-        int rows = Math.Min(7, Math.Min(player.dye.Length - 3, Math.Min(player.armor.Length - 3, player.armor.Length - 13)));
+        for (int r = 0; r < 3; r++)
+        {
+            int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
+
+            // Draw slots that can be clicked on
+            DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y, player);
+            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, x1, y, player);
+            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmor, r, x2, y, player);
+
+            // Draw slots ON top of the existing ones that are purely visually correct
+            ItemSlot.Draw(sb, player.dye, ItemSlot.Context.EquipDye, r, new Vector2(x0, y));
+            ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, new Vector2(x1, y));
+            ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmor, r, new Vector2(x2, y));
+        }
+        Main.inventoryScale = old;
+    }
+    
+    private static void DrawAccessories(SpriteBatch sb, Vector2 topLeft, Player player)
+    {
+        // Use the big right-edge scrollbar for accessories
+        var scrollbar = instance?._scrollbar;
+
+        int size = Main.screenWidth < 1200 ? 36 : 40;
+        int pad = 4;
         int rowStep = size + pad;
-        int totalHeight = rows * rowStep;
 
+        // How many rows we can actually show
+        int dyeRows = Math.Max(0, player.dye.Length - 3);
+        int equipRows = Math.Max(0, player.armor.Length - 3);
+        int vanityRows = Math.Max(0, player.armor.Length - 13);
+        int totalRows = Math.Min(dyeRows, Math.Min(equipRows, vanityRows));
+
+        int totalHeight = totalRows * rowStep;
+
+        // Viewport for the accessories column group (3 columns)
         int viewportBottom = Main.screenHeight - 80;
-        int viewportHeight = Math.Clamp(viewportBottom - (int)topLeft.Y, rowStep, totalHeight);
+        int viewportHeight = Math.Clamp(viewportBottom - (int)topLeft.Y, rowStep, Math.Max(rowStep, totalHeight));
 
+        // Configure the big scrollbar for THIS content area
         if (scrollbar != null)
         {
-            scrollbar.Left.Set(topLeft.X + 3 * rowStep + 4, 0f);
-            scrollbar.Top.Set(topLeft.Y, 0f);
-            scrollbar.Height.Set(viewportHeight, 0f);
-            scrollbar.Recalculate();
-            scrollbar.SetView(viewportHeight, totalHeight);
+            // Make sure SetView gets sane values (avoid 0/0)
+            int maxSize = Math.Max(viewportHeight, totalHeight);
+            scrollbar.SetView(viewportHeight, maxSize);
+
+            // Mouse wheel over the accessories viewport controls the big scrollbar
+            var vpRect = new Rectangle((int)topLeft.X, (int)topLeft.Y, 3 * rowStep, viewportHeight);
+            if (vpRect.Contains(Main.MouseScreen.ToPoint()))
+            {
+                Main.LocalPlayer.mouseInterface = true;
+
+                int wheel = PlayerInput.ScrollWheelDelta;
+                if (wheel != 0)
+                {
+                    float step = rowStep; // one row per notch
+                    float maxScroll = Math.Max(0, maxSize - viewportHeight);
+                    float next = scrollbar.ViewPosition - Math.Sign(wheel) * step;
+                    if (next < 0) next = 0;
+                    if (next > maxScroll) next = maxScroll;
+                    scrollbar.ViewPosition = next;
+                }
+            }
         }
 
         float scroll = scrollbar?.ViewPosition ?? 0f;
 
-        var vpRect = new Rectangle((int)topLeft.X, (int)topLeft.Y, 3 * rowStep, viewportHeight);
-        if (vpRect.Contains(Main.MouseScreen.ToPoint()))
-            Main.LocalPlayer.mouseInterface = true;
-
-        for (int r = 0; r < rows; r++)
+        // Draw visible rows
+        for (int r = 0; r < totalRows; r++)
         {
             int y = (int)topLeft.Y + r * rowStep - (int)scroll;
-            if (y + size < topLeft.Y)
-                continue;
-            if (y > topLeft.Y + viewportHeight)
-                break;
+            if (y + size < topLeft.Y) continue;                         // above view
+            if (y > topLeft.Y + viewportHeight) break;                  // below view
 
             int dyeIndex = 3 + r;
             int vanityIndex = 13 + r;
@@ -568,12 +557,41 @@ public class PlayerInfoState : UIState, ILoadable
             int x1 = (int)topLeft.X + 1 * rowStep;
             int x2 = (int)topLeft.X + 2 * rowStep;
 
-            DrawLoaderSlot(player.dye, 12, dyeIndex, x0, y, player);
-            DrawLoaderSlot(player.armor, 11, vanityIndex, x1, y, player);
-            DrawLoaderSlot(player.armor, 10, equipIndex, x2, y, player);
+            DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, dyeIndex, x0, y, player);
+            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, vanityIndex, x1, y, player);
+            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmor, equipIndex, x2, y, player);
         }
     }
 
+    private static bool HasAnyBuff(Player p) { for (int i = 0; i < p.buffType.Length; i++) if (p.buffType[i] > 0 && p.buffTime[i] > 0) return true; return false; }
+
+    private static void DrawBuffs(SpriteBatch sb, Rectangle bgRect, Player player)
+    {
+        int size = 32, pad = 6, perRow = 10; var start = new Vector2(bgRect.X, bgRect.Bottom + 52 + 5 * (40 + 4) + 35); var font = FontAssets.MouseText.Value;
+        int n = 0;
+        for (int i = 0; i < player.buffType.Length; i++)
+        {
+            int id = player.buffType[i]; if (id <= 0) continue; if (!player.HasBuff(id)) continue;
+            int row = n / perRow; int col = n % perRow; var r = new Rectangle((int)(start.X + col * (size + pad)), (int)(start.Y + row * (size + pad)), size, size);
+            sb.Draw(TextureAssets.Buff[id].Value, r, Color.White);
+            int t = player.buffTime[i];
+            if (t > 2)
+            {
+                int s = t / 60; string label;
+                if (s >= 3600) { label = (s / 3600).ToString() + ":" + ((s % 3600) / 60).ToString("00"); }
+                else if (s >= 60) { label = (s / 60).ToString() + ":" + (s % 60).ToString("00"); }
+                else { label = s.ToString(); }
+                var ls = font.MeasureString(label); Utils.DrawBorderString(sb, label, new Vector2(r.Right - ls.X + 1, r.Bottom - ls.Y + 1), Color.White, 0.7f, 0f, 0f);
+            }
+            bool hover = r.Contains(Main.MouseScreen.ToPoint()) && !PlayerInput.IgnoreMouseInterface;
+            if (hover)
+            {
+                UICommon.TooltipMouseText(Lang.GetBuffName(id)); Main.LocalPlayer.mouseInterface = true;
+                if (Main.mouseRight && Main.mouseRightRelease && !Main.debuff[id]) { player.DelBuff(i); Main.mouseRightRelease = false; }
+            }
+            n++;
+        }
+    }
 
     private void Back_OnLeftClick(UIMouseEvent evt, UIElement listeningElement)
     {

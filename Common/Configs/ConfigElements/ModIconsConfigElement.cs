@@ -1,10 +1,13 @@
 ﻿using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ModLoader;
 using Terraria.ModLoader.Config.UI;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -45,25 +48,34 @@ public class ModIconsConfigElement : ConfigElement<bool>
 
     private void DrawExampleModIcon(SpriteBatch sb)
     {
-        // position
         var dims = GetDimensions();
-        Vector2 pos = new(dims.X+151, dims.Y);
+        Vector2 pos = new(dims.X + 175, dims.Y);
 
-        // mod icon tag
         string tag = ModIconTagHandler.GenerateTag("ChatPlus");
-        float scale = 1.0f; // 150% bigger
+
+        // Parse the message into snippets
+        TextSnippet[] snippets = ChatManager.ParseMessage(tag, Color.White).ToArray();
+
+        // Draw using the snippet overload
         ChatManager.DrawColorCodedStringWithShadow(
             sb,
             FontAssets.MouseText.Value,
-            tag,
+            snippets,
             pos + new Vector2(3, 4),
-            Color.White,
-            0f,            // rotation
-            Vector2.Zero,  // origin
-            new Vector2(scale), // scale
-            -1f,
-            1f
+            0f,
+            Vector2.Zero,
+            Vector2.One,
+            out int hovered
         );
+
+        // Show tooltip if hovered (doesnt work)
+        if (hovered >= 0)
+        {
+            if (ModLoader.TryGetMod("ChatPlus", out Mod m))
+            {
+                HoveredModOverlay.Set(m);
+            }
+        }
     }
 
     private void DrawToggleTexture(SpriteBatch sb)

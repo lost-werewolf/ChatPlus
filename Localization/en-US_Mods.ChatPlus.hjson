@@ -80,7 +80,7 @@ Configs: {
 
 		PlayerIcons: {
 			Label: Player Icon
-			Tooltip: Adds a player head before every chat sent by a player.
+			Tooltip: Adds a player icon before every chat sent by a player.
 		}
 
 		PlayerColor: {
@@ -90,22 +90,22 @@ Configs: {
 
 		ShowPlayerPreviewWhenHovering: {
 			Label: Show Player Preview When Hovering
-			Tooltip: Shows a preview of a player and their stats when hovering a player icon. Click the player to view more stats.
+			Tooltip: Shows a preview of player stats when hovering a player icon.
 		}
 
 		ShowModPreviewWhenHovering: {
 			Label: Show Mod Preview When Hovering
-			Tooltip: Shows a preview of a mod and its stats when hovering a mod icon. Click the mod to view more.
+			Tooltip: Shows a preview of mod stats when hovering a mod icon.
 		}
 
 		ShowUploadPreviewWhenHovering: {
 			Label: Show Upload Preview When Hovering
-			Tooltip: ""
+			Tooltip: Shows a bigger image when hovering.
 		}
 
 		DisableHoverWhenBossIsAlive: {
 			Label: Disable Hover When Boss Is Alive
-			Tooltip: ""
+			Tooltip: Turn this on to avoid being distracted by hover tooltips when a boss fight is active.
 		}
 	}
 }

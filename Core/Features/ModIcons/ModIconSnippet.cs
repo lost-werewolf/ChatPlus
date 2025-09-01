@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
-using ChatPlus.Core.Features.PlayerIcons
-.PlayerInfo;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -193,62 +191,58 @@ public sealed class ModIconSnippet : TextSnippet
         try
         {
             var frames = new StackTrace().GetFrames();
-            if (frames == null || frames.Length == 0)
-            {
-                return "Terraria";
-            }
+            if (frames == null) return null;
 
-            int pivot = -1;
+            var terrariaAsm = typeof(Main).Assembly;
+            var loaderAsm = typeof(ModLoader).Assembly;
+            var chatPlusAsm = typeof(ModIconSnippet).Assembly;
+
+            var pivot = -1;
             for (int i = 0; i < frames.Length; i++)
             {
                 var m = frames[i].GetMethod();
                 if (m == null) continue;
-
-                string n = m.Name;
-                if (n.Contains("NewText") || n.Contains("AddNewMessage"))
+                var n = m.Name;
+                if (n.IndexOf("NewText", StringComparison.Ordinal) >= 0 || n.IndexOf("AddNewMessage", StringComparison.Ordinal) >= 0)
                 {
                     pivot = i;
                     break;
                 }
             }
+            if (pivot < 0) return null;
 
-            int start = pivot >= 0 ? pivot + 1 : 0;
-
-            for (int i = start; i < frames.Length; i++)
+            for (int i = pivot + 1; i < frames.Length; i++)
             {
-                var method = frames[i].GetMethod();
-                var type = method?.DeclaringType;
-                if (type == null) continue;
+                var m = frames[i].GetMethod();
+                if (m == null) continue;
 
-                var assembly = type.Assembly;
-                if (assembly == null) continue;
+                var t = m.DeclaringType;
+                if (t == null) continue;
 
-                // if the caller is this mod’s assembly, return "ChatPlus"
-                if (assembly == typeof(ChatPlus).Assembly)
+                var asm = t.Assembly;
+                var ns = t.Namespace ?? string.Empty;
+
+                // Skip engine, loader, and our own code
+                //if (asm == terrariaAsm) continue;
+                if (asm == chatPlusAsm) continue;
+
+                // If the caller is tModLoader (e.g., /playing), treat as ModLoader
+                if (asm == loaderAsm)
                 {
-                    return "ChatPlus";
+                    if (ns.StartsWith("Terraria.ModLoader", StringComparison.OrdinalIgnoreCase)) return "ModLoader";
+                    continue;
                 }
 
-                var mod = ModLoader.Mods.FirstOrDefault(z => z != null && z.Code == assembly);
-                if (mod == null) continue;
-
-                if (mod.Name == "DragonLens")
-                {
-                    return "Terraria";
-                }
-                if (mod.Name == "ModLoader")
-                {
-                    return "Terraria";
-                }
-
-                return mod.Name;
+                var mod = ModLoader.Mods.FirstOrDefault(z => z != null && z.Code == asm);
+                if (mod.Name == "DragonLens") return "Terraria";
+                if (mod != null) return mod.Name;
             }
-            return "Terraria";
+
+            return "ModLoader";
         }
         catch
         {
-            return "Terraria";
+            return null;
         }
     }
-
 }

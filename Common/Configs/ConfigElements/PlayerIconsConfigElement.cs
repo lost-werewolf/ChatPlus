@@ -1,11 +1,14 @@
-﻿using ChatPlus.Core.Features.PlayerIcons
-;
+﻿using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.PlayerIcons;
+using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using Stubble.Core.Classes;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ModLoader;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
@@ -48,16 +51,16 @@ public class PlayerIconsConfigElement : ConfigElement<bool>
     private void DrawPlayerIcon(SpriteBatch sb)
     {
         var dims = GetDimensions();
-        Vector2 pos = new(dims.X + 162, dims.Y + 12);
+        Vector2 pos = new(dims.X + 175+3, dims.Y + 11);
+        Rectangle rect = new((int)pos.X-8, (int)pos.Y-6, 22, 22);
 
         var player = Main.LocalPlayer;
 
-        // Fallback if player not ready
+        // Fallback if no player found
         if (player == null || !player.active || player.name == "" || Main.gameMenu)
         {
             var guide = Ass.AuthorIcon.Value;
-            Rectangle guideRect = new((int)pos.X - 8, (int)pos.Y - 7, 22, 22);
-            sb.Draw(guide, guideRect, Color.White);
+            sb.Draw(guide, rect, Color.White);
             return;
         }
 
@@ -66,16 +69,19 @@ public class PlayerIconsConfigElement : ConfigElement<bool>
             MapHeadRendererHook.shouldFlipHeadDraw = player.direction == -1;
             Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, pos, 1f, 0.75f, Color.White);
         }
-        catch
-        {
-            // If anything goes wrong, still fallback to guide
-            var guide = Ass.AuthorIcon.Value;
-            Rectangle guideRect = new((int)pos.X, (int)pos.Y, 22, 22);
-            sb.Draw(guide, guideRect, Color.White);
-        }
         finally
         {
             MapHeadRendererHook.shouldFlipHeadDraw = false;
+        }
+
+        // Check bounds
+        bool hovered = rect.Contains(Main.MouseScreen.ToPoint());
+
+        // Show tooltip if hovered
+        if (hovered)
+        {
+            if (Main.LocalPlayer == null) return;
+            HoveredPlayerOverlay.Set(Main.LocalPlayer.whoAmI);
         }
     }
 
