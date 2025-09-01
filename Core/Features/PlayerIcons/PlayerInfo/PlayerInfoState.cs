@@ -225,9 +225,6 @@ namespace ChatPlus.Core.Features.PlayerIcons
             var player = _whoAmI >= 0 && _whoAmI < Main.maxPlayers ? Main.player[_whoAmI] : null;
             if (player == null || !player.active) return;
 
-            // debug
-            Log.Info(PlayerInfoState.instance == null);
-
             // Dimensions
             int panelWidth = 96, gutter = 10, rowHeight = 31;
             int containerW = Math.Min((int)(Main.screenWidth * 0.8f), 1000);

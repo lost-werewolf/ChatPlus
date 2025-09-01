@@ -272,8 +272,7 @@ Row 5: author
 [done] Finish mod info state
 [done] Fix initial opening state doesnt show right header
 [done] Fix tml icon
-[done] Fix chat icons
+[done] Draw player compat for weaponOut
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[todo] Draw player compat for weaponOut

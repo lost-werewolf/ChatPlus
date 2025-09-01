@@ -8,10 +8,9 @@ using Terraria.ModLoader;
 namespace ChatPlus.Core.Features.PlayerIcons
 .PlayerInfo;
 
-public class PreviewFullBrightPlayer : ModPlayer
+public class ModifyPlayerDrawInfo : ModPlayer
 {
     public static bool ForceFullBrightOnce;
-
     public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
     {
         if (!ForceFullBrightOnce)

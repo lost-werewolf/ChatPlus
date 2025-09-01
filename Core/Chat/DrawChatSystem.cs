@@ -70,10 +70,6 @@ namespace ChatPlus.Core.Chat
             // debug player draw
             //PlayerInfoDrawer.DrawPlayer(Main.spriteBatch, new Vector2(710, 400), Main.LocalPlayer);
 
-
-            // debug
-            Log.Info(PlayerInfoState.instance == null);
-
             if (!Main.drawingPlayerChat) { orig(self); return; }
 
             PlayerInput.WritingText = true;

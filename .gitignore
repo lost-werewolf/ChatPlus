@@ -7,7 +7,4 @@ Assets/NotoEmoji
 # files
 *.user
 *.sln
-description_workshop.txt
-description.txt
 emojibase.raw.json
-icon_small.png

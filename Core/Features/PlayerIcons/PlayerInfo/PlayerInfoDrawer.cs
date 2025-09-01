@@ -101,19 +101,20 @@ public static class PlayerInfoDrawer
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
 
-        PreviewFullBrightPlayer.ForceFullBrightOnce = true;
+        ModifyPlayerDrawInfo.ForceFullBrightOnce = true;
         try
         {
-            // Position
-            Vector2 offset = new(100, 90);
-            Vector2 worldDrawPos = pos + Main.screenPosition + offset;
-
             // Draw player
-            Main.PlayerRenderer.DrawPlayer(Main.Camera, player, worldDrawPos, 0f, Vector2.Zero, 0f, scale);
+            pos += Main.screenPosition + new Vector2(100, 90);
+
+            Log.Info(player.wings);
+            if (player.wings == 45) player.wings = 0;
+            
+            Main.PlayerRenderer.DrawPlayer(Main.Camera,player,pos,player.fullRotation,player.fullRotationOrigin,0f,scale);
         }
         finally
         {
-            PreviewFullBrightPlayer.ForceFullBrightOnce = false;
+            ModifyPlayerDrawInfo.ForceFullBrightOnce = false;
         }
     }
 

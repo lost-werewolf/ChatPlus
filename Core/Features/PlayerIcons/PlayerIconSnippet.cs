@@ -58,7 +58,7 @@ public class PlayerIconSnippet : TextSnippet
         var hoverRect = new Rectangle((int)pos.X - 10, (int)pos.Y - 6, width + 3, (int)size.Y + 3);
         
         // to debug; comment below line out!
-        //if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
+        if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
         {
             if (!Conf.C.ShowPlayerPreviewWhenHovering) return false;
 

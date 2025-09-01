@@ -95,7 +95,7 @@ public class ModIconsConfigElement : ConfigElement<bool>
     {
         CalculatedStyle dimensions = GetDimensions();
 
-        string label = Value ? "On" : "Off";
+        string label = Value ? Lang.menu[126].Value : Lang.menu[124].Value; // On / Off
 
         // Shift to a position you know is visible
         Vector2 pos = new Vector2(dimensions.X + dimensions.Width - 60f, dimensions.Y + 8f);
