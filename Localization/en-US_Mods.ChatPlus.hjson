@@ -118,4 +118,10 @@ Commands: {
 		Tag_7: Players     [p
 		Tag_8: Uploads     [u
 	}
+
+	ChatClearCommand: {
+		Usage: Mods.ChatPlus.Commands.ChatClearCommand.Usage
+		Description: Mods.ChatPlus.Commands.ChatClearCommand.Description
+		Cleared: Mods.ChatPlus.Commands.ChatClearCommand.Cleared
+	}
 }
