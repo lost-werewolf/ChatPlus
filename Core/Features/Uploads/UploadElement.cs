@@ -1,3 +1,4 @@
+using ChatPlus.Core.Features.Uploads.UploadInfo;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -5,7 +6,6 @@ using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ChatPlus.Core.Features.Uploads
 {
@@ -46,6 +46,7 @@ namespace ChatPlus.Core.Features.Uploads
             if (bounds.Contains(Main.MouseScreen.ToPoint()))
             {
                 UICommon.TooltipMouseText($"Shift+click to delete {Data.FileName}");
+                HoveredUploadOverlay.Set(Data);
             }
             // debug
             //sb.Draw(TextureAssets.MagicPixel.Value, bounds, Color.Red*0.5f);

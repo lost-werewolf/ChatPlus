@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
-using ChatPlus.Core.Features.PlayerIcons
-.PlayerInfo;
+using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 using ChatPlus.Core.UI;
 using Terraria;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.PlayerIcons
-;
+namespace ChatPlus.Core.Features.PlayerIcons;
 
 public class PlayerIconPanel : BasePanel<PlayerIcon>
 {

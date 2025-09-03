@@ -40,8 +40,8 @@ namespace ChatPlus.Core.Chat
 
         private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
         {
-            ModReloaderSystem.ChatOffsetX = 45;
-            ModReloaderSystem.ChatOffsetY = 0;
+            //ModReloaderSystem.ChatOffsetX = 45;
+            //ModReloaderSystem.ChatOffsetY = 0;
 
             bool hasUpload = drawingPlayerChat && UploadTagHandler.ContainsUploadTag(Main.chatText);
             if (!hasUpload)
@@ -83,11 +83,11 @@ namespace ChatPlus.Core.Chat
 
             int xOffset = 0;
             int yOffset = 0;
-            if (ModReloaderSystem.Found)
-            {
-                xOffset = 50;
-                yOffset = 0;
-            }
+            //if (ModReloaderSystem.Found)
+            //{
+                //xOffset = 50;
+                //yOffset = 0;
+            //}
             
             DrawChatbox(height, xOffset, yOffset);
 

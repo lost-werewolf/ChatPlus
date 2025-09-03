@@ -54,10 +54,13 @@ public static class PlayerInfoDrawer
         // Draw player
         DrawPlayer(sb, pos, player);
 
-        if (Main.netMode != NetmodeID.SinglePlayer)
+        // Draw stats to the left of player
+        if (Main.netMode != NetmodeID.SinglePlayer && player.team != 0)
         {
-            DrawTeamText(sb, cursor, player);
+            DrawTeamText(sb, cursor, player); // team x
         }
+
+        // Here is the end of player panel
         cursor += new Vector2(0, 110);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
 
@@ -213,23 +216,93 @@ public static class PlayerInfoDrawer
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
+        // Local helper: treat town NPCs (and town pets/slimes) as non-targets
+        static bool IsTownLikeNpc(NPC npc)
+        {
+            if (npc == null) return false;
+            if (npc.townNPC) return true;
+            if (NPCID.Sets.IsTownPet[npc.type]) return true;
+            return false;
+        }
+
         int bannerID = player.lastCreatureHit;
         int netID = bannerID > 0 ? Item.BannerToNPC(bannerID) : 0;
 
+        // If banner path failed, use our last hit NPC (but skip town-like)
         if (netID <= 0 && player.lastCreatureHit >= 0)
         {
-            NPC npc = Main.npc[BossHitSystem.GetLastNPCHit()];
-            if (npc != null && npc.active)
-                netID = npc.type;
+            int lastHit = BossHitSystem.GetLastNPCHit();
+            if (lastHit >= 0)
+            {
+                NPC npc = Main.npc[lastHit];
+                if (npc != null && npc.active && !IsTownLikeNpc(npc))
+                {
+                    netID = npc.type;
+                }
+            }
         }
 
-
-        // only update if valid
+        // Only update if valid (and not a town-like type if we can tell from an active instance)
         if (netID > 0 && netID < TextureAssets.Npc.Length && Main.npcFrameCount[netID] > 0)
-            _lastValidCreatureNetId = netID;
+        {
+            // If an active instance of this type exists and is town-like, skip it
+            bool hasActiveTownLike = false;
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                var n = Main.npc[i];
+                if (n != null && n.active && n.type == netID && IsTownLikeNpc(n))
+                {
+                    hasActiveTownLike = true;
+                    break;
+                }
+            }
 
+            if (!hasActiveTownLike)
+            {
+                _lastValidCreatureNetId = netID;
+            }
+        }
+
+        // If nothing valid yet → pick closest hostile (CanBeChasedBy already excludes friendlies; we also exclude town-like explicitly)
         if (_lastValidCreatureNetId <= 0)
-            return; // nothing valid ever yet → don’t draw anything
+        {
+            float bestDist = float.MaxValue;
+            int closest = -1;
+            Vector2 playerPos = player.Center;
+
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (npc != null && npc.active && npc.CanBeChasedBy() && !IsTownLikeNpc(npc))
+                {
+                    float dist = Vector2.Distance(playerPos, npc.Center);
+                    if (dist < bestDist)
+                    {
+                        bestDist = dist;
+                        closest = npc.type;
+                    }
+                }
+            }
+
+            if (closest > 0 && closest < TextureAssets.Npc.Length)
+            {
+                _lastValidCreatureNetId = closest;
+            }
+        }
+
+        // If still nothing → draw placeholder text
+        if (_lastValidCreatureNetId <= 0)
+        {
+            string noEnemy = "None"; // <= 9 chars
+            var tp = new Vector2(rect.X + 16, rect.Y + 4);
+            if (noEnemy.Length <= 7)
+            {
+                tp += new Vector2(16, 0);
+            }
+
+            Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, noEnemy, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+            return;
+        }
 
         // Draw npc
         Main.instance.LoadNPC(_lastValidCreatureNetId);
@@ -240,8 +313,7 @@ public static class PlayerInfoDrawer
         int frameHeight = npcTexture.Height / totalFrames;
         Rectangle npcDrawRectangle = new Rectangle(0, frameCounter * frameHeight, npcTexture.Width, frameHeight);
         float scale = 36f / Math.Max(npcTexture.Width, frameHeight);
-        Vector2 drawPos = rect.Center.ToVector2() -
-            new Vector2(npcTexture.Width * scale + 75, frameHeight * scale) / 2f;
+        Vector2 drawPos = rect.Center.ToVector2() - new Vector2(npcTexture.Width * scale + 75, frameHeight * scale) / 2f;
 
         frameTimer++;
         if (frameTimer > 14)
@@ -250,20 +322,22 @@ public static class PlayerInfoDrawer
             frameTimer = 0;
         }
 
-        // Draw npc
         sb.Draw(npcTexture, drawPos, npcDrawRectangle, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
 
         // Get npc name
         string creatureName = Lang.GetNPCNameValue(_lastValidCreatureNetId);
         if (creatureName.Length > 8)
+        {
             creatureName = creatureName[..7] + "...";
+        }
 
-        var tp = new Vector2(rect.X + 16, rect.Y + 4);
+        var textPos = new Vector2(rect.X + 16, rect.Y + 4);
         if (creatureName.Length <= 7)
-            tp += new Vector2(16, 0);
+        {
+            textPos += new Vector2(16, 0);
+        }
 
-        // Draw npc name
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, creatureName, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, creatureName, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
 
     public static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)
@@ -499,13 +573,13 @@ public static class PlayerInfoDrawer
     {
         string teamText = player.team switch
         {
-            0 => "[c/ffffff:No team]",
-            1 => "[c/DA3B3B:(Team Red)]",
-            2 => "[c/3bda55:(Team Green)]",
-            3 => "[c/3b95da:(Team Blue)]",
-            4 => "[c/f2dd64:(Team Yellow)]",
-            5 => "[c/e064f2:(Team Pink)]",
-            _ => "No team"
+            0 => string.Empty,
+            1 => "[c/DA3B3B:Team Red]",
+            2 => "[c/3bda55:Team Green]",
+            3 => "[c/3b95da:Team Blue]",
+            4 => "[c/f2dd64: Team Yellow]",
+            5 => "[c/e064f2: TeamPink]",
+            _ => string.Empty
         };
 
         var snippets = ChatManager.ParseMessage(teamText, Color.White).ToArray();
@@ -513,6 +587,40 @@ public static class PlayerInfoDrawer
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, new Vector2(1.0f), out _);
     }
 
+    public static void DrawBiomeText(SpriteBatch sb, Vector2 pos, Player player)
+    {
+        string biomeText =
+            player.ZoneDungeon ? "Dungeon" :
+            player.ZoneJungle ? "Jungle" :
+            player.ZoneSnow ? "Snow" :
+            player.ZoneDesert ? "Desert" :
+            player.ZoneHallow ? "Hallow" :
+            player.ZoneCorrupt ? "Corruption" :
+            player.ZoneCrimson ? "Crimson" :
+            player.ZoneGlowshroom ? "Mushroom" :
+            player.ZoneBeach ? "Ocean" :
+            player.ZoneUnderworldHeight ? "Underworld" :
+            player.ZoneSkyHeight ? "Sky" : 
+            string.Empty;
+
+        string formatted = "";
+        if (biomeText != string.Empty)
+            formatted = $"Biome: [c/ffffff:{biomeText}]";
+
+        var snippets = ChatManager.ParseMessage(formatted, Color.White).ToArray();
+        pos += new Vector2(7, 5);
+        ChatManager.DrawColorCodedStringWithShadow(
+            sb,
+            FontAssets.MouseText.Value,
+            snippets,
+            pos,
+            0f,
+            Vector2.Zero,
+            Vector2.One,
+            out _
+        );
+    }
+   
     public static void DrawPlayerID(SpriteBatch sb, Vector2 pos, Player player)
     {
         string ID = "ID: " + player.whoAmI.ToString();
@@ -520,19 +628,6 @@ public static class PlayerInfoDrawer
         var snippets = ChatManager.ParseMessage(ID, Color.White).ToArray();
         pos += new Vector2(7, 5);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, new Vector2(1.0f), out _);
-    }
-
-    public static void DrawSurfaceBackground(SpriteBatch sb, Rectangle rect)
-    {
-        var tex = Main.Assets.Request<Texture2D>("Images/MapBG1").Value;
-        int deflate = 4;
-        rect = new Rectangle(
-            rect.X + deflate,
-            rect.Y + deflate,
-            rect.Width - deflate * 2,
-            rect.Height - deflate * 2
-        );
-        sb.Draw(tex, rect, Color.White);
     }
     #endregion
 

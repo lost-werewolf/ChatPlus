@@ -133,7 +133,6 @@ Config v2:
 - Items visible (3-20)
 - Show tooltips
 - Show hover tooltips
-- 
 - Scroll speed
 
 Preview images on steam workshop later:
@@ -243,14 +242,12 @@ New features:
 
 ~---~
 
-Done:
 [done] Fix bugs like cant move items, right click, or draw right stuff in MoreInfoState
 [done] Fix scrollwheel bug causing all parsing to be removed
 [done] Fix links triple line drawing
 [done] Fix player drawing is too dark
 
 ~---~
-Todo:
 [done] Fix mod info open tooltip preview panel with mod side and more, click to open info state
 [done] Add left right buttons to scroll players
 [done] Implement player color and assigning
@@ -273,9 +270,20 @@ Row 5: author
 [done] Fix initial opening state doesnt show right header
 [done] Fix tml icon
 [done] Draw player compat for weaponOut
+[done] Disable preview when boss is alive
+[done] Move chat box for Mod Reloader
+[done] Fix ExampleMod stack source
+[idea] React to message: highlights the chat message, shows options: reply, quick emojis, or emoji panel.
+[todo] Typing indicator. Small "x is typing"...
+[todo] Investigate if chat source does things better by keeping it on
+[todo] Drag top of scrollbar to resize height of chats. Should be hardcoded to force whole number chat heights.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[done] Disable preview when boss is alive
-[todo] Move chat box for Mod Reloader
-[todo] Fix ExampleMod stack source
+[todo] Add replacement for last enemy hit
+[todo] Finalize icon
+[todo] Add regex for emojis so player can use : instead of [e
+[todo] Add regex for players so player can use @ to tag other players and format messages accordingly
+[todo] Add time in session
+[todo] Add current biome
+[todo] Add equipment

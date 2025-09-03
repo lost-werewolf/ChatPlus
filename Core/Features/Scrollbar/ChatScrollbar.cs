@@ -140,10 +140,10 @@ public class ChatScrollbar : UIElement
 
         Left.Set(50, 0);
         Top.Set(top, 0f);
-        if (ModReloaderSystem.Found)
-        {
-            Left.Set(100, 0);
-        }
+        //if (ModReloaderSystem.Found)
+        //{
+        //    Left.Set(100, 0);
+        //}
         Height.Set(h+30, 0f);
 
         if (IsMouseHovering) Main.LocalPlayer.mouseInterface = true;

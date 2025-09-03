@@ -7,8 +7,8 @@ Keybinds: {
 	"Open Upload Window.DisplayName": Open Upload Window
 	"DEBUG: Write Lines.DisplayName": D E B U G:  Write  Lines
 	"DEBUG: Write Chat Line Count.DisplayName": D E B U G:  Write  Chat  Line  Count
-	"Open Mod Window.DisplayName": Open  Mod  Window
-	"Open Player Window.DisplayName": Open  Player  Window
+	"Open Mod Window.DisplayName": Open Mod Window
+	"Open Player Window.DisplayName": Open Player Window
 }
 
 Configs: {
@@ -135,5 +135,27 @@ Commands: {
 		Usage: /clear
 		Description: Clears all chat messages.
 		Cleared: Chat cleared!
+	}
+}
+
+PlayerInfo: {
+	Headers: {
+		Inventory: Inventory
+		Accessories: Accessories
+		Stats: Stats
+		Biome: Biome
+	}
+
+	Stats: {
+		Health: Health
+		Mana: Mana
+		Defense: Defense
+		Deaths: Deaths
+		Coins: Coins
+		Ammo: Ammo
+		Minions: Minions
+		Sentries: Sentries
+		HeldItem: Held Item
+		LastCreatureHit: Last Creature Hit
 	}
 }

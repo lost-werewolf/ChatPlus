@@ -186,63 +186,67 @@ public sealed class ModIconSnippet : TextSnippet
         return false;
     }
 
-    public static string GetModSource()
+    public static string GetCallingName(bool whitespace = false)
     {
+        string name = string.Empty;
+
+        StackFrame[] frames/* = new StackFrame[1]*/;
         try
         {
-            var frames = new StackTrace().GetFrames();
-            if (frames == null) return null;
-
-            var terrariaAsm = typeof(Main).Assembly;
-            var loaderAsm = typeof(ModLoader).Assembly;
-            var chatPlusAsm = typeof(ModIconSnippet).Assembly;
-
-            var pivot = -1;
-            for (int i = 0; i < frames.Length; i++)
+            frames = new StackTrace(true).GetFrames();
+            Logging.PrettifyStackTraceSources(frames);
+            //We want to find the call after the first found, last NewText or AddNewMessage
+            int index;
+            bool correctSequenceFound = false;
+            for (index = 0; index < frames.Length; index++)
             {
-                var m = frames[i].GetMethod();
-                if (m == null) continue;
-                var n = m.Name;
-                if (n.IndexOf("NewText", StringComparison.Ordinal) >= 0 || n.IndexOf("AddNewMessage", StringComparison.Ordinal) >= 0)
+                var method = frames[index].GetMethod();
+                var methodName = method.Name;
+                if (methodName.Contains("NewText") || methodName.Contains("AddNewMessage"))
                 {
-                    pivot = i;
-                    break;
+                    correctSequenceFound = true;
+                }
+                else if (correctSequenceFound)
+                {
+                    break; //Done
                 }
             }
-            if (pivot < 0) return null;
 
-            for (int i = pivot + 1; i < frames.Length; i++)
+            if (index == frames.Length)
             {
-                var m = frames[i].GetMethod();
-                if (m == null) continue;
+                name = string.Empty;
+            }
+            else
+            {
+                var frame = frames[index];
+                var method = frame.GetMethod();
 
-                var t = m.DeclaringType;
-                if (t == null) continue;
-
-                var asm = t.Assembly;
-                var ns = t.Namespace ?? string.Empty;
-
-                // Skip engine, loader, and our own code
-                //if (asm == terrariaAsm) continue;
-                if (asm == chatPlusAsm) continue;
-
-                // If the caller is tModLoader (e.g., /playing), treat as ModLoader
-                if (asm == loaderAsm)
+                Type declaringType = method.DeclaringType;
+                if (declaringType != null && declaringType.Namespace != null)
                 {
-                    if (ns.StartsWith("Terraria.ModLoader", StringComparison.OrdinalIgnoreCase)) return "ModLoader";
-                    continue;
+                    name = declaringType.Namespace.Split('.')[0];
+                }
+                else
+                {
+                    name = "Terraria";
                 }
 
-                var mod = ModLoader.Mods.FirstOrDefault(z => z != null && z.Code == asm);
-                if (mod.Name == "DragonLens") return "Terraria";
-                if (mod != null) return mod.Name;
             }
-
-            return "ModLoader";
         }
         catch
         {
-            return null;
+            //var logger = ModContent.GetInstance<ChatSource>().Logger;
+            //logger.Info("#####");
+            //foreach (var frame in frames)
+            //{
+            //    logger.Info(frame?.ToString() ?? "frame null");
+            //}
+            //logger.Info("#####");
         }
+        if (string.IsNullOrEmpty(name))
+            return string.Empty;
+
+        return name;
     }
 }
+

@@ -21,19 +21,9 @@ public class PlayerInfoState : UIState, ILoadable
 {
     public static PlayerInfoState instance;
 
-    private int _whoAmI;
-    private string _playerName = "Unknown";
-    private ChatSession.Snapshot? _returnSnapshot;
-
     private UITextPanel<string> titlePanel;
     private UIElement _messageBox;
-    private UIScrollbar _scrollbar;
-
-    private UIScrollbar accessoriesScrollbar;
-
     private static Type _messageBoxType;
-    private static MethodInfo _setTextMethod;
-    private static MethodInfo _setScrollbarMethod;
 
     // bottom
     private UIElement _bottom;
@@ -41,14 +31,14 @@ public class PlayerInfoState : UIState, ILoadable
     private UITextPanel<string> _prevBtn;
     private UITextPanel<string> _nextBtn;
     private int _currentPlayerIndex;
+    private int _whoAmI;
+    private string _playerName = "Unknown";
+    private ChatSession.Snapshot? _returnSnapshot;
 
     public void Load(Mod mod)
     {
         instance = this;
-        var asm = typeof(UICommon).Assembly;
-        _messageBoxType = asm.GetType("Terraria.ModLoader.UI.UIMessageBox");
-        _setTextMethod = _messageBoxType?.GetMethod("SetText");
-        _setScrollbarMethod = _messageBoxType?.GetMethod("SetScrollbar");
+        _messageBoxType = typeof(UICommon).Assembly.GetType("Terraria.ModLoader.UI.UIMessageBox");
     }
 
     public void Unload() { instance = null; }
@@ -69,10 +59,6 @@ public class PlayerInfoState : UIState, ILoadable
             _messageBox.Width.Set(0, 1f); _messageBox.Height.Set(0, 1f); body.Append(_messageBox);
         }
 
-        _scrollbar = new UIScrollbar { Height = { Pixels = -12f, Percent = 1f }, VAlign = 0.5f, HAlign = 1f }.WithView(100f, 1000f);
-        panel.Append(_scrollbar);
-        if (_messageBox != null && _setScrollbarMethod != null) _setScrollbarMethod.Invoke(_messageBox, new object[] { _scrollbar });
-
         titlePanel = new UITextPanel<string>($"Player: {_playerName}", 0.8f, true)
         { HAlign = 0.5f, Top = { Pixels = -35f }, BackgroundColor = UICommon.DefaultUIBlue }.WithPadding(15f);
         uiContainer.Append(titlePanel);
@@ -89,24 +75,15 @@ public class PlayerInfoState : UIState, ILoadable
         _currentPlayerIndex = _whoAmI >= 0 ? _whoAmI : Main.myPlayer;
         SetPlayerFromIndex(_currentPlayerIndex);
     }
+
+    #region Cycle players
     public static bool Active { get; private set; }
-
-    public override void OnActivate()
-    {
-        base.OnActivate();
-        Active = true;
-    }
-
-    public override void OnDeactivate()
-    {
-        base.OnDeactivate();
-        Active = false;
-    }
-
+    public override void OnActivate() => Active = true;
+    public override void OnDeactivate() => Active = false;
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        RefreshNavButtons(); // handles SP → MP, players joining/leaving, etc.
+        RefreshNavButtons(); 
     }
 
     private void RefreshNavButtons()
@@ -176,7 +153,6 @@ public class PlayerInfoState : UIState, ILoadable
         _bottom.Recalculate();
         Recalculate();
     }
-
     private void CyclePlayer(int dir)
     {
         var list = GetActivePlayerIndices();
@@ -195,7 +171,7 @@ public class PlayerInfoState : UIState, ILoadable
         if (p == null || !p.active) return;
 
         _currentPlayerIndex = idx;
-        _whoAmI = idx; // <-- critical: keep Draw() in sync
+        _whoAmI = idx;
 
         _playerName = p.name;
         titlePanel?.SetText($"Player: {_playerName}");
@@ -219,55 +195,85 @@ public class PlayerInfoState : UIState, ILoadable
         _whoAmI = whoAmI;
         _playerName = nameOverride ?? Main.player?[whoAmI]?.name ?? $"Player {whoAmI}";
     }
+    #endregion
 
+    #region Draw
     public override void Draw(SpriteBatch sb)
     {
         base.Draw(sb);
+
         var player = _whoAmI >= 0 && _whoAmI < Main.maxPlayers ? Main.player[_whoAmI] : null;
         if (player == null || !player.active) return;
 
-        // Dimensions
         int panelWidth = 96, gutter = 10, rowHeight = 31;
         int containerW = Math.Min((int)(Main.screenWidth * 0.8f), 1000);
         int containerLeft = (Main.screenWidth - containerW) / 2, top = 120;
-        int bgW = 436;
-        int bgH = 200;
+        int bgW = 436, bgH = 200;
         var bgRect = new Rectangle(containerLeft + 42, top + 42, bgW, bgH);
         int leftColumn = containerLeft + containerW - (panelWidth * 2 + gutter) - 60;
         int rightColumn = leftColumn + panelWidth + gutter;
         int y0 = bgRect.Y;
-        Vector2 cursor = new Vector2(bgRect.X, bgRect.Y); // start at top left
         bool smallWidth = Main.screenWidth < 1200;
-        if (Main.screenWidth < 940)
-            bgRect.Width = bgW - 110;
+        if (Main.screenWidth < 940) bgRect.Width = bgW - 110;
 
-        // Draw background
+        int panelTop = top;
+        int panelBottom = Main.screenHeight - 110;
+
+        int invSlot = smallWidth ? 36 : 40;
+        int invPad = 4;
+        int invRowH = invSlot + invPad;
+        int invRows = 5;
+        int invHeight = invRows * invRowH;
+
+        int buffSize = 32, buffPad = 6, buffPerRow = 10;
+        int buffCount = CountActiveBuffs(player);
+        int buffRows = (buffCount + buffPerRow - 1) / buffPerRow;
+        int buffRowH = buffSize + buffPad;
+        int buffHeight = buffRows * buffRowH;
+
+        int accSlot = smallWidth ? 36 : 40;
+        int accPad = 4;
+        int accRowH = accSlot + accPad;
+        int dyeRows = Math.Max(0, player.dye.Length - 3);
+        int equipRows = Math.Max(0, player.armor.Length - 3);
+        int vanityRows = Math.Max(0, player.armor.Length - 13);
+        int accRows = Math.Min(dyeRows, Math.Min(equipRows, vanityRows));
+        int accHeight = accRows * accRowH;
+
+        var playerPos = new Vector2(bgRect.X + bgRect.Width * 0.5f - 100f, bgRect.Y + 50);
+
+        Vector2 invStart = new(bgRect.X, bgRect.Bottom + 52);
+        Vector2 buffStart = new(bgRect.X, invStart.Y + invHeight + 35);
+
+        int xOffset = 0, yOffset = 0;
+        if (smallWidth) { xOffset = 275; yOffset = 220; }
+
+        Vector2 accPos = new(
+            x: leftColumn - 200 + xOffset,
+            y: y0 + 30 + yOffset
+        );
+
         PlayerInfoDrawer.DrawSeparatorBorder(sb, bgRect);
         PlayerInfoDrawer.DrawMapFullscreenBackground(sb, bgRect);
 
-        // Draw top left info
+        // Draw stats to the left of player
+        Vector2 bgTopLeft = new(bgRect.X, bgRect.Y);
         if (Main.netMode != NetmodeID.SinglePlayer)
         {
-            PlayerInfoDrawer.DrawTeamText(sb, cursor, player);
-            cursor += new Vector2(0, 21);
-            PlayerInfoDrawer.DrawPlayerID(sb, cursor, player);
+            if (player.team != 0)
+                PlayerInfoDrawer.DrawTeamText(sb, bgTopLeft += new Vector2(0, 21), player);
+            PlayerInfoDrawer.DrawPlayerID(sb, bgTopLeft, player);
+            bgTopLeft += new Vector2(0, 21);
         }
+        PlayerInfoDrawer.DrawBiomeText(sb, bgTopLeft, player);
 
         // Draw player
-        var playerPos = new Vector2(bgRect.X + bgRect.Width * 0.5f - 100f, bgRect.Y + 50);
         PlayerInfoDrawer.DrawPlayer(sb, playerPos, player, 1.8f);
 
-        // Stats header
         Vector2 statsHeaderPos = new(leftColumn, y0 - 4);
-        if (!smallWidth)
-            Utils.DrawBorderStringBig(sb, "Stats", statsHeaderPos, Color.White, scale: 0.5f);
-        if (smallWidth)
-        {
-            y0 -= 30;
-        }
+        if (!smallWidth) Utils.DrawBorderStringBig(sb, "Stats", statsHeaderPos, Color.White, scale: 0.5f);
+        if (smallWidth) y0 -= 30;
 
-
-        // Bounds
         Rectangle hpBounds = new(leftColumn, y0 + rowHeight + 6, panelWidth, rowHeight);
         Rectangle manaBounds = new(rightColumn, y0 + rowHeight + 6, panelWidth, rowHeight);
         Rectangle defBounds = new(leftColumn, y0 + rowHeight * 2 + 12, panelWidth, rowHeight);
@@ -277,10 +283,8 @@ public class PlayerInfoState : UIState, ILoadable
         Rectangle minionBounds = new(leftColumn, y0 + rowHeight * 4 + 24, panelWidth, rowHeight);
         Rectangle sentryBounds = new(rightColumn, y0 + rowHeight * 4 + 24, panelWidth, rowHeight);
         Rectangle heldItemBounds = new(leftColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
-        Rectangle lastCreateHitBounds = new(rightColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
+        Rectangle lastCreateBounds = new(rightColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
 
-
-        // Draw stats
         PlayerInfoDrawer.DrawStat_HP(sb, hpBounds, player);
         PlayerInfoDrawer.DrawStat_Mana(sb, manaBounds, player);
         PlayerInfoDrawer.DrawStat_Defense(sb, defBounds, player);
@@ -290,38 +294,20 @@ public class PlayerInfoState : UIState, ILoadable
         PlayerInfoDrawer.DrawStat_Minions(sb, minionBounds, player);
         PlayerInfoDrawer.DrawStat_Sentries(sb, sentryBounds, player);
         PlayerInfoDrawer.DrawStat_HeldItem(sb, heldItemBounds, player);
-        PlayerInfoDrawer.DrawStat_LastCreatureHit(sb, lastCreateHitBounds, player);
+        PlayerInfoDrawer.DrawStat_LastCreatureHit(sb, lastCreateBounds, player);
 
-        // Draw inventory
-        DrawInventory(sb, bgRect, player);
+        Rectangle viewport = new(containerLeft+20, top+20, containerW-20*4, panelBottom - top-20*2);
+        DrawDebugRect(viewport);
+        Utils.DrawBorderStringBig(sb, "Inventory", new Vector2(invStart.X + 2, invStart.Y - 35), Color.White, 0.5f);
+        DrawInventory(sb, invStart, player, viewport);
+        DrawAccessories(sb, accPos, player, viewport);
 
-        // Draw buffs
-        if (HasAnyBuff(player))
-            Utils.DrawBorderStringBig(sb, "Buffs", new Vector2(bgRect.X, bgRect.Y + 476), Color.White, 0.52f);
-        DrawBuffs(sb, bgRect, player);
-
-        // Draw accessories
-        int xOffset = 0;
-        int yOffset = 0;
-        if (smallWidth)
+        if (buffCount > 0 && viewport.Bottom > buffStart.Y+20)
         {
-            xOffset = 275;
-            yOffset = 250;
+            Utils.DrawBorderStringBig(sb, "Buffs", new Vector2(buffStart.X, buffStart.Y - 36), Color.White, 0.52f);
+            DrawBuffs(sb, buffStart, player, viewport);
         }
 
-        Vector2 armorPos = new(
-            x: leftColumn - 200 + xOffset,
-            y: y0 + 3 * 44 + 120 - 44 * 5 + yOffset);
-        Vector2 accessoriesPos = new(armorPos.X, armorPos.Y + 3 * 44);
-        if (smallWidth)
-            accessoriesPos.Y = armorPos.Y + 3 * 40;
-
-        Utils.DrawBorderStringBig(sb, "Accessories", new Vector2(armorPos.X, armorPos.Y - 36), Color.White, 0.52f);
-
-        DrawArmor(sb, armorPos, player);
-        DrawAccessories(sb, accessoriesPos, player);
-
-        // Handle hovers
         Point p = Main.MouseScreen.ToPoint();
         if (hpBounds.Contains(p)) UICommon.TooltipMouseText("Health");
         if (manaBounds.Contains(p)) UICommon.TooltipMouseText("Mana");
@@ -332,93 +318,96 @@ public class PlayerInfoState : UIState, ILoadable
         if (minionBounds.Contains(p)) UICommon.TooltipMouseText("Minions");
         if (sentryBounds.Contains(p)) UICommon.TooltipMouseText("Sentries");
         if (heldItemBounds.Contains(p)) UICommon.TooltipMouseText("Held Item");
-        if (lastCreateHitBounds.Contains(p)) UICommon.TooltipMouseText("Last Creature Hit");
+        if (lastCreateBounds.Contains(p)) UICommon.TooltipMouseText("Last Creature Hit");
     }
 
-    private static void DrawInventory(SpriteBatch sb, Rectangle bgRect, Player player)
+    private static void DrawInventory(SpriteBatch sb, Vector2 start, Player player, Rectangle viewport)
     {
-        int size = 40, pad = 4;
-        bool smallWidth = Main.screenWidth < 1200;
-        if (smallWidth)
-            size = 36;
-        var start = new Vector2(bgRect.X, bgRect.Bottom + 52);
-        Utils.DrawBorderStringBig(sb, "Inventory", new Vector2(start.X + 2, start.Y - 35), Color.White, 0.5f);
-        bool TryEquipFromInventory(Player p, int invIndex)
-        {
-            // we can only equip items from ourself
-            if (player != Main.LocalPlayer) return false;
-
-            ref Item it = ref p.inventory[invIndex]; if (it.IsAir) return false;
-
-            if (it.accessory)
-            {
-                int begin = 3;
-                int end = Math.Min(10, p.armor.Length);
-                int empty = -1;
-                for (int s = begin; s < end; s++)
-                {
-                    if (p.armor[s].type == it.type)
-                        return false;
-
-                    if (empty < 0 && p.armor[s].IsAir)
-                        empty = s;
-                }
-                if (empty >= 0)
-                {
-                    p.armor[empty] = it.Clone();
-                    it.TurnToAir();
-                    return true;
-                }
-                for (int s = begin; s < end; s++)
-                {
-                    if (!p.armor[s].IsAir)
-                    {
-                        var tmp = p.armor[s];
-                        p.armor[s] = it;
-                        p.inventory[invIndex] = tmp;
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            int equip = -1; int vanity = -1;
-            if (it.headSlot >= 0) { equip = 0; vanity = 10; } else if (it.bodySlot >= 0) { equip = 1; vanity = 11; } else if (it.legSlot >= 0) { equip = 2; vanity = 12; }
-            if (equip >= 0)
-            {
-                int target = it.defense > 0 ? equip : vanity;
-                if (p.armor[target].IsAir) { p.armor[target] = it.Clone(); it.TurnToAir(); return true; }
-                var sw = p.armor[target]; p.armor[target] = it; p.inventory[invIndex] = sw; return true;
-            }
-
-            return false;
-        }
+        int size = Main.screenWidth < 1200 ? 36 : 40;
+        int pad = 4;
 
         for (int i = 0; i < 50; i++)
         {
             int row = i / 10, col = i % 10;
-            var r = new Rectangle((int)(start.X + col * (size + pad)), (int)(start.Y + row * (size + pad)), size, size);
+
+            var r = new Rectangle(
+                (int)(start.X + col * (size + pad)),
+                (int)(start.Y + row * (size + pad)),
+                size, size
+            );
+
+            if (r.Bottom > viewport.Bottom-10) continue;
+
             var item = player.inventory[i];
 
-            // Draw special InvBack for held item
             if (item == player.HeldItem)
                 sb.Draw(TextureAssets.InventoryBack14.Value, r, Color.White);
             else
                 sb.Draw(TextureAssets.InventoryBack.Value, r, Color.White);
 
-            if (!item.IsAir)
+                if (!item.IsAir)
             {
-                ItemSlot.DrawItemIcon(item, 31, sb, r.Center(), 0.9f, size - 6, Color.White);
+                var center = new Vector2(r.X + r.Width / 2f, r.Y + r.Height / 2f);
+                ItemSlot.DrawItemIcon(item, 31, sb, center, 0.9f, size - 6, Color.White);
+
                 if (r.Contains(Main.MouseScreen.ToPoint()))
                 {
-                    UICommon.TooltipMouseText(""); Main.LocalPlayer.mouseInterface = true; Main.HoverItem = item.Clone();
+                    UICommon.TooltipMouseText("");
+                    Main.LocalPlayer.mouseInterface = true;
+                    Main.HoverItem = item.Clone();
                     Main.hoverItemName = item.Name;
+
                     if (Main.mouseRight && Main.mouseRightRelease && !PlayerInput.IgnoreMouseInterface)
                     {
-                        if (TryEquipFromInventory(player, i)) Main.mouseRightRelease = false;
+                        bool TryEquipFromInventory(Player p, int invIndex)
+                        {
+                            if (player != Main.LocalPlayer) return false;
+                            ref Item it = ref p.inventory[invIndex]; if (it.IsAir) return false;
+
+                            if (it.accessory)
+                            {
+                                int begin = 3;
+                                int end = Math.Min(10, p.armor.Length);
+                                int empty = -1;
+                                for (int s = begin; s < end; s++)
+                                {
+                                    if (p.armor[s].type == it.type) return false;
+                                    if (empty < 0 && p.armor[s].IsAir) empty = s;
+                                }
+                                if (empty >= 0) { p.armor[empty] = it.Clone(); it.TurnToAir(); return true; }
+                                for (int s = begin; s < end; s++)
+                                {
+                                    if (!p.armor[s].IsAir)
+                                    {
+                                        var tmp = p.armor[s];
+                                        p.armor[s] = it;
+                                        p.inventory[invIndex] = tmp;
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+
+                            int equip = -1, vanity = -1;
+                            if (it.headSlot >= 0) { equip = 0; vanity = 10; }
+                            else if (it.bodySlot >= 0) { equip = 1; vanity = 11; }
+                            else if (it.legSlot >= 0) { equip = 2; vanity = 12; }
+
+                            if (equip >= 0)
+                            {
+                                int target = it.defense > 0 ? equip : vanity;
+                                if (p.armor[target].IsAir) { p.armor[target] = it.Clone(); it.TurnToAir(); return true; }
+                                var sw = p.armor[target]; p.armor[target] = it; p.inventory[invIndex] = sw; return true;
+                            }
+                            return false;
+                        }
+
+                        if (TryEquipFromInventory(player, i))
+                            Main.mouseRightRelease = false;
                     }
                 }
             }
+
             if (i < 10)
             {
                 string label = i == 9 ? "0" : (i + 1).ToString();
@@ -433,8 +422,7 @@ public class PlayerInfoState : UIState, ILoadable
         float old = Main.inventoryScale;
         Main.inventoryScale = 40f / TextureAssets.InventoryBack.Width();
         bool smallWidth = Main.screenWidth < 1200;
-        if (smallWidth)
-            Main.inventoryScale = 36f / TextureAssets.InventoryBack.Width();
+        if (smallWidth) Main.inventoryScale = 36f / TextureAssets.InventoryBack.Width();
 
         int w = (int)(TextureAssets.InventoryBack.Width() * Main.inventoryScale);
         int h = (int)(TextureAssets.InventoryBack.Height() * Main.inventoryScale);
@@ -450,7 +438,6 @@ public class PlayerInfoState : UIState, ILoadable
 
             if (Main.mouseLeft && Main.mouseLeftRelease)
             {
-                //ItemSlot.LeftClick(items, context, slot);
                 Main.mouseLeftRelease = false;
             }
             if (Main.mouseRight && Main.mouseRightRelease && player == Main.LocalPlayer)
@@ -467,9 +454,8 @@ public class PlayerInfoState : UIState, ILoadable
         Main.inventoryScale = old;
     }
 
-    private static void DrawArmor(SpriteBatch sb, Vector2 topLeft, Player player)
+    private static void DrawVisualVanityAccessorySlots(SpriteBatch sb, Vector2 topLeft, Player player)
     {
-        var font = FontAssets.MouseText.Value;
         int size = 40, pad = 4;
         bool smallWidth = Main.screenWidth < 1200;
         if (smallWidth)
@@ -480,122 +466,144 @@ public class PlayerInfoState : UIState, ILoadable
         {
             int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
 
-            // Draw slots that can be clicked on
-            DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y, player);
-            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, x1, y, player);
-            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmor, r, x2, y, player);
-
             // Draw slots ON top of the existing ones that are purely visually correct
-            ItemSlot.Draw(sb, player.dye, ItemSlot.Context.EquipDye, r, new Vector2(x0, y));
             ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, new Vector2(x1, y));
-            ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmor, r, new Vector2(x2, y));
         }
         Main.inventoryScale = old;
     }
-    
-    private static void DrawAccessories(SpriteBatch sb, Vector2 topLeft, Player player)
-    {
-        // Use the big right-edge scrollbar for accessories
-        var scrollbar = instance?._scrollbar;
 
+    private static void DrawAccessories(SpriteBatch sb, Vector2 topLeft, Player player, Rectangle viewport)
+    {
         int size = Main.screenWidth < 1200 ? 36 : 40;
         int pad = 4;
         int rowStep = size + pad;
 
-        // How many rows we can actually show
-        int dyeRows = Math.Max(0, player.dye.Length - 3);
-        int equipRows = Math.Max(0, player.armor.Length - 3);
-        int vanityRows = Math.Max(0, player.armor.Length - 13);
-        int totalRows = Math.Min(dyeRows, Math.Min(equipRows, vanityRows));
+        Utils.DrawBorderStringBig(sb, "Accessories", new Vector2(topLeft.X, topLeft.Y - 36), Color.White, 0.52f);
 
-        int totalHeight = totalRows * rowStep;
-
-        // Viewport for the accessories column group (3 columns)
-        int viewportBottom = Main.screenHeight - 80;
-        int viewportHeight = Math.Clamp(viewportBottom - (int)topLeft.Y, rowStep, Math.Max(rowStep, totalHeight));
-
-        // Configure the big scrollbar for THIS content area
-        if (scrollbar != null)
+        for (int r = 0; r < 3; r++)
         {
-            // Make sure SetView gets sane values (avoid 0/0)
-            int maxSize = Math.Max(viewportHeight, totalHeight);
-            scrollbar.SetView(viewportHeight, maxSize);
+            int y = (int)topLeft.Y + r * rowStep;
+            var rowRect = new Rectangle((int)topLeft.X, y, 3 * rowStep, rowStep);
 
-            // Mouse wheel over the accessories viewport controls the big scrollbar
-            var vpRect = new Rectangle((int)topLeft.X, (int)topLeft.Y, 3 * rowStep, viewportHeight);
-            if (vpRect.Contains(Main.MouseScreen.ToPoint()))
+            if (rowRect.Bottom < viewport.Top || rowRect.Y > viewport.Bottom || rowRect.Right < viewport.Left || rowRect.X > viewport.Right)
             {
-                Main.LocalPlayer.mouseInterface = true;
-
-                int wheel = PlayerInput.ScrollWheelDelta;
-                if (wheel != 0)
-                {
-                    float step = rowStep; // one row per notch
-                    float maxScroll = Math.Max(0, maxSize - viewportHeight);
-                    float next = scrollbar.ViewPosition - Math.Sign(wheel) * step;
-                    if (next < 0) next = 0;
-                    if (next > maxScroll) next = maxScroll;
-                    scrollbar.ViewPosition = next;
-                }
+                continue;
             }
-        }
-
-        float scroll = scrollbar?.ViewPosition ?? 0f;
-
-        // Draw visible rows
-        for (int r = 0; r < totalRows; r++)
-        {
-            int y = (int)topLeft.Y + r * rowStep - (int)scroll;
-            if (y + size < topLeft.Y) continue;                         // above view
-            if (y > topLeft.Y + viewportHeight) break;                  // below view
-
-            int dyeIndex = 3 + r;
-            int vanityIndex = 13 + r;
-            int equipIndex = 3 + r;
 
             int x0 = (int)topLeft.X + 0 * rowStep;
             int x1 = (int)topLeft.X + 1 * rowStep;
             int x2 = (int)topLeft.X + 2 * rowStep;
 
+            // Draw top 3 armor dye slots
+            DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y, player);
+
+            // Draw middle 3 armor vanity slots
+            DrawLoaderSlot(player.armor, ItemSlot.Context.InWorld, 10 + r, x1, y, player);
+            
+            // Draw 3 armor slots
+            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, r, x2, y, player);
+
+            // Draw backup visual slots with accurate ItemSlot.Context,
+            // which, for some reason, works...
+            float scaleBackup = Main.inventoryScale;
+            Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
+            ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, new Vector2(x1, y));
+            ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmor, r, new Vector2(x2, y));
+            Main.inventoryScale = scaleBackup;
+        }
+
+        Vector2 accTopLeft = new(topLeft.X, topLeft.Y + 3 * rowStep);
+
+        int dyeRows = Math.Max(0, player.dye.Length - 3);
+        int equipRows = Math.Max(0, player.armor.Length - 3);
+        int vanityRows = Math.Max(0, player.armor.Length - 13);
+        int totalRows = Math.Min(dyeRows, Math.Min(equipRows, vanityRows));
+
+        for (int r = 0; r < totalRows; r++)
+        {
+            int y = (int)accTopLeft.Y + r * rowStep;
+            var rowRect = new Rectangle((int)accTopLeft.X, y, 3 * rowStep, rowStep);
+
+            int dyeIndex = 3 + r;
+            int vanityIndex = 13 + r;
+            int equipIndex = 3 + r;
+
+            int x0 = (int)accTopLeft.X + 0 * rowStep;
+            int x1 = (int)accTopLeft.X + 1 * rowStep;
+            int x2 = (int)accTopLeft.X + 2 * rowStep;
+
+            // Draw accessory dye slots
             DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, dyeIndex, x0, y, player);
-            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, vanityIndex, x1, y, player);
-            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmor, equipIndex, x2, y, player);
+
+            // Draw accessory vanity slots
+            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipAccessoryVanity, vanityIndex, x1, y, player);
+
+            // Draw accessory slots
+            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipAccessory, equipIndex, x2, y, player);
         }
     }
-
-    private static bool HasAnyBuff(Player p) { for (int i = 0; i < p.buffType.Length; i++) if (p.buffType[i] > 0 && p.buffTime[i] > 0) return true; return false; }
-
-    private static void DrawBuffs(SpriteBatch sb, Rectangle bgRect, Player player)
+    private static void DrawBuffs(SpriteBatch sb, Vector2 start, Player player, Rectangle viewport)
     {
-        int size = 32, pad = 6, perRow = 10; var start = new Vector2(bgRect.X, bgRect.Bottom + 52 + 5 * (40 + 4) + 35); var font = FontAssets.MouseText.Value;
+        int size = 32, pad = 6, perRow = 10;
+        var font = FontAssets.MouseText.Value;
         int n = 0;
+
         for (int i = 0; i < player.buffType.Length; i++)
         {
-            int id = player.buffType[i]; if (id <= 0) continue; if (!player.HasBuff(id)) continue;
-            int row = n / perRow; int col = n % perRow; var r = new Rectangle((int)(start.X + col * (size + pad)), (int)(start.Y + row * (size + pad)), size, size);
+            int id = player.buffType[i];
+            if (id <= 0 || !player.HasBuff(id)) continue;
+
+            int row = n / perRow, col = n % perRow;
+            var r = new Rectangle(
+                (int)(start.X + col * (size + pad)),
+                (int)(start.Y + row * (size + pad)),
+                size, size
+            );
+
             sb.Draw(TextureAssets.Buff[id].Value, r, Color.White);
+
             int t = player.buffTime[i];
             if (t > 2)
             {
                 int s = t / 60; string label;
-                if (s >= 3600) { label = (s / 3600).ToString() + ":" + ((s % 3600) / 60).ToString("00"); }
-                else if (s >= 60) { label = (s / 60).ToString() + ":" + (s % 60).ToString("00"); }
-                else { label = s.ToString(); }
-                var ls = font.MeasureString(label); Utils.DrawBorderString(sb, label, new Vector2(r.Right - ls.X + 1, r.Bottom - ls.Y + 1), Color.White, 0.7f, 0f, 0f);
+                if (s >= 3600) label = (s / 3600) + ":" + ((s % 3600) / 60).ToString("00");
+                else if (s >= 60) label = (s / 60) + ":" + (s % 60).ToString("00");
+                else label = s.ToString();
+                var ls = font.MeasureString(label);
+                Utils.DrawBorderString(sb, label, new Vector2(r.Right - ls.X + 1, r.Bottom - ls.Y + 1), Color.White, 0.7f, 0f, 0f);
             }
+
             bool hover = r.Contains(Main.MouseScreen.ToPoint()) && !PlayerInput.IgnoreMouseInterface;
             if (hover)
             {
-                UICommon.TooltipMouseText(Lang.GetBuffName(id)); Main.LocalPlayer.mouseInterface = true;
-                if (Main.mouseRight && Main.mouseRightRelease && !Main.debuff[id]) { player.DelBuff(i); Main.mouseRightRelease = false; }
+                UICommon.TooltipMouseText(Lang.GetBuffName(id));
+                Main.LocalPlayer.mouseInterface = true;
+
+                if (Main.mouseRight && Main.mouseRightRelease && !Main.debuff[id])
+                {
+                    player.DelBuff(i);
+                    Main.mouseRightRelease = false;
+                }
             }
             n++;
         }
     }
+    #endregion
 
+    #region Helpers
+    private static int CountActiveBuffs(Player p)
+    {
+        int n = 0;
+        for (int i = 0; i < p.buffType.Length; i++)
+            if (p.buffType[i] > 0 && p.buffTime[i] > 0) n++;
+        return n;
+    }
+    #endregion
     private void Back_OnLeftClick(UIMouseEvent evt, UIElement listeningElement)
     {
         IngameFancyUI.Close();
         if (_returnSnapshot.HasValue) { ChatSession.Restore(_returnSnapshot.Value); _returnSnapshot = null; }
     }
+
+    private static void DrawDebugRect(Rectangle r) => Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, r, Color.Red * 0.5f);
 }
