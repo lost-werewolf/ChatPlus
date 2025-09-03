@@ -186,15 +186,17 @@ public sealed class ModIconSnippet : TextSnippet
         return false;
     }
 
-    public static string GetCallingName(bool whitespace = false)
+    public static string GetCallingName()
     {
         string name = string.Empty;
 
-        StackFrame[] frames/* = new StackFrame[1]*/;
+        StackFrame[] frames;
+        //StackFrame[] frames = new StackFrame[1];
         try
         {
             frames = new StackTrace(true).GetFrames();
-            Logging.PrettifyStackTraceSources(frames);
+            //Log.Info(frames.Count());
+            //Logging.PrettifyStackTraceSources(frames);
             //We want to find the call after the first found, last NewText or AddNewMessage
             int index;
             bool correctSequenceFound = false;
@@ -235,13 +237,12 @@ public sealed class ModIconSnippet : TextSnippet
         }
         catch
         {
-            //var logger = ModContent.GetInstance<ChatSource>().Logger;
-            //logger.Info("#####");
+            //Log.Info("#####");
             //foreach (var frame in frames)
             //{
-            //    logger.Info(frame?.ToString() ?? "frame null");
+            //    Log.Info(frame?.ToString() ?? "frame null");
             //}
-            //logger.Info("#####");
+            //Log.Info("#####");
         }
         if (string.IsNullOrEmpty(name))
             return string.Empty;

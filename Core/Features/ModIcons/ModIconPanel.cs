@@ -23,8 +23,6 @@ public class ModIconPanel : BasePanel<ModIcon>
 
     public override void Update(GameTime gt)
     {
-        if (items.Count == 0)
-            PopulatePanel();
         base.Update(gt);
     }
 

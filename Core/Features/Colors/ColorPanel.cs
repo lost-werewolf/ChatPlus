@@ -13,9 +13,6 @@ namespace ChatPlus.Core.Features.Colors
 
         public override void Update(GameTime gt)
         {
-            if (items.Count == 0)
-                PopulatePanel();
-
             base.Update(gt);
         }
     }

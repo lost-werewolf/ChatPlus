@@ -6,6 +6,7 @@ using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
@@ -297,7 +298,7 @@ public class PlayerInfoState : UIState, ILoadable
         PlayerInfoDrawer.DrawStat_LastCreatureHit(sb, lastCreateBounds, player);
 
         Rectangle viewport = new(containerLeft+20, top+20, containerW-20*4, panelBottom - top-20*2);
-        DrawDebugRect(viewport);
+        //DrawDebugRect(viewport);
         Utils.DrawBorderStringBig(sb, "Inventory", new Vector2(invStart.X + 2, invStart.Y - 35), Color.White, 0.5f);
         DrawInventory(sb, invStart, player, viewport);
         DrawAccessories(sb, accPos, player, viewport);
@@ -454,24 +455,6 @@ public class PlayerInfoState : UIState, ILoadable
         Main.inventoryScale = old;
     }
 
-    private static void DrawVisualVanityAccessorySlots(SpriteBatch sb, Vector2 topLeft, Player player)
-    {
-        int size = 40, pad = 4;
-        bool smallWidth = Main.screenWidth < 1200;
-        if (smallWidth)
-            size = 36;
-        float old = Main.inventoryScale; Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
-
-        for (int r = 0; r < 3; r++)
-        {
-            int x0 = (int)topLeft.X, x1 = (int)topLeft.X + (size + pad), x2 = (int)topLeft.X + 2 * (size + pad), y = (int)topLeft.Y + r * (size + pad);
-
-            // Draw slots ON top of the existing ones that are purely visually correct
-            ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, new Vector2(x1, y));
-        }
-        Main.inventoryScale = old;
-    }
-
     private static void DrawAccessories(SpriteBatch sb, Vector2 topLeft, Player player, Rectangle viewport)
     {
         int size = Main.screenWidth < 1200 ? 36 : 40;
@@ -485,11 +468,6 @@ public class PlayerInfoState : UIState, ILoadable
             int y = (int)topLeft.Y + r * rowStep;
             var rowRect = new Rectangle((int)topLeft.X, y, 3 * rowStep, rowStep);
 
-            if (rowRect.Bottom < viewport.Top || rowRect.Y > viewport.Bottom || rowRect.Right < viewport.Left || rowRect.X > viewport.Right)
-            {
-                continue;
-            }
-
             int x0 = (int)topLeft.X + 0 * rowStep;
             int x1 = (int)topLeft.X + 1 * rowStep;
             int x2 = (int)topLeft.X + 2 * rowStep;
@@ -497,11 +475,11 @@ public class PlayerInfoState : UIState, ILoadable
             // Draw top 3 armor dye slots
             DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y, player);
 
-            // Draw middle 3 armor vanity slots
+            // Draw middle 3 armor vanity slots (no visual)
             DrawLoaderSlot(player.armor, ItemSlot.Context.InWorld, 10 + r, x1, y, player);
             
-            // Draw 3 armor slots
-            DrawLoaderSlot(player.armor, ItemSlot.Context.EquipArmorVanity, r, x2, y, player);
+            // Draw 3 armor slots (no visual)
+            DrawLoaderSlot(player.armor, ItemSlot.Context.InWorld, r, x2, y, player);
 
             // Draw backup visual slots with accurate ItemSlot.Context,
             // which, for some reason, works...
@@ -524,6 +502,8 @@ public class PlayerInfoState : UIState, ILoadable
             int y = (int)accTopLeft.Y + r * rowStep;
             var rowRect = new Rectangle((int)accTopLeft.X, y, 3 * rowStep, rowStep);
 
+            if (y + size > viewport.Bottom) break;
+
             int dyeIndex = 3 + r;
             int vanityIndex = 13 + r;
             int equipIndex = 3 + r;
@@ -544,39 +524,81 @@ public class PlayerInfoState : UIState, ILoadable
     }
     private static void DrawBuffs(SpriteBatch sb, Vector2 start, Player player, Rectangle viewport)
     {
-        int size = 32, pad = 6, perRow = 10;
+        int size = 32;
+        int pad = 6;
+        int perRow = 10;
+        float textScale = 0.75f;
         var font = FontAssets.MouseText.Value;
         int n = 0;
 
         for (int i = 0; i < player.buffType.Length; i++)
         {
             int id = player.buffType[i];
-            if (id <= 0 || !player.HasBuff(id)) continue;
+            if (id <= 0) continue;
+            if (!player.HasBuff(id)) continue;
+            if (id >= TextureAssets.Buff.Length) continue;
 
-            int row = n / perRow, col = n % perRow;
-            var r = new Rectangle(
-                (int)(start.X + col * (size + pad)),
-                (int)(start.Y + row * (size + pad)),
-                size, size
-            );
+            int row = n / perRow;
+            int col = n % perRow;
 
-            sb.Draw(TextureAssets.Buff[id].Value, r, Color.White);
+            int x = (int)(start.X + col * (size + pad));
+            int y = (int)(start.Y + row * (size + pad));
 
-            int t = player.buffTime[i];
-            if (t > 2)
+            if (y + size > viewport.Bottom) break;
+
+            var iconRect = new Rectangle(x, y, size, size);
+
+            bool showTime = player.buffTime[i] > 2 && !Main.buffNoTimeDisplay[id];
+            string label = string.Empty;
+            Vector2 timePos = default;
+            Rectangle textRect = Rectangle.Empty;
+
+            if (showTime)
             {
-                int s = t / 60; string label;
-                if (s >= 3600) label = (s / 3600) + ":" + ((s % 3600) / 60).ToString("00");
-                else if (s >= 60) label = (s / 60) + ":" + (s % 60).ToString("00");
-                else label = s.ToString();
-                var ls = font.MeasureString(label);
-                Utils.DrawBorderString(sb, label, new Vector2(r.Right - ls.X + 1, r.Bottom - ls.Y + 1), Color.White, 0.7f, 0f, 0f);
+                int seconds = player.buffTime[i] / 60;
+                if (seconds >= 60)
+                {
+                    int minutes = seconds / 60;
+                    label = minutes + " m";
+                }
+                else
+                {
+                    label = seconds + " s";
+                }
+
+                int xOffset = 0;
+                if (seconds <= 600 && seconds >= 60) xOffset = 4;
+                if (seconds <= 60) xOffset = 2;
+                if (seconds <= 10) xOffset = 3;
+                if (seconds <= 9) xOffset = 6;
+
+                timePos = new Vector2(iconRect.X + xOffset, iconRect.Bottom + 2);
+
+                Vector2 textSize = font.MeasureString(label) * textScale;
+                textRect = new Rectangle((int)timePos.X, (int)timePos.Y, (int)Math.Ceiling(textSize.X), (int)Math.Ceiling(textSize.Y));
             }
 
-            bool hover = r.Contains(Main.MouseScreen.ToPoint()) && !PlayerInput.IgnoreMouseInterface;
+            Point mouse = Main.MouseScreen.ToPoint();
+            bool hoverIcon = iconRect.Contains(mouse) && !PlayerInput.IgnoreMouseInterface;
+            bool hoverText = showTime && textRect.Contains(mouse) && !PlayerInput.IgnoreMouseInterface;
+            bool hover = hoverIcon || hoverText;
+
+            float alpha = hover ? 1f : 0.75f;
+
+            sb.Draw(TextureAssets.Buff[id].Value, iconRect, Color.White * alpha);
+
+            if (showTime)
+            {
+                sb.DrawString(font, label, timePos, Color.White * alpha, 0f, Vector2.Zero, textScale, SpriteEffects.None, 0f);
+            }
+
             if (hover)
             {
-                UICommon.TooltipMouseText(Lang.GetBuffName(id));
+                string name = Lang.GetBuffName(id);
+                string desc = Lang.GetBuffDescription(id);
+                string tooltip = string.IsNullOrEmpty(desc) ? name : name + "\n" + desc;
+
+                Main.instance.MouseText(tooltip);
                 Main.LocalPlayer.mouseInterface = true;
 
                 if (Main.mouseRight && Main.mouseRightRelease && !Main.debuff[id])
@@ -585,9 +607,11 @@ public class PlayerInfoState : UIState, ILoadable
                     Main.mouseRightRelease = false;
                 }
             }
+
             n++;
         }
     }
+
     #endregion
 
     #region Helpers

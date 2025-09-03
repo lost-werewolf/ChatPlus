@@ -29,7 +29,7 @@ public class PlayerIconElement : BaseElement<PlayerIcon>
             pos + new Vector2(12, 5), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
 
         // Draw outline
-        pos += new Vector2(32, 4);
+        pos += new Vector2(35, 4);
         ChatManager.DrawColorCodedStringShadow(sb, FontAssets.MouseText.Value, snip, pos, Color.Black, 0f, Vector2.Zero, Vector2.One);
 
         // Draw player name in synced color
@@ -37,19 +37,8 @@ public class PlayerIconElement : BaseElement<PlayerIcon>
         if (AssignPlayerColorsSystem.PlayerColors.TryGetValue(Data.PlayerIndex, out var syncedHex))
             hex = syncedHex ?? "FFFFFF";
 
-        var coloredSnips = ChatManager.ParseMessage($"[c/{hex}:{Data.PlayerName}:]", Color.White).ToArray();
+        var coloredSnips = ChatManager.ParseMessage($"[c/{hex}:{Data.PlayerName}]", Color.White).ToArray();
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, coloredSnips,
             pos, 0f, Vector2.Zero, Vector2.One, out _, 500f);
-
-        // hover click action handler
-        Rectangle bounds = new((int)pos.X - 34, (int)pos.Y, (int)26, (int)26);
-        if (bounds.Contains(Main.MouseScreen.ToPoint()))
-        {
-            Player player = Main.player[Data.PlayerIndex];
-
-            if (player?.active == true && Conf.C.ShowPlayerPreviewWhenHovering)
-            {
-            }
-        }
     }
 }

@@ -16,6 +16,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Assets\Workshop\NewFolder\" />
+	  <Folder Include="Core\Features\PlayerIcons\NewFolder\" />
 	</ItemGroup>
 
 	<!-- References -->

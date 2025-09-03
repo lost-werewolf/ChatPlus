@@ -65,9 +65,12 @@ internal class AddNewMessageSystem : ModSystem
         }
 
         // 4. Add mod icon
-        string mod = ModIconSnippet.GetCallingName();
-        if (Conf.C.ModIcons && mod != null && string.IsNullOrEmpty(senderName) && !text.StartsWith("[m:"))
+        string mod = "";
+        if (Conf.C.ModIcons && string.IsNullOrEmpty(senderName) && !text.StartsWith("[m:"))
         {
+            //if (!string.IsNullOrEmpty(nameTagFull)) return;
+
+            mod = ModIconSnippet.GetCallingName();
             Log.Info(mod);
             string modTag = ModIconTagHandler.GenerateTag(mod);
             resultText = modTag + " " + resultText;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 using ChatPlus.Core.UI;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.UI;
 
@@ -15,7 +16,7 @@ public class PlayerIconPanel : BasePanel<PlayerIcon>
     protected override string GetDescription(PlayerIcon data) => data.PlayerName + "\nClick to view more";
     protected override string GetTag(PlayerIcon data) => data.Tag;
 
-    public override void Update(Microsoft.Xna.Framework.GameTime gt)
+    public override void Update(GameTime gt)
     {
         // Refresh population each frame in case players join/leave
         if (items.Count != PlayerIconManager.PlayerIcons.Count)

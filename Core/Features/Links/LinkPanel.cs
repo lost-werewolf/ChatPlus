@@ -14,8 +14,6 @@ public class LinkPanel : BasePanel<LinkEntry>
 
     public override void Update(GameTime gt)
     {
-        if (items.Count == 0)
-            PopulatePanel();
         base.Update(gt);
     }
 }

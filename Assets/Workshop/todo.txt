@@ -273,17 +273,17 @@ Row 5: author
 [done] Disable preview when boss is alive
 [done] Move chat box for Mod Reloader
 [done] Fix ExampleMod stack source
+[done] Investigate if chat source does things better by keeping it on
+[done] Add replacement for last enemy hit
 [idea] React to message: highlights the chat message, shows options: reply, quick emojis, or emoji panel.
 [todo] Typing indicator. Small "x is typing"...
-[todo] Investigate if chat source does things better by keeping it on
 [todo] Drag top of scrollbar to resize height of chats. Should be hardcoded to force whole number chat heights.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[todo] Add replacement for last enemy hit
-[todo] Finalize icon
-[todo] Add regex for emojis so player can use : instead of [e
-[todo] Add regex for players so player can use @ to tag other players and format messages accordingly
 [todo] Add time in session
 [todo] Add current biome
 [todo] Add equipment
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[todo] Finalize icon
+[todo] Add ' :' for emojis: regex for emojis so player can use : instead of [e
+[todo] Add reply: regex for players so player can use @ to tag other players and format messages accordingly

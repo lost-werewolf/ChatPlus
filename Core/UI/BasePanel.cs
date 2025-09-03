@@ -91,6 +91,37 @@ namespace ChatPlus.Core.UI
             Append(scrollbar);
         }
 
+        public override void OnActivate()
+        {
+            base.OnActivate();
+
+            PopulatePanel();
+
+            int itemCount = 10;
+            if (Conf.C != null)
+            {
+                itemCount = (int)Conf.C.AutocompleteItemCount;
+            }
+
+            Top.Set(-38, 0f);
+            Height.Set(itemCount * 30, 0f);
+            list.Height.Set(itemCount * 30, 0f);
+
+            list.ViewPosition = 0f;
+            currentIndex = 0;
+            if (items.Count > 0)
+            {
+                SetSelectedIndex(0);
+            }
+
+            Recalculate();
+
+            Main.oldKeyState = Main.keyState;
+
+            // Scroll to top
+            scrollbar.SetView(0, scrollbar.MaxViewSize);
+        }
+
         public override void LeftClick(UIMouseEvent evt)
         {
             bool leftShiftDown = Main.keyState.IsKeyDown(Keys.LeftShift);
@@ -267,43 +298,67 @@ namespace ChatPlus.Core.UI
         {
             if (items.Count == 0) return;
 
-            // wrap around
+            // Wrap around.
             if (index < 0) index = items.Count - 1;
             else if (index >= items.Count) index = 0;
 
-            // deselect all
+            // Deselect all.
             for (int i = 0; i < items.Count; i++)
+            {
                 items[i].SetSelected(false);
+            }
 
-            // update current index
+            // Update current index and select.
             currentIndex = index;
             var current = items[currentIndex];
             current.SetSelected(true);
             string tag = GetTag(current.Data);
 
-            // update view position
+            // Ensure layout is calculated before measuring.
             list.Recalculate();
+
             float viewportH = list.GetInnerDimensions().Height;
             float pad = list.ListPadding;
 
-            // distance from top to the selected item
-            float yTop = 0f;
-            for (int i = 0; i < currentIndex; i++)
-                yTop += items[i].GetOuterDimensions().Height + pad;
+            if (viewportH <= 1f)
+            {
+                // First-activation frame: viewport not ready yet.
+                // Do not auto-scroll; pin to top to avoid jumping to "second" row later.
+                list.ViewPosition = 0f;
+            }
+            else
+            {
+                // Distance from top to selected item.
+                float yTop = 0f;
+                for (int i = 0; i < currentIndex; i++)
+                {
+                    yTop += items[i].GetOuterDimensions().Height + pad;
+                }
 
-            float itemH = items[currentIndex].GetOuterDimensions().Height;
-            float yBottom = yTop + itemH;
+                float itemH = items[currentIndex].GetOuterDimensions().Height;
+                float yBottom = yTop + itemH;
 
-            float view = list.ViewPosition;
-            if (yTop < view) view = yTop;
-            else if (yBottom > view + viewportH) view = yBottom - viewportH;
+                float view = list.ViewPosition;
 
-            float totalH = 0f;
-            for (int i = 0; i < items.Count; i++)
-                totalH += items[i].GetOuterDimensions().Height + pad;
+                if (yTop < view)
+                {
+                    view = yTop;
+                }
+                else if (yBottom > view + viewportH)
+                {
+                    view = yBottom - viewportH;
+                }
 
-            float maxView = Math.Max(0f, totalH - viewportH);
-            list.ViewPosition = MathHelper.Clamp(view, 0f, maxView);
+                // Clamp against total content height.
+                float totalH = 0f;
+                for (int i = 0; i < items.Count; i++)
+                {
+                    totalH += items[i].GetOuterDimensions().Height + pad;
+                }
+
+                float maxView = Math.Max(0f, totalH - viewportH);
+                list.ViewPosition = MathHelper.Clamp(view, 0f, maxView);
+            }
 
             // 🔹 Update description panel
             if (ConnectedPanel is DescriptionPanel<TData> descPanel)
@@ -336,6 +391,7 @@ namespace ChatPlus.Core.UI
                 }
             }
         }
+
         private void HandleKeyPressed()
         {
             foreach (Keys key in Enum.GetValues(typeof(Keys)))
@@ -357,6 +413,13 @@ namespace ChatPlus.Core.UI
                 {
                     int newIndex = Math.Clamp(prevIndex, 0, items.Count - 1);
                     SetSelectedIndex(newIndex);
+                }
+                else
+                {
+                    if (ConnectedPanel is DescriptionPanel<TData> descPanel)
+                    {
+                        descPanel.SetText("No entries found.");
+                    }
                 }
             }
         }

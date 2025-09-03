@@ -44,9 +44,13 @@ public static class StateManager
         {
             if (ui.CurrentState != state)
             {
-                CloseOthers(ui);     // ensure exclusivity
+                CloseOthers(ui);
                 ui.SetState(state);
+
+                // ensure layout exists on the very first frame without running Update
+                ui.CurrentState?.Recalculate();
             }
+            // ensure mouse wheel scroll works
             ui.Update(gameTime);
         }
         else
