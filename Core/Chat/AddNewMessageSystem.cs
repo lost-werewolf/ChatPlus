@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.Links;
+using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerIcons;
@@ -77,9 +77,9 @@ internal class AddNewMessageSystem : ModSystem
         }
 
         // 5. Link tag
-        if (LinkTagHandler.TryGetLink(text, out string linkText))
+        if (MentionTagHandler.TryGetLink(text, out string linkText))
         {
-            string linkTag = LinkTagHandler.GenerateTag(linkText);
+            string linkTag = MentionTagHandler.GenerateTag(linkText);
             resultText = resultText.Replace(linkText, linkTag);
         }
 

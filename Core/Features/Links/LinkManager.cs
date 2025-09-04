@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ChatPlus.Core.Features.Mentions;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
@@ -10,7 +11,7 @@ internal class LinkManager : ModSystem
 
     public override void Load()
     {
-        ChatManager.Register<LinkTagHandler>(["l", "link"]);
+        ChatManager.Register<MentionTagHandler>(["l", "link"]);
 
         // Example links
         Links.Clear();

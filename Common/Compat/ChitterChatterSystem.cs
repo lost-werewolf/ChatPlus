@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using ChatPlus.Core.Features.Links;
+using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using MonoMod.RuntimeDetour;
@@ -185,7 +186,7 @@ namespace ChatPlus.Common.Compat
                 var t = snip.Text?.Trim();
                 if (string.IsNullOrEmpty(t)) continue;
 
-                if (LinkTagHandler.ContainsLink(t) && snip is not LinkSnippet)
+                if (MentionTagHandler.ContainsLink(t) && snip is not MentionSnippet)
                 {
                     line[i] = new LinkSnippet(snip);
                 }

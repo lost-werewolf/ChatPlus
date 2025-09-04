@@ -203,6 +203,13 @@ namespace ChatPlus.Core.UI
         #region Filter
         private bool MatchesFilter(TData data)
         {
+            if (this is EmojiPanel && EmojiSystem.IsForceOpen)
+            {
+                string t = Main.chatText ?? string.Empty;
+                if (t.LastIndexOf("[e", StringComparison.OrdinalIgnoreCase) < 0)
+                    return true; // show all entries when opened by button and no active [e tag
+            }
+
             string tag = GetTag(data) ?? string.Empty;
 
             // Use frozen text while navigating commands with Up/Down so we don't re-filter to a single item
@@ -439,6 +446,8 @@ namespace ChatPlus.Core.UI
 
         public void InsertSelectedTag()
         {
+            if (this is EmojiPanel) EmojiSystem.CloseAfterCommit();
+
             if (items.Count == 0 || currentIndex < 0) return;
 
             string tag = GetTag(items[currentIndex].Data);

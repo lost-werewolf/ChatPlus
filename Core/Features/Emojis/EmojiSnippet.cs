@@ -33,21 +33,8 @@ namespace ChatPlus.Core.Features.Emojis
 
             // Draw emoji
             sb.Draw(tex, position, null, color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
-            DrawEmojiHover(sb, position, w, h, tex, s, color);
 
             return true;
-        }
-
-        private void DrawEmojiHover(SpriteBatch sb, Vector2 position, float w, float h, Texture2D tex, float s, Color color)
-        {
-            if (color == Color.Black)
-                return;
-
-            Rectangle bounds = new((int)position.X, (int)position.Y, (int)w, (int)h);
-            if (bounds.Contains(Main.MouseScreen.ToPoint()))
-            {
-                UICommon.TooltipMouseText(Text);
-            }
         }
     }
 }
