@@ -4,5 +4,8 @@ namespace ChatPlus.Core.Features.Mentions;
 
 public class MentionState : BaseState<MentionEntry>
 {
-    public MentionState() : base(new MentionPanel(), new DescriptionPanel<MentionEntry>()) { }
+    public MentionState() : base(new MentionPanel(), new DescriptionPanel<MentionEntry>()) 
+    {
+        
+    }
 }

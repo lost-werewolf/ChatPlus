@@ -25,7 +25,7 @@
 
 	<!-- Locate FXC (Shader compiler of choice) -->
 	<PropertyGroup>
-		<FxcCompilerPath>.\Assets\Effects\Compiler\fxc.exe</FxcCompilerPath>
+		<FxcCompilerPath>.\Assets\Shaders\fxc.exe</FxcCompilerPath>
 	</PropertyGroup>
 
 	<!-- Effect File Compilation -->

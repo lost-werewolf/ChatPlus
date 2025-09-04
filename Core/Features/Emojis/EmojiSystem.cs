@@ -18,10 +18,12 @@ namespace ChatPlus.Core.Features.Emojis
 
         private static bool _forceOpen;
         public static bool IsForceOpen => _forceOpen;
+        public static bool FilterReset { get; private set; }
 
         public static void OpenFromButton()
         {
             _forceOpen = true;
+            FilterReset = true; // show full list when opened by button
             var sys = ModContent.GetInstance<EmojiSystem>();
             if (sys.ui.CurrentState != sys.state)
             {
@@ -34,6 +36,7 @@ namespace ChatPlus.Core.Features.Emojis
         public static void CloseAfterCommit()
         {
             _forceOpen = false;
+            FilterReset = false; // clear reset on close
             var sys = ModContent.GetInstance<EmojiSystem>();
             if (sys.ui.CurrentState != null)
                 sys.ui.SetState(null);
@@ -53,66 +56,52 @@ namespace ChatPlus.Core.Features.Emojis
             {
                 if (ui.CurrentState != null) ui.SetState(null);
                 _forceOpen = false;
-                return;
-            }
-
-            // Button override keeps it open regardless of text
-            if (_forceOpen)
-            {
-                if (ui.CurrentState != state)
-                {
-                    StateManager.CloseOthers(ui);
-                    ui.SetState(state);
-                    ui.CurrentState?.Recalculate();
-                }
-                ui.Update(gameTime);
+                FilterReset = false; // <- clear
                 return;
             }
 
             string text = Main.chatText ?? string.Empty;
             int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
 
-            // Case 1: actively typing an [e ...] tag (no closing bracket yet)
-            bool hasOpenETag = false;
-            {
-                int eStart = text.LastIndexOf("[e", StringComparison.OrdinalIgnoreCase);
-                hasOpenETag = eStart >= 0 && text.IndexOf(']', eStart + 2) == -1;
-            }
+            // [e ... (no closing ])
+            int eStart = text.LastIndexOf("[e", StringComparison.OrdinalIgnoreCase);
+            bool hasOpenETag = eStart >= 0 && text.IndexOf(']', eStart + 2) == -1;
 
-            // Case 2: a ':' that is NOT inside any bracketed tag like [c:...], [e:...], [g:...], [n:...]
+            // ':' not inside [tag:...]
+            int searchStart = Math.Min(caret - 1, text.Length - 1);
+            int colon = searchStart >= 0 ? text.LastIndexOf(':', searchStart) : -1;
             bool colonTrigger = false;
+            if (colon >= 0)
             {
-                int searchStart = Math.Min(caret - 1, text.Length - 1);
-                int colon = searchStart >= 0 ? text.LastIndexOf(':', searchStart) : -1;
-                if (colon >= 0)
-                {
-                    // If the nearest '[' to the left is after the nearest ']' to the left,
-                    // the ':' lives inside a tag ⇒ don't trigger.
-                    int lb = text.LastIndexOf('[', colon);
-                    int rb = text.LastIndexOf(']', colon);
-                    bool insideTag = lb > rb;
-                    colonTrigger = !insideTag;
-                }
+                int lb = text.LastIndexOf('[', colon);
+                int rb = text.LastIndexOf(']', colon);
+                bool insideTag = lb > rb;
+                colonTrigger = !insideTag;
             }
 
-            bool shouldOpen = hasOpenETag || colonTrigger;
+            bool shouldOpen = _forceOpen || hasOpenETag || colonTrigger;
 
             if (shouldOpen)
             {
-                if (ui.CurrentState != state)
+                bool justOpened = ui.CurrentState != state;
+                if (justOpened)
                 {
                     StateManager.CloseOthers(ui);
                     ui.SetState(state);
                     ui.CurrentState?.Recalculate();
+
+                    // Reset filter when opening via button or ':'
+                    FilterReset = _forceOpen || colonTrigger;
                 }
                 ui.Update(gameTime);
             }
             else
             {
-                if (ui.CurrentState == state)
-                    ui.SetState(null);
+                if (ui.CurrentState == state) ui.SetState(null);
+                FilterReset = false; // <- clear when not open
             }
         }
+
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int index = layers.FindIndex(l => l.Name.Equals("Vanilla: Death Text"));

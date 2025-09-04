@@ -1,8 +1,9 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
-using Terraria.ModLoader.UI;
+using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.Emojis
@@ -10,6 +11,22 @@ namespace ChatPlus.Core.Features.Emojis
     public class EmojiSnippet : TextSnippet
     {
         private readonly Asset<Texture2D> emojiAsset;
+
+        private static readonly Lazy<Effect?> GrayscaleEffect = new(() =>
+        {
+            try
+            {
+                return ModContent.Request<Effect>("ChatPlus/Assets/Shaders/Grayscale", AssetRequestMode.ImmediateLoad).Value;
+            }
+            catch
+            {
+                return null; // Graceful fallback if asset missing
+            }
+        });
+
+        // 0 = off, 1 = full grayscale
+        public static float GrayscaleIntensity = 1f;
+
         public EmojiSnippet(Asset<Texture2D> asset)
         {
             emojiAsset = asset;
@@ -29,11 +46,17 @@ namespace ChatPlus.Core.Features.Emojis
             float w = tex.Width * s;
             size = new Vector2(w, h);
 
-            if (justCheckingString) return true;
+            if (justCheckingString)
+                return true;
 
-            // Draw emoji
-            sb.Draw(tex, position, null, color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
+            var fx = GrayscaleEffect.Value;
+            if (fx != null && GrayscaleIntensity > 0f)
+            {
+                fx.Parameters["Intensity"]?.SetValue(MathHelper.Clamp(GrayscaleIntensity, 0f, 1f));
+                fx.CurrentTechnique.Passes[0].Apply();
+            }
 
+            sb.Draw(tex, position, null, color == default ? Color.White : color, 0f, Vector2.Zero, s, SpriteEffects.None, 0f);
             return true;
         }
     }
