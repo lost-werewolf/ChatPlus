@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.GameContent;
-using Terraria.Graphics;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -76,7 +72,7 @@ public static class PlayerInfoDrawer
         // Draw row 2
         int rowY2 = (int)cursor.Y + rowHeight + 6;
         DrawStat_Defense(sb, new Rectangle(leftColumn, rowY2, panelWidth, rowHeight), player);
-        DrawStat_DeathCount(sb, new Rectangle(rightColumn, rowY2, panelWidth, rowHeight), player);
+        DrawStat_Attack(sb, new Rectangle(rightColumn, rowY2, panelWidth, rowHeight), player);
 
         // Draw row 3
         int rowY3 = (int)cursor.Y + rowHeight * 2 + 6 * 2;
@@ -90,8 +86,8 @@ public static class PlayerInfoDrawer
 
         // Draw row 5
         int rowY5 = (int)cursor.Y + rowHeight * 4 + 6 * 4;
-        DrawStat_HeldItem(sb, new Rectangle(leftColumn, rowY5, panelWidth, rowHeight), player);
-        DrawStat_LastCreatureHit(sb, new Rectangle(rightColumn, rowY5, panelWidth, rowHeight), player);
+        DrawStat_TimeInSession(sb, new Rectangle(leftColumn, rowY5, panelWidth, rowHeight), player);
+        DrawStat_DaysInSession(sb, new Rectangle(rightColumn, rowY5, panelWidth, rowHeight), player);
 
         sb.End(); // restore
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
@@ -119,7 +115,6 @@ public static class PlayerInfoDrawer
             ModifyPlayerDrawInfo.ForceFullBrightOnce = false;
         }
     }
-
     public static void DrawMapFullscreenBackground(SpriteBatch sb, Rectangle rect)
     {
         var player = Main.LocalPlayer;
@@ -183,161 +178,186 @@ public static class PlayerInfoDrawer
     }
 
     #region Stats
-    public static void DrawStat_HeldItem(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_DaysInSession(SpriteBatch sb, Rectangle rect, Player player)
     {
-        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
-
-        Item held = player.HeldItem;
-        if (held == null || held.IsAir)
-            held = new Item(ItemID.None);
-
-        var pos = new Vector2(rect.X + 15, rect.Y + 15);
-        ItemSlot.DrawItemIcon(held, 31, sb, pos, 0.8f, 32f, Color.White);
-
-        string t = held.IsAir ? "(none)" : held.Name;
-        if (t.Length > 8) t = t.Substring(0, 8) + "...";
-        var tp = new Vector2(rect.X + 10, rect.Y + 4);
-        if (t.Length <= 7)
-        {
-            tp += new Vector2(16, 0);
-        }
-
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, t, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
-    }
-
-    private static int frameCounter = 0;
-    private static int frameTimer = 0;
-    private static int _lastValidCreatureNetId = -1;
-
-    public static void DrawStat_LastCreatureHit(SpriteBatch sb, Rectangle rect, Player player)
-    {
-        // Draw stat panel
+        // Draw background
         var tex = Ass.StatPanel;
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        // Local helper: treat town NPCs (and town pets/slimes) as non-targets
-        static bool IsTownLikeNpc(NPC npc)
+        // Draw sun or moondial
+        Item icon = new(Main.dayTime ? ItemID.Sundial : ItemID.Moondial);
+        Vector2 pos = new(rect.X + 16, rect.Y + 14);
+        ItemSlot.DrawItemIcon(icon, 31, sb, pos, 1.0f, 32f, Color.White);
+
+        // Draw days in session
+        var text = SessionTrackerSystem.GetSessionDurationIngameDays(player.whoAmI);
+        int xOffset = 0;
+        if (text == string.Empty)
         {
-            if (npc == null) return false;
-            if (npc.townNPC) return true;
-            if (NPCID.Sets.IsTownPet[npc.type]) return true;
-            return false;
+            text = "n/a";
+            xOffset = +3; // -55+3 = 52
         }
+        var size = FontAssets.MouseText.Value.MeasureString(text);
+        var textPos = new Vector2(rect.X + rect.Width - 52, rect.Y + 5);
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, text, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+    }
+    public static void DrawStat_TimeInSession(SpriteBatch sb, Rectangle rect, Player player)
+    {
+        // Draw background
+        var tex = Ass.StatPanel;
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
+        sb.Draw(tex.Value, rect, Color.White);
+
+        // Draw stopwatch
+        Item icon = new(ItemID.Stopwatch);
+        Vector2 pos = new(rect.X+16, rect.Y+14);
+        ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.8f, 32f, Color.White);
+
+        // Draw time in session
+        var text = SessionTrackerSystem.GetSessionDuration(player.whoAmI);
+        int xOffset = 0;
+        if (text == string.Empty)
+        {
+            text = "n/a";
+            xOffset = +3; // -55+3 = 52
+        }
+
+        if (text.Length > 6)
+            xOffset = -5;
+
+        var size = FontAssets.MouseText.Value.MeasureString(text);
+        var textPos = new Vector2(rect.X + rect.Width - 55 + xOffset, rect.Y + 5);
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, text, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+    }
+
+    // Enemy animation state
+    private static int _lastValidId = -1;
+    private static int _enemyFrameCounter = 0;
+    private static int _enemyFrameTimer = 0;
+
+    // Boss animation state
+    private static int _bossFrameCounter = 0;
+    private static int _bossFrameTimer = 0;
+
+    public static void DrawStat_LastBossHit(SpriteBatch sb, Rectangle rect, Player player)
+    {
+        // Draw background
+        var tex = Ass.StatPanel;
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
+        sb.Draw(tex.Value, rect, Color.White);
+
+        int npcId = BossTracker.GetLastNPCHit();
+        if (npcId == -1)
+        {
+            // Draw question mark
+            var questionTex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Locked");
+            var rect2 = new Rectangle(rect.X, rect.Y, questionTex.Width(), questionTex.Height());
+            sb.Draw(questionTex.Value, new Vector2(rect.X+6, rect.Y+1), null, Color.White, 0f, 
+                Vector2.Zero, scale: 0.8f, SpriteEffects.None, 0f);
+
+            Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, "n/a",
+                rect.X + 45, rect.Y + 4, Color.White, Color.Black, Vector2.Zero, 1f);
+            return;
+        }
+
+        NPC npc = Main.npc[npcId];
+        if (!npc.boss)
+        {
+            // Draw question mark
+            var questionTex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Locked");
+            var rect2 = new Rectangle(rect.X, rect.Y, questionTex.Width(), questionTex.Height());
+            sb.Draw(questionTex.Value, new Vector2(rect.X + 6, rect.Y + 1), null, Color.White, 0f,
+                Vector2.Zero, scale: 0.8f, SpriteEffects.None, 0f);
+
+            Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, "n/a",
+                rect.X + 45, rect.Y + 4, Color.White, Color.Black, Vector2.Zero, 1f);
+            return;
+        }
+
+        Main.instance.LoadNPC(npc.type);
+        Texture2D npcTex = TextureAssets.Npc[npc.type].Value;
+
+        int frames = Main.npcFrameCount[npc.type];
+        if (frames <= 0) frames = 1;
+
+        int frameHeight = npcTex.Height / frames;
+        Rectangle src = new(0, _bossFrameCounter * frameHeight, npcTex.Width, frameHeight);
+
+        float scale = 36f / Math.Max(npcTex.Width, frameHeight);
+        Vector2 pos = rect.Center.ToVector2() - new Vector2(npcTex.Width * scale + 75, frameHeight * scale) / 2f;
+
+        _bossFrameTimer++;
+        if (_bossFrameTimer > 14)
+        {
+            _bossFrameCounter = (_bossFrameCounter + 1) % frames;
+            _bossFrameTimer = 0;
+        }
+
+        sb.Draw(npcTex, pos, src, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+
+        string name = Lang.GetNPCNameValue(npc.type);
+        if (name.Length > 8) name = name[..7] + "...";
+
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, name,
+            rect.X + 16, rect.Y + 4, Color.White, Color.Black, Vector2.Zero, 1f);
+    }
+
+    public static void DrawStat_LastEnemyHit(SpriteBatch sb, Rectangle rect, Player player)
+    {
+        // Draw background
+        var tex = Ass.StatPanel;
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
+        sb.Draw(tex.Value, rect, Color.White);
 
         int bannerID = player.lastCreatureHit;
         int netID = bannerID > 0 ? Item.BannerToNPC(bannerID) : 0;
 
-        // If banner path failed, use our last hit NPC (but skip town-like)
-        if (netID <= 0 && player.lastCreatureHit >= 0)
-        {
-            int lastHit = BossHitSystem.GetLastNPCHit();
-            if (lastHit >= 0)
-            {
-                NPC npc = Main.npc[lastHit];
-                if (npc != null && npc.active && !IsTownLikeNpc(npc))
-                {
-                    netID = npc.type;
-                }
-            }
-        }
-
-        // Only update if valid (and not a town-like type if we can tell from an active instance)
+        // Only update if valid
         if (netID > 0 && netID < TextureAssets.Npc.Length && Main.npcFrameCount[netID] > 0)
         {
-            // If an active instance of this type exists and is town-like, skip it
-            bool hasActiveTownLike = false;
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                var n = Main.npc[i];
-                if (n != null && n.active && n.type == netID && IsTownLikeNpc(n))
-                {
-                    hasActiveTownLike = true;
-                    break;
-                }
-            }
-
-            if (!hasActiveTownLike)
-            {
-                _lastValidCreatureNetId = netID;
-            }
+            _lastValidId = netID;
         }
 
-        // If nothing valid yet → pick closest hostile (CanBeChasedBy already excludes friendlies; we also exclude town-like explicitly)
-        if (_lastValidCreatureNetId <= 0)
+        if (_lastValidId <= 0)
         {
-            float bestDist = float.MaxValue;
-            int closest = -1;
-            Vector2 playerPos = player.Center;
+            // Draw question mark
+            var questionTex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Locked");
+            var rect2 = new Rectangle(rect.X, rect.Y, questionTex.Width(), questionTex.Height());
+            sb.Draw(questionTex.Value, new Vector2(rect.X + 6, rect.Y + 1), null, Color.White, 0f,
+                Vector2.Zero, scale: 0.8f, SpriteEffects.None, 0f);
 
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                NPC npc = Main.npc[i];
-                if (npc != null && npc.active && npc.CanBeChasedBy() && !IsTownLikeNpc(npc))
-                {
-                    float dist = Vector2.Distance(playerPos, npc.Center);
-                    if (dist < bestDist)
-                    {
-                        bestDist = dist;
-                        closest = npc.type;
-                    }
-                }
-            }
-
-            if (closest > 0 && closest < TextureAssets.Npc.Length)
-            {
-                _lastValidCreatureNetId = closest;
-            }
-        }
-
-        // If still nothing → draw placeholder text
-        if (_lastValidCreatureNetId <= 0)
-        {
-            string noEnemy = "None"; // <= 9 chars
-            var tp = new Vector2(rect.X + 16, rect.Y + 4);
-            if (noEnemy.Length <= 7)
-            {
-                tp += new Vector2(16, 0);
-            }
-
-            Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, noEnemy, tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+            Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, "n/a",
+                rect.X + 45, rect.Y + 4, Color.White, Color.Black, Vector2.Zero, 1f);
             return;
         }
 
-        // Draw npc
-        Main.instance.LoadNPC(_lastValidCreatureNetId);
-        Texture2D npcTexture = TextureAssets.Npc[_lastValidCreatureNetId].Value;
-        int totalFrames = Main.npcFrameCount[_lastValidCreatureNetId];
-        if (totalFrames <= 0) totalFrames = 1;
+        Main.instance.LoadNPC(_lastValidId);
+        Texture2D npcTex = TextureAssets.Npc[_lastValidId].Value;
 
-        int frameHeight = npcTexture.Height / totalFrames;
-        Rectangle npcDrawRectangle = new Rectangle(0, frameCounter * frameHeight, npcTexture.Width, frameHeight);
-        float scale = 36f / Math.Max(npcTexture.Width, frameHeight);
-        Vector2 drawPos = rect.Center.ToVector2() - new Vector2(npcTexture.Width * scale + 75, frameHeight * scale) / 2f;
+        int frames = Main.npcFrameCount[_lastValidId];
+        if (frames <= 0) frames = 1;
 
-        frameTimer++;
-        if (frameTimer > 14)
+        int frameHeight = npcTex.Height / frames;
+        Rectangle src = new Rectangle(0, _enemyFrameCounter * frameHeight, npcTex.Width, frameHeight);
+
+        float scale = 36f / Math.Max(npcTex.Width, frameHeight);
+        Vector2 pos = rect.Center.ToVector2() - new Vector2(npcTex.Width * scale + 75, frameHeight * scale) / 2f;
+
+        _enemyFrameTimer++;
+        if (_enemyFrameTimer > 14)
         {
-            frameCounter = (frameCounter + 1) % totalFrames;
-            frameTimer = 0;
+            _enemyFrameCounter = (_enemyFrameCounter + 1) % frames;
+            _enemyFrameTimer = 0;
         }
 
-        sb.Draw(npcTexture, drawPos, npcDrawRectangle, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        sb.Draw(npcTex, pos, src, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
 
-        // Get npc name
-        string creatureName = Lang.GetNPCNameValue(_lastValidCreatureNetId);
-        if (creatureName.Length > 8)
-        {
-            creatureName = creatureName[..7] + "...";
-        }
+        string name = Lang.GetNPCNameValue(_lastValidId);
+        if (name.Length > 10) name = name[..9] + "..";
 
-        var textPos = new Vector2(rect.X + 16, rect.Y + 4);
-        if (creatureName.Length <= 7)
-        {
-            textPos += new Vector2(16, 0);
-        }
-
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, creatureName, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, name,
+            rect.X + 16, rect.Y + 4, Color.White, Color.Black, Vector2.Zero, 1f);
     }
 
     public static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)
@@ -356,10 +376,11 @@ public static class PlayerInfoDrawer
                 var it = kv.Value; if (it == null) continue; if (it.summon || it.DamageType == DamageClass.Summon) { if (it.shoot == bestProj) { icon = new Item(it.type); break; } }
             }
         }
-        var pos = new Vector2(rect.X + 15, rect.Y + 15); ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.8f, 32f, Color.White);
-        var tp = new Vector2(rect.X + 52, rect.Y + 4); Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+        var pos = new Vector2(rect.X + 15, rect.Y + 15); 
+        ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.9f, 32f, Color.White);
+        var tp = new Vector2(rect.X + 45, rect.Y + 4); 
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
-
     public static void DrawStat_Sentries(SpriteBatch sb, Rectangle rect, Player player)
     {
         var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
@@ -367,7 +388,8 @@ public static class PlayerInfoDrawer
         for (int t = 0; t < player.ownedProjectileCounts.Length; t++)
         {
             int c = player.ownedProjectileCounts[t]; if (c <= 0) continue;
-            var proj = ContentSamples.ProjectilesByType[t]; if (!proj.sentry) continue;
+            var proj = ContentSamples.ProjectilesByType[t]; 
+            if (!proj.sentry) continue;
             cur += c;
             if (c > bestCount) { bestCount = c; bestProj = t; }
         }
@@ -380,8 +402,10 @@ public static class PlayerInfoDrawer
                 if (it.summon || it.DamageType == DamageClass.Summon) { if (it.shoot == bestProj) { icon = new Item(it.type); break; } }
             }
         }
-        var pos = new Vector2(rect.X + 15, rect.Y + 15); ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.8f, 32f, Color.White);
-        var tp = new Vector2(rect.X + 52, rect.Y + 4); Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+        var pos = new Vector2(rect.X + 15, rect.Y + 15); 
+        ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.9f, 32f, Color.White);
+        var tp = new Vector2(rect.X + 45, rect.Y + 4); 
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
     public static void DrawStat_Defense(SpriteBatch sb, Rectangle rect, Player player)
     {
@@ -390,10 +414,10 @@ public static class PlayerInfoDrawer
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        // Draw defense creatureName
+        // Draw defense NPCName
         var defenseText = $"{player.statDefense}";
         var snippets = ChatManager.ParseMessage(defenseText, Color.White).ToArray();
-        var pos = new Vector2(rect.X + 52, rect.Y + 4);
+        var pos = new Vector2(rect.X + 45, rect.Y + 4);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
     }
 
@@ -404,7 +428,7 @@ public static class PlayerInfoDrawer
         var rect2 = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect2, Color.White);
 
-        // Draw HP creatureName
+        // Draw HP NPCName
         var lifeText = $"{player.statLife}/{player.statLifeMax2}";
         var snippets = ChatManager.ParseMessage(lifeText, Color.White).ToArray();
         var pos = new Vector2(rect2.X + 32, rect2.Y + 4);
@@ -423,31 +447,38 @@ public static class PlayerInfoDrawer
         var manaRect = new Rectangle(rect.X + 4, rect.Y + 2, manaTex.Width(), manaTex.Height());
         sb.Draw(TextureAssets.Mana.Value, manaRect, Color.White);
 
-        // Draw mana creatureName
+        // Draw mana NPCName
         var manaText = $"{player.statMana}/{player.statManaMax2}";
         var size = FontAssets.MouseText.Value.MeasureString(manaText);
         var textPos = new Vector2(rect.X + rect.Width - size.X - 5, rect.Y + 5);
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, manaText, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
 
-    public static void DrawStat_DeathCount(SpriteBatch sb, Rectangle rect, Player player)
+    public static void DrawStat_Attack(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
-        var tex = Ass.StatPanel;
-        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
-        sb.Draw(tex.Value, rect, Color.White);
+        var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_Attack");
+        var rect2 = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
+        sb.Draw(tex.Value, rect2, Color.White);
 
-        // Draw plat
-        var item = new Item(ItemID.Tombstone);
-        var pos = new Vector2(rect.X + 15, rect.Y + 15);
-        ItemSlot.DrawItemIcon(item, 31, sb, pos, 0.8f, 32f, Color.White);
+        // Get damage
+        var item = player.HeldItem;
+        if (item == null || item.IsAir) return;
+        var dmgType = item.DamageType;
+        int baseDamage = item.damage;
+        int effectiveDamage = (int)player.GetTotalDamage(dmgType).ApplyTo(baseDamage);
+        string damageText = effectiveDamage.ToString();
+        if (baseDamage <= 0)
+        {
+            damageText = "n/a";
+        }
 
-        // Draw death count
-        var deathCount = player.numberOfDeathsPVE.ToString();
-        var size = FontAssets.MouseText.Value.MeasureString(deathCount);
-        var textPos = new Vector2(rect.X + 52, rect.Y + 4);
-        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, deathCount, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+        // Draw damage text
+        var size = FontAssets.MouseText.Value.MeasureString(damageText);
+        var textPos = new Vector2(rect.X + 45, rect.Y + 4);
+        Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, damageText, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
+
     public static void DrawStat_Coins(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background stat panel
@@ -523,7 +554,6 @@ public static class PlayerInfoDrawer
         }
     }
 
-
     public static void DrawStat_Ammo(SpriteBatch sb, Rectangle rect, Player player)
     {
         // Draw background
@@ -553,12 +583,12 @@ public static class PlayerInfoDrawer
         // Draw ammo count
         string highestAmmoStack = highestStack.ToString();
         var size = FontAssets.MouseText.Value.MeasureString(highestAmmoStack);
-        var textPos = new Vector2(rect.X + 52, rect.Y + 4);
+        var textPos = new Vector2(rect.X + 45, rect.Y + 4);
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, highestAmmoStack, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
     #endregion Stats
 
-    #region Helpers
+    #region Info Texts
     private static void DrawHeaderText(SpriteBatch sb, Rectangle rect, Player player)
     {
         string playerText = $"Player: {player.name}";
@@ -573,7 +603,7 @@ public static class PlayerInfoDrawer
     {
         string teamText = player.team switch
         {
-            0 => string.Empty,
+            0 => "No team",
             1 => "[c/DA3B3B:Team Red]",
             2 => "[c/3bda55:Team Green]",
             3 => "[c/3b95da:Team Blue]",
@@ -586,42 +616,8 @@ public static class PlayerInfoDrawer
         pos += new Vector2(7, 5);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, new Vector2(1.0f), out _);
     }
-
-    public static void DrawBiomeText(SpriteBatch sb, Vector2 pos, Player player)
-    {
-        string biomeText =
-            player.ZoneDungeon ? "Dungeon" :
-            player.ZoneJungle ? "Jungle" :
-            player.ZoneSnow ? "Snow" :
-            player.ZoneDesert ? "Desert" :
-            player.ZoneHallow ? "Hallow" :
-            player.ZoneCorrupt ? "Corruption" :
-            player.ZoneCrimson ? "Crimson" :
-            player.ZoneGlowshroom ? "Mushroom" :
-            player.ZoneBeach ? "Ocean" :
-            player.ZoneUnderworldHeight ? "Underworld" :
-            player.ZoneSkyHeight ? "Sky" : 
-            string.Empty;
-
-        string formatted = "";
-        if (biomeText != string.Empty)
-            formatted = $"Biome: [c/ffffff:{biomeText}]";
-
-        var snippets = ChatManager.ParseMessage(formatted, Color.White).ToArray();
-        pos += new Vector2(7, 5);
-        ChatManager.DrawColorCodedStringWithShadow(
-            sb,
-            FontAssets.MouseText.Value,
-            snippets,
-            pos,
-            0f,
-            Vector2.Zero,
-            Vector2.One,
-            out _
-        );
-    }
    
-    public static void DrawPlayerID(SpriteBatch sb, Vector2 pos, Player player)
+    public static void DrawPlayerIDText(SpriteBatch sb, Vector2 pos, Player player)
     {
         string ID = "ID: " + player.whoAmI.ToString();
 

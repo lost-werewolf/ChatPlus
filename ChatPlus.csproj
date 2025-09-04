@@ -8,17 +8,19 @@
 		<!-- Ignore warning -->
 		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 	</PropertyGroup>
+	<ItemGroup>
+	  <AdditionalFiles Remove="Core\Features\PlayerIcons\PlayerInfo\NewFolder\**" />
+	  <Compile Remove="Core\Features\PlayerIcons\PlayerInfo\NewFolder\**" />
+	  <EmbeddedResource Remove="Core\Features\PlayerIcons\PlayerInfo\NewFolder\**" />
+	  <None Remove="Core\Features\PlayerIcons\PlayerInfo\NewFolder\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1" />
 		<Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Core\Features\NewFolder\" />
-	</ItemGroup>
-
-	<!-- Locate all effect files (For whatever reason this condition stops files from being automatically removed) -->
+	<!-- Locate all effect files -->
 	<ItemGroup Condition="'$(DesignTimeBuild)' != 'true'">
 		<EffectFiles Include="**\*.fx" />
 	</ItemGroup>

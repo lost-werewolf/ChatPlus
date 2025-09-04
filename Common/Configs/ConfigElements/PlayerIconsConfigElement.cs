@@ -81,7 +81,6 @@ public class PlayerIconsConfigElement : ConfigElement<bool>
         if (hovered)
         {
             if (Main.LocalPlayer == null) return;
-            HoveredPlayerOverlay.Set(Main.LocalPlayer.whoAmI);
         }
     }
 

@@ -8,6 +8,7 @@ using ChatPlus.Core.Features.Emojis;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
 using ChatPlus.Core.Features.Links;
+using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerIcons;
@@ -222,7 +223,8 @@ namespace ChatPlus.Core.UI
                 this is ModIconPanel ? "[m" :
                 this is PlayerIconPanel ? "[p" :
                 this is UploadPanel ? "[u" :
-                this is LinkPanel ? "[l" : string.Empty;
+                this is LinkPanel ? "[l" :
+                this is MentionPanel ? "@" : string.Empty;
 
             if (prefix.Length == 0)
                 return tag.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
@@ -440,75 +442,29 @@ namespace ChatPlus.Core.UI
             }
         }
 
+        /// <summary>
+        /// Handle inserting most tags. 
+        /// Special cases are overriden in their separate panels for commands, emojis, mentions, etc.
+        /// </summary>
         public virtual void InsertSelectedTag()
         {
-            if (this is EmojiPanel) EmojiSystem.CloseAfterCommit();
             if (items.Count == 0 || currentIndex < 0) return;
 
             string tag = GetTag(items[currentIndex].Data);
             if (string.IsNullOrEmpty(tag)) return;
 
-            // Commands still replace the whole line
-            if (this is CommandPanel)
-            {
-                Main.chatText = tag;
-                HandleChatSystem.SetCaretPos(Main.chatText.Length);
-                return;
-            }
-
             string text = Main.chatText ?? string.Empty;
             int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
             char[] stops = [' ', '\t', '\n', '\r', ']'];
 
-            if (this is EmojiPanel)
-            {
-                // A) Replace an open [e ... (no closing ])
-                int eStart = text.LastIndexOf("[e", StringComparison.OrdinalIgnoreCase);
-                bool openE = eStart >= 0 && text.IndexOf(']', eStart + 2) == -1;
-                if (openE)
-                {
-                    int eEnd = text.IndexOfAny(stops, Math.Max(eStart, 0)); if (eEnd < 0) eEnd = text.Length;
-                    string before = text[..eStart], after = text[eEnd..];
-                    Main.chatText = before + tag + after;
-                    HandleChatSystem.SetCaretPos(before.Length + tag.Length);
-                    return;
-                }
-
-                // B) Replace a ':' shortcode outside any [tag:...] block
-                int searchStart = Math.Min(caret - 1, text.Length - 1);
-                int colon = searchStart >= 0 ? text.LastIndexOf(':', searchStart) : -1;
-                if (colon >= 0)
-                {
-                    int lb = text.LastIndexOf('[', colon), rb = text.LastIndexOf(']', colon);
-                    bool insideTag = lb > rb;
-                    if (!insideTag)
-                    {
-                        int end = text.IndexOfAny(stops, Math.Max(colon + 1, 0)); if (end < 0) end = text.Length;
-                        string before = text[..colon], after = text[end..];
-                        Main.chatText = before + tag + after;
-                        HandleChatSystem.SetCaretPos(before.Length + tag.Length);
-                        return;
-                    }
-                }
-
-                // C) Fallback: insert at caret
-                string pre = text[..caret], post = text[caret..];
-                Main.chatText = pre + tag + post;
-                HandleChatSystem.SetCaretPos(pre.Length + tag.Length);
-                return;
-            }
-
-            // Non-emoji panels keep prefix-based replacement
             string prefix = this switch
             {
                 ColorPanel => "[c",
-                EmojiPanel => "[e",
                 GlyphPanel => "[g",
                 ItemPanel => "[i",
                 ModIconPanel => "[m",
                 PlayerIconPanel => "[p",
                 UploadPanel => "[u",
-                LinkPanel => "[l",
                 _ => "[e"
             };
 
@@ -520,8 +476,11 @@ namespace ChatPlus.Core.UI
                 return;
             }
 
-            int end2 = text.IndexOfAny(stops, start); if (end2 < 0) end2 = text.Length;
-            string before2 = text[..start], after2 = text[end2..];
+            int end2 = text.IndexOfAny(stops, start);
+            if (end2 < 0) end2 = text.Length;
+
+            string before2 = text[..start];
+            string after2 = text[end2..];
             Main.chatText = before2 + tag + after2;
             HandleChatSystem.SetCaretPos(before2.Length + tag.Length);
         }

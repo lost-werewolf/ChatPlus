@@ -11,7 +11,7 @@ internal class LinkManager : ModSystem
 
     public override void Load()
     {
-        ChatManager.Register<MentionTagHandler>(["l", "link"]);
+        ChatManager.Register<LinkTagHandler>(["l", "link"]);
 
         // Example links
         Links.Clear();

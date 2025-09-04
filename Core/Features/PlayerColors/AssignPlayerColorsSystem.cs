@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Helpers;
 using Terraria;
 using Terraria.ID;
@@ -37,6 +38,7 @@ namespace ChatPlus.Core.Features.PlayerColors
                 }
 
                 AssignPlayerColorsSystem.PlayerColors[Player.whoAmI] = hex;
+                MentionSnippet.InvalidateCachesFor(Player.name);
 
                 // In MP, announce to server and request current table
                 if (Main.netMode == NetmodeID.MultiplayerClient)

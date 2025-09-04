@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Globalization;
 using ChatPlus.Common.Configs.ConfigElements.PlayerColor;
+using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 using ChatPlus.Core.Helpers;
@@ -74,38 +75,59 @@ public class PlayerColorConfigElement : ConfigElement<string>
         ApplyHex(NormalizeHex(s)); 
     }
 
+    public static string[] PlayerColors =
+    [
+        "F43030", // 1 red
+        "03BF29", // 2 orange
+        "ffff00", // 3 yellow
+        "38ff00", // 4 green
+        "00ffa7", // 5 cyan
+        "0087ff", // 6 blue
+        "7038ff", // 7 purple
+        "ff50BE", // 8 pink
+    ];
+
+    private int lastIndex = -1; // store last chosen index
+
+    private void Randomize_True()
+    {
+        // pick random r,g,b between 0 to 255
+        var r = Main.rand.Next(0, 255);
+        var g = Main.rand.Next(0, 255);
+        var b = Main.rand.Next(0, 255);
+
+        Color c = new(r, g, b);
+
+        // convert to HSL
+        hsl = Main.rgbToHsl(c);
+        PushFromHsl();
+    }
+
     private void Randomize()
     {
-        const float SAT_MIN = 0.65f;   // vivid
-        const float SAT_MAX = 0.95f;
-        const float L_MIN = 0.42f;   // avoid too dark
-        const float L_MAX = 0.62f;   // avoid too bright
-        const byte RGB_MIN = 20;      // clamp after HSL->RGB
-        const byte RGB_MAX = 235;
+        if (PlayerColors.Length == 0)
+            return;
 
-        // try a few times to find something that passes the RGB sanity check
-        for (int attempt = 0; attempt < 6; attempt++)
+        int idx = Main.rand.Next(PlayerColors.Length);
+
+        // if random rolled the same as last time, pick a neighbor
+        if (idx == lastIndex && PlayerColors.Length > 1)
         {
-            float h = Main.rand.NextFloat(); // any hue
-
-            // bias saturation toward the higher end (vivid): ease-out curve
-            float sT = Main.rand.NextFloat();
-            float s = MathHelper.Lerp(SAT_MIN, SAT_MAX, 1f - (float)System.Math.Pow(1f - sT, 2f));
-
-            // lightness centered in the middle: triangular distribution
-            float lT = 0.5f * (Main.rand.NextFloat() + Main.rand.NextFloat());
-            float l = MathHelper.Lerp(L_MIN, L_MAX, lT);
-
-            // check the final RGB isn't too dark/bright
-            Color c = Main.hslToRgb(h, s, l);
-            byte lo = (byte)System.Math.Min(c.R, System.Math.Min(c.G, c.B));
-            byte hi = (byte)System.Math.Max(c.R, System.Math.Max(c.G, c.B));
-
-            hsl = new Vector3(h, s, l);
-            if (lo >= RGB_MIN && hi <= RGB_MAX || attempt == 5)
-                break; // accept; last attempt falls back to whatever we got
+            idx = (idx + 1) % PlayerColors.Length;
         }
 
+        lastIndex = idx;
+        string hex = PlayerColors[idx];
+
+        // parse hex -> Color
+        byte r = Convert.ToByte(hex.Substring(0, 2), 16);
+        byte g = Convert.ToByte(hex.Substring(2, 2), 16);
+        byte b = Convert.ToByte(hex.Substring(4, 2), 16);
+
+        Color c = new(r, g, b);
+
+        // convert to HSL
+        hsl = Main.rgbToHsl(c);
         PushFromHsl();
     }
 
@@ -158,7 +180,6 @@ public class PlayerColorConfigElement : ConfigElement<string>
         // Show tooltip if hovered
         if (hovered)
         {
-            //TooltipFunction = () => "Set your own player color here.";
         }
         //else TooltipFunction = null;
     }
@@ -182,8 +203,23 @@ public class PlayerColorConfigElement : ConfigElement<string>
     {
         var c = Main.hslToRgb(hsl);
         var hex = PlayerColorHandler.ColorToHex(c);
-        if (hex != lastHex) { lastHex = hex; Value = hex; }
+        if (hex != lastHex)
+        {
+            lastHex = hex;
+            Value = hex;
+
+            // keep the synced table up to date
+            AssignPlayerColorsSystem.PlayerColors[Main.myPlayer] = hex;
+
+            // 🔁 invalidate mention caches for my name
+            MentionSnippet.InvalidateCachesFor(Main.LocalPlayer?.name);
+
+            // if MP, announce update (you already use this elsewhere)
+            if (Main.netMode == Terraria.ID.NetmodeID.MultiplayerClient)
+                PlayerColorNetHandler.ClientHello(Main.myPlayer, hex);
+        }
     }
+
 
     private void ApplyHex(string hex)
     {

@@ -36,7 +36,7 @@ public class PlayerIconSystem : ModSystem
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
     {
-        int index = layers.FindIndex(l => l.Name.Equals("Vanilla: Mouse Text"));
+        int index = layers.FindIndex(l => l.Name.Equals("Vanilla: Death Text"));
         if (index == -1)
             index = layers.Count;
 

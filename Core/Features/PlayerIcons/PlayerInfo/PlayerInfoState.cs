@@ -60,7 +60,7 @@ public class PlayerInfoState : UIState, ILoadable
             _messageBox.Width.Set(0, 1f); _messageBox.Height.Set(0, 1f); body.Append(_messageBox);
         }
 
-        titlePanel = new UITextPanel<string>($"Player: {_playerName}", 0.8f, true)
+        titlePanel = new UITextPanel<string>(Loc.Get("PlayerInfo.Headers.Player", _playerName), 0.8f, true)
         { HAlign = 0.5f, Top = { Pixels = -35f }, BackgroundColor = UICommon.DefaultUIBlue }.WithPadding(15f);
         uiContainer.Append(titlePanel);
 
@@ -261,18 +261,17 @@ public class PlayerInfoState : UIState, ILoadable
         Vector2 bgTopLeft = new(bgRect.X, bgRect.Y);
         if (Main.netMode != NetmodeID.SinglePlayer)
         {
-            if (player.team != 0)
-                PlayerInfoDrawer.DrawTeamText(sb, bgTopLeft += new Vector2(0, 21), player);
-            PlayerInfoDrawer.DrawPlayerID(sb, bgTopLeft, player);
+            PlayerInfoDrawer.DrawPlayerIDText(sb, bgTopLeft, player);
             bgTopLeft += new Vector2(0, 21);
+            PlayerInfoDrawer.DrawTeamText(sb, bgTopLeft, player);
         }
-        PlayerInfoDrawer.DrawBiomeText(sb, bgTopLeft, player);
 
         // Draw player
         PlayerInfoDrawer.DrawPlayer(sb, playerPos, player, 1.8f);
 
         Vector2 statsHeaderPos = new(leftColumn, y0 - 4);
-        if (!smallWidth) Utils.DrawBorderStringBig(sb, "Stats", statsHeaderPos, Color.White, scale: 0.5f);
+        y0 -= 8;
+        if (!smallWidth) Utils.DrawBorderStringBig(sb, Loc.Get("PlayerInfo.Headers.Stats"), statsHeaderPos, Color.White, scale: 0.5f);
         if (smallWidth) y0 -= 30;
 
         Rectangle hpBounds = new(leftColumn, y0 + rowHeight + 6, panelWidth, rowHeight);
@@ -283,43 +282,49 @@ public class PlayerInfoState : UIState, ILoadable
         Rectangle ammoBounds = new(rightColumn, y0 + rowHeight * 3 + 18, panelWidth, rowHeight);
         Rectangle minionBounds = new(leftColumn, y0 + rowHeight * 4 + 24, panelWidth, rowHeight);
         Rectangle sentryBounds = new(rightColumn, y0 + rowHeight * 4 + 24, panelWidth, rowHeight);
-        Rectangle heldItemBounds = new(leftColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
-        Rectangle lastCreateBounds = new(rightColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
+        Rectangle timeInSessionBounds = new(leftColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
+        Rectangle daysInSessionBounds = new(rightColumn, y0 + rowHeight * 5 + 30, panelWidth, rowHeight);
+        Rectangle lastEnemyBounds = new(leftColumn, y0 + rowHeight * 6 + 36, panelWidth, rowHeight);
+        Rectangle lastBossBounds = new(rightColumn, y0 + rowHeight * 6 + 36, panelWidth, rowHeight);
 
         PlayerInfoDrawer.DrawStat_HP(sb, hpBounds, player);
         PlayerInfoDrawer.DrawStat_Mana(sb, manaBounds, player);
         PlayerInfoDrawer.DrawStat_Defense(sb, defBounds, player);
-        PlayerInfoDrawer.DrawStat_DeathCount(sb, deathBounds, player);
+        PlayerInfoDrawer.DrawStat_Attack(sb, deathBounds, player);
         PlayerInfoDrawer.DrawStat_Coins(sb, coinBounds, player);
         PlayerInfoDrawer.DrawStat_Ammo(sb, ammoBounds, player);
         PlayerInfoDrawer.DrawStat_Minions(sb, minionBounds, player);
         PlayerInfoDrawer.DrawStat_Sentries(sb, sentryBounds, player);
-        PlayerInfoDrawer.DrawStat_HeldItem(sb, heldItemBounds, player);
-        PlayerInfoDrawer.DrawStat_LastCreatureHit(sb, lastCreateBounds, player);
+        PlayerInfoDrawer.DrawStat_TimeInSession(sb, timeInSessionBounds, player);
+        PlayerInfoDrawer.DrawStat_DaysInSession(sb, daysInSessionBounds, player);
+        PlayerInfoDrawer.DrawStat_LastEnemyHit(sb, lastEnemyBounds, player);
+        PlayerInfoDrawer.DrawStat_LastBossHit(sb, lastBossBounds, player);
 
         Rectangle viewport = new(containerLeft+20, top+20, containerW-20*4, panelBottom - top-20*2);
         //DrawDebugRect(viewport);
-        Utils.DrawBorderStringBig(sb, "Inventory", new Vector2(invStart.X + 2, invStart.Y - 35), Color.White, 0.5f);
+        Utils.DrawBorderStringBig(sb, Loc.Get("PlayerInfo.Headers.Inventory"), new Vector2(invStart.X + 2, invStart.Y - 35), Color.White, 0.5f);
         DrawInventory(sb, invStart, player, viewport);
         DrawAccessories(sb, accPos, player, viewport);
 
         if (buffCount > 0 && viewport.Bottom > buffStart.Y+20)
         {
-            Utils.DrawBorderStringBig(sb, "Buffs", new Vector2(buffStart.X, buffStart.Y - 36), Color.White, 0.52f);
+            Utils.DrawBorderStringBig(sb, Loc.Get("PlayerInfo.Headers.Buffs"), new Vector2(buffStart.X, buffStart.Y - 36), Color.White, 0.52f);
             DrawBuffs(sb, buffStart, player, viewport);
         }
 
         Point p = Main.MouseScreen.ToPoint();
-        if (hpBounds.Contains(p)) UICommon.TooltipMouseText("Health");
-        if (manaBounds.Contains(p)) UICommon.TooltipMouseText("Mana");
-        if (defBounds.Contains(p)) UICommon.TooltipMouseText("Defense");
-        if (deathBounds.Contains(p)) UICommon.TooltipMouseText("Deaths");
-        if (coinBounds.Contains(p)) UICommon.TooltipMouseText("Coins");
-        if (ammoBounds.Contains(p)) UICommon.TooltipMouseText("Ammo");
-        if (minionBounds.Contains(p)) UICommon.TooltipMouseText("Minions");
-        if (sentryBounds.Contains(p)) UICommon.TooltipMouseText("Sentries");
-        if (heldItemBounds.Contains(p)) UICommon.TooltipMouseText("Held Item");
-        if (lastCreateBounds.Contains(p)) UICommon.TooltipMouseText("Last Creature Hit");
+        if (hpBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Health"));
+        if (manaBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Mana"));
+        if (defBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Defense"));
+        if (deathBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Attack"));
+        if (coinBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Coins"));
+        if (ammoBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Ammo"));
+        if (minionBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Minions"));
+        if (sentryBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Sentries"));
+        if (timeInSessionBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.TimeInSession"));
+        if (daysInSessionBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.DaysInSession"));
+        if (lastEnemyBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.LastEnemyHit"));
+        if (lastBossBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.LastBossHit"));
     }
 
     private static void DrawInventory(SpriteBatch sb, Vector2 start, Player player, Rectangle viewport)

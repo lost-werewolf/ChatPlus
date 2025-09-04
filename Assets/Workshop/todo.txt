@@ -264,26 +264,21 @@ Row 5: author
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+[done] Fix tml icon
+[done] Disable preview when boss is alive
+[done] Fix ExampleMod stack source
+[done] Finalize icon
+[done] Add ' :' for emojis: regex for emojis so player can use : instead of [e
+[done] Add reply: regex for players so player can use @ to tag other players and format messages accordingly
+[done] Add time in session instead of last enemy hit
 [skip] Add example images
 [skip] Fix steam workshop click
-[done] Finish mod info state
-[done] Fix initial opening state doesnt show right header
-[done] Fix tml icon
-[done] Draw player compat for weaponOut
-[done] Disable preview when boss is alive
-[done] Move chat box for Mod Reloader
-[done] Fix ExampleMod stack source
-[done] Investigate if chat source does things better by keeping it on
-[done] Add replacement for last enemy hit
-[idea] React to message: highlights the chat message, shows options: reply, quick emojis, or emoji panel.
-[todo] Typing indicator. Small "x is typing"...
-[todo] Drag top of scrollbar to resize height of chats. Should be hardcoded to force whole number chat heights.
-[todo] Add time in session
-[todo] Add current biome
-[todo] Add equipment
+[skip] React to message: highlights the chat message, shows options: reply, quick emojis, or emoji panel.
+[skip] Typing indicator. Small "x is typing"...
+[skip] Drag top of scrollbar to resize height of chats. Should be hardcoded to force whole number chat heights.
+[skip] Draw player compat for weaponOut is too dark for ale
+[skip] Add current biome
+[skip] Add equipment
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[todo] Finalize icon
-[todo] Add ' :' for emojis: regex for emojis so player can use : instead of [e
-[todo] Add reply: regex for players so player can use @ to tag other players and format messages accordingly

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ChatPlus.Core.Helpers;
 using ChatPlus.Core.Netcode;
 using Terraria;
 using Terraria.ID;

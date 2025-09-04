@@ -1,37 +1,51 @@
-using ChatPlus.Core.UI;
+﻿using ChatPlus.Core.UI;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
-using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Core.Features.Emojis
+namespace ChatPlus.Core.Features.Emojis;
+
+public class EmojiElement : BaseElement<Emoji>
 {
-    public class EmojiElement : BaseElement<Emoji>
+    private readonly Emoji emoji;
+    private readonly EmojiIconImage image;
+
+    public EmojiElement(Emoji emoji) : base(emoji)
     {
-        public Emoji Emoji;
+        this.emoji = emoji;
+        image = new EmojiIconImage(emoji.FilePath);
+        Append(image);
+        Height.Set(30, 0);
+        Width.Set(0, 1f);
+    }
 
-        private EmojiIconImage image;
-        public EmojiElement(Emoji emoji) : base(emoji)
+    public override void Draw(SpriteBatch sb)
+    {
+        base.Draw(sb);
+
+        var dims = GetDimensions();
+        Vector2 pos = dims.Position() + new Vector2(32, 4);
+
+        // If the panel was triggered via ":" → also show display name after the tag
+        if (EmojiSystem.OpenedFromColon)
         {
-            Emoji = emoji;
-            image = new(emoji.FilePath);
-            Append(image);
+            string name = emoji.Description ?? emoji.Tag;
+            var nameSnip = new TextSnippet[] { new TextSnippet(":" + name) };
+            ChatManager.DrawColorCodedStringWithShadow(
+                sb, FontAssets.MouseText.Value,
+                nameSnip, pos - new Vector2(0, 0), // offset to the right of tag
+                0f, Vector2.Zero, Vector2.One, out _
+            );
         }
-
-        public override void LeftClick(UIMouseEvent evt)
+        else
         {
-            base.LeftClick(evt);
-        }
-
-        public override void Draw(SpriteBatch sb)
-        {
-            base.Draw(sb);
-
-            var dims = GetDimensions();
-            Vector2 pos = dims.Position();
-
-            TextSnippet[] snip = [new TextSnippet(Emoji.Tag)];
-            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32, 4), 0f, Vector2.Zero, Vector2.One, out _);
+            // draw the tag, e.g. [e:smile]
+            var tagSnip = new TextSnippet[] { new TextSnippet(emoji.Tag) };
+            ChatManager.DrawColorCodedStringWithShadow(
+                sb, FontAssets.MouseText.Value,
+                tagSnip, pos, 0f, Vector2.Zero, Vector2.One, out _
+            );
         }
     }
 }

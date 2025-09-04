@@ -140,22 +140,26 @@ Commands: {
 
 PlayerInfo: {
 	Headers: {
+		Player: Player: {0}
 		Inventory: Inventory
 		Accessories: Accessories
 		Stats: Stats
-		Biome: Biome
+		Back: Back
+		Buffs: Buffs
 	}
 
 	Stats: {
 		Health: Health
 		Mana: Mana
 		Defense: Defense
-		Deaths: Deaths
+		Attack: Attack
 		Coins: Coins
 		Ammo: Ammo
 		Minions: Minions
 		Sentries: Sentries
-		HeldItem: Held Item
-		LastCreatureHit: Last Creature Hit
+		TimeInSession: Time In Session
+		DaysInSession: Days In Session
+		LastEnemyHit: Last Enemy Hit
+		LastBossHit: Last Boss Hit
 	}
 }

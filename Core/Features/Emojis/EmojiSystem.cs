@@ -52,14 +52,16 @@ namespace ChatPlus.Core.Features.Emojis
             ui.SetState(null); // start hidden
         }
 
+        public static bool OpenedFromColon { get; private set; }
+
         public override void UpdateUI(GameTime gameTime)
         {
-            // Close if chat isn't open
             if (!Main.drawingPlayerChat)
             {
                 if (ui.CurrentState != null) ui.SetState(null);
                 _forceOpen = false;
-                FilterReset = false; // <- clear
+                FilterReset = false;
+                OpenedFromColon = false;
                 return;
             }
 
@@ -83,17 +85,15 @@ namespace ChatPlus.Core.Features.Emojis
             }
 
             bool shouldOpen = _forceOpen || hasOpenETag || colonTrigger;
+            OpenedFromColon = colonTrigger; // 🔹 track colon mode here
 
             if (shouldOpen)
             {
-                bool justOpened = ui.CurrentState != state;
-                if (justOpened)
+                if (ui.CurrentState != state)
                 {
                     StateManager.CloseOthers(ui);
                     ui.SetState(state);
                     ui.CurrentState?.Recalculate();
-
-                    // Reset filter when opening via button or ':'
                     FilterReset = _forceOpen || colonTrigger;
                 }
                 ui.Update(gameTime);
@@ -101,7 +101,8 @@ namespace ChatPlus.Core.Features.Emojis
             else
             {
                 if (ui.CurrentState == state) ui.SetState(null);
-                FilterReset = false; // <- clear when not open
+                FilterReset = false;
+                OpenedFromColon = false;
             }
         }
 

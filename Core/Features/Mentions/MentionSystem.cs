@@ -18,6 +18,7 @@ public class MentionSystem : ModSystem
         ui = new UserInterface();
         state = new MentionState();
         ui.SetState(null);
+        Terraria.UI.Chat.ChatManager.Register<MentionTagHandler>("mention");
     }
 
     public override void Unload()
@@ -60,7 +61,7 @@ public class MentionSystem : ModSystem
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
     {
-        int index = layers.FindIndex(l => l.Name.Equals("Vanilla: Mouse Text"));
+        int index = layers.FindIndex(l => l.Name.Equals("Vanilla: Death Text"));
         if (index == -1) index = layers.Count;
         layers.Insert(index, new LegacyGameInterfaceLayer(
             "ChatPlus: Mentions",

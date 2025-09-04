@@ -186,6 +186,74 @@ public sealed class ModIconSnippet : TextSnippet
         return false;
     }
 
+    // ty tomat from chitter-chatter
+    public static string GetModSource()
+    {
+        using (new Logging.QuietExceptionHandle())
+        {
+            try
+            {
+                var stackFrames = new StackTrace().GetFrames();
+
+                var foundNewText = false;
+                var postNewIndexIdx = -1;
+                foreach (var frame in stackFrames)
+                {
+                    postNewIndexIdx++;
+
+                    var methodName = frame.GetMethod()?.Name;
+                    if (methodName is null)
+                    {
+                        continue;
+                    }
+
+                    if (methodName.Contains("NewText") || methodName.Contains("AddNewMessage"))
+                    {
+                        foundNewText = true;
+                    }
+                    else if (foundNewText)
+                    {
+                        if (postNewIndexIdx == stackFrames.Length)
+                        {
+                            return null;
+                        }
+
+                        break;
+                    }
+                }
+
+                var declaringType = stackFrames[postNewIndexIdx].GetMethod()?.DeclaringType;
+                if (declaringType is null)
+                {
+                    return "Terraria";
+                }
+
+                if (declaringType.Namespace is null)
+                {
+                    return null;
+                }
+
+                if (declaringType.Namespace.StartsWith("Terraria"))
+                {
+                    return "Terraria";
+                }
+
+                //if (mod_source_cache.TryGetValue(declaringType, out var cached))
+                //{
+                //return cached;
+                //}
+
+                //return mod_source_cache[declaringType] = ModLoader.Mods.FirstOrDefault(x => x.Name != "ModLoader" && x.Code == declaringType.Assembly)?.Name ?? null;
+                return declaringType.Assembly.GetName().Name;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+
+    // ty dice from chat source
     public static string GetCallingName()
     {
         string name = string.Empty;

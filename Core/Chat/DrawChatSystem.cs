@@ -69,20 +69,27 @@ internal class DrawChatSystem : ModSystem
 
     private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
     {
-        if (!Main.drawingPlayerChat) { orig(self); return; }
+        if (!Main.drawingPlayerChat)
+        {
+            orig(self);
+            return;
+        }
 
         PlayerInput.WritingText = true;
         Main.instance.HandleIME();
-        if (++Main.instance.textBlinkerCount >= 20) { Main.instance.textBlinkerState = 1 - Main.instance.textBlinkerState; Main.instance.textBlinkerCount = 0; }
+        if (++Main.instance.textBlinkerCount >= 20)
+        {
+            Main.instance.textBlinkerState = 1 - Main.instance.textBlinkerState;
+            Main.instance.textBlinkerCount = 0;
+        }
 
         bool hasUpload = UploadTagHandler.ContainsUploadTag(Main.chatText);
-        int height = hasUpload ? 147 + 21 : 32; // 147 height + 21 input line height
+        int height = hasUpload ? 147 + 21 : 32;
 
-        int x = 0;
-        int y = 0;
-        
+        const int x = 0;
+        const int y = 0;
+
         DrawChatbox(height, x, y);
-        DrawEmojiButton(height, x, y);
 
         if (!hasUpload)
         {
@@ -91,63 +98,16 @@ internal class DrawChatSystem : ModSystem
         }
         else
         {
+            // reserve horizontal space for the upload preview and shift both text & caret
             int textOffsetX = DrawUploadAndGetTextOffset(height);
-            DrawInputLine(height, hasUpload, x, y);
+            DrawInputLine(height, hasUpload, textOffsetX, y);
+            DrawSelectionRectangle(height, textOffsetX, y);
         }
 
         Main.chatMonitor.DrawChat(true);
     }
 
     private static float animationSpeed;
-
-    private static void DrawEmojiButton(int height, int xOffset = 0, int yOffset = 0)
-    {
-        const float animDurationSeconds = 0.1f;
-        const float framesPerSecond = 60f;
-        const float stepPerFrame = 1f / (animDurationSeconds * framesPerSecond);
-        const float minScale = 0.9f;
-        const float maxScale = 1.0f;
-        const int logicalSize = 24;
-
-        int boxX = 78 + xOffset - 8;
-        int boxW = Main.screenWidth - 300;
-        int inputY = Main.screenHeight - height + yOffset;
-        int pad = 8;
-
-        Vector2 pos = new Vector2(boxX + boxW - pad - logicalSize, inputY + 2);
-        var baseRect = new Rectangle((int)pos.X, (int)pos.Y, logicalSize, logicalSize);
-        bool hover = baseRect.Contains(Main.MouseScreen.ToPoint()) && !PlayerInput.IgnoreMouseInterface;
-
-        if (hover)
-        {
-            animationSpeed += stepPerFrame;
-            if (animationSpeed > 1f) animationSpeed = 1f;
-        }
-        else
-        {
-            animationSpeed -= stepPerFrame;
-            if (animationSpeed < 0f) animationSpeed = 0f;
-        }
-
-        float scale = MathHelper.Lerp(minScale, maxScale, animationSpeed);
-
-        // Parse, mark as "special button", then draw
-        string tag = "[e:slightly_smiling_face/button]";
-        var snippets = ChatManager.ParseMessage(tag, Color.White).ToArray();
-
-        Utils.DrawBorderString(Main.spriteBatch, tag, pos, Color.White);
-
-        ChatManager.DrawColorCodedStringWithShadow(
-            Main.spriteBatch,
-            FontAssets.MouseText.Value,
-            snippets,
-            pos,
-            0f,
-            Vector2.Zero,
-            Vector2.One,
-            out int hovered);
-    }
-
     private static int DrawUploadAndGetTextOffset(int totalHeight)
     {
         if (!TryGetFirstUploadTexture(Main.chatText, out var tex)) return 0;
@@ -179,45 +139,77 @@ internal class DrawChatSystem : ModSystem
         int x = 78 + xOffset;
         DrawNineSlice(x, y, w, height, TextureAssets.TextBack.Value, new Color(100, 100, 100, 100));
     }
+    private static readonly Regex RxUpload = new(@"(?i)\[u:[^\]]+\]");
+    private static readonly Regex RxColorPx = new(@"(?i)\[c/[^:\]]*:");
 
-    private static void DrawInputLine(int height, bool hasUpload, int xOffset=0, int yOffset = 0)
+    private static void DrawInputLine(int height, bool hasUpload, int xOffset = 0, int yOffset = 0)
     {
         int baseX = 88;
         int baseY = Main.screenHeight - height;
 
-        // Strip upload tag from rendered text so input appears to the right of the image.
-        string raw = Main.chatText ?? "";
-        var tag = Regex.Match(raw, @"\[u:[^\]]+\]", RegexOptions.IgnoreCase);
-        string cleaned = tag.Success ? raw.Remove(tag.Index, tag.Length) : raw;
+        // 1) Raw text from chat
+        string raw = Main.chatText ?? string.Empty;
 
-        // Draw text
-        var snips = ChatManager.ParseMessage(cleaned, Color.White).ToArray();
+        // 2) Remove upload tag from the DRAWN text (we already render the image beside)
+        Match u = RxUpload.Match(raw);
+        string renderText = u.Success ? raw.Remove(u.Index, u.Length) : raw;
+
+        // 3) Map raw-caret -> visible-caret (subtract hidden segments)
+        int caretRaw = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, raw.Length);
+        int caretVis = caretRaw;
+
+        // 3a) adjust for upload tag
+        if (u.Success)
+        {
+            int uStart = u.Index;
+            int uEnd = u.Index + u.Length;
+            if (caretRaw > uStart)
+            {
+                if (caretRaw < uEnd) caretVis = uStart;          // caret inside tag → snap to tag start (visible = 0 shift here)
+                else caretVis -= u.Length;                        // caret after tag → shift left by tag length
+            }
+        }
+
+        // 3b) adjust for ALL color prefixes before caret and their closing bracket if present
+        for (Match m = RxColorPx.Match(raw); m.Success && m.Index < caretRaw; m = m.NextMatch())
+        {
+            int pxStart = m.Index;
+            int pxEnd = m.Index + m.Length;                       // length of "[c/...:"
+                                                                  // subtract prefix length if caret is beyond the prefix
+            caretVis -= Math.Max(0, Math.Min(caretRaw, pxEnd) - pxStart);
+
+            // if the closing ']' for this color tag exists and is before the caret, subtract that too
+            int close = raw.IndexOf(']', pxEnd);
+            if (close != -1 && close < caretRaw) caretVis -= 1;
+
+            // If caret is inside the prefix itself, keep it at the prefix start (so it doesn't drift)
+            if (caretRaw >= pxStart && caretRaw < pxEnd)
+                caretVis = Math.Min(caretVis, pxStart);
+        }
+
+        // Safety clamp to the text we actually draw
+        caretVis = Math.Clamp(caretVis, 0, renderText.Length);
+
+        // 4) Draw the line using the text that still contains color tags (so ChatManager colors it)
+        var snips = ChatManager.ParseMessage(renderText, Color.White).ToArray();
         ChatManager.DrawColorCodedStringWithShadow(
-            Main.spriteBatch, FontAssets.MouseText.Value,
-            snips, new Vector2(baseX + xOffset, baseY + yOffset),
-            0f, Vector2.Zero, Vector2.One, out _
+            Main.spriteBatch,
+            FontAssets.MouseText.Value,
+            snips,
+            new Vector2(baseX + xOffset, baseY + yOffset),
+            0f,
+            Vector2.Zero,
+            Vector2.One,
+            out _
         );
 
-        // Caret
+        // 5) Draw the caret at the visible position
         if (Main.instance.textBlinkerState == 1)
         {
-            int caretRaw = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, raw.Length);
-            int caretClean = caretRaw;
-
-            if (tag.Success)
-            {
-                int tagStart = tag.Index;
-                int tagEnd = tag.Index + tag.Length;
-                if (caretRaw <= tagEnd) caretClean = 0;                  // inside/at tag → snap to start of cleaned
-                else caretClean = caretRaw - tag.Length;                 // after tag → shift left by tag length
-            }
-
-            caretClean = Math.Clamp(caretClean, 0, cleaned.Length);
-            var before = ChatManager.ParseMessage(cleaned.Substring(0, caretClean), Color.White).ToArray();
+            var before = ChatManager.ParseMessage(renderText.Substring(0, caretVis), Color.White).ToArray();
             Vector2 beforeSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, before, Vector2.One);
-
             int caretX = baseX + xOffset + (int)beforeSize.X;
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(caretX, baseY + 2+yOffset, 1, 17), Color.White);
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(caretX, baseY + 2 + yOffset, 1, 17), Color.White);
         }
     }
 

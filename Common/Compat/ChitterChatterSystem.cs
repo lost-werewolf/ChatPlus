@@ -186,9 +186,12 @@ namespace ChatPlus.Common.Compat
                 var t = snip.Text?.Trim();
                 if (string.IsNullOrEmpty(t)) continue;
 
-                if (MentionTagHandler.ContainsLink(t) && snip is not MentionSnippet)
+                if (LinkTagHandler.ContainsLink(t) && snip is not MentionSnippet)
                 {
-                    line[i] = new LinkSnippet(snip);
+                    line[i] = new LinkSnippet(snip)
+                    {
+                        CheckForHover = true
+                    };
                 }
             }
         }

@@ -1,6 +1,5 @@
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 
@@ -20,31 +19,18 @@ public class LinkElement : BaseElement<LinkEntry>
         var dims = GetDimensions();
         var pos = dims.Position();
 
-        // Tag (iconic) - smaller
+        // Tag
         string tag = Data.Tag;
         ChatManager.DrawColorCodedStringWithShadow(
             sb,
             FontAssets.MouseText.Value,
             tag,
-            pos + new Microsoft.Xna.Framework.Vector2(4, 4),
-            Microsoft.Xna.Framework.Color.White,
+            pos + new Vector2(4, 4),
+            Color.White,
             0f,
-            Microsoft.Xna.Framework.Vector2.Zero,
-            new Microsoft.Xna.Framework.Vector2(0.9f),
+            Vector2.Zero,
+            new Vector2(0.9f),
             -1f,
             1f);
-
-        // Display text
-        //string txt = Data.Display;
-        //TextSnippet[] snips = [new TextSnippet(txt)];
-        //ChatManager.DrawColorCodedStringWithShadow(
-        //    sb,
-        //    FontAssets.MouseText.Value,
-        //    snips,
-        //    pos + new Microsoft.Xna.Framework.Vector2(150, 4),
-        //    0f,
-        //    Microsoft.Xna.Framework.Vector2.Zero,
-        //    Microsoft.Xna.Framework.Vector2.One,
-        //    out _);
     }
 }

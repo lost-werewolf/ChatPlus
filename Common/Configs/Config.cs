@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using ChatPlus.Common.Configs.ConfigElements;
+using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Helpers;
 using Terraria;
@@ -87,6 +88,7 @@ namespace ChatPlus.Common.Configs
                 if (Main.LocalPlayer != null)
                 {
                     AssignPlayerColorsSystem.PlayerColors[Main.myPlayer] = hex;
+                    MentionSnippet.InvalidateCachesFor(Main.LocalPlayer.name);
                 }
 
                 // In MP, notify server so it can rebroadcast to everyone

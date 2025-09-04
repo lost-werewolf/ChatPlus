@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using ChatPlus.Core.Features.PlayerColors;
+using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 
@@ -18,6 +19,10 @@ internal class ModNetHandler
 
             case PlayerColorNetHandler.HandlerId:
                 PlayerColorNetHandler.Instance.HandlePacket(r, fromWho);
+                break;
+
+            case SessionTrackerNetHandler.HandlerId:
+                SessionTrackerNetHandler.Instance.HandlePacket(r, fromWho);
                 break;
 
             default:
