@@ -115,31 +115,37 @@ internal class DrawChatSystem : ModSystem
         int pad = 8;
 
         Vector2 pos = new Vector2(boxX + boxW - pad - logicalSize, inputY + 2);
-        Rectangle baseRect = new Rectangle((int)pos.X, (int)pos.Y, logicalSize, logicalSize);
+        var baseRect = new Rectangle((int)pos.X, (int)pos.Y, logicalSize, logicalSize);
         bool hover = baseRect.Contains(Main.MouseScreen.ToPoint()) && !PlayerInput.IgnoreMouseInterface;
 
-        if (hover) { animationSpeed += stepPerFrame; if (animationSpeed > 1f) animationSpeed = 1f; }
-        else { animationSpeed -= stepPerFrame; if (animationSpeed < 0f) animationSpeed = 0f; }
+        if (hover)
+        {
+            animationSpeed += stepPerFrame;
+            if (animationSpeed > 1f) animationSpeed = 1f;
+        }
+        else
+        {
+            animationSpeed -= stepPerFrame;
+            if (animationSpeed < 0f) animationSpeed = 0f;
+        }
 
         float scale = MathHelper.Lerp(minScale, maxScale, animationSpeed);
 
-        string tag = "[e:slightly_smiling_face]";
+        // Parse, mark as "special button", then draw
+        string tag = "[e:slightly_smiling_face/button]";
         var snippets = ChatManager.ParseMessage(tag, Color.White).ToArray();
-        Vector2 baseSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, snippets, Vector2.One);
-        Vector2 scaledSize = baseSize * scale;
-        Vector2 offset = (baseSize - scaledSize) * 0.5f;
 
-        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.MouseText.Value, 
-            snippets, pos + offset, 0f, Vector2.Zero, new Vector2(scale, scale), out int hovered);
+        Utils.DrawBorderString(Main.spriteBatch, tag, pos, Color.White);
 
-        if (hovered >= 0 && Main.mouseLeft && Main.mouseLeftRelease)
-        {
-            // Open/close emoji state
-            if (StateManager.IsAnyStateActive())
-                EmojiSystem.CloseAfterCommit();
-            else
-                EmojiSystem.OpenFromButton();
-        }
+        ChatManager.DrawColorCodedStringWithShadow(
+            Main.spriteBatch,
+            FontAssets.MouseText.Value,
+            snippets,
+            pos,
+            0f,
+            Vector2.Zero,
+            Vector2.One,
+            out int hovered);
     }
 
     private static int DrawUploadAndGetTextOffset(int totalHeight)

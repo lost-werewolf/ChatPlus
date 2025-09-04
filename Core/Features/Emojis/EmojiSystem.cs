@@ -31,6 +31,9 @@ namespace ChatPlus.Core.Features.Emojis
                 sys.ui.SetState(sys.state);
                 sys.ui.CurrentState?.Recalculate();
             }
+
+            // ADD :
+            Main.chatText += ":";
         }
 
         public static void CloseAfterCommit()

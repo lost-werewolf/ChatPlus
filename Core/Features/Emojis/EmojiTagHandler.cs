@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
+using static ChatPlus.Core.Features.Emojis.EmojiSnippet;
 
 namespace ChatPlus.Core.Features.Emojis
 {
@@ -34,20 +36,76 @@ namespace ChatPlus.Core.Features.Emojis
 
         TextSnippet ITagHandler.Parse(string text, Color baseColor, string options)
         {
-            if (Registry.TryGetValue(text, out var texture))
+            // 1) Normalize: extract base key and merge options from "text" if it contains "/..."
+            string key = text;
+            string mergedOptions = options;
+
+            int slash = string.IsNullOrEmpty(text) ? -1 : text.IndexOf('/');
+            if (slash >= 0)
             {
-                return new EmojiSnippet(texture)
+                string suffix = text.Substring(slash + 1);
+                key = text.Substring(0, slash);
+
+                if (string.IsNullOrEmpty(mergedOptions))
                 {
-                    Text = GenerateEmojiTag(text),
-                    Color = Color.White
-                };
+                    mergedOptions = suffix;
+                }
+                else
+                {
+                    mergedOptions = mergedOptions + "," + suffix;
+                }
             }
-            else
+
+            // 2) Resolve the texture by base key
+            if (!Registry.TryGetValue(key, out var texture))
             {
-                // If no uploadedTexture is found, return the original text as a fallback
                 return new TextSnippet(text);
             }
+
+            // 3) Build a clean display tag without options for Text (stable re-emit)
+            string cleanTag = GenerateEmojiTag(key);
+
+            var snippet = new EmojiSnippet(texture, cleanTag)
+            {
+                Text = cleanTag,
+                Color = Color.White,
+                CheckForHover = true
+            };
+
+            // 4) Decide role based on merged options (accept several separators)
+            snippet.Role = HasOption(mergedOptions, "button")
+                ? EmojiSnippet.EmojiRenderRole.Button
+                : EmojiSnippet.EmojiRenderRole.Normal;
+
+            return snippet;
+
+
+            static bool HasOption(string opts, string target)
+            {
+                if (string.IsNullOrEmpty(opts)) return false;
+
+                var parts = opts.Split(new[] { '/', ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    if (parts[i].Trim().Equals(target, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
-        public static string GenerateEmojiTag(string key) => $"[e:{key}]";
+
+        // Optional convenience: emit with or without options
+        public static string GenerateEmojiTag(string key)
+        {
+            return "[e:" + key + "]";
+        }
+
+        public static string GenerateEmojiTag(string key, string option)
+        {
+            if (string.IsNullOrWhiteSpace(option)) return "[e:" + key + "]";
+            return "[e:" + key + "/" + option + "]";
+        }
     }
 }
