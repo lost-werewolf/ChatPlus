@@ -46,10 +46,10 @@ public class ModIconElement : BaseElement<ModIcon>
 
         if (bounds.Contains(Main.MouseScreen.ToPoint()))
         {
-            if (!Conf.C.ShowModPreviewWhenHovering) 
+            if (!Conf.C.ShowModStatsWhenHovering) 
                 return;
 
-            if (Conf.C.DisableHoverWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
+            if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return;
 
             HoveredModOverlay.Set(Data.mod);

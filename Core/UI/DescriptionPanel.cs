@@ -28,7 +28,7 @@ namespace ChatPlus.Core.UI
             {
                 int pad = 2;
                 int itemCount = 10;
-                if (Conf.C != null) itemCount = (int)Conf.C.AutocompleteItemCount;
+                if (Conf.C != null) itemCount = (int)Conf.C.AutocompleteItemsVisible;
                 return -itemCount * 30 - pad; // sit above the base panel
             }
         }

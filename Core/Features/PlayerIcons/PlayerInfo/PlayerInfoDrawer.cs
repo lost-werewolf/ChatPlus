@@ -355,9 +355,10 @@ public static class PlayerInfoDrawer
 
         string name = Lang.GetNPCNameValue(_lastValidId);
         if (name.Length > 10) name = name[..9] + "..";
+        var width = FontAssets.MouseText.Value.MeasureString(name).X;
 
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, name,
-            rect.X + 16, rect.Y + 4, Color.White, Color.Black, Vector2.Zero, 1f);
+            rect.X + tex.Width()-width-1, rect.Y + 4, Color.White, Color.Black, Vector2.Zero, 1f);
     }
 
     public static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)

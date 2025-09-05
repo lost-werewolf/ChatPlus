@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using ChatPlus.Common.Configs;
 using ChatPlus.Core.Helpers;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
@@ -11,12 +12,15 @@ namespace ChatPlus.Core.Features.Emojis
 {
     internal class EmojiManager : ModSystem
     {
-        public static List<Emoji> Emojis { get; private set; } = new();
+        public static List<Emoji> Emojis { get; private set; } = [];
         public static Dictionary<string, List<string>> EmojiMap { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
 
         public override void Load()
         {
+            if (!Conf.C.Emojis) return;
+
             ChatManager.Register<EmojiTagHandler>(["e", "emoji"]);
+
             InitializeEmojiMap();
             InitializeEmojis();
         }

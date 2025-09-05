@@ -31,7 +31,7 @@ namespace ChatPlus.Core.Features.Uploads
             // Hover
             Rectangle bounds = new((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
             bool hovering = bounds.Contains(Main.MouseScreen.ToPoint());
-            if (Conf.C != null && Conf.C.ShowUploadPreviewWhenHovering && hovering)
+            if (Conf.C != null && Conf.C.ShowUploadWhenHovering && hovering)
             {
                 if (StateManager.IsAnyStateActive()) return true;
 

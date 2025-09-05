@@ -84,7 +84,7 @@ public class PlayerInfoState : UIState, ILoadable
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        RefreshNavButtons(); 
+        RefreshNavButtons();
     }
 
     private void RefreshNavButtons()
@@ -300,13 +300,13 @@ public class PlayerInfoState : UIState, ILoadable
         PlayerInfoDrawer.DrawStat_LastEnemyHit(sb, lastEnemyBounds, player);
         PlayerInfoDrawer.DrawStat_LastBossHit(sb, lastBossBounds, player);
 
-        Rectangle viewport = new(containerLeft+20, top+20, containerW-20*4, panelBottom - top-20*2);
+        Rectangle viewport = new(containerLeft + 20, top + 20, containerW - 20 * 4, panelBottom - top - 20 * 2);
         //DrawDebugRect(viewport);
         Utils.DrawBorderStringBig(sb, Loc.Get("PlayerInfo.Headers.Inventory"), new Vector2(invStart.X + 2, invStart.Y - 35), Color.White, 0.5f);
         DrawInventory(sb, invStart, player, viewport);
         DrawAccessories(sb, accPos, player, viewport);
 
-        if (buffCount > 0 && viewport.Bottom > buffStart.Y+20)
+        if (buffCount > 0 && viewport.Bottom > buffStart.Y + 20)
         {
             Utils.DrawBorderStringBig(sb, Loc.Get("PlayerInfo.Headers.Buffs"), new Vector2(buffStart.X, buffStart.Y - 36), Color.White, 0.52f);
             DrawBuffs(sb, buffStart, player, viewport);
@@ -342,7 +342,7 @@ public class PlayerInfoState : UIState, ILoadable
                 size, size
             );
 
-            if (r.Bottom > viewport.Bottom-10) continue;
+            if (r.Bottom > viewport.Bottom - 10) continue;
 
             var item = player.inventory[i];
 
@@ -351,7 +351,7 @@ public class PlayerInfoState : UIState, ILoadable
             else
                 sb.Draw(TextureAssets.InventoryBack.Value, r, Color.White);
 
-                if (!item.IsAir)
+            if (!item.IsAir)
             {
                 var center = new Vector2(r.X + r.Width / 2f, r.Y + r.Height / 2f);
                 ItemSlot.DrawItemIcon(item, 31, sb, center, 0.9f, size - 6, Color.White);
@@ -482,7 +482,7 @@ public class PlayerInfoState : UIState, ILoadable
 
             // Draw middle 3 armor vanity slots (no visual)
             DrawLoaderSlot(player.armor, ItemSlot.Context.InWorld, 10 + r, x1, y, player);
-            
+
             // Draw 3 armor slots (no visual)
             DrawLoaderSlot(player.armor, ItemSlot.Context.InWorld, r, x2, y, player);
 

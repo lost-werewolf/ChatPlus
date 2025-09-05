@@ -101,7 +101,7 @@ namespace ChatPlus.Core.UI
             int itemCount = 10;
             if (Conf.C != null)
             {
-                itemCount = (int)Conf.C.AutocompleteItemCount;
+                itemCount = (int)Conf.C.AutocompleteItemsVisible;
             }
 
             Top.Set(-38, 0f);
@@ -287,7 +287,7 @@ namespace ChatPlus.Core.UI
             // Sizing and position
             int itemCount = 10;
             if (Conf.C != null)
-                itemCount = (int)Conf.C.AutocompleteItemCount;
+                itemCount = (int)Conf.C.AutocompleteItemsVisible;
             Top.Set(-38, 0);
             Height.Set(itemCount * 30, 0);
             list.Height.Set(itemCount * 30, 0);

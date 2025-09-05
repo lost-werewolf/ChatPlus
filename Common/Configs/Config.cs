@@ -23,7 +23,11 @@ namespace ChatPlus.Common.Configs
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
-        public bool BetterTextEditor = true;
+        public bool Emojis = true;
+
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        [DefaultValue(true)]
+        public bool TextEditor = true;
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [DefaultValue(true)]
@@ -33,29 +37,13 @@ namespace ChatPlus.Common.Configs
         [Range(10f, 20f)]
         [Increment(1f)]
         [DefaultValue(10f)]
-        public float ChatItemCount = 10f;
+        public float ChatsVisible = 10f;
 
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         [Range(10f, 20f)]
         [Increment(1f)]
         [DefaultValue(10f)]
-        public float AutocompleteItemCount = 10f;
-
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [DefaultValue(true)]
-        public bool ShowModPreviewWhenHovering = true;
-
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [DefaultValue(true)]
-        public bool ShowPlayerPreviewWhenHovering = true;
-
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [DefaultValue(true)]
-        public bool ShowUploadPreviewWhenHovering = true;
-
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
-        [DefaultValue(true)]
-        public bool DisableHoverWhenBossIsAlive = true;
+        public float AutocompleteItemsVisible = 10f;
 
         [Header("ChatFormat")]
 
@@ -73,6 +61,24 @@ namespace ChatPlus.Common.Configs
         [CustomModConfigItem(typeof(PlayerColorConfigElement))]
         [DefaultValue("FFFFFF")]
         public string PlayerColor = "FFFFFF";
+
+        [Header("Stats")]
+
+        [BackgroundColor(192, 54, 64)] // Calamity Red
+        [DefaultValue(true)]
+        public bool ShowModStatsWhenHovering = true;
+
+        [BackgroundColor(192, 54, 64)] // Calamity Red
+        [DefaultValue(true)]
+        public bool ShowPlayerStatsWhenHovering = true;
+
+        [BackgroundColor(192, 54, 64)] // Calamity Red
+        [DefaultValue(true)]
+        public bool ShowUploadWhenHovering = true;
+
+        [BackgroundColor(192, 54, 64)] // Calamity Red
+        [DefaultValue(true)]
+        public bool DisableStatsWhenBossIsAlive = true;
 
         public override void OnChanged()
         {
@@ -96,6 +102,7 @@ namespace ChatPlus.Common.Configs
                 {
                     PlayerColorNetHandler.ClientHello(Main.myPlayer, hex);
                 }
+                MentionSnippet.ClearAllCaches();
             }
             catch (Exception e)
             {

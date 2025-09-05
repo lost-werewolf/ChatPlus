@@ -18,7 +18,7 @@ Configs: {
 		Headers: {
 			Config: Config
 			ChatFormat: Chat Format
-			PlayerFormat: Player Format
+			Stats: Stats
 		}
 
 		Autocomplete: {
@@ -38,37 +38,17 @@ Configs: {
 				'''
 		}
 
-		ShowLinks: {
-			Label: Links
-			Tooltip: Links you type in chat become clickable.
-		}
-
-		BetterTextEditor: {
-			Label: Text Editor
-			Tooltip:
-				'''
-				Improves the chat box with the following shortcuts:
-				Ctrl+C: Copy
-				Ctrl+V: Paste
-				Ctrl+X: Cut
-				Ctrl+A: Select all
-				Arrows: Move cursor
-				Shift+Arrows: Select characters
-				Ctrl+Shift+Arrows: Select words
-				'''
-		}
-
 		Scrollbar: {
 			Label: Scrollbar
 			Tooltip: Shows a scrollbar when more than 10 messages have been sent.
 		}
 
-		ChatItemCount: {
+		ChatsVisible: {
 			Label: Chats Visible
 			Tooltip: Set the number of chat messages that can be visible at one time.
 		}
 
-		AutocompleteItemCount: {
+		AutocompleteItemsVisible: {
 			Label: Autocomplete Items Visible
 			Tooltip: Set the number of items in the autocomplete window that can be visible at one time.
 		}
@@ -88,24 +68,44 @@ Configs: {
 			Tooltip: ""
 		}
 
-		ShowPlayerPreviewWhenHovering: {
-			Label: Show Player Preview When Hovering
-			Tooltip: Shows a preview of player stats when hovering a player icon.
+		Emojis: {
+			Label: Emojis
+			Tooltip: Turn on to load emojis when loading the mod.
 		}
 
-		ShowModPreviewWhenHovering: {
-			Label: Show Mod Preview When Hovering
+		TextEditor: {
+			Label: Text Editor
+			Tooltip:
+				'''
+				Improves the chat box with the following shortcuts:
+				Ctrl+C: Copy
+				Ctrl+V: Paste
+				Ctrl+X: Cut
+				Ctrl+A: Select all
+				Arrows: Move cursor
+				Shift+Arrows: Select characters
+				Ctrl+Shift+Arrows: Select words
+				'''
+		}
+
+		ShowModStatsWhenHovering: {
+			Label: Show Mod Stats When Hovering
 			Tooltip: Shows a preview of mod stats when hovering a mod icon.
 		}
 
-		ShowUploadPreviewWhenHovering: {
-			Label: Show Upload Preview When Hovering
+		ShowPlayerStatsWhenHovering: {
+			Label: Show Player Stats When Hovering
+			Tooltip: Shows a preview of player stats when hovering a player icon.
+		}
+
+		ShowUploadWhenHovering: {
+			Label: Show Upload When Hovering
 			Tooltip: Shows a bigger image when hovering.
 		}
 
-		DisableHoverWhenBossIsAlive: {
-			Label: Disable Hover When Boss Is Alive
-			Tooltip: Turn this on to avoid being distracted by hover tooltips when a boss fight is active.
+		DisableStatsWhenBossIsAlive: {
+			Label: Disable Stats When Boss Is Alive
+			Tooltip: Keep this on to avoid being distracted by hover tooltips when a boss fight is active.
 		}
 	}
 }

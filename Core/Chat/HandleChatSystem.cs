@@ -64,7 +64,7 @@ namespace ChatPlus.Core.Chat
         {
             orig();
 
-            if (!Conf.C.BetterTextEditor) return;
+            if (!Conf.C.TextEditor) return;
 
             if (!Main.drawingPlayerChat)
             {
@@ -105,7 +105,7 @@ namespace ChatPlus.Core.Chat
                 return orig(oldString, allowMultiLine);
             }
 
-            if (!Conf.C.BetterTextEditor)
+            if (!Conf.C.TextEditor)
                 return orig(oldString, allowMultiLine);
 
             Main.inputTextEnter = false;

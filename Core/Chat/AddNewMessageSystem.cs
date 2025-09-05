@@ -41,7 +41,7 @@ internal class AddNewMessageSystem : ModSystem
         string resultText = text;
 
         /// 1. Set show count from config
-        self._showCount = (int)Conf.C.ChatItemCount;
+        self._showCount = (int)Conf.C.ChatsVisible;
 
         /// 2. Adds upload padding
         if (UploadTagHandler.ContainsUploadTag(text))
@@ -85,9 +85,7 @@ internal class AddNewMessageSystem : ModSystem
         }
 
         // Mentions: convert @LocalPlayerName only
-        string localName = Main.LocalPlayer?.name;
-        if (!string.IsNullOrWhiteSpace(localName))
-            resultText = TransformMentions(resultText, localName);
+        resultText = TransformMentions(resultText);
 
         // 6. Replace the name tag with color tag using synced table; fallback to white
         if (!string.IsNullOrEmpty(senderName) && !string.IsNullOrEmpty(nameTagFull))
@@ -117,34 +115,43 @@ internal class AddNewMessageSystem : ModSystem
 
         orig(self, resultText, color, widthLimitInPixels);
     }
-
-    private static string TransformMentions(string input, string localPlayerName)
+    private static string TransformMentions(string input)
     {
-        if (string.IsNullOrEmpty(input) || input.IndexOf('@') == -1) return input;
-        if (string.IsNullOrWhiteSpace(localPlayerName)) return input;
+        if (string.IsNullOrEmpty(input) || input.IndexOf('@') == -1)
+            return input;
 
         var sb = new System.Text.StringBuilder(input.Length + 16);
+        bool insideTag = false;
+
         for (int i = 0; i < input.Length; i++)
         {
             char c = input[i];
-            if (c == '@')
+
+            // Track [ ... ] tag sections so we don't transform inside tags
+            if (c == '[') insideTag = true;
+            if (c == ']') insideTag = false;
+
+            if (!insideTag && c == '@')
             {
                 int start = i + 1;
                 int j = start;
-                while (j < input.Length && !char.IsWhiteSpace(input[j]) && input[j] != ':' && input[j] != '[' && input[j] != ']') j++;
+
+                // simple “mention word” scan: stop at whitespace or tag delimiters
+                while (j < input.Length && !char.IsWhiteSpace(input[j]) && input[j] != ':' && input[j] != '[' && input[j] != ']')
+                    j++;
+
                 if (j > start)
                 {
-                    string candidate = input.Substring(start, j - start);
-                    if (string.Equals(candidate, localPlayerName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        sb.Append(MentionTagHandler.GenerateTag(candidate));
-                        i = j - 1;
-                        continue;
-                    }
+                    string name = input.Substring(start, j - start);
+                    sb.Append(MentionTagHandler.GenerateTag(name)); // [mention:Name]
+                    i = j - 1;
+                    continue;
                 }
             }
+
             sb.Append(c);
         }
+
         return sb.ToString();
     }
 }

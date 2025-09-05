@@ -61,10 +61,10 @@ public class PlayerIconSnippet : TextSnippet
         // to debug; comment below line out!
         if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
         {
-            if (!Conf.C.ShowPlayerPreviewWhenHovering) 
+            if (!Conf.C.ShowPlayerStatsWhenHovering) 
                 return true;
 
-            if (Conf.C.DisableHoverWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
+            if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return true;
 
             Main.LocalPlayer.mouseInterface = true;
@@ -117,10 +117,10 @@ public class PlayerIconSnippet : TextSnippet
 
         if (_playerIndex >= 0 && _playerIndex < Main.maxPlayers)
         {
-            if (!Conf.C.ShowPlayerPreviewWhenHovering) 
+            if (!Conf.C.ShowPlayerStatsWhenHovering) 
                 return;
 
-            if (Conf.C.DisableHoverWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
+            if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return;
 
             HoveredPlayerOverlay.Set(_playerIndex);

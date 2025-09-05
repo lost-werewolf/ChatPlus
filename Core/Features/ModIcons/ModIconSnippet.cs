@@ -73,10 +73,10 @@ public sealed class ModIconSnippet : TextSnippet
         var hoverRect = new Rectangle((int)pos.X - 5, (int)pos.Y - 4, 32, (int)size.Y + 5);
         if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
         {
-            if (!Conf.C.ShowModPreviewWhenHovering)
+            if (!Conf.C.ShowModStatsWhenHovering)
                 return true;
 
-            if (Conf.C.DisableHoverWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
+            if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return true;
 
             if (ModLoader.TryGetMod(modName, out Mod mod))
@@ -153,10 +153,10 @@ public sealed class ModIconSnippet : TextSnippet
 
         if (ModLoader.TryGetMod(modName, out Mod mod))
         {
-            if (!Conf.C.ShowModPreviewWhenHovering) 
+            if (!Conf.C.ShowModStatsWhenHovering) 
                 return;
 
-            if (Conf.C.DisableHoverWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
+            if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return;
 
             HoveredModOverlay.Set(mod);

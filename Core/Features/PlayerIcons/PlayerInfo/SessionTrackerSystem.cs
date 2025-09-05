@@ -114,7 +114,6 @@ namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo
             return $"{(int)span.TotalMinutes:D2}:{span.Seconds:D2}";
         }
 
-        // === Net sending (server only) ===
         private static void SendFullSync(int toClient)
         {
             var packet = ModContent.GetInstance<ChatPlus>().GetPacket();
@@ -127,10 +126,10 @@ namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo
             }
             packet.Send(toClient: toClient);
         }
-
         private static void SendPlayerJoin(int index, DateTime time)
         {
             var packet = ModContent.GetInstance<ChatPlus>().GetPacket();
+            packet.Write(SessionTrackerNetHandler.HandlerId);     
             packet.Write((byte)SessionMessage.PlayerJoin);
             packet.Write((byte)index);
             packet.Write(time.Ticks);
@@ -140,10 +139,12 @@ namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo
         private static void SendPlayerLeave(int index)
         {
             var packet = ModContent.GetInstance<ChatPlus>().GetPacket();
+            packet.Write(SessionTrackerNetHandler.HandlerId);   
             packet.Write((byte)SessionMessage.PlayerLeave);
             packet.Write((byte)index);
             packet.Send();
         }
+
         public class SessionTrackerPlayer : ModPlayer
         {
             public override void OnEnterWorld()

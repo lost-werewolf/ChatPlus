@@ -58,7 +58,7 @@ public class ChatScrollSystem : ModSystem
                 "ChatPlus: Chat Scrollbar",
                 () =>
                 {
-                    int show = Math.Clamp((int)Conf.C.ChatItemCount, 10, 20);
+                    int show = Math.Clamp((int)Conf.C.ChatsVisible, 10, 20);
                     bool moreThanVisible = ChatScrollList.GetTotalLines() > show;
                     if (Main.drawingPlayerChat && chatScrollUI?.CurrentState != null && Conf.C.Scrollbar && moreThanVisible)
                         chatScrollUI.Draw(Main.spriteBatch, Main.gameTimeCache);
