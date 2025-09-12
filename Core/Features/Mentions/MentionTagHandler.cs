@@ -9,6 +9,8 @@ internal class MentionTagHandler : ITagHandler
 
     public TextSnippet Parse(string text, Color baseColor = default, string options = null)
     {
-        return new MentionSnippet(new TextSnippet(text, baseColor == default ? Color.White : baseColor));
+        Color c = baseColor == default ? Color.White : baseColor;
+
+        return new MentionSnippet(new TextSnippet(text, c));
     }
 }

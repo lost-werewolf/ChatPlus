@@ -29,7 +29,13 @@ namespace ChatPlus.Core.Features.Uploads
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[u");
+            ChatPlus.StateManager.OpenStateByTriggers(
+                gameTime,
+                ui,
+                state,
+                ChatTriggers.UnclosedTag("[u"),
+                ChatTriggers.CurrentWordStartsWith('#')
+            );
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

@@ -26,24 +26,17 @@ namespace ChatPlus.Core.Features.PlayerColors
         {
             public override void OnEnterWorld()
             {
-                // Decide my local color (use config if set, else pick and save)
                 var cfg = Conf.C;
-                string hex = (cfg.PlayerColor ?? "FFFFFF").Trim().TrimStart('#');
-                if (hex.Equals("FFFFFF", StringComparison.OrdinalIgnoreCase))
-                {
-                    var list = ModContent.GetInstance<AssignPlayerColorsSystem>().RandomColors;
-                    hex = list[Main.rand.Next(list.Count)];
-                    cfg.PlayerColor = hex;
-                    try { cfg.SaveChanges(); } catch { Log.Error("Failed to save config!!"); }
-                }
+                string hex = (cfg.PlayerColor ?? "FFFFFF").Trim().TrimStart('#').ToUpperInvariant();
 
-                AssignPlayerColorsSystem.PlayerColors[Player.whoAmI] = hex;
-                MentionSnippet.InvalidateCachesFor(Player.name);
-
-                // In MP, announce to server and request current table
+                PlayerColors[Player.whoAmI] = hex;
+                
                 if (Main.netMode == NetmodeID.MultiplayerClient)
-                    PlayerColorNetHandler.ClientHello(Player.whoAmI, hex);
+                {
+                    PlayerColorNetHandler.ClientHello(Player.whoAmI, AssignPlayerColorsSystem.PlayerColors[Player.whoAmI]);
+                }
             }
+
         }
     }
 }

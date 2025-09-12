@@ -212,7 +212,7 @@ public class PlayerColorConfigElement : ConfigElement<string>
             AssignPlayerColorsSystem.PlayerColors[Main.myPlayer] = hex;
 
             // 🔁 invalidate mention caches for my name
-            MentionSnippet.InvalidateCachesFor(Main.LocalPlayer?.name);
+            //MentionSnippet.InvalidateCachesFor(Main.LocalPlayer?.name);
 
             // if MP, announce update (you already use this elsewhere)
             if (Main.netMode == Terraria.ID.NetmodeID.MultiplayerClient)

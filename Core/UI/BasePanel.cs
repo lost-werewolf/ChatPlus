@@ -204,15 +204,12 @@ namespace ChatPlus.Core.UI
         #region Filter
         protected virtual bool MatchesFilter(TData data)
         {
-            if (this is EmojiPanel && EmojiSystem.FilterReset)
-                return true;
-
             string tag = GetTag(data) ?? string.Empty;
 
-            // Use frozen text while navigating commands with Up/Down so we don't re-filter to a single item
             string text = Main.chatText ?? string.Empty;
-
             if (text.Length == 0) return true;
+
+            int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
 
             string prefix =
                 this is CommandPanel ? "/" :
@@ -223,56 +220,122 @@ namespace ChatPlus.Core.UI
                 this is ModIconPanel ? "[m" :
                 this is PlayerIconPanel ? "[p" :
                 this is UploadPanel ? "[u" :
-                this is LinkPanel ? "[l" :
                 this is MentionPanel ? "@" : string.Empty;
 
-            if (prefix.Length == 0)
-                return tag.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
+            char bare = '\0';
+            if (this is CommandPanel) bare = '/';
+            if (this is EmojiPanel) bare = ':';
+            if (this is UploadPanel) bare = '#';
+            if (this is PlayerIconPanel) bare = '@';
+            if (this is MentionPanel) bare = '@';
 
-            char[] stopChars = [' ', '\t', '\n', '\r', ']'];
-
-            if (prefix == "/")
-            {
-                int s = text.LastIndexOf('/');
-                if (s < 0 || s + 1 >= text.Length) return true;
-
-                int e = text.IndexOfAny(stopChars, s + 1); if (e < 0) e = text.Length;
-                string q = text.Substring(s + 1, e - (s + 1)).Trim();
-                if (q.Length == 0) return true;
-                return tag.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0;
-            }
-
-            int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
-            if (start < 0)
-                return tag.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
-
-            int qStart = start + prefix.Length;
-            if (qStart < text.Length && (text[qStart] == ':' || text[qStart] == '/')) qStart++;
-            if (qStart >= text.Length) return true;
-
-            int qEnd = text.IndexOfAny(stopChars, qStart); if (qEnd < 0) qEnd = text.Length;
-            string query = text.Substring(qStart, qEnd - qStart).Trim();
-            if (query.Length == 0) return true;
+            string query = ExtractQuery(text, caret, prefix, bare);
+            if (string.IsNullOrEmpty(query)) return true;
 
             if (this is EmojiPanel && data is Emoji emoji)
             {
-                if (tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
-                foreach (string syn in emoji.Synonyms)
-                    if (!string.IsNullOrEmpty(syn) && syn.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                        return true;
+                if (Contains(tag, query)) return true;
+                if (emoji.Synonyms != null)
+                {
+                    foreach (string syn in emoji.Synonyms)
+                    {
+                        if (!string.IsNullOrEmpty(syn))
+                        {
+                            if (Contains(syn, query)) return true;
+                        }
+                    }
+                }
                 return false;
             }
 
             if (this is ItemPanel && data is ItemEntry item)
             {
-                if (tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
-                if ((item.DisplayName ?? string.Empty).IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) return true;
+                if (Contains(tag, query)) return true;
+                string dn = item.DisplayName ?? string.Empty;
+                if (Contains(dn, query)) return true;
                 if (int.TryParse(query, out int qid) && qid == item.ID) return true;
                 return false;
             }
 
-            return tag.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+            return Contains(tag, query);
+
+
+            static bool Contains(string haystack, string needle)
+            {
+                if (haystack == null) return false;
+                return haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+
+            static string ExtractQuery(string source, int caretPos, string pre, char bareChar)
+            {
+                if (string.IsNullOrEmpty(source)) return string.Empty;
+
+                // 1) Bare prefix outside tags (e.g., :, #, @, /)
+                if (bareChar != '\0')
+                {
+                    int bi = LastIndexOf(source, bareChar, caretPos - 1);
+                    if (bi >= 0 && IsOutsideTags(source, bi))
+                    {
+                        int start = bi + 1;
+                        int end = FindStop(source, start);
+                        if (end < 0 || end > caretPos) end = caretPos;
+                        if (end <= start) return string.Empty;
+                        return source.Substring(start, end - start).Trim();
+                    }
+                }
+
+                // 2) Bracketed or explicit string prefix (e.g., [e, [u, [p, /, @)
+                if (!string.IsNullOrEmpty(pre))
+                {
+                    int startIndex = Math.Max(0, Math.Min(caretPos - 1, source.Length - 1));
+                    int count = startIndex + 1;
+                    int s = source.LastIndexOf(pre, startIndex, count, StringComparison.OrdinalIgnoreCase);
+                    if (s >= 0)
+                    {
+                        int start = s + pre.Length;
+
+                        if (start < source.Length)
+                        {
+                            char ch = source[start];
+                            if (ch == ':' || ch == '/')
+                            {
+                                start++;
+                            }
+                        }
+
+                        int end = FindStop(source, start);
+                        if (end < 0 || end > caretPos) end = caretPos;
+                        if (end <= start) return string.Empty;
+
+                        return source.Substring(start, end - start).Trim();
+                    }
+                }
+
+                return string.Empty;
+            }
+
+            static int LastIndexOf(string s, char ch, int fromInclusive)
+            {
+                if (fromInclusive < 0) return -1;
+                int start = Math.Min(fromInclusive, s.Length - 1);
+                return s.LastIndexOf(ch, start);
+            }
+
+            static int FindStop(string s, int start)
+            {
+                if (start >= s.Length) return -1;
+                char[] stopChars = [' ', '\t', '\n', '\r', ']'];
+                return s.IndexOfAny(stopChars, start);
+            }
+
+            static bool IsOutsideTags(string s, int indexBefore)
+            {
+                int lb = s.LastIndexOf('[', indexBefore);
+                int rb = s.LastIndexOf(']', indexBefore);
+                return lb <= rb;
+            }
         }
+
 
         #endregion
 
@@ -281,8 +344,8 @@ namespace ChatPlus.Core.UI
             base.Update(gt);
 
             // debug TODO
-            //OverflowHidden = false;
-            //list.OverflowHidden = false;
+            //OverflowHidden = true;
+            //list.OverflowHidden = true;
 
             // Sizing and position
             int itemCount = 10;
@@ -449,6 +512,8 @@ namespace ChatPlus.Core.UI
         public virtual void InsertSelectedTag()
         {
             if (items.Count == 0 || currentIndex < 0) return;
+
+            Log.Info("ins");
 
             string tag = GetTag(items[currentIndex].Data);
             if (string.IsNullOrEmpty(tag)) return;

@@ -75,21 +75,14 @@ namespace ChatPlus.Core.Features.PlayerColors
                             string requested = SanHex(reader.ReadString());
                             string assigned = requested;
 
-                            // Server decides a real color if the client has the default/white
-                            if (string.Equals(assigned, "FFFFFF", StringComparison.OrdinalIgnoreCase))
+                            if (assigned == "FFFFFF")
                             {
-                                var list = ModContent.GetInstance<AssignPlayerColorsSystem>().RandomColors;
-                                var used = new HashSet<string>(AssignPlayerColorsSystem.PlayerColors.Values, StringComparer.OrdinalIgnoreCase);
-
-                                // pick a not-yet-used color if possible, else any
-                                assigned = list.FirstOrDefault(c => !used.Contains(c)) ?? list[Main.rand.Next(list.Count)];
+                                AssignPlayerColorsSystem.PlayerColors.Remove(who);
                             }
                             else
                             {
+                                AssignPlayerColorsSystem.PlayerColors[who] = assigned;
                             }
-
-                            // Register on server
-                            AssignPlayerColorsSystem.PlayerColors[who] = assigned;
 
                             // Send full table back to the joiner
                             var all = Instance.GetPacket((byte)Msg.SyncAll);
@@ -101,14 +94,13 @@ namespace ChatPlus.Core.Features.PlayerColors
                                 all.Write(SanHex(kv.Value));
                             }
                             all.Send(toClient: who);
-                            //Log.Info($"[AssignPlayerColor] Server ->who={who} SyncAll count={map.Count}");
 
                             // Broadcast this player's color to everyone
                             var one = Instance.GetPacket((byte)Msg.SyncSingle);
                             one.Write(who);
                             one.Write(assigned);
                             one.Send();
-                            //Log.Info($"[AssignPlayerColor] Server broadcast SyncSingle who={who} hex={assigned}");
+
                             break;
                         }
                 }

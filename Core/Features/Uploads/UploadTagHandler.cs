@@ -38,7 +38,7 @@ namespace ChatPlus.Core.Features.Uploads
 
             if (Registry.TryGetValue(key, out var texture))
             {
-                return new UploadSnippet(texture)
+                return new UploadSnippet(key, texture)
                 {
                     Text = GenerateTag(key)
                 };

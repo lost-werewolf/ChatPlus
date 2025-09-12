@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
+using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.Mentions;
 
@@ -18,7 +19,7 @@ public class MentionSystem : ModSystem
         ui = new UserInterface();
         state = new MentionState();
         ui.SetState(null);
-        Terraria.UI.Chat.ChatManager.Register<MentionTagHandler>("mention");
+        ChatManager.Register<MentionTagHandler>("mention");
     }
 
     public override void Unload()
@@ -29,34 +30,14 @@ public class MentionSystem : ModSystem
 
     public override void UpdateUI(GameTime gameTime)
     {
-        // Open while user is typing an '@' mention that is not yet followed by a space
-        if (!Main.drawingPlayerChat)
-        {
-            if (ui?.CurrentState != null) ui.SetState(null);
-            return;
-        }
-        string text = Main.chatText ?? string.Empty;
-        int at = text.LastIndexOf('@');
-        if (at == -1)
-        {
-            if (ui?.CurrentState != null) ui.SetState(null);
-            return;
-        }
-        // if there is a space after the @ in the current word, close
-        int space = text.IndexOf(' ', at + 1);
-        if (space != -1)
-        {
-            if (ui?.CurrentState != null) ui.SetState(null);
-            return;
-        }
-
-        if (ui.CurrentState != state)
-        {
-            StateManager.CloseOthers(ui);
-            ui.SetState(state);
-            ui.CurrentState?.Recalculate();
-        }
-        ui.Update(gameTime);
+        ChatPlus.StateManager.OpenStateByTriggers(
+            gameTime,
+            ui,
+            state,
+            ChatTriggers.UnclosedTag("[mention"),     // bracketed: [mention...
+            ChatTriggers.CharOutsideTags('@'),        // bare: @query
+            ChatTriggers.AtMentionWord()              // your existing convenience trigger
+        );
     }
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

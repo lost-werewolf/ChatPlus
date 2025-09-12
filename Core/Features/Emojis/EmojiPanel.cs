@@ -22,87 +22,13 @@ namespace ChatPlus.Core.Features.Emojis
             string text = Main.chatText ?? string.Empty;
             int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
 
-            int colon = -1;
-            if (caret > 0)
-            {
-                colon = text.LastIndexOf(':', caret - 1);
-            }
+            string query = GetEmojiQuery(text, caret);
 
-            bool colonMode = false;
-            if (colon >= 0)
-            {
-                int lb = text.LastIndexOf('[', colon);
-                int rb = text.LastIndexOf(']', colon);
-                colonMode = lb <= rb;
-            }
-
-            string query = null;
-
-            if (colonMode)
-            {
-                int qStart = colon + 1;
-                int qLen = caret - qStart;
-                if (qLen < 0) qLen = 0;
-
-                if (qLen > 0)
-                {
-                    query = text.Substring(qStart, qLen);
-                }
-                else
-                {
-                    query = string.Empty;
-                }
-            }
-            else
-            {
-                int eStart = text.LastIndexOf("[e", StringComparison.OrdinalIgnoreCase);
-                bool eOpen = false;
-                if (eStart >= 0)
-                {
-                    if (caret >= eStart)
-                    {
-                        int closing = text.IndexOf(']', eStart + 2);
-                        eOpen = closing == -1;
-                    }
-                }
-
-                if (eOpen)
-                {
-                    int qStart = eStart + 2;
-                    if (qStart < text.Length)
-                    {
-                        char ch = text[qStart];
-                        if (ch == ':' || ch == '/')
-                        {
-                            qStart++;
-                        }
-                    }
-
-                    int qLen = caret - qStart;
-                    if (qLen < 0) qLen = 0;
-
-                    if (qLen > 0)
-                    {
-                        query = text.Substring(qStart, qLen).Trim();
-                    }
-                    else
-                    {
-                        query = string.Empty;
-                    }
-                }
-            }
-
-            if (EmojiSystem.IsForceOpen && string.IsNullOrEmpty(query))
+            if (string.IsNullOrEmpty(query))
             {
                 return true;
             }
 
-            if (query == null || query.Length == 0)
-            {
-                return true;
-            }
-
-            // Compare against the plain key (from Tag) and Description + Synonyms.
             string key = ExtractKeyFromTag(data.Tag);
             if (string.IsNullOrEmpty(key))
             {
@@ -121,12 +47,14 @@ namespace ChatPlus.Core.Features.Emojis
             {
                 foreach (string syn in data.Synonyms)
                 {
-                    if (!string.IsNullOrEmpty(syn))
+                    if (string.IsNullOrEmpty(syn))
                     {
-                        if (syn.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            return true;
-                        }
+                        continue;
+                    }
+
+                    if (syn.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        return true;
                     }
                 }
             }
@@ -134,9 +62,76 @@ namespace ChatPlus.Core.Features.Emojis
             return false;
 
 
+            static string GetEmojiQuery(string source, int caretPos)
+            {
+                if (string.IsNullOrEmpty(source))
+                {
+                    return string.Empty;
+                }
+
+                int colon = -1;
+                if (caretPos > 0)
+                {
+                    colon = source.LastIndexOf(':', caretPos - 1);
+                }
+
+                bool colonMode = false;
+                if (colon >= 0)
+                {
+                    int lb = source.LastIndexOf('[', colon);
+                    int rb = source.LastIndexOf(']', colon);
+                    colonMode = lb <= rb;
+                }
+
+                if (colonMode)
+                {
+                    int qStart = colon + 1;
+                    int qLen = caretPos - qStart;
+                    if (qLen <= 0)
+                    {
+                        return string.Empty;
+                    }
+
+                    return source.Substring(qStart, qLen);
+                }
+
+                int eStart = source.LastIndexOf("[e", StringComparison.OrdinalIgnoreCase);
+                if (eStart >= 0 && caretPos >= eStart)
+                {
+                    int closing = source.IndexOf(']', eStart + 2);
+                    bool eOpen = closing == -1;
+                    if (eOpen)
+                    {
+                        int qStart = eStart + 2;
+
+                        if (qStart < source.Length)
+                        {
+                            char ch = source[qStart];
+                            if (ch == ':' || ch == '/')
+                            {
+                                qStart++;
+                            }
+                        }
+
+                        int qLen = caretPos - qStart;
+                        if (qLen <= 0)
+                        {
+                            return string.Empty;
+                        }
+
+                        return source.Substring(qStart, qLen).Trim();
+                    }
+                }
+
+                return string.Empty;
+            }
+
             static string ExtractKeyFromTag(string tag)
             {
-                if (string.IsNullOrEmpty(tag)) return null;
+                if (string.IsNullOrEmpty(tag))
+                {
+                    return null;
+                }
 
                 int c = tag.IndexOf(':');
                 int r = tag.LastIndexOf(']');
@@ -153,21 +148,30 @@ namespace ChatPlus.Core.Features.Emojis
                 return tag;
             }
         }
+
         public override void InsertSelectedTag()
         {
-            if (items.Count == 0) return;
-            if (currentIndex < 0) return;
+            if (items.Count == 0)
+            {
+                return;
+            }
 
-            // BasePanel<Emoji> already gives you a strongly-typed element.
+            if (currentIndex < 0)
+            {
+                return;
+            }
+
             Emoji emoji = items[currentIndex].Data;
 
             string insert = ComputeInsert(emoji);
-            if (string.IsNullOrEmpty(insert)) return;
+            if (string.IsNullOrEmpty(insert))
+            {
+                return;
+            }
 
             string text = Main.chatText ?? string.Empty;
             int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
 
-            // Prefer replacing from the nearest ':' token (if outside any tag)
             int colon = -1;
             if (caret > 0)
             {
@@ -179,7 +183,7 @@ namespace ChatPlus.Core.Features.Emojis
             {
                 int lb = text.LastIndexOf('[', colon);
                 int rb = text.LastIndexOf(']', colon);
-                colonMode = lb <= rb; // true if outside a [...] tag
+                colonMode = lb <= rb;
             }
 
             if (colonMode)
@@ -188,41 +192,29 @@ namespace ChatPlus.Core.Features.Emojis
                 string after = text.Substring(caret);
                 Main.chatText = before + insert + after;
                 HandleChatSystem.SetCaretPos(before.Length + insert.Length);
-                EmojiSystem.CloseAfterCommit();
                 return;
             }
 
-            // Otherwise if we're in an open "[e" context, replace from that start
             int eStart = text.LastIndexOf("[e", StringComparison.OrdinalIgnoreCase);
-            bool eOpen = false;
-            if (eStart >= 0)
+            if (eStart >= 0 && caret >= eStart)
             {
-                if (caret >= eStart)
+                int closing = text.IndexOf(']', eStart + 2);
+                bool eOpen = closing == -1;
+                if (eOpen)
                 {
-                    int closing = text.IndexOf(']', eStart + 2);
-                    eOpen = closing == -1;
+                    string before = text.Substring(0, eStart);
+                    string after = text.Substring(caret);
+                    Main.chatText = before + insert + after;
+                    HandleChatSystem.SetCaretPos(before.Length + insert.Length);
+                    return;
                 }
             }
 
-            if (eOpen)
-            {
-                string before = text.Substring(0, eStart);
-                string after = text.Substring(caret);
-                Main.chatText = before + insert + after;
-                HandleChatSystem.SetCaretPos(before.Length + insert.Length);
-                EmojiSystem.CloseAfterCommit();
-                return;
-            }
-
-            // Fallback: append
             Main.chatText += insert;
             HandleChatSystem.SetCaretPos(Main.chatText.Length);
-            EmojiSystem.CloseAfterCommit();
-
 
             static string ComputeInsert(in Emoji e)
             {
-                // If Tag already looks like [e:...], use it as-is.
                 if (!string.IsNullOrEmpty(e.Tag))
                 {
                     string t = e.Tag.Trim();
@@ -238,7 +230,6 @@ namespace ChatPlus.Core.Features.Emojis
                     }
                 }
 
-                // Otherwise build from Description.
                 if (!string.IsNullOrEmpty(e.Description))
                 {
                     string key = NormalizeKey(e.Description);
@@ -253,7 +244,10 @@ namespace ChatPlus.Core.Features.Emojis
 
             static string ExtractKeyFromTag(string tag)
             {
-                if (string.IsNullOrEmpty(tag)) return null;
+                if (string.IsNullOrEmpty(tag))
+                {
+                    return null;
+                }
 
                 int c = tag.IndexOf(':');
                 int r = tag.LastIndexOf(']');
@@ -262,13 +256,12 @@ namespace ChatPlus.Core.Features.Emojis
                     return tag.Substring(c + 1, r - c - 1);
                 }
 
-                // If someone stored "[e:smile" or "smile]" or just "smile", do a best effort.
                 if (tag.StartsWith("[e", StringComparison.OrdinalIgnoreCase))
                 {
-                    int colon = tag.IndexOf(':');
-                    if (colon >= 0 && colon + 1 < tag.Length)
+                    int colonIndex = tag.IndexOf(':');
+                    if (colonIndex >= 0 && colonIndex + 1 < tag.Length)
                     {
-                        string tail = tag.Substring(colon + 1);
+                        string tail = tag.Substring(colonIndex + 1);
                         if (tail.EndsWith("]"))
                         {
                             tail = tail.Substring(0, tail.Length - 1);
@@ -287,11 +280,13 @@ namespace ChatPlus.Core.Features.Emojis
 
             static string NormalizeKey(string s)
             {
-                if (string.IsNullOrWhiteSpace(s)) return null;
+                if (string.IsNullOrWhiteSpace(s))
+                {
+                    return null;
+                }
 
                 s = s.Trim().ToLowerInvariant();
 
-                // Convert spaces and dashes to underscores; collapse double underscores.
                 var chars = new List<char>(s.Length);
                 bool lastUnderscore = false;
 

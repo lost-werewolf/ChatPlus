@@ -5,12 +5,20 @@ Chat+ is a massive overhaul to Terraria's chat system; making it look better, sm
 1. [b]Emojis😎📷[/b]: Access thousands of emojis directly in chat!
 2. [b]Images[/b]: Upload and send your own images!
 3. [b]Links🔗[/b]: Links you type in chat become clickable.
-4. [b]Autocomplete🏷️[/b]: Type any command OR tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
-5. [b]Player Stats[/b]: A player stat previewer is available when hovering over player icons.
-6. [b]More✍️[/b]: A better text editor, customizable scrollbar, and much more!
+4. [b]Autocomplete!🏷️[/b]: Type any command or tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
+5. [b]Stats[/b]: A stat viewer is available when hovering over player and mod icons.
+6. [b]Text Editor✍️[/b]: Highlight text, copy/paste and more!
+7. [b]Scrollbar✍️[/b]: A scrollbar is now available to scroll through chat history.
+
+[h3] 📖 How to use autocomplete [/h3] 
+/ to open commands.
+: to open emojis.
+@ to open player mentions.
+# to upload an image.
+All other tags have their own prefixes, like [c for colors, [i for items, etc. See all tags with /tags.
 
 [h3] 🤝Credits [/h3] 
-- Thanks to thraaks for making the icon!
+Thanks to Neptune for making the icon!
 
 [h3] ❤️ Support the Project [/h3]
 [url=https://github.com/emyhrberg/ChatPlus] GitHub (source code) [/url] | [url=https://discord.gg/JWbYUktRPV] Discord [/url] | [url=https://ko-fi.com/erkyy] Ko-Fi [/url][quote=tModLoader ChatPlus]

@@ -46,7 +46,7 @@ public class ModIconElement : BaseElement<ModIcon>
 
         if (bounds.Contains(Main.MouseScreen.ToPoint()))
         {
-            if (!Conf.C.ShowModStatsWhenHovering) 
+            if (!Conf.C.ShowStatsWhenHovering) 
                 return;
 
             if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)

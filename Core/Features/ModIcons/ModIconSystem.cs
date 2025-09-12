@@ -22,7 +22,12 @@ public class ModIconSystem : ModSystem
 
     public override void UpdateUI(GameTime gameTime)
     {
-        StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[m");
+        ChatPlus.StateManager.OpenStateByTriggers(
+            gameTime,
+            ui,
+            state,
+            ChatTriggers.UnclosedTag("[m")
+        );
     }
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

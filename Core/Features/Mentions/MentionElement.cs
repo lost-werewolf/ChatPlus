@@ -24,7 +24,7 @@ public class MentionElement : BaseElement<Mention>
         Vector2 pos = dims.Position();
         string playerName = Data.Tag;
 
-        // Build a fake player head tag like PlayerIconElement does
+        // Player head
         string headTag = PlayerIconTagHandler.GenerateTag(playerName);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, headTag,
             pos + new Vector2(12, 5), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);

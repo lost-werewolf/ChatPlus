@@ -43,7 +43,7 @@ namespace ChatPlus.Core.Chat
 
                     // Set linesOffset = 0 if any chatScrollState is active.
                     // This effectively stops lines scrolling if any chatScrollState is active.
-                    c.EmitDelegate<Func<int, int>>(v => StateManager.IsAnyStateActive() ? 0 : v);
+                    c.EmitDelegate<Func<int, int>>(v => ChatPlus.StateManager.IsAnyStateActive() ? 0 : v);
                 }
                 else
                 {

@@ -29,7 +29,12 @@ namespace ChatPlus.Core.Features.Items
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[i");
+            ChatPlus.StateManager.OpenStateByTriggers(
+                gameTime,
+                ui,
+                state,
+                ChatTriggers.UnclosedTag("[i")
+            );
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

@@ -21,7 +21,12 @@ namespace ChatPlus.Core.Features.Colors
         }
         public override void UpdateUI(GameTime gameTime)
         {
-            StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[c");
+            ChatPlus.StateManager.OpenStateByTriggers(
+                gameTime,
+                ui,
+                state,
+                ChatTriggers.UnclosedTag("[c")
+            );
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

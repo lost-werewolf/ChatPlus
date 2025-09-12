@@ -1,24 +1,54 @@
 ﻿using System;
+using ChatPlus.Core.Chat;
 using ChatPlus.Core.Features.Colors;
 using ChatPlus.Core.Features.Commands;
 using ChatPlus.Core.Features.Emojis;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.Items;
-using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.Features.Uploads;
 using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace ChatPlus.Core.Helpers;
-
-public static class StateManager
+public class StateManager
 {
-    public static void OpenStateIfPrefixMatches(GameTime gameTime, UserInterface ui, UIState state, string prefix)
+    public CommandSystem CommandSystem { get; }
+    public ColorSystem ColorSystem { get; }
+    public EmojiSystem EmojiSystem { get; }
+    public GlyphSystem GlyphSystem { get; }
+    public ItemSystem ItemSystem { get; }
+    public ModIconSystem ModIconSystem { get; }
+    public MentionSystem MentionSystem { get; }
+    public PlayerIconSystem PlayerIconSystem { get; }
+    public UploadSystem UploadSystem { get; }
+
+    public StateManager(
+        CommandSystem commandSystem,
+        ColorSystem colorSystem,
+        EmojiSystem emojiSystem,
+        GlyphSystem glyphSystem,
+        ItemSystem itemSystem,
+        ModIconSystem modIconSystem,
+        MentionSystem mentionSystem,
+        PlayerIconSystem playerIconSystem,
+        UploadSystem uploadSystem)
+    {
+        CommandSystem = commandSystem;
+        ColorSystem = colorSystem;
+        EmojiSystem = emojiSystem;
+        GlyphSystem = glyphSystem;
+        ItemSystem = itemSystem;
+        ModIconSystem = modIconSystem;
+        MentionSystem = mentionSystem;
+        PlayerIconSystem = playerIconSystem;
+        UploadSystem = uploadSystem;
+    }
+
+    public void OpenStateByTriggers(GameTime gameTime,UserInterface ui,UIState state,params ITrigger[] triggers)
     {
         if (!Main.drawingPlayerChat)
         {
@@ -26,30 +56,32 @@ public static class StateManager
                 ui.SetState(null);
             return;
         }
-        string text = Main.chatText ?? string.Empty;
 
-        int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
-        if (start == -1)
+        string text = Main.chatText ?? string.Empty;
+        int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
+
+        bool shouldOpen = false;
+        if (triggers != null && triggers.Length > 0)
         {
-            if (ui.CurrentState == state)
-                ui.SetState(null);
-            return;
+            foreach (var trigger in triggers)
+            {
+                if (trigger.ShouldOpen(text, caret))
+                {
+                    shouldOpen = true;
+                    break;
+                }
+            }
         }
 
-        int end = text.IndexOf(']', start + prefix.Length);
-        bool isClosed = end != -1;
-
-        if (!isClosed)
+        if (shouldOpen)
         {
             if (ui.CurrentState != state)
             {
                 CloseOthers(ui);
                 ui.SetState(state);
-
-                // ensure layout exists on the very first frame without running Update
-                ui.CurrentState?.Recalculate();
+                ui.CurrentState.Recalculate();
             }
-            // ensure mouse wheel scroll works
+
             ui.Update(gameTime);
         }
         else
@@ -59,32 +91,20 @@ public static class StateManager
         }
     }
 
-    public static bool IsAnyStateActive()
+    public bool IsAnyStateActive()
     {
-        var cmdSys = ModContent.GetInstance<CommandSystem>();
-        var colorSys = ModContent.GetInstance<ColorSystem>();
-        var emojiSys = ModContent.GetInstance<EmojiSystem>();
-        var glyphSys = ModContent.GetInstance<GlyphSystem>();
-        var itemSys = ModContent.GetInstance<ItemSystem>();
-        var linkSys = ModContent.GetInstance<LinkSystem>();
-        var modIconSys = ModContent.GetInstance<ModIconSystem>();
-        var playerIconSys = ModContent.GetInstance<PlayerIconSystem>();
-        var mentionSys = ModContent.GetInstance<MentionSystem>();
-        var uploadSys = ModContent.GetInstance<UploadSystem>();
-
-        return cmdSys?.ui?.CurrentState != null ||
-               colorSys?.ui?.CurrentState != null ||
-               emojiSys?.ui?.CurrentState != null ||
-               glyphSys?.ui?.CurrentState != null ||
-               itemSys?.ui?.CurrentState != null ||
-               modIconSys?.ui?.CurrentState != null ||
-               playerIconSys?.ui?.CurrentState != null ||
-               uploadSys?.ui?.CurrentState != null ||
-               linkSys?.ui?.CurrentState != null ||
-               mentionSys?.ui?.CurrentState != null;
+        return CommandSystem?.ui?.CurrentState != null ||
+               ColorSystem?.ui?.CurrentState != null ||
+               EmojiSystem?.ui?.CurrentState != null ||
+               GlyphSystem?.ui?.CurrentState != null ||
+               ItemSystem?.ui?.CurrentState != null ||
+               ModIconSystem?.ui?.CurrentState != null ||
+               PlayerIconSystem?.ui?.CurrentState != null ||
+               UploadSystem?.ui?.CurrentState != null ||
+               MentionSystem?.ui?.CurrentState != null;
     }
 
-    public static void CloseOthers(UserInterface keep)
+    public void CloseOthers(UserInterface keep)
     {
         void Close(UserInterface u)
         {
@@ -92,26 +112,14 @@ public static class StateManager
                 u.SetState(null);
         }
 
-        var cmdSys = ModContent.GetInstance<CommandSystem>();
-        var colorSys = ModContent.GetInstance<ColorSystem>();
-        var emojiSys = ModContent.GetInstance<EmojiSystem>();
-        var glyphSys = ModContent.GetInstance<GlyphSystem>();
-        var itemSys = ModContent.GetInstance<ItemSystem>();
-        var modIconSys = ModContent.GetInstance<ModIconSystem>();
-        var playerIconSys = ModContent.GetInstance<PlayerIconSystem>();
-        var mentionSys = ModContent.GetInstance<MentionSystem>();
-        var uploadSys = ModContent.GetInstance<UploadSystem>();
-        var linkSys = ModContent.GetInstance<LinkSystem>();
-
-        Close(cmdSys?.ui);
-        Close(colorSys?.ui);
-        Close(emojiSys?.ui);
-        Close(glyphSys?.ui);
-        Close(itemSys?.ui);
-        Close(modIconSys?.ui);
-        Close(playerIconSys?.ui);
-        Close(uploadSys?.ui);
-        Close(linkSys?.ui);
-        Close(mentionSys?.ui);
+        Close(CommandSystem?.ui);
+        Close(ColorSystem?.ui);
+        Close(EmojiSystem?.ui);
+        Close(GlyphSystem?.ui);
+        Close(ItemSystem?.ui);
+        Close(ModIconSystem?.ui);
+        Close(PlayerIconSystem?.ui);
+        Close(UploadSystem?.ui);
+        Close(MentionSystem?.ui);
     }
 }

@@ -12,6 +12,7 @@ using ChatPlus.Core.Helpers;
 using Terraria;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
+using static Terraria.Localization.NetworkText;
 
 namespace ChatPlus.Core.Chat;
 
@@ -56,10 +57,13 @@ internal class AddNewMessageSystem : ModSystem
             nameTagFull = nameTag;
             var m = Regex.Match(nameTag, @"\[n:(?<name>[^\]]+)\]", RegexOptions.IgnoreCase);
             if (m.Success) senderName = m.Groups["name"].Value;
+#if DEBUG
+            //Log.Info("nameTagFull:" + nameTagFull + ", senderName: " + senderName);
+#endif
         }
 
         // 3. Add player icon
-        if (!string.IsNullOrEmpty(senderName))
+        if (Conf.C.PlayerIcons && !string.IsNullOrEmpty(senderName))
         {
             string playerTag = PlayerIconTagHandler.GenerateTag(senderName);
             resultText = playerTag + " " + resultText;
@@ -72,7 +76,9 @@ internal class AddNewMessageSystem : ModSystem
             //if (!string.IsNullOrEmpty(nameTagFull)) return;
 
             mod = ModIconSnippet.GetModSource();
-            Log.Info(mod);
+#if DEBUG
+            Log.Info("mod source: " + mod);
+#endif
             string modTag = ModIconTagHandler.GenerateTag(mod);
             resultText = modTag + " " + resultText;
         }
@@ -87,34 +93,31 @@ internal class AddNewMessageSystem : ModSystem
         // Mentions: convert @LocalPlayerName only
         resultText = TransformMentions(resultText);
 
-        // 6. Replace the name tag with color tag using synced table; fallback to white
+        // 6. Name color formatting
         if (!string.IsNullOrEmpty(senderName) && !string.IsNullOrEmpty(nameTagFull))
         {
             string hex = "FFFFFF";
-            int who = -1;
 
-            for (int i = 0; i < Main.maxPlayers; i++)
+            int who = Array.FindIndex(Main.player, p => p?.active == true && p.name == senderName);
+            if (who >= 0 && AssignPlayerColorsSystem.PlayerColors.TryGetValue(who, out var syncedHex)
+                && !string.IsNullOrWhiteSpace(syncedHex))
             {
-                var p = Main.player[i];
-                if (p?.active == true && p.name == senderName) { who = i; break; }
+                hex = syncedHex.ToUpperInvariant();
             }
+            //Log.Info($"found {hex} for {who}");
 
-            if (who >= 0 && AssignPlayerColorsSystem.PlayerColors.TryGetValue(who, out var syncedHex))
-            {
-                hex = string.IsNullOrWhiteSpace(syncedHex) ? "FFFFFF" : syncedHex.ToUpperInvariant();
-            }
-            else
-            {
-                // Fallback
-                hex = PlayerColorHandler.HexFromName(senderName);
-            }
-
-            string colored = $"[c/{hex}:{senderName}:]";
-            resultText = resultText.Replace(nameTagFull, colored);
+            resultText = resultText.Replace(nameTagFull, $"[c/{hex}:{senderName}:]");
         }
+#if DEBUG
+        Log.Info(resultText);
+#endif
 
         orig(self, resultText, color, widthLimitInPixels);
     }
+
+    /// <summary>
+    /// Transforms every @x to [mention:x]
+    /// </summary>
     private static string TransformMentions(string input)
     {
         if (string.IsNullOrEmpty(input) || input.IndexOf('@') == -1)
@@ -151,7 +154,9 @@ internal class AddNewMessageSystem : ModSystem
 
             sb.Append(c);
         }
-
+#if DEBUG
+        //Log.Info($"Mention: {input} -> {sb.ToString()}");
+#endif
         return sb.ToString();
     }
 }

@@ -46,7 +46,7 @@ namespace ChatPlus.Core.Features.Uploads
             if (bounds.Contains(Main.MouseScreen.ToPoint()))
             {
                 UICommon.TooltipMouseText($"Shift+click to delete {Data.FileName}");
-                HoveredUploadOverlay.Set(Data);
+                //HoveredUploadOverlay.Set(Data);
             }
             // debug
             //sb.Draw(TextureAssets.MagicPixel.Value, bounds, Color.Red*0.5f);

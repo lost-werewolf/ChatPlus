@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ChatPlus.Core.Chat;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
+﻿using System.Collections.Generic;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -16,35 +13,6 @@ namespace ChatPlus.Core.Features.Emojis
         public UserInterface ui;
         public EmojiState state;
 
-        private static bool _forceOpen;
-        public static bool IsForceOpen => _forceOpen;
-        public static bool FilterReset { get; private set; }
-
-        public static void OpenFromButton()
-        {
-            _forceOpen = true;
-            FilterReset = true; // show full list when opened by button
-            var sys = ModContent.GetInstance<EmojiSystem>();
-            if (sys.ui.CurrentState != sys.state)
-            {
-                StateManager.CloseOthers(sys.ui);
-                sys.ui.SetState(sys.state);
-                sys.ui.CurrentState?.Recalculate();
-            }
-
-            // ADD :
-            Main.chatText += ":";
-        }
-
-        public static void CloseAfterCommit()
-        {
-            _forceOpen = false;
-            FilterReset = false; // clear reset on close
-            var sys = ModContent.GetInstance<EmojiSystem>();
-            if (sys.ui.CurrentState != null)
-                sys.ui.SetState(null);
-        }
-
         public override void PostSetupContent()
         {
             ui = new UserInterface();
@@ -56,54 +24,13 @@ namespace ChatPlus.Core.Features.Emojis
 
         public override void UpdateUI(GameTime gameTime)
         {
-            if (!Main.drawingPlayerChat)
-            {
-                if (ui.CurrentState != null) ui.SetState(null);
-                _forceOpen = false;
-                FilterReset = false;
-                OpenedFromColon = false;
-                return;
-            }
-
-            string text = Main.chatText ?? string.Empty;
-            int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
-
-            // [e ... (no closing ])
-            int eStart = text.LastIndexOf("[e", StringComparison.OrdinalIgnoreCase);
-            bool hasOpenETag = eStart >= 0 && text.IndexOf(']', eStart + 2) == -1;
-
-            // ':' not inside [tag:...]
-            int searchStart = Math.Min(caret - 1, text.Length - 1);
-            int colon = searchStart >= 0 ? text.LastIndexOf(':', searchStart) : -1;
-            bool colonTrigger = false;
-            if (colon >= 0)
-            {
-                int lb = text.LastIndexOf('[', colon);
-                int rb = text.LastIndexOf(']', colon);
-                bool insideTag = lb > rb;
-                colonTrigger = !insideTag;
-            }
-
-            bool shouldOpen = _forceOpen || hasOpenETag || colonTrigger;
-            OpenedFromColon = colonTrigger; // 🔹 track colon mode here
-
-            if (shouldOpen)
-            {
-                if (ui.CurrentState != state)
-                {
-                    StateManager.CloseOthers(ui);
-                    ui.SetState(state);
-                    ui.CurrentState?.Recalculate();
-                    FilterReset = _forceOpen || colonTrigger;
-                }
-                ui.Update(gameTime);
-            }
-            else
-            {
-                if (ui.CurrentState == state) ui.SetState(null);
-                FilterReset = false;
-                OpenedFromColon = false;
-            }
+            ChatPlus.StateManager.OpenStateByTriggers(
+                gameTime,
+                ui,
+                state,
+                ChatTriggers.UnclosedTag("[e"),
+                ChatTriggers.CharOutsideTags(':')
+            );
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

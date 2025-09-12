@@ -2,6 +2,8 @@ using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.UI;
 
@@ -30,8 +32,14 @@ namespace ChatPlus.Core.UI
         {
             base.LeftClick(evt);
 
-            // Walk up until we find the panel, usually 3 steps: from InnerList -> List -> EmojiPanel
-            UIElement parent = Parent;
+            // If left shift is clicked, do not insert the tag
+            // Left shift is used for deleting images 
+            // so we dont want to insert the tag when we delete an image
+            bool leftShiftDown = Main.keyState.IsKeyDown(Keys.LeftShift);
+            if (leftShiftDown) return;
+               
+           // Walk up until we find the panel, usually 3 steps: from InnerList -> List -> EmojiPanel
+                UIElement parent = Parent;
             while (parent != null && parent is not BasePanel<TData>)
                 parent = parent.Parent;
 

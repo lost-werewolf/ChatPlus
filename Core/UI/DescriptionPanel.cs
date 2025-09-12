@@ -9,6 +9,7 @@ using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerIcons
 ;
 using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -52,8 +53,7 @@ namespace ChatPlus.Core.UI
                 else if (typeof(TData) == typeof(Features.Items.ItemEntry)) initialText = "[c/FFF014:Items]";
                 else if (typeof(TData) == typeof(ModIcon)) initialText = "[c/FFF014:Mods]";
                 else if (typeof(TData) == typeof(PlayerIcon)) initialText = "[c/FFF014:Players]";
-                else if (typeof(TData) == typeof(Upload)) initialText = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
-                else if (typeof(TData) == typeof(LinkEntry)) initialText = "[c/FFF014:Links]";
+                else if (typeof(TData) == typeof(Features.Uploads.Upload)) initialText = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
                 else initialText = string.Empty;
             }
 
@@ -69,7 +69,7 @@ namespace ChatPlus.Core.UI
                 return;
 
             // Uploads
-            if (typeof(TData) == typeof(Upload) && ConnectedPanel is UploadPanel up)
+            if (typeof(TData) == typeof(Features.Uploads.Upload) && ConnectedPanel is UploadPanel up)
             {
                 up.UploadImage();
                 up.PopulatePanel();
@@ -97,7 +97,7 @@ namespace ChatPlus.Core.UI
                 return;
 
             // Uploads
-            if (typeof(TData) == typeof(Upload) && ConnectedPanel is UploadPanel up)
+            if (typeof(TData) == typeof(Features.Uploads.Upload) && ConnectedPanel is UploadPanel up)
             {
                 up.OpenUploadsFolder();
                 return;
@@ -110,13 +110,13 @@ namespace ChatPlus.Core.UI
             float maxWidth = Width.Pixels;
 
             // Special case: uploads
-            if (typeof(TData) == typeof(Upload))
+            if (typeof(TData) == typeof(Features.Uploads.Upload))
             {
                 string t = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
                 text.SetText(t);
                 text.VAlign = 0f;
                 Height.Set(62, 0);
-                Recalculate();
+                base.Recalculate();
                 return;
             }
 
@@ -171,7 +171,7 @@ namespace ChatPlus.Core.UI
 
         public override void Draw(SpriteBatch sb)
         {
-            if (typeof(TData) == typeof(Upload))
+            if (typeof(TData) == typeof(Features.Uploads.Upload))
             {
                 // Lock panel height
                 MinHeight.Set(62, 0);

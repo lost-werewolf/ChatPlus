@@ -1,23 +1,20 @@
-using ChatPlus.Core.Features.Uploads;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace ChatPlus.Core.Features.Uploads.UploadInfo;
 
-/// <summary>
-/// Global static storage for hovered upload so we can draw its preview at the very top UI layer.
-/// </summary>
 public static class HoveredUploadOverlay
 {
-    private static Upload? _hovered;
+    private static Texture2D hovered;
 
-    public static void Set(Upload upload)
+    public static void Set(Texture2D texture)
     {
-        _hovered = upload;
+        hovered = texture;
     }
 
-    internal static Upload? Consume()
+    internal static Texture2D Consume()
     {
-        var u = _hovered;
-        _hovered = null;
-        return u;
+        var tex = hovered;
+        hovered = null;
+        return tex;
     }
 }

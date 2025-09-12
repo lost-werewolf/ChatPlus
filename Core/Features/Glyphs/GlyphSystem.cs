@@ -29,7 +29,12 @@ namespace ChatPlus.Core.Features.Glyphs
 
         public override void UpdateUI(GameTime gameTime)
         {
-            StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[g");
+            ChatPlus.StateManager.OpenStateByTriggers(
+                gameTime,
+                ui,
+                state,
+                ChatTriggers.UnclosedTag("[g")
+            );
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

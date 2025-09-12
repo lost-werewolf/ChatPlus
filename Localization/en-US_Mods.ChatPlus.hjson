@@ -18,23 +18,22 @@ Configs: {
 		Headers: {
 			Config: Config
 			ChatFormat: Chat Format
-			Stats: Stats
+			StatsViewer: Stats
 		}
 
 		Autocomplete: {
 			Label: Autocomplete
 			Tooltip:
 				'''
-				Allows for autocompletion of the following:
+				Opens an autocomplete window for the following prefixes:
 				/ for commands
 				[c for colors
-				[e for emojis
+				[e or : for emojis
 				[g for glyphs
 				[i for items
-				[l for link examples
 				[m for mod icons
-				[p for player icons
-				[u for uploads
+				[p or @ for player mentions
+				[u or # for uploads
 				'''
 		}
 
@@ -55,12 +54,12 @@ Configs: {
 
 		ModIcons: {
 			Label: Mod Icon
-			Tooltip: Adds a mod icon before every chat sent by a mod.
+			Tooltip: Shows a mod icon before every chat sent by a mod.
 		}
 
 		PlayerIcons: {
 			Label: Player Icon
-			Tooltip: Adds a player icon before every chat sent by a player.
+			Tooltip: Shows a player icon before every chat sent by a player.
 		}
 
 		PlayerColor: {
@@ -88,25 +87,37 @@ Configs: {
 				'''
 		}
 
-		ShowModStatsWhenHovering: {
-			Label: Show Mod Stats When Hovering
-			Tooltip: Shows a preview of mod stats when hovering a mod icon.
-		}
-
-		ShowPlayerStatsWhenHovering: {
-			Label: Show Player Stats When Hovering
-			Tooltip: Shows a preview of player stats when hovering a player icon.
-		}
-
-		ShowUploadWhenHovering: {
-			Label: Show Upload When Hovering
-			Tooltip: Shows a bigger image when hovering.
-		}
-
 		DisableStatsWhenBossIsAlive: {
 			Label: Disable Stats When Boss Is Alive
 			Tooltip: Keep this on to avoid being distracted by hover tooltips when a boss fight is active.
 		}
+
+		ShowStatsWhenHovering: {
+			Label: Show Stats When Hovering
+			Tooltip: Shows a info panel when hovering player icons, mod icons, and uploaded images.
+		}
+
+		StatsPrivacy: {
+			Label: Stats Privacy
+			Tooltip:
+				'''
+				No one: No one can view your stats.
+				Team: Only players on your team can view your stats.
+				Everyone: Everyone on the server can view your stats.
+				'''
+		}
+
+		ShowUploadsWhenHovering: {
+			Label: Show Uploads When Hovering
+			Tooltip: ""
+		}
+	}
+
+	UserStatsPrivacy: {
+		Tooltip: ""
+		NoOne.Label: No one
+		Team.Label: Team
+		Everyone.Label: Everyone
 	}
 }
 

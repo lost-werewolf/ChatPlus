@@ -30,8 +30,12 @@ public class PlayerIconSystem : ModSystem
 
     public override void UpdateUI(GameTime gameTime)
     {
-        // Open while user is typing an unclosed [p: tag
-        StateManager.OpenStateIfPrefixMatches(gameTime, ui, state, "[p");
+        ChatPlus.StateManager.OpenStateByTriggers(
+            gameTime,
+            ui,
+            state,
+            ChatTriggers.UnclosedTag("[p")
+        );
     }
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

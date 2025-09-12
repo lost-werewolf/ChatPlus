@@ -61,7 +61,7 @@ public class PlayerIconSnippet : TextSnippet
         // to debug; comment below line out!
         if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
         {
-            if (!Conf.C.ShowPlayerStatsWhenHovering) 
+            if (!Conf.C.ShowStatsWhenHovering) 
                 return true;
 
             if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
@@ -117,7 +117,7 @@ public class PlayerIconSnippet : TextSnippet
 
         if (_playerIndex >= 0 && _playerIndex < Main.maxPlayers)
         {
-            if (!Conf.C.ShowPlayerStatsWhenHovering) 
+            if (!Conf.C.ShowStatsWhenHovering) 
                 return;
 
             if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)

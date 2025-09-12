@@ -271,7 +271,7 @@ internal class DrawChatSystem : ModSystem
         }
     }
 
-    private static void DrawNineSlice(int x, int y, int w, int h, Texture2D tex, Color color)
+    private static void DrawNineSlice(int x, int y, int w, int h, Microsoft.Xna.Framework.Graphics.Texture2D tex, Color color)
     {
         int c = 10;
         int ew = tex.Width - c * 2;

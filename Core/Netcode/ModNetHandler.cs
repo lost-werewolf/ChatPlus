@@ -1,33 +1,40 @@
 ﻿using System.IO;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
+using ChatPlus.Core.Features.PlayerIcons.PlayerInfo.SessionTracker;
+using ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 
-namespace ChatPlus.Core.Netcode;
-
-internal class ModNetHandler
+namespace ChatPlus.Core.Netcode
 {
-    public static void HandlePacket(BinaryReader r, int fromWho)
+    internal class ModNetHandler
     {
-        byte handlerType = r.ReadByte();
-        switch (handlerType)
+        public static void HandlePacket(BinaryReader r, int fromWho)
         {
-            case UploadNetHandler.HandlerId:
-                UploadNetHandler.Instance.HandlePacket(r, fromWho);
-                break;
+            byte handlerType = r.ReadByte();
 
-            case PlayerColorNetHandler.HandlerId:
-                PlayerColorNetHandler.Instance.HandlePacket(r, fromWho);
-                break;
+            switch (handlerType)
+            {
+                case UploadNetHandler.HandlerId:
+                    UploadNetHandler.Instance.HandlePacket(r, fromWho);
+                    break;
 
-            case SessionTrackerNetHandler.HandlerId:
-                SessionTrackerNetHandler.Instance.HandlePacket(r, fromWho);
-                break;
+                case PlayerColorNetHandler.HandlerId:
+                    PlayerColorNetHandler.Instance.HandlePacket(r, fromWho);
+                    break;
 
-            default:
-                Log.Warn("Unknown packet handler type: " + handlerType);
-                break;
+                case SessionTrackerNetHandler.HandlerId:
+                    SessionTrackerNetHandler.Instance.HandlePacket(r, fromWho);
+                    break;
+
+                case StatsPrivacyNetHandler.HandlerId:
+                    StatsPrivacyNetHandler.Instance.HandlePacket(r, fromWho);
+                    break;
+
+                default:
+                    Log.Warn("Unknown packet handler type: " + handlerType);
+                    break;
+            }
         }
     }
 }

@@ -208,10 +208,12 @@ public static class ModInfoDrawer
     {
         if (mod == null) return;
 
-        string playerText = $"Mod: {mod.DisplayNameClean}";
+        string modText = $"Mod: {mod.DisplayNameClean}";
+        if (mod.displayNameClean.Length > 25)
+            modText = mod.displayNameClean.Replace(mod.displayNameClean[23..], "..");
 
-        var snippets = ChatManager.ParseMessage(playerText, Color.White).ToArray();
-        Vector2 textSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, playerText, Vector2.One);
+        var snippets = ChatManager.ParseMessage(modText, Color.White).ToArray();
+        Vector2 textSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, modText, Vector2.One);
         float textWidth = textSize.X;
         Vector2 pos = new(rect.X + (rect.Width - textWidth) / 2f, rect.Y + 6);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);

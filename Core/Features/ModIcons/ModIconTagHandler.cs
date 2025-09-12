@@ -21,7 +21,7 @@ public sealed class ModIconTagHandler : ITagHandler
     private static readonly Dictionary<string, Texture2D> Registry = new(StringComparer.OrdinalIgnoreCase);
     public static void Clear() => Registry.Clear();
     public static string GenerateTag(string internalName) => $"[m:{internalName}]";
-
+    private static int modCount = 0;
     public static bool Register(Mod mod)
     {
         string internalName = mod.Name;
@@ -50,7 +50,8 @@ public sealed class ModIconTagHandler : ITagHandler
         }
 
         Registry[internalName] = tex;
-        Log.Info($"Successfully registered mod icon for '{internalName}' (has texture: {tex != null}) (smallExists: {smallExists})");
+        modCount++;
+        Log.Info($"({modCount}) Mod icon: '{internalName}' loaded. Texture: {tex != null}, Small Icon Exists: {smallExists}");
         return true;
     }
 

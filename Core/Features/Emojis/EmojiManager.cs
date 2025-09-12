@@ -17,8 +17,6 @@ namespace ChatPlus.Core.Features.Emojis
 
         public override void Load()
         {
-            if (!Conf.C.Emojis) return;
-
             ChatManager.Register<EmojiTagHandler>(["e", "emoji"]);
 
             InitializeEmojiMap();

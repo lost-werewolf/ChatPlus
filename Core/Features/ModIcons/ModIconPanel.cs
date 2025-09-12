@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ChatPlus.Core.Chat;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
@@ -17,7 +18,7 @@ public class ModIconPanel : BasePanel<ModIcon>
     protected override BaseElement<ModIcon> BuildElement(ModIcon data) => new ModIconElement(data);
     protected override string GetDescription(ModIcon data)
     {
-        return $"{data.mod.Name}\nClick to view more";
+        return $"Mod: {data.mod.Name}\nClick here to view more";
     }
     protected override string GetTag(ModIcon data) => data.Tag;
 
@@ -25,6 +26,80 @@ public class ModIconPanel : BasePanel<ModIcon>
     {
         base.Update(gt);
     }
+
+    public override void InsertSelectedTag()
+    {
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        if (currentIndex < 0)
+        {
+            return;
+        }
+
+        string insert = GetTag(items[currentIndex].Data);
+        if (string.IsNullOrEmpty(insert))
+        {
+            return;
+        }
+
+        string text = Main.chatText ?? string.Empty;
+        int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
+
+        // 1) Open bracketed [m... fragment: replace it
+        int mStart = text.LastIndexOf("[m", StringComparison.OrdinalIgnoreCase);
+        if (mStart >= 0 && caret >= mStart)
+        {
+            int closing = text.IndexOf(']', mStart + 2);
+            bool isOpen = closing == -1 || closing > caret;
+            if (isOpen)
+            {
+                string before = text.Substring(0, mStart);
+                string after = text.Substring(caret);
+
+                bool needSpace = NeedsLeadingSpace(before);
+                string space = needSpace ? " " : string.Empty;
+
+                Main.chatText = before + space + insert + after;
+                HandleChatSystem.SetCaretPos(before.Length + space.Length + insert.Length);
+                return;
+            }
+        }
+
+        // 2) Fallback: append with leading space if needed
+        {
+            string before = text;
+            bool needSpace = NeedsLeadingSpace(before);
+            string space = needSpace ? " " : string.Empty;
+
+            Main.chatText = before + space + insert;
+            HandleChatSystem.SetCaretPos(Main.chatText.Length);
+        }
+
+        static bool NeedsLeadingSpace(string before)
+        {
+            if (string.IsNullOrEmpty(before))
+            {
+                return false;
+            }
+
+            char prev = before[before.Length - 1];
+            if (char.IsWhiteSpace(prev))
+            {
+                return false;
+            }
+
+            if (prev == '[')
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
 
     public void OpenModInfoForSelectedMod()
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
@@ -30,7 +31,9 @@ public abstract class DraggablePanel : UIPanel
     {
         base.OnActivate();
         live.Add(this);
-        if (!sharedInitialized) { sharedPos = new Vector2(Left.Pixels, Top.Pixels - SharedYOffset); sharedInitialized = true; }
+        if (!sharedInitialized) 
+            sharedPos = new Vector2(Left.Pixels, Top.Pixels - SharedYOffset); sharedInitialized = true; 
+        
         Left.Set(sharedPos.X, 0f);
         Top.Set(sharedPos.Y + SharedYOffset, 0f);
         Recalculate();
@@ -140,6 +143,8 @@ public abstract class DraggablePanel : UIPanel
 
     private static bool IsAnyScrollbarHovering()
     {
+        Log.Info("check scrollbar");
+
         var states = new object[]
         {
         ModContent.GetInstance<Features.Commands.CommandSystem>()?.state,
@@ -154,8 +159,16 @@ public abstract class DraggablePanel : UIPanel
 
         foreach (var s in states)
         {
-            if (s is BaseState<dynamic> baseState && baseState.Panel?.scrollbar?.IsMouseHovering == true)
-                return true;
+            if (s is BaseState<dynamic> baseState)
+            {
+                Log.Info($"state panel: " + baseState.Panel != null);
+                if (baseState.Panel?.scrollbar?.IsMouseHovering == true)
+                    return true;
+            }
+            else
+            {
+                Log.Info("not");
+            }
         }
         return false;
     }

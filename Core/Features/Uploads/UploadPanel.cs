@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using ChatPlus.Core.Chat;
 using ChatPlus.Core.Helpers;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.UI;
 using Terraria.Utilities.FileBrowser;
 using static nativefiledialog;
 
@@ -25,6 +27,91 @@ namespace ChatPlus.Core.Features.Uploads
                 PopulatePanel();
 
             base.Update(gt);
+        }
+
+        public override void InsertSelectedTag()
+        {
+            if (items.Count == 0)
+            {
+                return;
+            }
+
+            if (currentIndex < 0)
+            {
+                return;
+            }
+
+            string insert = GetTag(items[currentIndex].Data);
+            if (string.IsNullOrEmpty(insert))
+            {
+                return;
+            }
+
+            string text = Main.chatText ?? string.Empty;
+            int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
+
+            // 1) Bare '#' mode outside tags: replace "#query" with the tag
+            int hash = -1;
+            if (caret > 0)
+            {
+                int start = Math.Min(caret - 1, Math.Max(0, text.Length - 1));
+                hash = text.LastIndexOf('#', start);
+            }
+
+            bool hashMode = false;
+            if (hash >= 0)
+            {
+                int lb = text.LastIndexOf('[', hash);
+                int rb = text.LastIndexOf(']', hash);
+                hashMode = lb <= rb; // outside any [...] tag
+            }
+
+            if (hashMode)
+            {
+                int start = hash;
+                int stop = FindStop(text, start + 1);
+                if (stop < 0 || stop > caret)
+                {
+                    stop = caret;
+                }
+
+                string before = text.Substring(0, start);
+                string after = text.Substring(stop);
+                Main.chatText = before + insert + after;
+                HandleChatSystem.SetCaretPos(before.Length + insert.Length);
+                return;
+            }
+
+            // 2) Open bracketed [u... (no closing ] yet): replace the open fragment
+            int uStart = text.LastIndexOf("[u", StringComparison.OrdinalIgnoreCase);
+            if (uStart >= 0 && caret >= uStart)
+            {
+                int closing = text.IndexOf(']', uStart + 2);
+                bool open = closing == -1;
+                if (open)
+                {
+                    string before = text.Substring(0, uStart);
+                    string after = text.Substring(caret);
+                    Main.chatText = before + insert + after;
+                    HandleChatSystem.SetCaretPos(before.Length + insert.Length);
+                    return;
+                }
+            }
+
+            // 3) Fallback: append at end
+            Main.chatText += insert;
+            HandleChatSystem.SetCaretPos(Main.chatText.Length);
+
+            static int FindStop(string s, int start)
+            {
+                if (start >= s.Length)
+                {
+                    return -1;
+                }
+
+                char[] stops = [' ', '\t', '\n', '\r', ']'];
+                return s.IndexOfAny(stops, start);
+            }
         }
 
         public void UploadImage()
@@ -95,7 +182,7 @@ namespace ChatPlus.Core.Features.Uploads
             // Concatenate extensions for NFD: "png,jpg,jpeg"
             string extensionStr = string.Join(',', extensions.Extensions);
 
-            // Initial directory – use the user's Pictures folder or leave null for default
+            // Initial directory ï¿½ use the user's Pictures folder or leave null for default
             //string startDir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
 
             nfdresult_t result = NFD_OpenDialog(

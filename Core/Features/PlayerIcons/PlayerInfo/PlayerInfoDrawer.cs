@@ -1,4 +1,5 @@
 ﻿using System;
+using ChatPlus.Core.Features.PlayerIcons.PlayerInfo.SessionTracker;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;

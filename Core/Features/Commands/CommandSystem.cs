@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -20,32 +21,12 @@ namespace ChatPlus.Core.Features.Commands
         }
         public override void UpdateUI(GameTime gameTime)
         {
-            if (!Main.drawingPlayerChat)
-            {
-                if (ui.CurrentState != null)
-                {
-                    ui.SetState(null);
-                }
-                return;
-            }
-
-            char prefix = '/';
-
-            if (Main.chatText.StartsWith(prefix))
-            {
-                if (ui.CurrentState != state)
-                {
-                    ui.SetState(state);
-                }
-                ui.Update(gameTime);
-            }
-            else
-            {
-                if (ui.CurrentState == state)
-                {
-                    ui.SetState(null);
-                }
-            }
+            ChatPlus.StateManager.OpenStateByTriggers(
+                gameTime,
+                ui,
+                state,
+                ChatTriggers.CurrentWordStartsWith('/')
+            );
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

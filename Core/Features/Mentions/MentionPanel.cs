@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using ChatPlus.Core.Chat;
 using ChatPlus.Core.UI;
+using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.UI;
 
 namespace ChatPlus.Core.Features.Mentions;
 
@@ -33,40 +35,98 @@ public class MentionPanel : BasePanel<Mention>
         return "@" + data.Tag + " ";
     }
 
+    public override void LeftClick(UIMouseEvent evt)
+    {
+        for (int i = 0; i < items.Count; i++)
+        {
+            if (items[i].IsMouseHovering)
+            {
+                SetSelectedIndex(i);
+                InsertSelectedTag();
+                return;
+            }
+        }
+    }
+
     public override void InsertSelectedTag()
     {
-        if (items.Count == 0 || currentIndex < 0) return;
+        if (items.Count == 0)
+        {
+            return;
+        }
 
-        string name = items[currentIndex].Data.Tag;
-        if (string.IsNullOrWhiteSpace(name)) return;
+        if (currentIndex < 0)
+        {
+            return;
+        }
 
-        string mention = "@" + name + " "; // what we actually want to insert
+        string insert = GetTag(items[currentIndex].Data);
+        if (string.IsNullOrEmpty(insert))
+        {
+            return;
+        }
 
         string text = Main.chatText ?? string.Empty;
         int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
 
-        // Replace the nearest @word before the caret if present
-        int searchStart = Math.Min(caret - 1, text.Length - 1);
-        int at = searchStart >= 0 ? text.LastIndexOf('@', searchStart) : -1;
-        if (at >= 0)
+        int atIndex = -1;
+        if (caret > 0)
         {
-            int end = at + 1;
-            while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
+            int probe = Math.Min(caret - 1, Math.Max(0, text.Length - 1));
+            atIndex = text.LastIndexOf('@', probe);
+        }
 
-            string before = text[..at];
-            string after = text[end..];
+        bool outsideTags = false;
+        if (atIndex >= 0)
+        {
+            int lastLb = text.LastIndexOf('[', atIndex);
+            int lastRb = text.LastIndexOf(']', atIndex);
+            outsideTags = lastLb <= lastRb;
+        }
 
-            Main.chatText = before + mention + after;
-            HandleChatSystem.SetCaretPos(before.Length + mention.Length);
+        if (atIndex >= 0 && outsideTags)
+        {
+            int start = atIndex;
+            int stop = FindStop(text, start + 1);
+            if (stop < 0 || stop > caret)
+            {
+                stop = caret;
+            }
+
+            string before = text.Substring(0, start);
+            string after = text.Substring(stop);
+            Main.chatText = before + insert + after;
+            HandleChatSystem.SetCaretPos(before.Length + insert.Length);
             return;
         }
 
-        // No '@' token → insert at caret (optionally add a space before)
-        bool needSpaceBefore = caret > 0 && !char.IsWhiteSpace(text[caret - 1]);
-        string pre = text[..caret];
-        string post = text[caret..];
+        int fragStart = text.LastIndexOf("[mention", StringComparison.OrdinalIgnoreCase);
+        if (fragStart >= 0 && caret >= fragStart)
+        {
+            int closing = text.IndexOf(']', fragStart + 8);
+            bool isOpen = closing == -1 || closing > caret;
+            if (isOpen)
+            {
+                string before = text.Substring(0, fragStart);
+                string after = text.Substring(caret);
+                Main.chatText = before + insert + after;
+                HandleChatSystem.SetCaretPos(before.Length + insert.Length);
+                return;
+            }
+        }
 
-        Main.chatText = pre + (needSpaceBefore ? " " : "") + mention + post;
-        HandleChatSystem.SetCaretPos(pre.Length + (needSpaceBefore ? 1 : 0) + mention.Length);
+        Main.chatText += insert;
+        HandleChatSystem.SetCaretPos(Main.chatText.Length);
+
+        static int FindStop(string s, int start)
+        {
+            if (start >= s.Length)
+            {
+                return -1;
+            }
+
+            char[] stops = [' ', '\t', '\n', '\r', ']', ',', '.', ':', ';', '!', '?'];
+            return s.IndexOfAny(stops, start);
+        }
     }
 }
