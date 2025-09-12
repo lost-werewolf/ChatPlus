@@ -270,6 +270,9 @@ Row 5: author
 [done] Finalize icon
 [done] Add ' :' for emojis: regex for emojis so player can use : instead of [e
 [done] Add reply: regex for players so player can use @ to tag other players and format messages accordingly
+[done] Add session tracker
+[done] Fix @ to mention bold and insert selected tag
+[done] Fix scrollbar dragging
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -283,11 +286,9 @@ Row 5: author
 [skip] Add equipment
 [skip] Add config options for autocomplete: 1. draw under or above chat, 2. opacity, 3. draggable
 [skip] Add config preview
+[skip] Add equipment toggle like vanilla for PlayerInfoState
+[skip] Add enemy tracker
+[skip] overflow when dragging scrollbar on BasePanel
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[todo] Add session tracker
-[todo] Add enemy tracker
-[bug] Fix @ to mention bold and insert selected tag
-[bug] Fix scrollbar dragging
-[bug] overflow on BasePanel

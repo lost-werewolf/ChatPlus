@@ -1,4 +1,4 @@
-using ChatPlus.Common.Configs;
+﻿using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Features.PlayerIcons
 .PlayerInfo;
@@ -44,6 +44,8 @@ public class PlayerIconSnippet : TextSnippet
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
         pos = new Vector2(pos.X + 8f, pos.Y + 8f);
+
+        // force player head to draw facing only ONE direction
         MapHeadRendererHook.shouldFlipHeadDraw = player.direction == -1;
         Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, pos, 1f, scale, Color.White);
         MapHeadRendererHook.shouldFlipHeadDraw = false;
@@ -91,8 +93,15 @@ public class PlayerIconSnippet : TextSnippet
         Main.LocalPlayer.mouseInterface = true;
 
         if (_playerIndex < 0 || _playerIndex >= Main.maxPlayers) return;
-        var plr = Main.player[_playerIndex];
-        if (plr == null || !plr.active) return;
+        var target = Main.player[_playerIndex];
+        if (target == null || !target.active) return;
+
+        // 🔒 block if no access
+        if (target != null && !PlayerInfoDrawer.HasAccess(Main.LocalPlayer, target))
+        {
+            Main.NewText($"{target.name}'s stats is private.", Color.OrangeRed);
+            return;
+        }
 
         var state = PlayerInfoState.instance;
         if (state == null)
@@ -104,7 +113,7 @@ public class PlayerIconSnippet : TextSnippet
         // Snapshot current chat so the info UI can restore it later
         var snap = ChatSession.Capture();
 
-        state.SetPlayer(_playerIndex, plr.name);          // tell the UI which player to show
+        state.SetPlayer(_playerIndex, target.name);          // tell the UI which player to show
         state.SetReturnSnapshot(snap);                    // so Back can restore chat/session
 
         Main.drawingPlayerChat = false;                   // hide chat while the modal is open (optional)

@@ -1,8 +1,11 @@
 ﻿using System;
+using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.PlayerIcons.PlayerInfo.SessionTracker;
+using ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -46,7 +49,8 @@ public static class PlayerInfoDrawer
         DrawSeparatorBorder(sb, rect);
 
         // Draw background
-        DrawMapFullscreenBackground(sb, rect);
+        rect = new Rectangle(rect.X + 2, rect.Y + 2, rect.Width - 4, rect.Height - 4);
+        DrawMapFullscreenBackground(sb, rect, player);
 
         // Draw player
         DrawPlayer(sb, pos, player);
@@ -100,6 +104,17 @@ public static class PlayerInfoDrawer
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.UIScaleMatrix);
 
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            Vector2 lockPos = pos + new Vector2(105, 65);
+            MapHeadRendererHook.shouldFlipHeadDraw = player.direction == -1;
+            Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, lockPos,
+                1f, 1.5f, Color.White);
+            MapHeadRendererHook.shouldFlipHeadDraw = false;
+            DrawLock(sb, lockPos + new Vector2(-36, -15), 4f);
+            return;
+        }
+
         ModifyPlayerDrawInfo.ForceFullBrightOnce = true;
         try
         {
@@ -108,18 +123,26 @@ public static class PlayerInfoDrawer
 
             // Celestial starboard (45) sucks
             if (player.wings == 45) player.wings = 0;
-            
-            Main.PlayerRenderer.DrawPlayer(Main.Camera,player,pos,player.fullRotation,player.fullRotationOrigin,0f,scale);
+
+            Main.PlayerRenderer.DrawPlayer(Main.Camera, player, pos, player.fullRotation, player.fullRotationOrigin, 0f, scale);
         }
         finally
         {
             ModifyPlayerDrawInfo.ForceFullBrightOnce = false;
         }
     }
-    public static void DrawMapFullscreenBackground(SpriteBatch sb, Rectangle rect)
+    public static void DrawMapFullscreenBackground(SpriteBatch sb, Rectangle rect, Player p)
     {
         var player = Main.LocalPlayer;
         if (player == null || !player.active) return;
+
+        if (!HasAccess(Main.LocalPlayer, p))
+        {
+            // Draw surface
+            var surfaceAsset = TextureAssets.MapBGs[0];
+            sb.Draw(surfaceAsset.Value, rect, Color.YellowGreen * 0.5f);
+            return;
+        }
 
         var screenPos = Main.screenPosition;
         var tile = Main.tile[(int)(player.Center.X / 16f), (int)(player.Center.Y / 16f)];
@@ -201,6 +224,13 @@ public static class PlayerInfoDrawer
         }
         var size = FontAssets.MouseText.Value.MeasureString(text);
         var textPos = new Vector2(rect.X + rect.Width - 52, rect.Y + 5);
+
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            DrawLock(sb, new Vector2(rect.X + 40, rect.Y));
+            return;
+        }
+
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, text, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
     public static void DrawStat_TimeInSession(SpriteBatch sb, Rectangle rect, Player player)
@@ -212,7 +242,7 @@ public static class PlayerInfoDrawer
 
         // Draw stopwatch
         Item icon = new(ItemID.Stopwatch);
-        Vector2 pos = new(rect.X+16, rect.Y+14);
+        Vector2 pos = new(rect.X + 16, rect.Y + 14);
         ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.8f, 32f, Color.White);
 
         // Draw time in session
@@ -227,7 +257,12 @@ public static class PlayerInfoDrawer
         if (text.Length > 6)
             xOffset = -5;
 
-        var size = FontAssets.MouseText.Value.MeasureString(text);
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            DrawLock(sb, new Vector2(rect.X + 40, rect.Y));
+            return;
+        }
+
         var textPos = new Vector2(rect.X + rect.Width - 55 + xOffset, rect.Y + 5);
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, text, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
@@ -248,13 +283,13 @@ public static class PlayerInfoDrawer
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        int npcId = BossTracker.GetLastNPCHit();
+        int npcId = -1; // TODO!
         if (npcId == -1)
         {
             // Draw question mark
             var questionTex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Locked");
             var rect2 = new Rectangle(rect.X, rect.Y, questionTex.Width(), questionTex.Height());
-            sb.Draw(questionTex.Value, new Vector2(rect.X+6, rect.Y+1), null, Color.White, 0f, 
+            sb.Draw(questionTex.Value, new Vector2(rect.X + 6, rect.Y + 1), null, Color.White, 0f,
                 Vector2.Zero, scale: 0.8f, SpriteEffects.None, 0f);
 
             Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, "n/a",
@@ -359,7 +394,7 @@ public static class PlayerInfoDrawer
         var width = FontAssets.MouseText.Value.MeasureString(name).X;
 
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, name,
-            rect.X + tex.Width()-width-1, rect.Y + 4, Color.White, Color.Black, Vector2.Zero, 1f);
+            rect.X + tex.Width() - width - 1, rect.Y + 4, Color.White, Color.Black, Vector2.Zero, 1f);
     }
 
     public static void DrawStat_Minions(SpriteBatch sb, Rectangle rect, Player player)
@@ -378,9 +413,16 @@ public static class PlayerInfoDrawer
                 var it = kv.Value; if (it == null) continue; if (it.summon || it.DamageType == DamageClass.Summon) { if (it.shoot == bestProj) { icon = new Item(it.type); break; } }
             }
         }
-        var pos = new Vector2(rect.X + 15, rect.Y + 15); 
+        var pos = new Vector2(rect.X + 15, rect.Y + 15);
         ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.9f, 32f, Color.White);
-        var tp = new Vector2(rect.X + 45, rect.Y + 4); 
+
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            DrawLock(sb, new Vector2(rect.X + 40, rect.Y));
+            return;
+        }
+
+        var tp = new Vector2(rect.X + 45, rect.Y + 4);
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
     public static void DrawStat_Sentries(SpriteBatch sb, Rectangle rect, Player player)
@@ -390,7 +432,7 @@ public static class PlayerInfoDrawer
         for (int t = 0; t < player.ownedProjectileCounts.Length; t++)
         {
             int c = player.ownedProjectileCounts[t]; if (c <= 0) continue;
-            var proj = ContentSamples.ProjectilesByType[t]; 
+            var proj = ContentSamples.ProjectilesByType[t];
             if (!proj.sentry) continue;
             cur += c;
             if (c > bestCount) { bestCount = c; bestProj = t; }
@@ -404,9 +446,16 @@ public static class PlayerInfoDrawer
                 if (it.summon || it.DamageType == DamageClass.Summon) { if (it.shoot == bestProj) { icon = new Item(it.type); break; } }
             }
         }
-        var pos = new Vector2(rect.X + 15, rect.Y + 15); 
+        var pos = new Vector2(rect.X + 15, rect.Y + 15);
         ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.9f, 32f, Color.White);
-        var tp = new Vector2(rect.X + 45, rect.Y + 4); 
+
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            DrawLock(sb, new Vector2(rect.X + 40, rect.Y));
+            return;
+        }
+
+        var tp = new Vector2(rect.X + 45, rect.Y + 4);
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, $"{cur}/{max}", tp.X, tp.Y, Color.White, Color.Black, Vector2.Zero, 1f);
     }
     public static void DrawStat_Defense(SpriteBatch sb, Rectangle rect, Player player)
@@ -415,6 +464,12 @@ public static class PlayerInfoDrawer
         var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_Defense");
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
+
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            DrawLock(sb, new Vector2(rect.X + 40, rect.Y));
+            return;
+        }
 
         // Draw defense NPCName
         var defenseText = $"{player.statDefense}";
@@ -425,16 +480,21 @@ public static class PlayerInfoDrawer
 
     public static void DrawStat_HP(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background
         var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_HP");
-        var rect2 = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
-        sb.Draw(tex.Value, rect2, Color.White);
+        sb.Draw(tex.Value, rect, Color.White);
 
-        // Draw HP NPCName
-        var lifeText = $"{player.statLife}/{player.statLifeMax2}";
-        var snippets = ChatManager.ParseMessage(lifeText, Color.White).ToArray();
-        var pos = new Vector2(rect2.X + 32, rect2.Y + 4);
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            DrawLock(sb, new Vector2(rect.X + 40, rect.Y));
+            return;
+        }
+
+        string text = $"{player.statLife}/{player.statLifeMax2}";
+        ChatManager.DrawColorCodedStringWithShadow(
+            sb, FontAssets.MouseText.Value,
+            ChatManager.ParseMessage(text, Color.White).ToArray(),
+            new Vector2(rect.X + 32, rect.Y + 4),
+            0f, Vector2.Zero, Vector2.One, out _);
     }
 
     public static void DrawStat_Mana(SpriteBatch sb, Rectangle rect, Player player)
@@ -449,6 +509,12 @@ public static class PlayerInfoDrawer
         var manaRect = new Rectangle(rect.X + 4, rect.Y + 2, manaTex.Width(), manaTex.Height());
         sb.Draw(TextureAssets.Mana.Value, manaRect, Color.White);
 
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            DrawLock(sb, new Vector2(rect.X + 40, rect.Y));
+            return;
+        }
+
         // Draw mana NPCName
         var manaText = $"{player.statMana}/{player.statManaMax2}";
         var size = FontAssets.MouseText.Value.MeasureString(manaText);
@@ -462,6 +528,12 @@ public static class PlayerInfoDrawer
         var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_Attack");
         var rect2 = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect2, Color.White);
+
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            DrawLock(sb, new Vector2(rect.X + 40, rect.Y));
+            return;
+        }
 
         // Get damage
         var item = player.HeldItem;
@@ -487,6 +559,15 @@ public static class PlayerInfoDrawer
         var tex = Ass.StatPanel;
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
+
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            Vector2 goldCoinPos = new(rect.X + 17, rect.Y + 15);
+            ItemSlot.DrawItemIcon(new Item(ItemID.GoldCoin), 31, sb, goldCoinPos, 1f, 32, Color.White);
+            Vector2 lockPos = new(rect.X + 40, rect.Y);
+            DrawLock(sb, lockPos);
+            return;
+        }
 
         // Count total
         long CountCoins(Item[] items, params int[] excludeSlots)
@@ -582,6 +663,12 @@ public static class PlayerInfoDrawer
         var pos = new Vector2(rect.X + 15, rect.Y + 15);
         ItemSlot.DrawItemIcon(highestStackItem, 31, sb, pos, 0.8f, 32f, Color.White);
 
+        if (!HasAccess(Main.LocalPlayer, player))
+        {
+            DrawLock(sb, new Vector2(rect.X + 40, rect.Y));
+            return;
+        }
+
         // Draw ammo count
         string highestAmmoStack = highestStack.ToString();
         var size = FontAssets.MouseText.Value.MeasureString(highestAmmoStack);
@@ -609,8 +696,8 @@ public static class PlayerInfoDrawer
             1 => "[c/DA3B3B:Team Red]",
             2 => "[c/3bda55:Team Green]",
             3 => "[c/3b95da:Team Blue]",
-            4 => "[c/f2dd64: Team Yellow]",
-            5 => "[c/e064f2: TeamPink]",
+            4 => "[c/f2dd64:Team Yellow]",
+            5 => "[c/e064f2:Team Pink]",
             _ => string.Empty
         };
 
@@ -618,7 +705,7 @@ public static class PlayerInfoDrawer
         pos += new Vector2(7, 5);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snippets, pos, 0f, Vector2.Zero, new Vector2(1.0f), out _);
     }
-   
+
     public static void DrawPlayerIDText(SpriteBatch sb, Vector2 pos, Player player)
     {
         string ID = "ID: " + player.whoAmI.ToString();
@@ -629,11 +716,28 @@ public static class PlayerInfoDrawer
     }
     #endregion
 
+    #region Helpers
+    public static bool HasAccess(Player viewer, Player target)
+    {
+        var privacy = PrivacyCache.Get(target.whoAmI);
+        return privacy switch
+        {
+            Config.UserStatsPrivacy.Everyone => true,
+            Config.UserStatsPrivacy.Team =>
+                viewer != null && target != null &&
+                viewer.team != 0 && viewer.team == target.team,
+            _ => viewer == target // NoOne: only yourself
+        };
+    }
+
+    #endregion
+
     #region Panels & Separators
     public static void DrawSeparatorBorder(SpriteBatch sb, Rectangle rect, int edgeWidth = 2)
     {
         var tex = Main.Assets.Request<Texture2D>("Images/UI/CharCreation/Separator1").Value;
-        Color color = new Color(89, 116, 213, 255) * 0.9f;
+        //var tex = TextureAssets.MagicPixel.Value;
+        Color color = new Color(89, 116, 213, 255) * 1.0f;
 
         DrawPanel(tex, edgeWidth, 0, sb, new Vector2(rect.X, rect.Y), rect.Width, color);
         DrawPanel(tex, edgeWidth, 0, sb, new Vector2(rect.X, rect.Bottom - edgeWidth), rect.Width, color);
@@ -687,6 +791,18 @@ public static class PlayerInfoDrawer
 
         DrawNineSlice(sb, BG.Value, rect, new Color(63, 82, 151) * 1.0f);
         DrawNineSlice(sb, Border.Value, rect, Color.Black);
+    }
+
+    private static void DrawLock(SpriteBatch sb, Vector2 pos, float scale = 1.5f)
+    {
+        Texture2D tex = TextureAssets.HbLock[0].Value;
+
+        // Calculate the width of one frame (assuming horizontal split)
+        int frameWidth = tex.Width / 2;
+        Rectangle sourceRect = new(0, 0, frameWidth, tex.Height);
+
+        sb.Draw(tex, pos, sourceRect, Color.White, 0f, Vector2.Zero,
+            scale: scale, SpriteEffects.None, 0f);
     }
 
     public static void DrawHorizontalSeparator(SpriteBatch sb, Vector2 pos, float width, int edgeWidth = 2)

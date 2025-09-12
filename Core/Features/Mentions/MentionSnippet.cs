@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
@@ -74,6 +76,7 @@ public sealed class MentionSnippet : TextSnippet
         if (string.IsNullOrWhiteSpace(name)) return "FFFFFF";
         if (_nameToHex.TryGetValue(name, out var hex)) return hex;
 
+
         // prefer synced table
         for (int i = 0; i < Main.maxPlayers; i++)
         {
@@ -117,28 +120,31 @@ public sealed class MentionSnippet : TextSnippet
 
         // text color from cached hex
         string hex = ResolveHex(name);
+        //Log.Info($"hex: {hex} for: {name}");
         Color textColor = Color.White;
         if (hex.Length == 6 &&
-            byte.TryParse(hex[..2], System.Globalization.NumberStyles.HexNumber, null, out var r) &&
-            byte.TryParse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, null, out var g) &&
-            byte.TryParse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, null, out var b))
+            byte.TryParse(hex[..2], NumberStyles.HexNumber, null, out var r) &&
+            byte.TryParse(hex.Substring(2, 2), NumberStyles.HexNumber, null, out var g) &&
+            byte.TryParse(hex.Substring(4, 2), NumberStyles.HexNumber, null, out var b))
             textColor = new Color(r, g, b);
 
         Vector2 p = new((float)Math.Floor(pos.X), (float)Math.Floor(pos.Y));
 
-        // outline
-        sb.DrawString(font, display, p + new Vector2(1, 1), new Color(0, 0, 0, 160), 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-
         // bold if this client is the mentioned player
-        bool isLocalTarget =
-            !string.IsNullOrWhiteSpace(Main.LocalPlayer?.name) &&
-            string.Equals(name, Main.LocalPlayer.name, StringComparison.OrdinalIgnoreCase);
+        if (string.Equals(name, Main.LocalPlayer.name))
+        {
+            Vector2 off = pos + new Vector2(1, 0);
+            ChatManager.DrawColorCodedStringShadow(sb, font, display, off, Color.Black, 0f, Vector2.Zero, Vector2.One);
+            ChatManager.DrawColorCodedStringShadow(sb, font, display, off, Color.Black, 0f, Vector2.Zero, Vector2.One);
+            off = pos + new Vector2(-1, 0);
+            ChatManager.DrawColorCodedStringShadow(sb, font, display, off, Color.Black, 0f, Vector2.Zero, Vector2.One);
+            ChatManager.DrawColorCodedStringShadow(sb, font, display, off, Color.Black, 0f, Vector2.Zero, Vector2.One);
+        }
+        Utils.DrawBorderString(sb, display, pos, textColor);
 
-        if (isLocalTarget)
-            sb.DrawString(font, display, p + new Vector2(1, 0), textColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-
-        // base text
-        sb.DrawString(font, display, p, textColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        // Draw outer and inner
+        //ChatManager.DrawColorCodedStringShadow(sb, font, display, pos, Color.Black, 0f, Vector2.Zero, Vector2.One);
+        //ChatManager.DrawColorCodedString(sb, font, display, pos, textColor, 0f, Vector2.Zero, Vector2.One);
 
         // hover (like links)
         int width = (int)Math.Ceiling(size.X);
@@ -146,14 +152,16 @@ public sealed class MentionSnippet : TextSnippet
         var hoverR = new Rectangle((int)p.X, (int)p.Y, width, Math.Max(1, lineH - 7));
 
         isHovered = hoverR.Contains(Main.MouseScreen.ToPoint());
+
+        // to debug and always see hovered player overlay: comment the below line out
         if (isHovered)
         {
             Main.LocalPlayer.mouseInterface = true;
 
             // underline slightly darker than text color
             Color ul = new((byte)(textColor.R * 0.85f), (byte)(textColor.G * 0.85f), (byte)(textColor.B * 0.85f));
-            int underlineY = (int)Math.Floor(p.Y + lineH - 9f);
-            sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)p.X, underlineY, width, 1), ul);
+            int underlineY = (int)Math.Floor(p.Y + lineH - 10f);
+            sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)p.X, underlineY, width, 2), ul);
 
             // topmost overlay + click
             HoveredPlayerOverlay.Set(_lastIndex);
@@ -169,10 +177,19 @@ public sealed class MentionSnippet : TextSnippet
         Main.LocalPlayer.mouseInterface = true;
 
         int idx = _lastIndex;
-        if (idx < 0 || idx >= Main.maxPlayers) return;
+        if (idx < 0 || idx >= Main.maxPlayers)
+            return;
 
-        var plr = Main.player[idx];
-        if (plr == null || !plr.active) return;
+        var target = Main.player[idx];
+        if (target == null || !target.active)
+            return;
+
+        // 🔒 block if no access
+        if (target != null && !PlayerInfoDrawer.HasAccess(Main.LocalPlayer, target))
+        {
+            Main.NewText($"{target.name}'s stats is private.", Color.OrangeRed);
+            return;
+        }
 
         var state = PlayerInfoState.instance;
         if (state == null)
@@ -181,13 +198,11 @@ public sealed class MentionSnippet : TextSnippet
             return;
         }
 
-        // snapshot chat so the UI can restore it later
         var snap = ChatSession.Capture();
-
-        state.SetPlayer(idx, plr.name);
+        state.SetPlayer(idx, target.name);
         state.SetReturnSnapshot(snap);
 
-        Main.drawingPlayerChat = false;       
+        Main.drawingPlayerChat = false;
         IngameFancyUI.OpenUIState(state);
     }
 }

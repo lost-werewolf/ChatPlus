@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Helpers;
@@ -255,7 +256,7 @@ public class PlayerInfoState : UIState, ILoadable
         );
 
         PlayerInfoDrawer.DrawSeparatorBorder(sb, bgRect);
-        PlayerInfoDrawer.DrawMapFullscreenBackground(sb, bgRect);
+        PlayerInfoDrawer.DrawMapFullscreenBackground(sb, bgRect, player);
 
         // Draw stats to the left of player
         Vector2 bgTopLeft = new(bgRect.X, bgRect.Y);
@@ -297,8 +298,8 @@ public class PlayerInfoState : UIState, ILoadable
         PlayerInfoDrawer.DrawStat_Sentries(sb, sentryBounds, player);
         PlayerInfoDrawer.DrawStat_TimeInSession(sb, timeInSessionBounds, player);
         PlayerInfoDrawer.DrawStat_DaysInSession(sb, daysInSessionBounds, player);
-        PlayerInfoDrawer.DrawStat_LastEnemyHit(sb, lastEnemyBounds, player);
-        PlayerInfoDrawer.DrawStat_LastBossHit(sb, lastBossBounds, player);
+        //PlayerInfoDrawer.DrawStat_LastEnemyHit(sb, lastEnemyBounds, player);
+        //PlayerInfoDrawer.DrawStat_LastBossHit(sb, lastBossBounds, player);
 
         Rectangle viewport = new(containerLeft + 20, top + 20, containerW - 20 * 4, panelBottom - top - 20 * 2);
         //DrawDebugRect(viewport);
@@ -306,29 +307,60 @@ public class PlayerInfoState : UIState, ILoadable
         DrawInventory(sb, invStart, player, viewport);
         DrawAccessories(sb, accPos, player, viewport);
 
-        if (buffCount > 0 && viewport.Bottom > buffStart.Y + 20)
+        if (viewport.Bottom > buffStart.Y + 20)
         {
-            Utils.DrawBorderStringBig(sb, Loc.Get("PlayerInfo.Headers.Buffs"), new Vector2(buffStart.X, buffStart.Y - 36), Color.White, 0.52f);
+            string buffsHeader = Loc.Get("PlayerInfo.Headers.Buffs");
+
+            if (PlayerInfoDrawer.HasAccess(Main.LocalPlayer, player))
+                buffsHeader += ": " + buffCount;
+
+            Utils.DrawBorderStringBig(sb, buffsHeader, new Vector2(buffStart.X, buffStart.Y - 36), Color.White, 0.52f);
             DrawBuffs(sb, buffStart, player, viewport);
         }
 
         Point p = Main.MouseScreen.ToPoint();
-        if (hpBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Health"));
-        if (manaBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Mana"));
-        if (defBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Defense"));
-        if (deathBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Attack"));
-        if (coinBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Coins"));
-        if (ammoBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Ammo"));
-        if (minionBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Minions"));
-        if (sentryBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.Sentries"));
-        if (timeInSessionBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.TimeInSession"));
-        if (daysInSessionBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.DaysInSession"));
-        if (lastEnemyBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.LastEnemyHit"));
-        if (lastBossBounds.Contains(p)) UICommon.TooltipMouseText(Loc.Get("PlayerInfo.Stats.LastBossHit"));
+        StatTooltip(hpBounds, p, "PlayerInfo.Stats.Health", player);
+        StatTooltip(manaBounds, p, "PlayerInfo.Stats.Mana", player);
+        StatTooltip(defBounds, p, "PlayerInfo.Stats.Defense", player);
+        StatTooltip(deathBounds, p, "PlayerInfo.Stats.Attack", player);
+        StatTooltip(coinBounds, p, "PlayerInfo.Stats.Coins", player);
+        StatTooltip(ammoBounds, p, "PlayerInfo.Stats.Ammo", player);
+        StatTooltip(minionBounds, p, "PlayerInfo.Stats.Minions", player);
+        StatTooltip(sentryBounds, p, "PlayerInfo.Stats.Sentries", player);
+        StatTooltip(timeInSessionBounds, p, "PlayerInfo.Stats.TimeInSession", player);
+        StatTooltip(daysInSessionBounds, p, "PlayerInfo.Stats.DaysInSession", player);
+        //StatTooltip(lastEnemyBounds, p, "PlayerInfo.Stats.LastEnemyHit", player);
+        //StatTooltip(lastBossBounds, p, "PlayerInfo.Stats.LastBossHit", player);
+    }
+
+    private static void StatTooltip(Rectangle bounds, Point p, string loc, Terraria.Player target)
+    {
+        if (bounds.Contains(p))
+        {
+            string localizedText = Loc.Get(loc);
+            if (!PlayerInfoDrawer.HasAccess(Main.LocalPlayer, target))
+                localizedText += " (Locked)";
+            UICommon.TooltipMouseText(localizedText);
+        }
+    }
+
+
+    private static void DrawLockSlot(SpriteBatch sb, Vector2 pos, float scale = 1.5f)
+    {
+        Texture2D tex = TextureAssets.HbLock[0].Value;
+
+        // Calculate the width of one frame (assuming horizontal split)
+        int frameWidth = tex.Width / 2;
+        Rectangle sourceRect = new(0, 0, frameWidth, tex.Height);
+
+        sb.Draw(tex, pos, sourceRect, Color.White, 0f, Vector2.Zero,
+            scale: scale, SpriteEffects.None, 0f);
     }
 
     private static void DrawInventory(SpriteBatch sb, Vector2 start, Player player, Rectangle viewport)
     {
+        
+
         int size = Main.screenWidth < 1200 ? 36 : 40;
         int pad = 4;
 
@@ -351,17 +383,35 @@ public class PlayerInfoState : UIState, ILoadable
             else
                 sb.Draw(TextureAssets.InventoryBack.Value, r, Color.White);
 
+            Vector2 slotPos = new(r.X+7, r.Y+7);
+            //DrawLockSlot(sb, slotPos, 1.0f);
+
             if (!item.IsAir)
             {
                 var center = new Vector2(r.X + r.Width / 2f, r.Y + r.Height / 2f);
-                ItemSlot.DrawItemIcon(item, 31, sb, center, 0.9f, size - 6, Color.White);
+                if (!PlayerInfoDrawer.HasAccess(Main.LocalPlayer, player))
+                {
+                    DrawLockSlot(sb, slotPos, 1.0f);
+                }
+                else
+                {
+                    ItemSlot.DrawItemIcon(item, 31, sb, center, 0.9f, size - 6, Color.White);
+                }
 
                 if (r.Contains(Main.MouseScreen.ToPoint()))
                 {
                     UICommon.TooltipMouseText("");
                     Main.LocalPlayer.mouseInterface = true;
-                    Main.HoverItem = item.Clone();
-                    Main.hoverItemName = item.Name;
+                    if (!PlayerInfoDrawer.HasAccess(Main.LocalPlayer, player))
+                    {
+                        UICommon.TooltipMouseText("Locked");
+                        Main.hoverItemName = "Locked";
+                    }
+                    else
+                    {
+                        Main.HoverItem = item.Clone();
+                        Main.hoverItemName = item.Name;
+                    }
 
                     if (Main.mouseRight && Main.mouseRightRelease && !PlayerInput.IgnoreMouseInterface)
                     {
@@ -417,7 +467,7 @@ public class PlayerInfoState : UIState, ILoadable
             if (i < 10)
             {
                 string label = i == 9 ? "0" : (i + 1).ToString();
-                Vector2 numberPos = new(r.Right - 35f, r.Bottom - 38f);
+                Vector2 numberPos = new(r.Right - 32f, r.Bottom - 36f);
                 Utils.DrawBorderString(sb, label, numberPos, Color.White, 0.75f, 0f, 0f);
             }
         }
@@ -436,6 +486,22 @@ public class PlayerInfoState : UIState, ILoadable
 
         ref Item it = ref items[slot];
 
+        // If the slot has an item but access is denied → show lock instead of item
+        if (!it.IsAir && !PlayerInfoDrawer.HasAccess(Main.LocalPlayer, player))
+        {
+            Item dummy = new Item();
+            dummy.SetDefaults(ItemID.None); // force blank slot
+            ItemSlot.Draw(Main.spriteBatch, ref dummy, context, new Vector2(x, y));
+            DrawLockSlot(Main.spriteBatch, new Vector2(x + 7, y + 7), 1f);
+            Main.inventoryScale = old;
+            if (!it.IsAir && hover)
+            {
+                UICommon.TooltipMouseText("Locked");
+            }
+            return;
+        }
+
+        // Normal access OR slot is empty
         if (!it.IsAir && hover)
         {
             UICommon.TooltipMouseText("");
@@ -456,7 +522,6 @@ public class PlayerInfoState : UIState, ILoadable
         }
 
         ItemSlot.Draw(Main.spriteBatch, ref it, context, new Vector2(x, y));
-
         Main.inventoryScale = old;
     }
 
@@ -468,33 +533,56 @@ public class PlayerInfoState : UIState, ILoadable
 
         Utils.DrawBorderStringBig(sb, "Accessories", new Vector2(topLeft.X, topLeft.Y - 36), Color.White, 0.52f);
 
+        // Armor rows (head/body/legs + dyes + vanity)
         for (int r = 0; r < 3; r++)
         {
             int y = (int)topLeft.Y + r * rowStep;
-            var rowRect = new Rectangle((int)topLeft.X, y, 3 * rowStep, rowStep);
 
             int x0 = (int)topLeft.X + 0 * rowStep;
             int x1 = (int)topLeft.X + 1 * rowStep;
             int x2 = (int)topLeft.X + 2 * rowStep;
 
-            // Draw top 3 armor dye slots
+            // draw 3 armor dye slots
             DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y, player);
-
-            // Draw middle 3 armor vanity slots (no visual)
+            
+            // draw 3 vanity slots
             DrawLoaderSlot(player.armor, ItemSlot.Context.InWorld, 10 + r, x1, y, player);
 
-            // Draw 3 armor slots (no visual)
+            // draw 3 armor slots
             DrawLoaderSlot(player.armor, ItemSlot.Context.InWorld, r, x2, y, player);
 
-            // Draw backup visual slots with accurate ItemSlot.Context,
-            // which, for some reason, works...
+            // backup visuals
             float scaleBackup = Main.inventoryScale;
             Main.inventoryScale = size / (float)TextureAssets.InventoryBack.Width();
-            ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, new Vector2(x1, y));
-            ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmor, r, new Vector2(x2, y));
+
+            if (PlayerInfoDrawer.HasAccess(Main.LocalPlayer, player))
+            {
+                ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmorVanity, 10 + r, new Vector2(x1, y));
+                ItemSlot.Draw(sb, player.armor, ItemSlot.Context.EquipArmor, r, new Vector2(x2, y));
+            }
+            else
+            {
+                Item[] _ghostArmor = Enumerable.Repeat(new Item(), 30).ToArray();
+                Item[] _ghostDye = Enumerable.Repeat(new Item(), 10).ToArray();
+                ItemSlot.Draw(sb, _ghostArmor, ItemSlot.Context.EquipArmorVanity, 10 + r, new Vector2(x1, y));
+                ItemSlot.Draw(sb, _ghostArmor, ItemSlot.Context.EquipArmor, r, new Vector2(x2, y));
+
+                // overlay locks ONLY if the real player slots contain items
+                if (10 + r < player.armor.Length && !player.armor[10 + r].IsAir)
+                    DrawLockSlot(sb, new Vector2(x1 + 7, y + 7), 1.0f);
+
+                if (r < player.armor.Length && !player.armor[r].IsAir)
+                    DrawLockSlot(sb, new Vector2(x2 + 7, y + 7), 1.0f);
+            }
+            
+
             Main.inventoryScale = scaleBackup;
+
+            bool SlotHasItem(Item[] arr, int index) 
+                => index >= 0 && index < arr.Length && !arr[index].IsAir;
         }
 
+        // Accessories rows
         Vector2 accTopLeft = new(topLeft.X, topLeft.Y + 3 * rowStep);
 
         int dyeRows = Math.Max(0, player.dye.Length - 3);
@@ -505,8 +593,6 @@ public class PlayerInfoState : UIState, ILoadable
         for (int r = 0; r < totalRows; r++)
         {
             int y = (int)accTopLeft.Y + r * rowStep;
-            var rowRect = new Rectangle((int)accTopLeft.X, y, 3 * rowStep, rowStep);
-
             if (y + size > viewport.Bottom) break;
 
             int dyeIndex = 3 + r;
@@ -517,16 +603,17 @@ public class PlayerInfoState : UIState, ILoadable
             int x1 = (int)accTopLeft.X + 1 * rowStep;
             int x2 = (int)accTopLeft.X + 2 * rowStep;
 
-            // Draw accessory dye slots
+            // draw accessory dye slots
             DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, dyeIndex, x0, y, player);
-
-            // Draw accessory vanity slots
+            
+            // draw accessory vanity slots
             DrawLoaderSlot(player.armor, ItemSlot.Context.EquipAccessoryVanity, vanityIndex, x1, y, player);
-
-            // Draw accessory slots
+            
+            // draw accessory slots
             DrawLoaderSlot(player.armor, ItemSlot.Context.EquipAccessory, equipIndex, x2, y, player);
         }
     }
+
     private static void DrawBuffs(SpriteBatch sb, Vector2 start, Player player, Rectangle viewport)
     {
         int size = 32;
@@ -590,9 +677,21 @@ public class PlayerInfoState : UIState, ILoadable
 
             float alpha = hover ? 1f : 0.75f;
 
-            sb.Draw(TextureAssets.Buff[id].Value, iconRect, Color.White * alpha);
+            if (PlayerInfoDrawer.HasAccess(Main.LocalPlayer, player))
+            {
+                sb.Draw(TextureAssets.Buff[id].Value, iconRect, Color.White * alpha);
+            }
+            else
+            {
+                if (TextureAssets.Buff.Length > 203 && TextureAssets.Buff[203] != null)
+                {
+                    sb.Draw(TextureAssets.Buff[203].Value, iconRect, Color.White * alpha);
+                }
+                DrawLockSlot(sb, new Vector2(iconRect.X+5, iconRect.Y+4), 1.0f);
+            }
 
-            if (showTime)
+
+            if (showTime && PlayerInfoDrawer.HasAccess(Main.LocalPlayer, player))
             {
                 sb.DrawString(font, label, timePos, Color.White * alpha, 0f, Vector2.Zero, textScale, SpriteEffects.None, 0f);
             }
@@ -602,6 +701,10 @@ public class PlayerInfoState : UIState, ILoadable
                 string name = Lang.GetBuffName(id);
                 string desc = Lang.GetBuffDescription(id);
                 string tooltip = string.IsNullOrEmpty(desc) ? name : name + "\n" + desc;
+                if (!PlayerInfoDrawer.HasAccess(Main.LocalPlayer, player))
+                {
+                    tooltip = "Locked";
+                }
 
                 Main.instance.MouseText(tooltip);
                 Main.LocalPlayer.mouseInterface = true;

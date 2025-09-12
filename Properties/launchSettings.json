@@ -19,11 +19,5 @@
 			"commandLineArgs": "$(tMLPath) -skipselect",
 			"workingDirectory": "$(tMLSteamPath)"
 		},
-		"Terraria Two Clients": {
-			"commandName": "Executable",
-			"executablePath": "$(DotNetName)",
-			"commandLineArgs": "$(tMLPath) -skipselect",
-			"workingDirectory": "$(tMLSteamPath)"
-		}
 	}
 }

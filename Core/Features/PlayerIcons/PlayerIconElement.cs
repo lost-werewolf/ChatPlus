@@ -25,8 +25,8 @@ public class PlayerIconElement : BaseElement<PlayerIcon>
         string tag = Data.Tag;
 
         // Draw player head
-        //ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, tag,
-            //pos + new Vector2(12, 5), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, tag,
+            pos + new Vector2(12, 3), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
 
         // Draw outline
         pos += new Vector2(35, 4);

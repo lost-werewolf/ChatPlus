@@ -1,20 +1,34 @@
 using Microsoft.Xna.Framework.Graphics;
 
-namespace ChatPlus.Core.Features.Uploads.UploadInfo;
-
-public static class HoveredUploadOverlay
+namespace ChatPlus.Core.Features.Uploads.UploadInfo
 {
-    private static Texture2D hovered;
-
-    public static void Set(Texture2D texture)
+    public static class HoveredUploadOverlay
     {
-        hovered = texture;
-    }
+        private static Texture2D hovered;
+        private static bool suppressed;
 
-    internal static Texture2D Consume()
-    {
-        var tex = hovered;
-        hovered = null;
-        return tex;
+        public static void Set(Texture2D texture)
+        {
+            hovered = texture;
+        }
+
+        public static void SuppressThisFrame()
+        {
+            suppressed = true;
+        }
+
+        internal static Texture2D Consume()
+        {
+            if (suppressed)
+            {
+                suppressed = false;
+                hovered = null;
+                return null;
+            }
+
+            var tex = hovered;
+            hovered = null;
+            return tex;
+        }
     }
 }

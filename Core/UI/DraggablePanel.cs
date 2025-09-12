@@ -143,34 +143,15 @@ public abstract class DraggablePanel : UIPanel
 
     private static bool IsAnyScrollbarHovering()
     {
-        Log.Info("check scrollbar");
-
-        var states = new object[]
-        {
-        ModContent.GetInstance<Features.Commands.CommandSystem>()?.state,
-        ModContent.GetInstance<Features.Colors.ColorSystem>()?.state,
-        ModContent.GetInstance<Features.Emojis.EmojiSystem>()?.state,
-        ModContent.GetInstance<Features.Glyphs.GlyphSystem>()?.state,
-        ModContent.GetInstance<Features.Items.ItemSystem>()?.state,
-        ModContent.GetInstance<Features.ModIcons.ModIconSystem>()?.state,
-        ModContent.GetInstance<Features.PlayerIcons.PlayerIconSystem>()?.state,
-        ModContent.GetInstance<Features.Uploads.UploadSystem>()?.state
-        };
-
-        foreach (var s in states)
-        {
-            if (s is BaseState<dynamic> baseState)
-            {
-                Log.Info($"state panel: " + baseState.Panel != null);
-                if (baseState.Panel?.scrollbar?.IsMouseHovering == true)
-                    return true;
-            }
-            else
-            {
-                Log.Info("not");
-            }
-        }
-        return false;
+        return
+            ChatPlus.StateManager.CommandSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true ||
+            ChatPlus.StateManager.ColorSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true ||
+            ChatPlus.StateManager.EmojiSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true ||
+            ChatPlus.StateManager.GlyphSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true ||
+            ChatPlus.StateManager.ItemSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true ||
+            ChatPlus.StateManager.ModIconSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true ||
+            ChatPlus.StateManager.MentionSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true ||
+            ChatPlus.StateManager.PlayerIconSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true ||
+            ChatPlus.StateManager.UploadSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true;
     }
-
 }

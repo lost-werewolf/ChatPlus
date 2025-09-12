@@ -66,8 +66,8 @@ public class LinkSnippet : TextSnippet
             Main.LocalPlayer.mouseInterface = true;
 
             // Draw a single 1px underline for this visible segment
-            int underlineY = (int)System.Math.Floor(p.Y + lineHeight - 9f);
-            var underlineRect = new Rectangle((int)p.X, underlineY, width, 1);
+            int underlineY = (int)System.Math.Floor(p.Y + lineHeight - 10f);
+            var underlineRect = new Rectangle((int)p.X, underlineY, width, 2);
             sb.Draw(TextureAssets.MagicPixel.Value, underlineRect, GetVisibleColor());
 
             if (Main.mouseLeft && Main.mouseLeftRelease)

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
+using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Netcode;
 using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace ChatPlus.Core.Features.PlayerColors
 {
@@ -46,9 +43,21 @@ namespace ChatPlus.Core.Features.PlayerColors
                         {
                             byte who = reader.ReadByte();
                             string hex = reader.ReadString();
+
                             AssignPlayerColorsSystem.PlayerColors[who] = SanHex(hex);
+
+                            var name = Main.player[who]?.name;
+                            if (!string.IsNullOrWhiteSpace(name))
+                            {
+                                MentionSnippet.InvalidateCachesFor(name);
+                            }
+                            else
+                            {
+                                MentionSnippet.ClearAllCaches();
+                            }
                             break;
                         }
+
                     case Msg.SyncAll:
                         {
                             AssignPlayerColorsSystem.PlayerColors.Clear();
@@ -59,6 +68,7 @@ namespace ChatPlus.Core.Features.PlayerColors
                                 string hex = reader.ReadString();
                                 AssignPlayerColorsSystem.PlayerColors[who] = SanHex(hex);
                             }
+                            MentionSnippet.ClearAllCaches();
                             break;
                         }
                 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using ChatPlus.Core.Chat;
 using ChatPlus.Core.Features.ModIcons.ModInfo;
@@ -151,6 +151,7 @@ public class PlayerIconPanel : BasePanel<PlayerIcon>
         if (!TryGetSelected(out var entry)) return;
 
         int who = entry.PlayerIndex;
+        Player target = null;
         string name = null;
         if (who < 0 || who >= Main.maxPlayers || !Main.player[who].active)
         {
@@ -159,9 +160,12 @@ public class PlayerIconPanel : BasePanel<PlayerIcon>
             who = -1;
             for (int i = 0; i < Main.maxPlayers; i++)
             {
-                if (Main.player[i]?.active == true &&
-                    string.Equals(Main.player[i].name, name, StringComparison.OrdinalIgnoreCase))
-                { who = i; break; }
+                if (Main.player[i]?.active == true && string.Equals(Main.player[i].name, name, StringComparison.OrdinalIgnoreCase))
+                { 
+                    who = i;
+                    target = Main.player[i];
+                    break; 
+                }
             }
             if (who < 0) { Main.NewText("Player not found.", Microsoft.Xna.Framework.Color.Orange); return; }
         }
@@ -170,6 +174,13 @@ public class PlayerIconPanel : BasePanel<PlayerIcon>
         if (s == null)
         {
             Main.NewText("Player info UI not available.", Microsoft.Xna.Framework.Color.Orange);
+            return;
+        }
+
+        // 🔒 block if no access
+        if (target != null && !PlayerInfoDrawer.HasAccess(Main.LocalPlayer, target))
+        {
+            Main.NewText($"{target.name}'s stats is private.", Color.OrangeRed);
             return;
         }
 

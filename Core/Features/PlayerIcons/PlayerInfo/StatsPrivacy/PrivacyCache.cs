@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Helpers;
 using Terraria;
 
 namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy;
@@ -16,6 +17,20 @@ public static class PrivacyCache
         for (int i = 0; i < values.Length; i++)
         {
             values[i] = Config.UserStatsPrivacy.Everyone;
+        }
+    }
+
+    // debug function
+    public static void PrintAll()
+    {
+        for (int i = 0; i < Main.maxPlayers; i++)
+        {
+            var p = Main.player[i];
+            if (p?.active == true)
+            {
+                var privacy = Get(i);
+                Log.Info(p.name + ": " + privacy);
+            }
         }
     }
 

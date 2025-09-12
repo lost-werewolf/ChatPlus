@@ -89,9 +89,16 @@ public class Config : ModConfig
 
         UpdatePlayerColor();
 
-        // Update stats privacy
         PrivacyCache.Set(Main.myPlayer, StatsPrivacy);
-        StatsPrivacyNetHandler.Instance.SendLocalPrivacy();
+
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+        {
+            StatsPrivacyNetHandler.Instance.SendLocalPrivacy();
+        }
+        else if (Main.netMode == NetmodeID.Server)
+        {
+            StatsPrivacyNetHandler.Instance.BroadcastSingle(Main.myPlayer, StatsPrivacy);
+        }
     }
 
     private void UpdatePlayerColor()
