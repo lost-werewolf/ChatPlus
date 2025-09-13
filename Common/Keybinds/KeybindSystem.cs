@@ -1,11 +1,6 @@
 ﻿using ChatPlus.Core.Chat;
-using ChatPlus.Core.Features.Colors;
 using ChatPlus.Core.Features.Commands;
 using ChatPlus.Core.Features.Emojis;
-using ChatPlus.Core.Features.Glyphs;
-using ChatPlus.Core.Features.Items;
-using ChatPlus.Core.Features.ModIcons;
-using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.Features.Scrollbar;
 using ChatPlus.Core.Features.Uploads;
 using Microsoft.Xna.Framework.Input;
@@ -29,7 +24,7 @@ namespace ChatPlus.Common.Keybinds
         public override void Load()
         {
             CommandKB = KeybindLoader.RegisterKeybind(Mod, "Open Command Window", Keys.C);
-            EmojiKB = KeybindLoader.RegisterKeybind(Mod, "Open Emoji Window", Keys.E);
+            EmojiKB = KeybindLoader.RegisterKeybind(Mod, "Open Emoji Window", Keys.Y);
             UploadsKB = KeybindLoader.RegisterKeybind(Mod, "Open Upload Window", Keys.U);
 
 #if DEBUG

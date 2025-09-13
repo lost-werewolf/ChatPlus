@@ -12,15 +12,12 @@ namespace ChatPlus.Common.ModCommands
     {
         public static LocalizedText UsageText { get; private set; }
         public static LocalizedText DescriptionText { get; private set; }
-        public static LocalizedText ClearedText { get; private set; }
-
         public override void SetStaticDefaults()
         {
             string key = $"Commands.{nameof(ModsCommand)}.";
 
             UsageText = Mod.GetLocalization($"{key}Usage");
             DescriptionText = Mod.GetLocalization($"{key}Description");
-            ClearedText = Mod.GetLocalization($"{key}Cleared");
         }
 
         public override CommandType Type => CommandType.Chat;

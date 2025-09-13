@@ -152,9 +152,8 @@ Commands: {
 	}
 
 	ModsCommand: {
-		Description: Mods.ChatPlus.Commands.ModsCommand.Description
-		Usage: Mods.ChatPlus.Commands.ModsCommand.Usage
-		Cleared: Mods.ChatPlus.Commands.ModsCommand.Cleared
+		Description: List the names of all the mods
+		Usage: List the names of all the mods
 	}
 }
 

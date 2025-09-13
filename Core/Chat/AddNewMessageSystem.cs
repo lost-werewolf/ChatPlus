@@ -96,9 +96,10 @@ namespace ChatPlus.Core.Chat
             {
                 string format = GetTimeFormat(Conf.C.timestampSettings);
                 string timestamp = DateTime.Now.ToString(format);
-
-                // Always wrap in [] and color dim
-                resultText = $"[c/FFFFFF:[{timestamp}]] {resultText}";
+                string whiteTimestamp = $"[c/ffffff:{timestamp}]";
+                string bracket1 = $"[c/ffffff:[]";
+                string bracket2 = $"[c/ffffff:]]";
+                resultText = bracket1 + whiteTimestamp + bracket2 + resultText;
             }
 
             // 6) Mentions: transform @name -> [mention:name]
