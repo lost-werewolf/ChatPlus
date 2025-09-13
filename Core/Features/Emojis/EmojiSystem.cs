@@ -24,12 +24,21 @@ namespace ChatPlus.Core.Features.Emojis
 
         public override void UpdateUI(GameTime gameTime)
         {
+            string text = Main.chatText ?? string.Empty;
+            int caret = text.Length;
+
+            var unclosedTag = ChatTriggers.UnclosedTag("[e");
+            var colonWord = ChatTriggers.CharOutsideTags(':');
+
+            // Colon mode only if ':' is active and an [e tag is NOT active
+            OpenedFromColon = colonWord.ShouldOpen(text, caret) && !unclosedTag.ShouldOpen(text, caret);
+
             ChatPlus.StateManager.OpenStateByTriggers(
                 gameTime,
                 ui,
                 state,
-                ChatTriggers.UnclosedTag("[e"),
-                ChatTriggers.CharOutsideTags(':')
+                unclosedTag,
+                colonWord
             );
         }
 

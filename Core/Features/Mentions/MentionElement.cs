@@ -27,7 +27,7 @@ public class MentionElement : BaseElement<Mention>
         // Player head
         string headTag = PlayerIconTagHandler.GenerateTag(playerName);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, headTag,
-            pos + new Vector2(12, 5), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
+            pos + new Vector2(12, 3), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
 
         // Colorized player name
         pos += new Vector2(35, 4);

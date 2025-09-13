@@ -1,14 +1,7 @@
 Keybinds: {
-	"Open Command Window.DisplayName": Open Command Window
-	"Open Emoji Window.DisplayName": Open Emoji Window
-	"Open Glyph Window.DisplayName": Open Glyph  Window
-	"Open Item Window.DisplayName": Open Item Window
-	"Open Color Window.DisplayName": Open Color Window
-	"Open Upload Window.DisplayName": Open Upload Window
-	"DEBUG: Write Lines.DisplayName": D E B U G:  Write  Lines
-	"DEBUG: Write Chat Line Count.DisplayName": D E B U G:  Write  Chat  Line  Count
-	"Open Mod Window.DisplayName": Open Mod Window
-	"Open Player Window.DisplayName": Open Player Window
+	"Open Command Window.DisplayName": Open Commands
+	"Open Emoji Window.DisplayName": Open Emojis
+	"Open Upload Window.DisplayName": Open Uploads
 }
 
 Configs: {
@@ -19,6 +12,9 @@ Configs: {
 			Config: Config
 			ChatFormat: Chat Format
 			StatsViewer: Stats
+			StatsPrivacy: Stats Privacy
+			Stats: Stats Header
+			ChatSettings: Chat Settings
 		}
 
 		Autocomplete: {
@@ -39,7 +35,7 @@ Configs: {
 
 		Scrollbar: {
 			Label: Scrollbar
-			Tooltip: Shows a scrollbar when more than 10 messages have been sent.
+			Tooltip: Shows a scrollbar when the number of messages exceed the visible limit.
 		}
 
 		ChatsVisible: {
@@ -54,12 +50,12 @@ Configs: {
 
 		ModIcons: {
 			Label: Mod Icon
-			Tooltip: Shows a mod icon before every chat sent by a mod.
+			Tooltip: Shows which mod writes stuff to chat.
 		}
 
 		PlayerIcons: {
 			Label: Player Icon
-			Tooltip: Shows a player icon before every chat sent by a player.
+			Tooltip: Shows who writes stuff to chat.
 		}
 
 		PlayerColor: {
@@ -76,7 +72,7 @@ Configs: {
 			Label: Text Editor
 			Tooltip:
 				'''
-				Improves the chat box with the following shortcuts:
+				Improves the text editor with the following shortcuts:
 				Ctrl+C: Copy
 				Ctrl+V: Paste
 				Ctrl+X: Cut
@@ -87,35 +83,35 @@ Configs: {
 				'''
 		}
 
-		DisableStatsWhenBossIsAlive: {
-			Label: Disable Stats When Boss Is Alive
-			Tooltip: Keep this on to avoid being distracted by hover tooltips when a boss fight is active.
-		}
-
 		ShowStatsWhenHovering: {
 			Label: Show Stats When Hovering
-			Tooltip: Shows a info panel when hovering player icons, mod icons, and uploaded images.
+			Tooltip: Shows stats when hovering above a player or mod icon.
+		}
+
+		ShowUploadsWhenHovering: {
+			Label: Show Uploads When Hovering
+			Tooltip: Shows a bigger upload when hovering.
+		}
+
+		ShowStatsWhenBossIsAlive: {
+			Label: Show Stats When Boss Is Alive
+			Tooltip: Keep this off to disable stats hovering when a boss is alive.
 		}
 
 		StatsPrivacy: {
 			Label: Stats Privacy
 			Tooltip:
 				'''
-				No one: No one can view your stats.
+				Only you: Only you can view your stats.
 				Team: Only players on your team can view your stats.
 				Everyone: Everyone on the server can view your stats.
 				'''
-		}
-
-		ShowUploadsWhenHovering: {
-			Label: Show Uploads When Hovering
-			Tooltip: ""
 		}
 	}
 
 	UserStatsPrivacy: {
 		Tooltip: ""
-		NoOne.Label: No one
+		NoOne.Label: Only you
 		Team.Label: Team
 		Everyone.Label: Everyone
 	}
@@ -132,14 +128,13 @@ Commands: {
 		Usage: /tags
 		Description: Shows all tags available in Chat+.
 		TagsHeader: "{0}Tags:{1}"
-		Tag_0: Colors      [c
-		Tag_1: Emojis      [e
-		Tag_2: Glyphs      [g
-		Tag_3: Items        [i
-		Tag_4: Links        [l
-		Tag_5: Mods        [m
+		Tag_1: Colors      [c
+		Tag_2: Emojis      [e or :
+		Tag_3: Glyphs      [g
+		Tag_4: Items        [i
+		Tag_5: Mod Icons  [m
 		Tag_6: Players      [p
-		Tag_7: Uploads      [u
+		Tag_7: Uploads     [u or #
 	}
 
 	ChatClearCommand: {
@@ -172,5 +167,6 @@ PlayerInfo: {
 		DaysInSession: Days In Session
 		LastEnemyHit: Last Enemy Hit
 		LastBossHit: Last Boss Hit
+		Locked: Locked
 	}
 }

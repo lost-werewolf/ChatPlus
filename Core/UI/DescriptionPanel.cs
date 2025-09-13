@@ -53,7 +53,7 @@ namespace ChatPlus.Core.UI
                 else if (typeof(TData) == typeof(Features.Items.ItemEntry)) initialText = "[c/FFF014:Items]";
                 else if (typeof(TData) == typeof(ModIcon)) initialText = "[c/FFF014:Mods]";
                 else if (typeof(TData) == typeof(PlayerIcon)) initialText = "[c/FFF014:Players]";
-                else if (typeof(TData) == typeof(Features.Uploads.Upload)) initialText = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
+                else if (typeof(TData) == typeof(Features.Uploads.Upload)) initialText = "[c/FFF014:Uploads]: Click here to upload images \nRight click to open folder";
                 else initialText = string.Empty;
             }
 
@@ -112,7 +112,7 @@ namespace ChatPlus.Core.UI
             // Special case: uploads
             if (typeof(TData) == typeof(Features.Uploads.Upload))
             {
-                string t = "[c/FFF014:Uploads]: Click to upload images \nRight click to open folder";
+                string t = "[c/FFF014:Uploads]: Click here to upload images \nRight click to open folder";
                 text.SetText(t);
                 text.VAlign = 0f;
                 Height.Set(62, 0);

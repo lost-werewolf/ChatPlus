@@ -49,7 +49,7 @@ public class ModIconElement : BaseElement<ModIcon>
             if (!Conf.C.ShowStatsWhenHovering) 
                 return;
 
-            if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
+            if (!Conf.C.ShowStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return;
 
             HoveredModOverlay.Set(Data.mod);

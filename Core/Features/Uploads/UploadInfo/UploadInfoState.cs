@@ -58,7 +58,7 @@ namespace ChatPlus.Core.Features.Uploads.UploadInfo
             }.WithPadding(15f);
             if (currentUpload != null)
             {
-                titlePanel.SetText("Upload: " + currentUpload.Value.FileName);
+                titlePanel.SetText(currentUpload.Value.FileName);
             }
             root.Append(titlePanel);
 
@@ -121,7 +121,7 @@ namespace ChatPlus.Core.Features.Uploads.UploadInfo
         public void Show(Upload upload)
         {
             currentUpload = upload;
-            titlePanel?.SetText($"Upload: {upload.FileName}");
+            titlePanel?.SetText($"{upload.FileName}");
             IngameFancyUI.OpenUIState(this);
         }
 

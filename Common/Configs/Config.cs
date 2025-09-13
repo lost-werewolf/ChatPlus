@@ -19,31 +19,31 @@ public class Config : ModConfig
     public enum UserStatsPrivacy { NoOne, Team, Everyone }
     public override ConfigScope Mode => ConfigScope.ClientSide;
 
-    [Header("Config")]
+    [Header("ChatSettings")]
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
     [DefaultValue(true)]
     public bool Autocomplete = true;
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
-    [DefaultValue(true)]
-    public bool TextEditor = true;
+    [Range(10f, 20f)]
+    [Increment(1f)]
+    [DefaultValue(10f)]
+    public float AutocompleteItemsVisible = 10f;
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
     [DefaultValue(true)]
     public bool Scrollbar = true;
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
-    [Range(10f, 20f)]
-    [Increment(1f)]
-    [DefaultValue(10f)]
-    public float ChatsVisible = 10f;
+    [DefaultValue(true)]
+    public bool TextEditor = true;
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
     [Range(10f, 20f)]
     [Increment(1f)]
     [DefaultValue(10f)]
-    public float AutocompleteItemsVisible = 10f;
+    public float ChatsVisible = 10f;
 
     [Header("ChatFormat")]
 
@@ -65,11 +65,6 @@ public class Config : ModConfig
     [Header("StatsViewer")]
 
     [BackgroundColor(192, 54, 64)] // Calamity Red
-    [DefaultValue(UserStatsPrivacy.Everyone)]
-    [JsonConverter(typeof(StringEnumConverter))]
-    public UserStatsPrivacy StatsPrivacy { get; set; }
-
-    [BackgroundColor(192, 54, 64)] // Calamity Red
     [DefaultValue(true)]
     public bool ShowStatsWhenHovering = true;
 
@@ -79,7 +74,14 @@ public class Config : ModConfig
 
     [BackgroundColor(192, 54, 64)] // Calamity Red
     [DefaultValue(true)]
-    public bool DisableStatsWhenBossIsAlive = true;
+    public bool ShowStatsWhenBossIsAlive = true;
+
+    [Header("StatsPrivacy")]
+
+    [BackgroundColor(192, 54, 64)] // Calamity Red
+    [DefaultValue(UserStatsPrivacy.Everyone)]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public UserStatsPrivacy StatsPrivacy { get; set; }
 
     public override void OnChanged()
     {

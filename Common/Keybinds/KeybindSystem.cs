@@ -17,28 +17,20 @@ namespace ChatPlus.Common.Keybinds
 {
     public class KeybindSystem : ModSystem
     {
-        public static ModKeybind OpenCommandKeybind;
-        public static ModKeybind OpenColorWindowKeybind;
-        public static ModKeybind OpenEmojiKeybind;
-        public static ModKeybind OpenGlyphKeybind;
-        public static ModKeybind OpenItemWindowKeybind;
-        public static ModKeybind OpenModWindowKeybind;
-        public static ModKeybind OpenPlayerWindowKeybind;
-        public static ModKeybind OpenUploadWindow;
+        public static ModKeybind CommandKB;
+        public static ModKeybind EmojiKB;
+        public static ModKeybind UploadsKB;
 
-        // Debug
+#if DEBUG
         public static ModKeybind WriteLineCount;
+#endif
+        
 
         public override void Load()
         {
-            OpenCommandKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Command Window", Keys.C);
-            OpenColorWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Color Window", Keys.O);
-            OpenEmojiKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Emoji Window", Keys.E);
-            OpenGlyphKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Glyph Window", Keys.G);
-            OpenItemWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Item Window", Keys.I);
-            OpenModWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Mod Window", Keys.M);
-            OpenPlayerWindowKeybind = KeybindLoader.RegisterKeybind(Mod, "Open Player Window", Keys.P);
-            OpenUploadWindow = KeybindLoader.RegisterKeybind(Mod, "Open Upload Window", Keys.U);
+            CommandKB = KeybindLoader.RegisterKeybind(Mod, "Open Command Window", Keys.C);
+            EmojiKB = KeybindLoader.RegisterKeybind(Mod, "Open Emoji Window", Keys.E);
+            UploadsKB = KeybindLoader.RegisterKeybind(Mod, "Open Upload Window", Keys.U);
 
 #if DEBUG
             WriteLineCount = KeybindLoader.RegisterKeybind(Mod, "DEBUG: Write Chat Line Count", Keys.L);
@@ -61,7 +53,7 @@ namespace ChatPlus.Common.Keybinds
             }
 #endif
 
-            void OpenSystem<TSystem>(ModKeybind keybind, TSystem sys, string prefix) where TSystem : ModSystem
+            static void Open<TSystem>(ModKeybind keybind, TSystem sys, string prefix) where TSystem : ModSystem
             {
                 if (!keybind.JustPressed)
                     return;
@@ -83,14 +75,9 @@ namespace ChatPlus.Common.Keybinds
                 HandleChatSystem.SetCaretPos(Main.chatText.Length);
             }
 
-            OpenSystem(KeybindSystem.OpenCommandKeybind, ModContent.GetInstance<CommandSystem>(), "/");
-            OpenSystem(KeybindSystem.OpenColorWindowKeybind, ModContent.GetInstance<ColorSystem>(), "[c");
-            OpenSystem(KeybindSystem.OpenEmojiKeybind, ModContent.GetInstance<EmojiSystem>(), "[e");
-            OpenSystem(KeybindSystem.OpenGlyphKeybind, ModContent.GetInstance<GlyphSystem>(), "[g");
-            OpenSystem(KeybindSystem.OpenItemWindowKeybind, ModContent.GetInstance<ItemSystem>(), "[i");
-            OpenSystem(KeybindSystem.OpenModWindowKeybind, ModContent.GetInstance<ModIconSystem>(), "[m");
-            OpenSystem(KeybindSystem.OpenPlayerWindowKeybind, ModContent.GetInstance<PlayerIconSystem>(), "[p");
-            OpenSystem(KeybindSystem.OpenUploadWindow, ModContent.GetInstance<UploadSystem>(), "[u");
+            Open(KeybindSystem.CommandKB, ModContent.GetInstance<CommandSystem>(), "/");
+            Open(KeybindSystem.EmojiKB, ModContent.GetInstance<EmojiSystem>(), "[e");
+            Open(KeybindSystem.UploadsKB, ModContent.GetInstance<UploadSystem>(), "#");
         }
     }
 }

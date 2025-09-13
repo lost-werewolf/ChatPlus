@@ -353,7 +353,8 @@ namespace ChatPlus.Core.UI
                 itemCount = (int)Conf.C.AutocompleteItemsVisible;
             Top.Set(-38, 0);
             Height.Set(itemCount * 30, 0);
-            list.Height.Set(itemCount * 30, 0);
+            scrollbar.Top.Set(6, 0);
+            list.Height.Set(itemCount * 30, 0f);
 
             HandleKeyPressed();
             HandleNavigationKeys(gt);

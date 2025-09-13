@@ -1,25 +1,27 @@
 ﻿[h1] Chat+ [/h1] 
-Chat+ is a massive overhaul to Terraria's chat system; making it look better, smarter and more fun with player icons, mod icons, emojis, images, links, a scrollbar, new text editor, and more!
+Chat+ is a massive overhaul to Terraria's chat system — enhancing both its appearance and functionality with powerful new features.
 
 [h3] ✨ What’s New? [/h3] 
-1. [b]Emojis😎📷[/b]: Access thousands of emojis directly in chat!
-2. [b]Images[/b]: Upload and send your own images!
-3. [b]Links🔗[/b]: Links you type in chat become clickable.
+1. [b]Emojis😎[/b]: Access thousands of emojis directly in chat!
+2. [b]Images📷[/b]: Upload and send your own images!
+3. [b]Links🔗[/b]: All links in chat become instantly clickable.
 4. [b]Autocomplete!🏷️[/b]: Type any command or tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
-5. [b]Stats[/b]: A stat viewer is available when hovering over player and mod icons.
-6. [b]Text Editor✍️[/b]: Highlight text, copy/paste and more!
-7. [b]Scrollbar✍️[/b]: A scrollbar is now available to scroll through chat history.
+5. [b]Stats📊[/b]: A stat viewer is available when hovering over player and mod icons.
+6. [b]Chat Icons▶️[/b]: Add player icons, mod icons and customize your own player color! 
+7. [b]Text Editor✍️[/b]: Highlight text, copy & paste words, and more!
+8. [b]Scrollbar[/b]: Scroll through chat history.
 
-[h3] 📖 How to use autocomplete [/h3] 
-/ to open commands.
-: to open emojis.
-@ to open player mentions.
-# to upload an image.
+[h3] 🏷️ Autocomplete [/h3] 
+Press / to open commands.
+Press : to open emojis.
+Press @ to open player mentions.
+Press # to upload an image.
 All other tags have their own prefixes, like [c for colors, [i for items, etc. See all tags with /tags.
 
 [h3] 🤝Credits [/h3] 
 Thanks to Neptune for making the icon!
 
 [h3] ❤️ Support the Project [/h3]
-[url=https://github.com/emyhrberg/ChatPlus] GitHub (source code) [/url] | [url=https://discord.gg/JWbYUktRPV] Discord [/url] | [url=https://ko-fi.com/erkyy] Ko-Fi [/url][quote=tModLoader ChatPlus]
-Developed By Erky[/quote]
+Check out the source code at [url=https://github.com/emyhrberg/ChatPlus] GitHub [/url]
+Questions or suggestions? Join us at [url=https://discord.gg/JWbYUktRPV] Discord [/url] 
+Enjoying my mods? Support me at [url=https://ko-fi.com/erkyy] Ko-Fi [/url]

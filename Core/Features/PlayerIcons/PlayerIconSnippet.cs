@@ -66,7 +66,7 @@ public class PlayerIconSnippet : TextSnippet
             if (!Conf.C.ShowStatsWhenHovering) 
                 return true;
 
-            if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
+            if (!Conf.C.ShowStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return true;
 
             Main.LocalPlayer.mouseInterface = true;
@@ -129,7 +129,7 @@ public class PlayerIconSnippet : TextSnippet
             if (!Conf.C.ShowStatsWhenHovering) 
                 return;
 
-            if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
+            if (!Conf.C.ShowStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return;
 
             HoveredPlayerOverlay.Set(_playerIndex);

@@ -76,7 +76,7 @@ public sealed class ModIconSnippet : TextSnippet
             if (!Conf.C.ShowStatsWhenHovering)
                 return true;
 
-            if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
+            if (!Conf.C.ShowStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return true;
 
             if (ModLoader.TryGetMod(modName, out Mod mod))
@@ -156,7 +156,7 @@ public sealed class ModIconSnippet : TextSnippet
             if (!Conf.C.ShowStatsWhenHovering) 
                 return;
 
-            if (Conf.C.DisableStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
+            if (!Conf.C.ShowStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return;
 
             HoveredModOverlay.Set(mod);

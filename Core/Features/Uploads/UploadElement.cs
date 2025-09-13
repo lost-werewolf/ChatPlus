@@ -36,26 +36,51 @@ namespace ChatPlus.Core.Features.Uploads
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
 
-            // Draw image
             img._textScale = 0.3f;
             img.Left.Set(5, 0);
             img.Top.Set(8, 0);
 
-            // Draw image hover tooltip
-            Rectangle bounds = new((int)pos.X, (int)pos.Y, (int)60, (int)60);
+            Rectangle bounds = new Rectangle((int)pos.X, (int)pos.Y, 60, 60);
             if (bounds.Contains(Main.MouseScreen.ToPoint()))
             {
                 UICommon.TooltipMouseText($"Shift+click to delete {Data.FileName}");
                 HoveredUploadOverlay.SuppressThisFrame();
-                //HoveredUploadOverlay.Set(Data);
             }
-            // debug
-            //sb.Draw(TextureAssets.MagicPixel.Value, bounds, Color.Red*0.5f);
 
-            // Draw file name
-            TextSnippet[] snip = [new TextSnippet(Data.Tag)];
-            pos += new Vector2(65, 5);
-            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos, 0f, Vector2.Zero, Vector2.One, out _);
+            string ToHashLabel(string tag)
+            {
+                if (string.IsNullOrEmpty(tag))
+                    return "#";
+
+                if (tag.StartsWith("[u:") && tag.EndsWith("]"))
+                {
+                    int colon = tag.IndexOf(':');
+                    int close = tag.LastIndexOf(']');
+                    if (colon >= 0 && close > colon + 1)
+                        return "#" + tag.Substring(colon + 1, close - colon - 1);
+                }
+
+                if (tag.StartsWith("#"))
+                    return tag;
+
+                return "#" + tag.Trim('[', ']');
+            }
+
+            string display = UploadSystem.OpenedFromHash ? ToHashLabel(Data.Tag) : Data.Tag;
+
+            TextSnippet[] snip = [new TextSnippet(display)];
+            Vector2 textPos = pos + new Vector2(65, 5);
+
+            ChatManager.DrawColorCodedStringWithShadow(
+                sb,
+                FontAssets.MouseText.Value,
+                snip,
+                textPos,
+                0f,
+                Vector2.Zero,
+                Vector2.One,
+                out _
+            );
         }
     }
 }
