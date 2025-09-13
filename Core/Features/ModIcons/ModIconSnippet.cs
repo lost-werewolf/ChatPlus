@@ -38,12 +38,11 @@ public sealed class ModIconSnippet : TextSnippet
         const float BaseIconSize = 24f;
         float px = BaseIconSize * Math.Max(0f, scale);
         size = new Vector2(px - 8, px);
-        pos.X -= 8f;
 
         if (justCheckingString || color == Color.Black)
             return true;
 
-        var dest = new Rectangle((int)pos.X, (int)(pos.Y - 2), (int)px, (int)px);
+        var dest = new Rectangle((int)pos.X-4, (int)(pos.Y - 2), (int)px, (int)px);
 
         sb.End();
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
@@ -51,7 +50,7 @@ public sealed class ModIconSnippet : TextSnippet
         {
             if (Ass.TerrariaIcon?.Value != null)
             {
-                dest = new Rectangle((int)pos.X + 4, (int)(pos.Y - 0), (int)19, (int)23);
+                dest = new Rectangle((int)pos.X+1, (int)(pos.Y - 0), (int)16, (int)22);
                 sb.Draw(Ass.TerrariaIcon.Value, dest, Color.White);
             }
             return true;

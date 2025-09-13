@@ -42,7 +42,9 @@ namespace ChatPlus.Common.ModCommands
             if (ModLoader.TryGetMod("ChatPlus", out Mod chatPlus))
             {
                 string tag = ModIconTagHandler.GenerateTag(chatPlus.Name);
-                Main.NewTextMultiline(tag + " " + ClearedText.Value, c: Color.Green);
+                tag = null;
+                //Main.NewTextMultiline(tag + ClearedText.Value, c: Color.Green);
+                Main.NewText(tag + ClearedText.Value, Color.Green);
             }
         }
     }

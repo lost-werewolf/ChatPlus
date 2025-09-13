@@ -26,7 +26,7 @@ public class PlayerIconElement : BaseElement<PlayerIcon>
 
         // Draw player head
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, tag,
-            pos + new Vector2(12, 3), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
+            pos + new Vector2(4, 3), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
 
         // Draw outline
         pos += new Vector2(35, 4);

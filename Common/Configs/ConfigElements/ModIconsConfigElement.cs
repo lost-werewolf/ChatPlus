@@ -1,5 +1,4 @@
 ﻿using ChatPlus.Core.Features.ModIcons;
-using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -7,7 +6,6 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config.UI;
-using Terraria.ModLoader.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 

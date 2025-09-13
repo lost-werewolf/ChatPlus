@@ -81,7 +81,7 @@ namespace ChatPlus.Core.Chat
             if (Conf.C.ModIcons && string.IsNullOrEmpty(senderName) && !resultText.StartsWith("[m:"))
             {
                 string modTag = ModIconTagHandler.GenerateTag(ModIconSnippet.GetModSource());
-                resultText = modTag + " " + resultText;
+                resultText = " " + modTag + " " + resultText;
             }
 
             // 5) Link tag
@@ -89,6 +89,16 @@ namespace ChatPlus.Core.Chat
             {
                 string linkTag = LinkTagHandler.GenerateTag(linkText);
                 resultText = resultText.Replace(linkText, linkTag);
+            }
+
+            // Add timestamp if enabled
+            if (Conf.C.timestampSettings != Config.TimestampSettings.Off)
+            {
+                string format = GetTimeFormat(Conf.C.timestampSettings);
+                string timestamp = DateTime.Now.ToString(format);
+
+                // Always wrap in [] and color dim
+                resultText = $"[c/FFFFFF:[{timestamp}]] {resultText}";
             }
 
             // 6) Mentions: transform @name -> [mention:name]
@@ -111,6 +121,27 @@ namespace ChatPlus.Core.Chat
 
             // Hand off to vanilla
             orig(self, resultText, color, widthLimitInPixels);
+        }
+
+        private static string GetTimeFormat(Config.TimestampSettings setting)
+        {
+            if (setting == Config.TimestampSettings.HourAndMinute12Hours)
+            {
+                return "h:mm tt";
+            }
+            if (setting == Config.TimestampSettings.HourAndMinuteAndSeconds12Hours)
+            {
+                return "h:mm:ss tt";
+            }
+            if (setting == Config.TimestampSettings.HourAndMinute24Hours)
+            {
+                return "HH:mm";
+            }
+            if (setting == Config.TimestampSettings.HourAndMinuteAndSeconds24Hours)
+            {
+                return "HH:mm:ss";
+            }
+            return "HH:mm";
         }
 
         /// <summary>

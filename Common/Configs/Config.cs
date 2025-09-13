@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 using ChatPlus.Common.Configs.ConfigElements;
 using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.PlayerColors;
@@ -16,7 +17,22 @@ namespace ChatPlus.Common.Configs;
 
 public class Config : ModConfig
 {
-    public enum UserStatsPrivacy { NoOne, Team, Everyone }
+    #region Enums
+    public enum UserStatsPrivacy 
+    { 
+        NoOne, 
+        Team, 
+        Everyone 
+    }
+    public enum TimestampSettings 
+    { 
+        Off, 
+        HourAndMinute12Hours, 
+        HourAndMinuteAndSeconds12Hours,
+        HourAndMinute24Hours,
+        HourAndMinuteAndSeconds24Hours,
+    }
+    #endregion
     public override ConfigScope Mode => ConfigScope.ClientSide;
 
     [Header("ChatSettings")]
@@ -29,6 +45,7 @@ public class Config : ModConfig
     [Range(10f, 20f)]
     [Increment(1f)]
     [DefaultValue(10f)]
+    [DrawTicks]
     public float AutocompleteItemsVisible = 10f;
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
@@ -43,45 +60,50 @@ public class Config : ModConfig
     [Range(10f, 20f)]
     [Increment(1f)]
     [DefaultValue(10f)]
+    [DrawTicks]
     public float ChatsVisible = 10f;
 
     [Header("ChatFormat")]
 
+    [CustomModConfigItem(typeof(EnumStringOptionElement<TimestampSettings>))]
+    [BackgroundColor(85, 111, 64)] // Damp Green
+    [DefaultValue(TimestampSettings.HourAndMinute24Hours)]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public TimestampSettings timestampSettings;
+
     [CustomModConfigItem(typeof(ModIconsConfigElement))]
     [BackgroundColor(85, 111, 64)] // Damp Green
     [DefaultValue(true)]
-    public bool ModIcons = true;
+    public bool ModIcons;
 
     [CustomModConfigItem(typeof(PlayerIconsConfigElement))]
     [BackgroundColor(85, 111, 64)] // Damp Green
     [DefaultValue(true)]
-    public bool PlayerIcons = true;
+    public bool PlayerIcons;
 
     [BackgroundColor(85, 111, 64)] // Damp Green
     [CustomModConfigItem(typeof(PlayerColorConfigElement))]
     [DefaultValue("FFFFFF")]
-    public string PlayerColor = "FFFFFF";
+    public string PlayerColor;
 
     [Header("StatsViewer")]
 
     [BackgroundColor(192, 54, 64)] // Calamity Red
     [DefaultValue(true)]
-    public bool ShowStatsWhenHovering = true;
+    public bool ShowStatsWhenHovering;
 
     [BackgroundColor(192, 54, 64)] // Calamity Red
     [DefaultValue(true)]
-    public bool ShowUploadsWhenHovering = true;
+    public bool ShowUploadsWhenHovering;
 
     [BackgroundColor(192, 54, 64)] // Calamity Red
     [DefaultValue(true)]
-    public bool ShowStatsWhenBossIsAlive = true;
-
-    [Header("StatsPrivacy")]
+    public bool ShowStatsWhenBossIsAlive;
 
     [BackgroundColor(192, 54, 64)] // Calamity Red
     [DefaultValue(UserStatsPrivacy.Everyone)]
     [JsonConverter(typeof(StringEnumConverter))]
-    public UserStatsPrivacy StatsPrivacy { get; set; }
+    public UserStatsPrivacy StatsPrivacy;
 
     public override void OnChanged()
     {

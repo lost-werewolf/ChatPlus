@@ -39,6 +39,7 @@ namespace ChatPlus.Common.ModCommands
             if (ModLoader.TryGetMod("ChatPlus", out Mod chatPlus))
             {
                 string tag = ModIconTagHandler.GenerateTag(chatPlus.Name);
+                tag = null;
 
                 // Header
                 Main.NewText(HeaderText.Format(tag + " " + "[c/fff014:", "]"));

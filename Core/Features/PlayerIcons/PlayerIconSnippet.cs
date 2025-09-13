@@ -30,9 +30,9 @@ public class PlayerIconSnippet : TextSnippet
     {
         const float box = 26f;
         scale = 0.75f;
-        pos.X -= 7f;
 
-        size = new Vector2(box * scale - 3.5f, box * scale);
+        // reserve enough horizontal space (slightly more than icon width)
+        size = new Vector2(box * scale + 4f, box * scale);
 
         if (justCheckingString || color == Color.Black) return true;
 
@@ -42,50 +42,33 @@ public class PlayerIconSnippet : TextSnippet
 
         // draw head
         sb.End();
-        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
-        pos = new Vector2(pos.X + 8f, pos.Y + 8f);
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap,
+                 DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
 
-        // force player head to draw facing only ONE direction
+        // shift head right/down inside its box
+        Vector2 drawPos = new(pos.X + 12f, pos.Y + 8f);
+
         MapHeadRendererHook.shouldFlipHeadDraw = player.direction == -1;
-        Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, pos, 1f, scale, Color.White);
+        Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, drawPos, 1f, scale, Color.White);
         MapHeadRendererHook.shouldFlipHeadDraw = false;
 
-        //// debug
-        //Rectangle debugRect = new((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
-        //sb.Draw(TextureAssets.MagicPixel.Value, debugRect, Color.Red * 0.25f);
-
-        // hover
-        int width = (int)size.X;
-        //int nameWidth = (int)FontAssets.MouseText.Value.MeasureString(player.name).X;
-        //width += nameWidth + 10;
-        var hoverRect = new Rectangle((int)pos.X - 10, (int)pos.Y - 6, width + 3, (int)size.Y + 3);
-        
-        // to debug; comment below line out!
+        // hover rect aligned with reserved box
+        var hoverRect = new Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
         if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
         {
-            if (!Conf.C.ShowStatsWhenHovering) 
-                return true;
+            if (Conf.C.ShowStatsWhenHovering &&
+                (Conf.C.ShowStatsWhenBossIsAlive || !Main.CurrentFrameFlags.AnyActiveBossNPC))
+            {
+                Main.LocalPlayer.mouseInterface = true;
+                HoveredPlayerOverlay.Set(_playerIndex);
 
-            if (!Conf.C.ShowStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
-                return true;
-
-            Main.LocalPlayer.mouseInterface = true;
-
-            HoveredPlayerOverlay.Set(_playerIndex);
-
-            if (Main.mouseLeft && Main.mouseLeftRelease)
-                OnClick();
+                if (Main.mouseLeft && Main.mouseLeftRelease)
+                    OnClick();
+            }
         }
-
-        // debug
-        //hoverRect.X = 110;
-        //hoverRect.Width = nameWidth;
-        //sb.Draw(TextureAssets.MagicPixel.Value, hoverRect, Color.Red * 0.25f);
 
         return true;
     }
-
-
     public override void OnClick()
     {
         base.OnClick();

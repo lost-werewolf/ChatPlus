@@ -1,5 +1,4 @@
-﻿// UploadTagHandler.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;

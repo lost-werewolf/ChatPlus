@@ -2,6 +2,7 @@ Keybinds: {
 	"Open Command Window.DisplayName": Open Commands
 	"Open Emoji Window.DisplayName": Open Emojis
 	"Open Upload Window.DisplayName": Open Uploads
+	"DEBUG: Write Chat Line Count.DisplayName": D E B U G:  Write  Chat  Line  Count
 }
 
 Configs: {
@@ -10,11 +11,9 @@ Configs: {
 
 		Headers: {
 			Config: Config
+			ChatSettings: Chat Settings
 			ChatFormat: Chat Format
 			StatsViewer: Stats
-			StatsPrivacy: Stats Privacy
-			Stats: Stats Header
-			ChatSettings: Chat Settings
 		}
 
 		Autocomplete: {
@@ -63,11 +62,6 @@ Configs: {
 			Tooltip: ""
 		}
 
-		Emojis: {
-			Label: Emojis
-			Tooltip: Turn on to load emojis when loading the mod.
-		}
-
 		TextEditor: {
 			Label: Text Editor
 			Tooltip:
@@ -107,6 +101,11 @@ Configs: {
 				Everyone: Everyone on the server can view your stats.
 				'''
 		}
+
+		timestampSettings: {
+			Label: Timestamp Format
+			Tooltip: Shows when a chat was written.
+		}
 	}
 
 	UserStatsPrivacy: {
@@ -114,6 +113,15 @@ Configs: {
 		NoOne.Label: Only you
 		Team.Label: Team
 		Everyone.Label: Everyone
+	}
+
+	TimestampSettings: {
+		Tooltip: ""
+		Off.Label: Off
+		HourAndMinute12Hours.Label: Hour And Minute12 Hours
+		HourAndMinuteAndSeconds12Hours.Label: Hour And Minute And Seconds12 Hours
+		HourAndMinute24Hours.Label: Hour And Minute24 Hours
+		HourAndMinuteAndSeconds24Hours.Label: Hour And Minute And Seconds24 Hours
 	}
 }
 
@@ -141,6 +149,12 @@ Commands: {
 		Usage: /clear
 		Description: Clears all chat messages.
 		Cleared: Chat cleared!
+	}
+
+	ModsCommand: {
+		Description: Mods.ChatPlus.Commands.ModsCommand.Description
+		Usage: Mods.ChatPlus.Commands.ModsCommand.Usage
+		Cleared: Mods.ChatPlus.Commands.ModsCommand.Cleared
 	}
 }
 
