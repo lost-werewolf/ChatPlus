@@ -18,16 +18,16 @@ namespace ChatPlus.Common.Configs;
 public class Config : ModConfig
 {
     #region Enums
-    public enum UserStatsPrivacy 
-    { 
-        NoOne, 
-        Team, 
-        Everyone 
+    public enum UserStatsPrivacy
+    {
+        NoOne,
+        Team,
+        Everyone
     }
-    public enum TimestampSettings 
-    { 
-        Off, 
-        HourAndMinute12Hours, 
+    public enum TimestampSettings
+    {
+        Off,
+        HourAndMinute12Hours,
         HourAndMinuteAndSeconds12Hours,
         HourAndMinute24Hours,
         HourAndMinuteAndSeconds24Hours,
@@ -67,7 +67,7 @@ public class Config : ModConfig
 
     [CustomModConfigItem(typeof(EnumStringOptionElement<TimestampSettings>))]
     [BackgroundColor(85, 111, 64)] // Damp Green
-    [DefaultValue(TimestampSettings.HourAndMinute24Hours)]
+    [DefaultValue(TimestampSettings.Off)]
     [JsonConverter(typeof(StringEnumConverter))]
     public TimestampSettings timestampSettings;
 
@@ -97,7 +97,7 @@ public class Config : ModConfig
     public bool ShowUploadsWhenHovering;
 
     [BackgroundColor(192, 54, 64)] // Calamity Red
-    [DefaultValue(true)]
+    [DefaultValue(false)]
     public bool ShowStatsWhenBossIsAlive;
 
     [BackgroundColor(192, 54, 64)] // Calamity Red

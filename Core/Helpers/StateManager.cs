@@ -1,4 +1,5 @@
 ﻿using System;
+using ChatPlus.Common.Compat.CustomTags;
 using ChatPlus.Core.Chat;
 using ChatPlus.Core.Features.Colors;
 using ChatPlus.Core.Features.Commands;
@@ -25,6 +26,7 @@ public class StateManager
     public MentionSystem MentionSystem { get; }
     public PlayerIconSystem PlayerIconSystem { get; }
     public UploadSystem UploadSystem { get; }
+    public CustomTagSystem CustomTagSystem { get; }
 
     public StateManager(
         CommandSystem commandSystem,
@@ -35,7 +37,8 @@ public class StateManager
         ModIconSystem modIconSystem,
         MentionSystem mentionSystem,
         PlayerIconSystem playerIconSystem,
-        UploadSystem uploadSystem)
+        UploadSystem uploadSystem,
+        CustomTagSystem customTagSystem)
     {
         CommandSystem = commandSystem;
         ColorSystem = colorSystem;
@@ -46,6 +49,7 @@ public class StateManager
         MentionSystem = mentionSystem;
         PlayerIconSystem = playerIconSystem;
         UploadSystem = uploadSystem;
+        CustomTagSystem = customTagSystem;
     }
 
     public void OpenStateByTriggers(GameTime gameTime,UserInterface ui,UIState state,params ITrigger[] triggers)
@@ -72,6 +76,9 @@ public class StateManager
                 }
             }
         }
+        // debug test for fullscreen map
+        //if (state.GetType() == typeof(ItemState))
+            //Log.Info(shouldOpen);
 
         if (shouldOpen)
         {
@@ -101,7 +108,8 @@ public class StateManager
                ModIconSystem?.ui?.CurrentState != null ||
                PlayerIconSystem?.ui?.CurrentState != null ||
                UploadSystem?.ui?.CurrentState != null ||
-               MentionSystem?.ui?.CurrentState != null;
+               MentionSystem?.ui?.CurrentState != null ||
+               CustomTagSystem?.ui?.CurrentState != null;
     }
 
     public void CloseOthers(UserInterface keep)
@@ -121,5 +129,6 @@ public class StateManager
         Close(PlayerIconSystem?.ui);
         Close(UploadSystem?.ui);
         Close(MentionSystem?.ui);
+        Close(CustomTagSystem?.ui);
     }
 }

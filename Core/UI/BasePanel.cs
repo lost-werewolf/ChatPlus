@@ -142,36 +142,7 @@ namespace ChatPlus.Core.UI
             }
             else
             {
-                RemoveUploadElement();
-            }
-        }
-
-        private void RemoveUploadElement()
-        {
-            int indexToDelete = -1;
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                if (items[i].IsMouseHovering && items[i].Data is Upload)
-                {
-                    indexToDelete = i;
-                    break;
-                }
-            }
-
-            if (indexToDelete >= 0 && indexToDelete < items.Count)
-            {
-                var element = items[indexToDelete];
-                if (element.Data is Upload upload)
-                {
-                    UploadManager.Uploads.Remove(upload);
-
-                    items.RemoveAt(indexToDelete);
-                    element.Remove();
-
-                    Recalculate();
-                    PopulatePanel();
-                }
+                //RemoveUploadElement();
             }
         }
 
@@ -513,8 +484,6 @@ namespace ChatPlus.Core.UI
         public virtual void InsertSelectedTag()
         {
             if (items.Count == 0 || currentIndex < 0) return;
-
-            Log.Info("ins");
 
             string tag = GetTag(items[currentIndex].Data);
             if (string.IsNullOrEmpty(tag)) return;

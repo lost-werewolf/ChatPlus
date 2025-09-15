@@ -719,6 +719,17 @@ public static class PlayerInfoDrawer
     #region Helpers
     public static bool HasAccess(Player viewer, Player target)
     {
+        if (Main.netMode == NetmodeID.SinglePlayer)
+        {
+            var sp_privacy = PrivacyCache.Get(target.whoAmI);
+            return sp_privacy switch
+            {
+                Config.UserStatsPrivacy.Everyone => true,
+                Config.UserStatsPrivacy.Team => true,
+                _ => viewer == target // NoOne: only yourself
+            };
+        }
+
         var privacy = PrivacyCache.Get(target.whoAmI);
         return privacy switch
         {

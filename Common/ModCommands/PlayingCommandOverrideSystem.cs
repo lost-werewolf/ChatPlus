@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerIcons;
 using Terraria;
 using Terraria.Chat;
@@ -10,7 +11,7 @@ using Terraria.UI.Chat;
 
 namespace ChatPlus.Common.ModCommands
 {
-    public class PlayingOverrideSystem : ModSystem
+    public class PlayingCommandOverrideSystem : ModSystem
     {
         public override void PostSetupContent()
         {
@@ -33,16 +34,27 @@ namespace ChatPlus.Common.ModCommands
         {
             Main.NewText(" [c/fff014:Players:]");
 
-            var players = Main.player
-    .Where(p => p != null && p.active)
-    .Select(p =>
-    {
-        string tag = PlayerIconTagHandler.GenerateTag(p.name);
-        return $"{tag} {p.name}"; // space before tag, space after
-    });
+            var activePlayers = Main.player.Where(p => p != null && p.active);
+            List<string> parts = [];
 
-            string message = string.Join(",", players);
+            foreach (var player in activePlayers)
+            {
+                string iconTag = PlayerIconTagHandler.GenerateTag(player.name);
 
+                string hex = "FFFFFF";
+                if (AssignPlayerColorsSystem.PlayerColors.TryGetValue(player.whoAmI, out var assignedHex))
+                {
+                    if (!string.IsNullOrWhiteSpace(assignedHex))
+                    {
+                        hex = assignedHex.ToUpperInvariant();
+                    }
+                }
+
+                string coloredName = "[c/" + hex + ":" + player.name + "]";
+                parts.Add(iconTag + " " + coloredName);
+            }
+
+            string message = string.Join(", ", parts);
             if (string.IsNullOrEmpty(message))
             {
                 message = "No players online.";

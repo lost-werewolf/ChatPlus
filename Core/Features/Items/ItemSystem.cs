@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using ChatPlus.Core.Helpers;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
 
