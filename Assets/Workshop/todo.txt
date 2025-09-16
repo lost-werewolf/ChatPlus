@@ -10,9 +10,13 @@
 - Add enemy and boss tracker
 - Fix ModInfoDrawer mod icon size showing "n/a" bug sometimes
 - Add grid view to autocomplete
-- Add proper bold text for typing indicator and mentions
+- Add option for typing indicator to be drawn below chat
+- [HARD] Make player spectate with full background and proper player drawing
 
 ----------------------TODO------------------------
+- [PRIO] Fix fullscreen map
+- Add proper bold text for typing indicators
+- Make mentions copy discord style with low yellow highlight background color and the entire text and icon clickable
 
 ----------------------DONE------------------------
 - Links are clickable in chat

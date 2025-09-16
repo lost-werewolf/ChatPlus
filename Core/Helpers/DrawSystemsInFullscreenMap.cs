@@ -7,12 +7,13 @@ using Terraria;
 using Terraria.ModLoader;
 
 namespace ChatPlus.Core.Helpers;
+
 internal class DrawSystemsInFullscreenMap : ModSystem
 {
     public static void Draw()
     {
         var sm = ChatPlus.StateManager;
-        
+
         sm.CommandSystem?.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
         sm.ColorSystem?.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
         sm.CustomTagSystem?.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
