@@ -32,7 +32,6 @@ public class PlayerInfoState : BaseInfoState, ILoadable
     private int _currentPlayerIndex;
     private int _whoAmI;
     private string _playerName = "Unknown";
-    private ChatSession.Snapshot? _returnSnapshot;
     public static bool Active { get; private set; }
 
     public void Load(Mod mod)
@@ -77,17 +76,6 @@ public class PlayerInfoState : BaseInfoState, ILoadable
 
         _currentPlayerIndex = _whoAmI >= 0 ? _whoAmI : Main.myPlayer;
         SetPlayerFromIndex(_currentPlayerIndex);
-    }
-
-    protected override void OnBackClicked(UIMouseEvent evt, UIElement listeningElement)
-    {
-        CloseForCurrentContext();                
-
-        if (_returnSnapshot.HasValue)
-        {
-            ChatSession.Restore(_returnSnapshot.Value);
-            _returnSnapshot = null;
-        }
     }
 
     public override void OnActivate() => Active = true;
@@ -237,11 +225,6 @@ public class PlayerInfoState : BaseInfoState, ILoadable
             }
         }
         return list.ToArray();
-    }
-
-    public void SetReturnSnapshot(ChatSession.Snapshot snap)
-    {
-        _returnSnapshot = snap;
     }
 
     public void SetPlayer(int whoAmI, string nameOverride = null)

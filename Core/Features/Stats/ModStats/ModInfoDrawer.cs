@@ -209,7 +209,7 @@ public static class ModInfoDrawer
         if (mod == null) return;
 
         string modText = $"Mod: {mod.DisplayNameClean}";
-        if (mod.displayNameClean.Length > 25)
+        if (mod.displayNameClean.Length > 23)
             modText = mod.displayNameClean.Replace(mod.displayNameClean[23..], "..");
 
         var snippets = ChatManager.ParseMessage(modText, Color.White).ToArray();

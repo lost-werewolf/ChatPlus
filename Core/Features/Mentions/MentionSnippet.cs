@@ -193,7 +193,6 @@ public sealed class MentionSnippet : TextSnippet
         if (target == null || !target.active)
             return;
 
-        // 🔒 block if no access
         if (target != null && !PlayerInfoDrawer.HasAccess(Main.LocalPlayer, target))
         {
             Main.NewText($"{target.name}'s stats is private.", Color.OrangeRed);
@@ -207,9 +206,7 @@ public sealed class MentionSnippet : TextSnippet
             return;
         }
 
-        var snap = ChatSession.Capture();
         state.SetPlayer(idx, target.name);
-        state.SetReturnSnapshot(snap);
 
         Main.drawingPlayerChat = false;
         state.OpenForCurrentContext();

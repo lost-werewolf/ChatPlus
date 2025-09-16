@@ -66,7 +66,7 @@ namespace ChatPlus.Core.Helpers
         /// </summary>
         /// <param name="message"></param>
         /// <param name="callerFilePath"></param>
-        public static void Debug(string message, [CallerFilePath] string callerFilePath = "")
+        public static void Debug(object message, [CallerFilePath] string callerFilePath = "")
         {
             //if (Conf.C != null && !Conf.C.ShowDebugMessages) return; 
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ChatPlus.Common.Compat.CustomTags;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -23,6 +24,9 @@ public abstract class DraggablePanel : UIPanel
     private const float dragThreshold = 3f;
     private Vector2 mouseDownPos;
     public bool IsDragging => dragging;
+    public static bool AnyDragging
+        => live.Any(p => p.dragging);
+    public static bool AnyHovering;
 
     public DraggablePanel ConnectedPanel { get; set; }
     protected virtual float SharedYOffset => 0f;
@@ -45,9 +49,31 @@ public abstract class DraggablePanel : UIPanel
         base.OnDeactivate();
     }
 
+    public override void MouseOver(UIMouseEvent evt)
+    {
+        base.MouseOver(evt);
+        AnyHovering = true;
+    }
+
+    public override void MouseOut(UIMouseEvent evt)
+    {
+        base.MouseOut(evt);
+        AnyHovering = false;
+    }
+
     public override void Update(GameTime gameTime)
     {
-        if (IsMouseHovering) Main.LocalPlayer.mouseInterface = true;
+        if (IsMouseHovering)
+        {
+            //Log.Debug("hover dragpanel type: " + GetType());
+            //AnyHovering = true;
+            Main.LocalPlayer.mouseInterface = true;
+        }
+        else
+        {
+            //AnyHovering = false;
+        }
+        //Log.Info("any hovering: " + AnyHovering);
 
         // keep snapped when not dragging
         if (!dragging && sharedInitialized)
@@ -141,8 +167,16 @@ public abstract class DraggablePanel : UIPanel
         }
     }
 
-    private static bool IsAnyScrollbarHovering()
+    public static bool IsAnyScrollbarHovering()
     {
+        if (CustomTagSystem.States != null && CustomTagSystem.States.Count > 0)
+        {
+            foreach (BaseState<CustomTag> state in CustomTagSystem.States.Values)
+            {
+                if (state.Panel.scrollbar.IsMouseHovering == true) return true;
+            }
+        }
+
         return
             ChatPlus.StateManager.CommandSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true ||
             ChatPlus.StateManager.ColorSystem?.state?.Panel?.scrollbar?.IsMouseHovering == true ||

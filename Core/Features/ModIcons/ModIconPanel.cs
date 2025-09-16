@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ChatPlus.Core.Chat;
-using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.Stats.ModStats;
+using ChatPlus.Core.Helpers;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
-using Terraria.UI;
 
 namespace ChatPlus.Core.Features.ModIcons;
 
@@ -19,7 +18,21 @@ public class ModIconPanel : BasePanel<ModIcon>
     protected override BaseElement<ModIcon> BuildElement(ModIcon data) => new ModIconElement(data);
     protected override string GetDescription(ModIcon data)
     {
-        return $"Mod: {data.mod.Name}\nClick here to view more";
+        string result = data.mod.Name;
+
+        if (data.mod != null)
+        {
+            if (ModLoader.TryGetMod(data.mod.Name, out Mod mod))
+            {
+                LocalMod localMod = ModHelper.GetLocalMod(mod);
+                if (localMod != null && localMod.properties != null)
+                {
+                    result = data.mod.DisplayNameClean + " v" + localMod.properties.version;
+                }
+            }
+        }
+
+        return result;
     }
     protected override string GetTag(ModIcon data) => data.Tag;
 
@@ -120,13 +133,7 @@ public class ModIconPanel : BasePanel<ModIcon>
             string description = GetDescriptionForMod(mod);
 
             var state = ModInfoState.Instance;
-            var snap = ChatSession.Capture();
-
             state.SetModInfo(description, displayName, internalName);
-            state.SetReturnSnapshot(snap);
-
-            Main.drawingPlayerChat = false;
-
             state.OpenForCurrentContext();
         }
     }

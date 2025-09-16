@@ -14,7 +14,7 @@ public class PlayerIconPanel : BasePanel<PlayerIcon>
 {
     protected override IEnumerable<PlayerIcon> GetSource() => PlayerIconManager.PlayerIcons;
     protected override BaseElement<PlayerIcon> BuildElement(PlayerIcon data) => new PlayerIconElement(data);
-    protected override string GetDescription(PlayerIcon data) => "Player: " + data.PlayerName + "\nClick here to view more";
+    protected override string GetDescription(PlayerIcon data) => data.PlayerName;
     protected override string GetTag(PlayerIcon data) => data.Tag;
 
     public override void InsertSelectedTag()
@@ -184,16 +184,8 @@ public class PlayerIconPanel : BasePanel<PlayerIcon>
             return;
         }
 
-        // 1) Snapshot chat
-        var snap = ChatSession.Capture();
-
         // 2) Configure and open
         s.SetPlayer(who, Main.player[who]?.name);
-        s.SetReturnSnapshot(snap);
-
-        // Optional: hide chat while modal is open
-        Main.drawingPlayerChat = false;
-
         s.OpenForCurrentContext();
     }
 }

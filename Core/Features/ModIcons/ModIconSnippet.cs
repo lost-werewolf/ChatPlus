@@ -1,21 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.Stats.ModStats;
 using ChatPlus.Core.Helpers;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using ReLogic.Graphics;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Core;
-using Terraria.ModLoader.UI;
-using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.ModIcons;
@@ -62,13 +55,6 @@ public sealed class ModIconSnippet : TextSnippet
             return true;
         }
 
-        // Try to resolve icon_small -> icon
-        if (TryGetModIcon(modName, out var icon))
-        {
-            sb.Draw(icon, dest, Color.White);
-            return true;
-        }
-
         // hover
         var hoverRect = new Rectangle((int)pos.X - 5, (int)pos.Y - 4, 32, (int)size.Y + 5);
         if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
@@ -88,6 +74,13 @@ public sealed class ModIconSnippet : TextSnippet
                 OnClick();
         }
 
+        // Try to resolve icon_small -> icon
+        if (TryGetModIcon(modName, out var icon))
+        {
+            sb.Draw(icon, dest, Color.White);
+            return true;
+        }
+
         // Fallback: draw two-letter initials centered
         string initials = ModHelper.GetDisplayName(modName);
         if (!string.IsNullOrWhiteSpace(initials))
@@ -103,6 +96,7 @@ public sealed class ModIconSnippet : TextSnippet
     public override void OnClick()
     {
         base.OnClick();
+        Main.NewText("c");
 
         var state = ModInfoState.Instance;
         if (state == null)
@@ -122,11 +116,7 @@ public sealed class ModIconSnippet : TextSnippet
         string version = mod.Version?.ToString() ?? "Unknown";
         string description = GetDescriptionForMod(mod);
 
-        var snap = ChatSession.Capture();
         state.SetModInfo(description, displayName, internalName);
-        state.SetReturnSnapshot(snap);
-
-        Main.drawingPlayerChat = false;
         state.OpenForCurrentContext();
     }
 
@@ -251,71 +241,6 @@ public sealed class ModIconSnippet : TextSnippet
                 return null;
             }
         }
-    }
-
-    // ty dice from chat source
-    public static string GetCallingName()
-    {
-        string name = string.Empty;
-
-        StackFrame[] frames;
-        //StackFrame[] frames = new StackFrame[1];
-        try
-        {
-            frames = new StackTrace(true).GetFrames();
-            //Log.Info(frames.Count());
-            //Logging.PrettifyStackTraceSources(frames);
-            //We want to find the call after the first found, last NewText or AddNewMessage
-            int index;
-            bool correctSequenceFound = false;
-            for (index = 0; index < frames.Length; index++)
-            {
-                var method = frames[index].GetMethod();
-                var methodName = method.Name;
-                if (methodName.Contains("NewText") || methodName.Contains("AddNewMessage"))
-                {
-                    correctSequenceFound = true;
-                }
-                else if (correctSequenceFound)
-                {
-                    break; //Done
-                }
-            }
-
-            if (index == frames.Length)
-            {
-                name = string.Empty;
-            }
-            else
-            {
-                var frame = frames[index];
-                var method = frame.GetMethod();
-
-                Type declaringType = method.DeclaringType;
-                if (declaringType != null && declaringType.Namespace != null)
-                {
-                    name = declaringType.Namespace.Split('.')[0];
-                }
-                else
-                {
-                    name = "Terraria";
-                }
-
-            }
-        }
-        catch
-        {
-            //Log.Info("#####");
-            //foreach (var frame in frames)
-            //{
-            //    Log.Info(frame?.ToString() ?? "frame null");
-            //}
-            //Log.Info("#####");
-        }
-        if (string.IsNullOrEmpty(name))
-            return string.Empty;
-
-        return name;
     }
 }
 

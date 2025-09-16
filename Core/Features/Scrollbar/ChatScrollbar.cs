@@ -17,10 +17,11 @@ public class ChatScrollbar : UIElement
     private float viewSize = 1f;    // visible lines
     private float maxViewSize = 1f; // total lines
 
-    private bool isDragging;
+    private static bool isDragging;
     private bool isHoveringHandle;
     private float dragYOffset;
     public bool IsDragging => isDragging;
+    public static bool AnyDragging => isDragging;
 
     private Asset<Texture2D> trackTexture;
     private Asset<Texture2D> handleTexture;
@@ -140,7 +141,7 @@ public class ChatScrollbar : UIElement
 
         Left.Set(50, 0);
         Top.Set(top, 0f);
-        //if (ModReloaderSystem.Found)
+        //if (ModReloaderSystem.Found)  
         //{
         //    Left.Set(100, 0);
         //}

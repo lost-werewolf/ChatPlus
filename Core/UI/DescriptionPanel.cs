@@ -53,7 +53,7 @@ namespace ChatPlus.Core.UI
                 else if (typeof(TData) == typeof(Features.Items.ItemEntry)) initialText = "[c/FFF014:Items]";
                 else if (typeof(TData) == typeof(ModIcon)) initialText = "[c/FFF014:Mods]";
                 else if (typeof(TData) == typeof(PlayerIcon)) initialText = "[c/FFF014:Players]";
-                else if (typeof(TData) == typeof(Features.Uploads.Upload)) initialText = "[c/FFF014:Uploads]: Click here to upload images \nRight click to open folder";
+                else if (typeof(TData) == typeof(Upload)) initialText = "[c/FFF014:Uploads]: Click here to upload images \nRight click to open folder";
                 else initialText = string.Empty;
             }
 
@@ -69,26 +69,26 @@ namespace ChatPlus.Core.UI
                 return;
 
             // Uploads
-            if (typeof(TData) == typeof(Features.Uploads.Upload) && ConnectedPanel is UploadPanel up)
+            if (typeof(TData) == typeof(Upload) && ConnectedPanel is UploadPanel up)
             {
                 up.UploadImage();
                 up.PopulatePanel();
                 return;
             }
 
-            // Mods: open the “view more” page
-            if (typeof(TData) == typeof(ModIcon) && ConnectedPanel is ModIconPanel mp)
-            {
-                mp.OpenModInfoForSelectedMod();
-                return;
-            }
+            //// Mods: open the “view more” page
+            //if (typeof(TData) == typeof(ModIcon) && ConnectedPanel is ModIconPanel mp)
+            //{
+            //    mp.OpenModInfoForSelectedMod();
+            //    return;
+            //}
 
-            // Players: open the “view more” page
-            if (typeof(TData) == typeof(PlayerIcon) && ConnectedPanel is PlayerIconPanel ph)
-            {
-                ph.OpenPlayerInfoForSelected();
-                return;
-            }
+            //// Players: open the “view more” page
+            //if (typeof(TData) == typeof(PlayerIcon) && ConnectedPanel is PlayerIconPanel ph)
+            //{
+            //    ph.OpenPlayerInfoForSelected();
+            //    return;
+            //}
         }
 
         public override void RightClick(UIMouseEvent evt)
@@ -97,7 +97,7 @@ namespace ChatPlus.Core.UI
                 return;
 
             // Uploads
-            if (typeof(TData) == typeof(Features.Uploads.Upload) && ConnectedPanel is UploadPanel up)
+            if (typeof(TData) == typeof(Upload) && ConnectedPanel is UploadPanel up)
             {
                 up.OpenUploadsFolder();
                 return;

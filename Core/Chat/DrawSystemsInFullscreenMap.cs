@@ -9,12 +9,11 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Helpers;
+namespace ChatPlus.Core.Chat;
 public static class DrawSystemsInFullscreenMap
 {
     public static void DrawInfoStatesTopMost()
     {
-
         var ui = Main.InGameUI;
         if (ui?.CurrentState is not BaseInfoState baseState)
             return;
@@ -23,7 +22,6 @@ public static class DrawSystemsInFullscreenMap
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,SamplerState.LinearClamp,DepthStencilState.None,Main.Rasterizer,null,Main.UIScaleMatrix);
 
-        // Make sure layout is up to date, then draw on TOP of the map
         ui.Update(Main._drawInterfaceGameTime);
         ui.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
 

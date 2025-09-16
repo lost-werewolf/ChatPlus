@@ -19,8 +19,6 @@ public class ModInfoState : BaseInfoState, ILoadable
     private static Type _messageBoxType;
     private static MethodInfo _setTextMethod;
 
-    private ChatSession.Snapshot? _returnSnapshot;
-
     public void Load(Mod mod)
     {
         Instance = this;
@@ -30,10 +28,6 @@ public class ModInfoState : BaseInfoState, ILoadable
     }
 
     public void Unload() => Instance = null;
-
-    protected override string DefaultTitle => "Mod Info";
-    protected override float TopOffsetPx => 220f;              // keep your original layout
-    protected override float ContentBottomPaddingPx => 110f;   // matches panel Height = -110
 
     public override void OnInitialize()
     {
@@ -70,22 +64,10 @@ public class ModInfoState : BaseInfoState, ILoadable
         SetTitle($"Mod Info: {modDisplayName}");
     }
 
-    public void SetReturnSnapshot(ChatSession.Snapshot snap) => _returnSnapshot = snap;
 
     private void ApplyCurrentDescription()
     {
         if (_messageBox != null && _setTextMethod != null)
             _setTextMethod.Invoke(_messageBox, [CurrentModDescription]);
-    }
-
-    protected override void OnBackClicked(UIMouseEvent evt, UIElement listeningElement)
-    {
-        CloseForCurrentContext();           
-
-        if (_returnSnapshot.HasValue)
-        {
-            ChatSession.Restore(_returnSnapshot.Value);
-            _returnSnapshot = null;
-        }
     }
 }

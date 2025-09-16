@@ -14,7 +14,6 @@
 - [HARD] Make player spectate with full background and proper player drawing
 
 ----------------------TODO------------------------
-- [PRIO] Fix fullscreen map
 - Add proper bold text for typing indicators
 - Make mentions copy discord style with low yellow highlight background color
 
@@ -31,3 +30,6 @@
 - Added stat viewer for both players and mods
 - Improved text editor with better caret movement, character highlighting and shortcuts
 - Added a scrollbar to chat history
+- Some compat for WeaponOut to show weapon previews in PlayerInfoDrawer:DrawPlayer
+- Some compat for ChatImprover to disable the text caret drawing if that mod is enabled
+- Some compat for Chitter-Chatter to add upload snippet rows and such

@@ -20,16 +20,17 @@ public abstract class BaseInfoState : UIState
     protected UIElement BottomBar;
     protected UITextPanel<string> BackButton;
 
-    // Layout knobs (override per state if needed)
-    protected virtual float TopOffsetPx => 120f;
-    protected virtual float TitleOffsetPx => -35f;
-    protected virtual float ContentBottomPaddingPx => 110f; // matches panel Height = -110
-    protected virtual float BottomBarOffsetPx => -60f;
-    protected virtual string DefaultTitle => "Info";
-    protected virtual bool ShowBack => true;
+    protected ChatSession.Snapshot? _returnSnapshot;
 
     public override void OnInitialize()
     {
+        // Positions
+        float TopOffsetPx = 120f;
+        float TitleOffsetPx = -35f;
+        float ContentBottomPaddingPx = 110f;
+        float BottomBarOffsetPx = -60f;
+        string DefaultTitle = "Info";
+
         Root = new UIElement
         {
             Width = { Percent = 0.8f },
@@ -48,6 +49,7 @@ public abstract class BaseInfoState : UIState
         };
         Root.Append(MainPanel);
 
+        // Title panel
         TitlePanel = new UITextPanel<string>(DefaultTitle, 0.8f, true)
         {
             HAlign = 0.5f,
@@ -56,26 +58,24 @@ public abstract class BaseInfoState : UIState
         }.WithPadding(15f);
         Root.Append(TitlePanel);
 
-        if (ShowBack)
+        // Back button
+        BottomBar = new UIElement
         {
-            BottomBar = new UIElement
-            {
-                Width = { Percent = 1f },
-                Height = { Pixels = 40f },
-                VAlign = 1f,
-                Top = { Pixels = BottomBarOffsetPx }
-            };
-            Root.Append(BottomBar);
+            Width = { Percent = 1f },
+            Height = { Pixels = 40f },
+            VAlign = 1f,
+            Top = { Pixels = BottomBarOffsetPx }
+        };
+        Root.Append(BottomBar);
 
-            BackButton = new UITextPanel<string>(Terraria.Localization.Language.GetTextValue("UI.Back"))
-            {
-                Width = { Percent = 1f },
-                Height = { Pixels = 40f }
-            }.WithFadedMouseOver();
+        BackButton = new UITextPanel<string>(Terraria.Localization.Language.GetTextValue("UI.Back"))
+        {
+            Width = { Percent = 1f },
+            Height = { Pixels = 40f }
+        }.WithFadedMouseOver();
 
-            BackButton.OnLeftClick += OnBackClicked;
-            BottomBar.Append(BackButton);
-        }
+        BackButton.OnLeftClick += OnBackClicked;
+        BottomBar.Append(BackButton);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -107,23 +107,35 @@ public abstract class BaseInfoState : UIState
         );
     }
 
-    protected bool OpenedFromMap { get; private set; }
-
     public void OpenForCurrentContext()
     {
-        OpenedFromMap = Main.mapFullscreen;
-        Main.inFancyUI = true;                 // vanilla uses this as a gate for “fancy” UI
-        Main.ClosePlayerChat();                // mirror IngameFancyUI.ClearChat() minimal behavior
+        _returnSnapshot = ChatSession.Capture();
+
+        bool openedFromMap = Main.mapFullscreen;
+
+        Main.ClosePlayerChat();
         Main.chatText = string.Empty;
-        Main.InGameUI.SetState(this);          // always route through Main.InGameUI
+
+        // TODO does this fix double cursor bug? prob not
+        if (!openedFromMap)
+            Main.inFancyUI = true;
+
+        Main.InGameUI.SetState(this);
     }
+
 
     protected void CloseForCurrentContext()
     {
         if (Main.InGameUI.CurrentState == this)
-            Main.InGameUI.SetState(null);      // just remove our state
+            Main.InGameUI.SetState(null);     
 
-        Main.inFancyUI = false;                // stop fancy UI mode
+        Main.inFancyUI = false; 
+
+        if (_returnSnapshot.HasValue)
+        {
+            ChatSession.Restore(_returnSnapshot.Value);
+            _returnSnapshot = null;
+        }
     }
 
     protected void SetTitle(string text) => TitlePanel?.SetText(text ?? string.Empty);

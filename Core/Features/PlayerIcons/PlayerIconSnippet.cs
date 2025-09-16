@@ -92,13 +92,7 @@ public class PlayerIconSnippet : TextSnippet
             return;
         }
 
-        // Snapshot current chat so the info UI can restore it later
-        var snap = ChatSession.Capture();
-
         state.SetPlayer(_playerIndex, target.name);          // tell the UI which player to show
-        state.SetReturnSnapshot(snap);                    // so Back can restore chat/session
-
-        Main.drawingPlayerChat = false;                   // hide chat while the modal is open (optional)
         state.OpenForCurrentContext();                 // open the "view more" UI
     }
 

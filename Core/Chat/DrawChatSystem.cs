@@ -4,10 +4,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.Scrollbar;
 using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.TypingIndicators;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
+using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -27,6 +29,8 @@ namespace ChatPlus.Core.Chat;
 /// </summary>
 internal class DrawChatSystem : ModSystem
 {
+    private static bool _uiLeftCapture;
+
     public override void Load()
     {
         if (ModLoader.TryGetMod("ChatImprover", out Mod _))
@@ -37,7 +41,8 @@ internal class DrawChatSystem : ModSystem
         On_Main.DrawPlayerChat += DrawUIInFullscreenMap;
         On_Main.DrawPendingMouseText += DrawTopMostUIInFullscreenMap;
         On_RemadeChatMonitor.DrawChat += DrawMonitor;
-        On_Main.DrawMapFullscreenBackground += DrawTopMostStatesAfterFullscreenMap;
+        On_Main.DrawMap += PreventMapDrag;
+        On_Player.Update += PreventMapZoom;
     }
 
     public override void Unload()
@@ -51,13 +56,108 @@ internal class DrawChatSystem : ModSystem
         On_Main.DrawPlayerChat -= DrawUIInFullscreenMap;
         On_Main.DrawPendingMouseText -= DrawTopMostUIInFullscreenMap;
         On_RemadeChatMonitor.DrawChat -= DrawMonitor;
-        On_Main.DrawMapFullscreenBackground += DrawTopMostStatesAfterFullscreenMap;
+        On_Main.DrawMap -= PreventMapDrag;
+        On_Player.Update -= PreventMapZoom;
     }
 
-    private void DrawTopMostStatesAfterFullscreenMap(On_Main.orig_DrawMapFullscreenBackground orig, Vector2 pos, int w, int h)
+    private void PreventMapZoom(On_Player.orig_Update orig, Player self, int i)
     {
-        orig(pos, w, h);
-        Utils.DrawBorderString(Main.spriteBatch, "abc", new Vector2(50, 50), Color.White);
+        if (i != Main.myPlayer || !Main.mapFullscreen)
+        {
+            orig(self, i);
+            return;
+        }
+        //var chat = ModContent.GetInstance<ChatScrollSystem>()?.chatScrollState;
+
+        // Reuse your existing signals
+        bool overInfo = Main.InGameUI?.CurrentState is BaseInfoState s && s.IsMouseOverRoot();
+        bool overScroll = DraggablePanel.IsAnyScrollbarHovering();
+        bool overPanel = DraggablePanel.AnyHovering;
+
+        bool blockZoom = overInfo || overScroll || overPanel;
+
+        //Log.Debug($"{overInfo}{overScroll}{overPanel}");
+
+        // snapshot inputs
+        int wheel = PlayerInput.ScrollWheelDelta;
+        bool plus = PlayerInput.Triggers.Current.HotbarPlus;
+        bool minus = PlayerInput.Triggers.Current.HotbarMinus;
+        bool zoomIn = self.mapZoomIn;
+        bool zoomOut = self.mapZoomOut;
+
+        try
+        {
+            if (blockZoom)
+            {
+                PlayerInput.ScrollWheelDelta = 0;
+                self.mapZoomIn = false;
+                self.mapZoomOut = false;
+            }
+
+            orig(self, i);
+        }
+        finally
+        {
+            // restore
+            PlayerInput.ScrollWheelDelta = wheel;
+            self.mapZoomIn = zoomIn;
+            self.mapZoomOut = zoomOut;
+        }
+    }
+
+    private void PreventMapDrag(On_Main.orig_DrawMap orig, Main self, GameTime gameTime)
+    {
+        if (!Main.mapFullscreen)
+        {
+            orig(self, gameTime);
+            return;
+        }
+        var chat = ModContent.GetInstance<ChatScrollSystem>()?.chatScrollState;
+
+
+        bool overInfo = Main.InGameUI?.CurrentState is BaseInfoState s && s.IsMouseOverRoot();
+        bool overPanel = DraggablePanel.AnyHovering;
+        bool overChatScrollbar = (chat?.chatScrollbar?.IsMouseHovering ?? false);
+
+        bool block = overInfo || overPanel || overChatScrollbar;
+
+        // snapshot inputs/map state
+        bool oldLeft = Main.mouseLeft;
+        bool oldMouseInterface = Main.LocalPlayer.mouseInterface;
+        float oldScale = Main.mapFullscreenScale;
+
+        int wheel = PlayerInput.ScrollWheelDelta;
+        if (wheel != 0)
+        {
+            wheel = 0;
+            //Log.Info(wheel);
+        }
+        //Log.Debug(Main.mapFullscreenScale);
+        //Log.Debug("info: " + overInfo + ", panel: " + overPanel + ", chatScroll: " + overChatScrollbar);
+
+        try
+        {
+            if (block)
+            {
+                Main.LocalPlayer.mouseInterface = true;
+                Main.mouseLeft = false; // prevent pan/grab
+                PlayerInput.LockVanillaMouseScroll("ChatPlus/MapBlockScroll"); // prevent zoom
+            }
+
+            orig(self, gameTime);
+        }
+        finally
+        {
+            Main.mouseLeft = oldLeft;
+            Main.LocalPlayer.mouseInterface = oldMouseInterface;
+
+            if (block)
+            {
+                // reset grab anchors so next frame doesn't compute a delta
+                Main.grabMapX = Main.mouseX;
+                Main.grabMapY = Main.mouseY;
+            }
+        }
     }
 
     private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
@@ -203,7 +303,7 @@ internal class DrawChatSystem : ModSystem
         return UploadTagHandler.TryGet(key, out tex);
     }
 
-    private static void DrawChatbox(int height, int xOffset=0, int yOffset=0)
+    private static void DrawChatbox(int height, int xOffset = 0, int yOffset = 0)
     {
         int w = Main.screenWidth - 300;
         int y = Main.screenHeight - 4 - height + yOffset;
@@ -284,7 +384,7 @@ internal class DrawChatSystem : ModSystem
         }
     }
 
-    private void DrawSelectionRectangle(int height, int xOffset=0, int yOffset=0)
+    private void DrawSelectionRectangle(int height, int xOffset = 0, int yOffset = 0)
     {
         var sel = HandleChatSystem.GetSelection();
         if (sel == null) return;
@@ -328,7 +428,7 @@ internal class DrawChatSystem : ModSystem
 
         var rect = new Rectangle(
             88 + xOffset + (int)System.Math.Floor(preSize.X),
-            Main.screenHeight-height+yOffset,
+            Main.screenHeight - height + yOffset,
             (int)System.Math.Ceiling(midSize.X),
             20
         );

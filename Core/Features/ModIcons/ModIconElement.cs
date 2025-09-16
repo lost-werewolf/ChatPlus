@@ -31,9 +31,9 @@ public class ModIconElement : BaseElement<ModIcon>
             tag,
             pos + new Vector2(13, 5),
             Color.White,
-            0f,            // rotation
-            Vector2.Zero,  // origin
-            new Vector2(scale), // scale
+            0f,           
+            Vector2.Zero, 
+            new Vector2(scale), 
             -1f,
             1f
         );
@@ -53,7 +53,7 @@ public class ModIconElement : BaseElement<ModIcon>
             if (!Conf.C.ShowStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return;
 
-            HoveredModOverlay.Set(Data.mod);
+            //HoveredModOverlay.Set(Data.mod);
         }
 
         // debug

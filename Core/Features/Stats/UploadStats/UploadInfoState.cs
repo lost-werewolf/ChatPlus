@@ -10,9 +10,6 @@ public class UploadInfoState : BaseInfoState, ILoadable
     public static UploadInfoState Instance;
 
     private Upload? _current;
-    protected override float TopOffsetPx => 120f;
-    protected override string DefaultTitle => "Upload";
-
     public void Load(Mod mod) => Instance = this;
     public void Unload() => Instance = null;
 
