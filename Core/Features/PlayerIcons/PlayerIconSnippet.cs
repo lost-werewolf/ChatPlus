@@ -1,7 +1,6 @@
 ﻿using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.ModIcons.ModInfo;
-using ChatPlus.Core.Features.PlayerIcons
-.PlayerInfo;
+using ChatPlus.Core.Features.Stats.Base;
+using ChatPlus.Core.Features.Stats.PlayerStats;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -100,7 +99,7 @@ public class PlayerIconSnippet : TextSnippet
         state.SetReturnSnapshot(snap);                    // so Back can restore chat/session
 
         Main.drawingPlayerChat = false;                   // hide chat while the modal is open (optional)
-        IngameFancyUI.OpenUIState(state);                 // open the "view more" UI
+        state.OpenForCurrentContext();                 // open the "view more" UI
     }
 
     public override void OnHover()

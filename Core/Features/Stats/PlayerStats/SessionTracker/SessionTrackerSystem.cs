@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo.SessionTracker
+namespace ChatPlus.Core.Features.Stats.PlayerStats.SessionTracker
 {
     public partial class SessionTrackerSystem : ModSystem
     {

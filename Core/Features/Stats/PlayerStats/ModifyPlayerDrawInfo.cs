@@ -5,7 +5,7 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 
-namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
+namespace ChatPlus.Core.Features.Stats.PlayerStats;
 
 public class ModifyPlayerDrawInfo : ModPlayer
 {

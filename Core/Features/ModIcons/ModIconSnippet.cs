@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.ModIcons.ModInfo;
+using ChatPlus.Core.Features.Stats.Base;
+using ChatPlus.Core.Features.Stats.ModStats;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -126,7 +127,7 @@ public sealed class ModIconSnippet : TextSnippet
         state.SetReturnSnapshot(snap);
 
         Main.drawingPlayerChat = false;
-        IngameFancyUI.OpenUIState(state);
+        state.OpenForCurrentContext();
     }
 
     private string GetDescriptionForMod(Mod mod)

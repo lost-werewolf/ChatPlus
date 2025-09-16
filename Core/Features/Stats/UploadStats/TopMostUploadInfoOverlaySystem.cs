@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using ChatPlus.Core.Features.Uploads.UploadInfo;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -8,7 +7,7 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.Uploads.UploadInfo;
+namespace ChatPlus.Core.Features.Stats.UploadStats;
 
 /// <summary>
 /// Draws hovered upload preview (image + filename) above every other interface layer.

@@ -34,9 +34,9 @@ public class MentionSystem : ModSystem
             gameTime,
             ui,
             state,
-            ChatTriggers.UnclosedTag("[mention"),     // bracketed: [mention...
-            ChatTriggers.CharOutsideTags('@'),        // bare: @query
-            ChatTriggers.AtMentionWord()              // your existing convenience trigger
+            ChatTriggers.UnclosedTag("[mention"),   
+            ChatTriggers.CharOutsideTags('@'),        
+            ChatTriggers.AtMentionWord()             
         );
     }
 

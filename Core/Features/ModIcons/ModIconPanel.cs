@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ChatPlus.Core.Chat;
-using ChatPlus.Core.Features.ModIcons.ModInfo;
+using ChatPlus.Core.Features.Stats.Base;
+using ChatPlus.Core.Features.Stats.ModStats;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -118,21 +119,15 @@ public class ModIconPanel : BasePanel<ModIcon>
             string version = mod?.Version?.ToString() ?? "Unknown";
             string description = GetDescriptionForMod(mod);
 
-            // Populate and open ModInfoState
-            var s = ModInfoState.Instance;
-
-            // 1) Snapshot current chat
+            var state = ModInfoState.Instance;
             var snap = ChatSession.Capture();
 
-            // 2) Prepare the view-more UI
-            s.SetModInfo(description, displayName, internalName);
-            s.SetReturnSnapshot(snap);
+            state.SetModInfo(description, displayName, internalName);
+            state.SetReturnSnapshot(snap);
 
-            // 3) Optionally hide chat while the modal is open
             Main.drawingPlayerChat = false;
 
-            // 4) Open it
-            IngameFancyUI.OpenUIState(s);
+            state.OpenForCurrentContext();
         }
     }
 

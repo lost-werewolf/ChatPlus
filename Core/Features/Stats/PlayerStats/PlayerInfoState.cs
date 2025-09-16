@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Reflection;
-using ChatPlus.Core.Features.ModIcons.ModInfo;
+using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,25 +16,24 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
+namespace ChatPlus.Core.Features.Stats.PlayerStats;
 
-public class PlayerInfoState : UIState, ILoadable
+public class PlayerInfoState : BaseInfoState, ILoadable
 {
     public static PlayerInfoState instance;
 
-    private UITextPanel<string> titlePanel;
     private UIElement _messageBox;
     private static Type _messageBoxType;
 
-    // bottom
-    private UIElement _bottom;
-    private UITextPanel<string> _backBtn;
+    // nav in bottom bar
     private UITextPanel<string> _prevBtn;
     private UITextPanel<string> _nextBtn;
+
     private int _currentPlayerIndex;
     private int _whoAmI;
     private string _playerName = "Unknown";
     private ChatSession.Snapshot? _returnSnapshot;
+    public static bool Active { get; private set; }
 
     public void Load(Mod mod)
     {
@@ -43,45 +41,58 @@ public class PlayerInfoState : UIState, ILoadable
         _messageBoxType = typeof(UICommon).Assembly.GetType("Terraria.ModLoader.UI.UIMessageBox");
     }
 
-    public void Unload() { instance = null; }
+    public void Unload()
+    {
+        instance = null;
+    }
+
+    #region Cycle players
     public override void OnInitialize()
     {
-        var uiContainer = new UIElement { Width = { Percent = 0.8f }, MaxWidth = new StyleDimension(1000f, 0f), Top = { Pixels = 120f }, Height = { Pixels = -120f, Percent = 1f }, HAlign = 0.5f };
-        Append(uiContainer);
+        // Build the shared chrome (Root, MainPanel, TitlePanel, BottomBar, BackButton)
+        base.OnInitialize();
 
-        var panel = new UIPanel { Width = { Percent = 1f }, Height = { Pixels = -110f, Percent = 1f }, BackgroundColor = UICommon.MainPanelBackground };
-        uiContainer.Append(panel);
-
-        var body = new UIPanel { Width = { Pixels = -25f, Percent = 1f }, Height = { Percent = 1f }, BackgroundColor = Color.Transparent, BorderColor = Color.Transparent };
-        panel.Append(body);
+        // Optional add own inner "body" to MainPanel
+        var body = new UIPanel
+        {
+            Width = { Pixels = -25f, Percent = 1f },
+            Height = { Percent = 1f },
+            BackgroundColor = Color.Transparent,
+            BorderColor = Color.Transparent
+        };
+        MainPanel.Append(body);
 
         if (_messageBoxType != null)
         {
-            _messageBox = (UIElement)Activator.CreateInstance(_messageBoxType, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new object[] { "" }, null);
-            _messageBox.Width.Set(0, 1f); _messageBox.Height.Set(0, 1f); body.Append(_messageBox);
+            _messageBox = (UIElement)Activator.CreateInstance(
+                _messageBoxType,
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                null,
+                new object[] { string.Empty },
+                null);
+            _messageBox.Width.Set(0, 1f);
+            _messageBox.Height.Set(0, 1f);
+            body.Append(_messageBox);
         }
-
-        titlePanel = new UITextPanel<string>(Loc.Get("PlayerInfo.Headers.Player", _playerName), 0.8f, true)
-        { HAlign = 0.5f, Top = { Pixels = -35f }, BackgroundColor = UICommon.DefaultUIBlue }.WithPadding(15f);
-        uiContainer.Append(titlePanel);
-
-        _bottom = new UIElement { Width = { Percent = 1f }, Height = { Pixels = 40f }, VAlign = 1f, Top = { Pixels = -60f } };
-        _bottom.PaddingLeft = 0f;
-        _bottom.PaddingRight = 0f;
-        uiContainer.Append(_bottom);
-
-        _backBtn = new UITextPanel<string>("Back") { Height = { Pixels = 40f } }.WithFadedMouseOver();
-        _backBtn.OnLeftClick += Back_OnLeftClick;
-        _bottom.Append(_backBtn);
 
         _currentPlayerIndex = _whoAmI >= 0 ? _whoAmI : Main.myPlayer;
         SetPlayerFromIndex(_currentPlayerIndex);
     }
 
-    #region Cycle players
-    public static bool Active { get; private set; }
+    protected override void OnBackClicked(UIMouseEvent evt, UIElement listeningElement)
+    {
+        CloseForCurrentContext();                
+
+        if (_returnSnapshot.HasValue)
+        {
+            ChatSession.Restore(_returnSnapshot.Value);
+            _returnSnapshot = null;
+        }
+    }
+
     public override void OnActivate() => Active = true;
     public override void OnDeactivate() => Active = false;
+
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
@@ -92,22 +103,31 @@ public class PlayerInfoState : UIState, ILoadable
     {
         const float NAV_W = 36f;
 
-        var active = GetActivePlayerIndices();
+        int[] active = GetActivePlayerIndices();
         bool multi = Main.netMode != NetmodeID.SinglePlayer && active.Length > 1;
 
         if (multi)
         {
             if (_prevBtn == null)
             {
-                _prevBtn = new UITextPanel<string>("<", 1.0f, false) { Width = { Pixels = NAV_W }, Height = { Pixels = 40f } }.WithFadedMouseOver();
+                _prevBtn = new UITextPanel<string>("<", 1.0f, false)
+                {
+                    Width = { Pixels = NAV_W },
+                    Height = { Pixels = 40f }
+                }.WithFadedMouseOver();
                 _prevBtn.Left.Set(0f, 0f);
                 _prevBtn.OnLeftClick += (_, __) => CyclePlayer(-1);
             }
+
             if (_nextBtn == null)
             {
-                _nextBtn = new UITextPanel<string>(">", 1.0f, false) { Width = { Pixels = NAV_W }, Height = { Pixels = 40f } }.WithFadedMouseOver();
-                _nextBtn.HAlign = 1f;                 // make it stick to the right edge
-                _nextBtn.Left.Set(0f, 0f);            // no extra offset
+                _nextBtn = new UITextPanel<string>(">", 1.0f, false)
+                {
+                    Width = { Pixels = NAV_W },
+                    Height = { Pixels = 40f },
+                    HAlign = 1f
+                }.WithFadedMouseOver();
+                _nextBtn.Left.Set(0f, 0f);
                 _nextBtn.OnLeftClick += (_, __) => CyclePlayer(+1);
             }
         }
@@ -116,67 +136,93 @@ public class PlayerInfoState : UIState, ILoadable
         {
             if (_prevBtn?.Parent != null) _prevBtn.Remove();
             if (_nextBtn?.Parent != null) _nextBtn.Remove();
-            _backBtn.Left.Set(0f, 0f);
-            _backBtn.Width.Set(0f, 1f);
 
-            _backBtn.Recalculate();
-            _bottom.Recalculate();
+            // Stretch the base BackButton across BottomBar
+            BackButton.Left.Set(0f, 0f);
+            BackButton.Width.Set(0f, 1f);
+
+            BackButton.Recalculate();
+            BottomBar.Recalculate();
             Recalculate();
             return;
         }
 
         int pos = Array.IndexOf(active, _currentPlayerIndex);
-        if (pos < 0) pos = 0;
+        if (pos < 0)
+        {
+            pos = 0;
+        }
 
         bool hasPrev = pos > 0;
         bool hasNext = pos < active.Length - 1;
 
         if (hasPrev)
         {
-            if (_prevBtn.Parent == null) _bottom.Append(_prevBtn);
+            if (_prevBtn.Parent == null) BottomBar.Append(_prevBtn);
         }
         else if (_prevBtn?.Parent != null) _prevBtn.Remove();
 
         if (hasNext)
         {
-            if (_nextBtn.Parent == null) _bottom.Append(_nextBtn);
+            if (_nextBtn.Parent == null) BottomBar.Append(_nextBtn);
         }
         else if (_nextBtn?.Parent != null) _nextBtn.Remove();
 
         float leftW = hasPrev ? NAV_W : 0f;
         float rightW = hasNext ? NAV_W : 0f;
 
-        _backBtn.Left.Set(leftW, 0f);
-        _backBtn.Width.Set(-(leftW + rightW), 1f);
+        // Position the base BackButton between prev/next
+        BackButton.Left.Set(leftW, 0f);
+        BackButton.Width.Set(-(leftW + rightW), 1f);
 
         _prevBtn?.Recalculate();
         _nextBtn?.Recalculate();
-        _backBtn.Recalculate();
-        _bottom.Recalculate();
+        BackButton.Recalculate();
+        BottomBar.Recalculate();
         Recalculate();
     }
     private void CyclePlayer(int dir)
     {
-        var list = GetActivePlayerIndices();
-        if (list.Length == 0) return;
+        int[] list = GetActivePlayerIndices();
+        if (list.Length == 0)
+        {
+            return;
+        }
 
         int pos = Array.IndexOf(list, _currentPlayerIndex);
-        if (pos < 0) pos = 0;
+        if (pos < 0)
+        {
+            pos = 0;
+        }
 
-        if (dir < 0 && pos > 0) SetPlayerFromIndex(list[pos - 1]);
-        else if (dir > 0 && pos < list.Length - 1) SetPlayerFromIndex(list[pos + 1]);
+        if (dir < 0 && pos > 0)
+        {
+            SetPlayerFromIndex(list[pos - 1]);
+        }
+        else if (dir > 0 && pos < list.Length - 1)
+        {
+            SetPlayerFromIndex(list[pos + 1]);
+        }
     }
+
     private void SetPlayerFromIndex(int idx)
     {
-        if (idx < 0 || idx >= Main.maxPlayers) return;
-        var p = Main.player[idx];
-        if (p == null || !p.active) return;
+        if (idx < 0 || idx >= Main.maxPlayers)
+        {
+            return;
+        }
+
+        Player p = Main.player[idx];
+        if (p == null || !p.active)
+        {
+            return;
+        }
 
         _currentPlayerIndex = idx;
         _whoAmI = idx;
 
         _playerName = p.name;
-        titlePanel?.SetText($"Player: {_playerName}");
+        SetTitle($"Player: {_playerName}");
     }
 
     private static int[] GetActivePlayerIndices()
@@ -184,19 +230,40 @@ public class PlayerInfoState : UIState, ILoadable
         var list = new List<int>(Main.maxPlayers);
         for (int i = 0; i < Main.maxPlayers; i++)
         {
-            var p = Main.player[i];
-            if (p != null && p.active) list.Add(i);
+            Player p = Main.player[i];
+            if (p != null && p.active)
+            {
+                list.Add(i);
+            }
         }
         return list.ToArray();
     }
 
-    public void SetReturnSnapshot(ChatSession.Snapshot snap) => _returnSnapshot = snap;
+    public void SetReturnSnapshot(ChatSession.Snapshot snap)
+    {
+        _returnSnapshot = snap;
+    }
 
     public void SetPlayer(int whoAmI, string nameOverride = null)
     {
         _whoAmI = whoAmI;
-        _playerName = nameOverride ?? Main.player?[whoAmI]?.name ?? $"Player {whoAmI}";
+        if (!string.IsNullOrEmpty(nameOverride))
+        {
+            _playerName = nameOverride;
+        }
+        else
+        {
+            if (Main.player != null && whoAmI >= 0 && whoAmI < Main.player.Length && Main.player[whoAmI] != null)
+            {
+                _playerName = Main.player[whoAmI].name;
+            }
+            else
+            {
+                _playerName = $"Player {whoAmI}";
+            }
+        }
     }
+
     #endregion
 
     #region Draw
@@ -258,7 +325,7 @@ public class PlayerInfoState : UIState, ILoadable
         PlayerInfoDrawer.DrawSeparatorBorder(sb, bgRect);
         PlayerInfoDrawer.DrawMapFullscreenBackground(sb, bgRect, player);
 
-        // Draw stats to the left of player
+        // DrawSystems stats to the left of player
         Vector2 bgTopLeft = new(bgRect.X, bgRect.Y);
         if (Main.netMode != NetmodeID.SinglePlayer)
         {
@@ -267,7 +334,7 @@ public class PlayerInfoState : UIState, ILoadable
             PlayerInfoDrawer.DrawTeamText(sb, bgTopLeft, player);
         }
 
-        // Draw player
+        // DrawSystems player
         PlayerInfoDrawer.DrawPlayer(sb, playerPos, player, 1.8f);
 
         Vector2 statsHeaderPos = new(leftColumn, y0 - 4);
@@ -333,7 +400,7 @@ public class PlayerInfoState : UIState, ILoadable
         //StatTooltip(lastBossBounds, p, "PlayerInfo.Stats.LastBossHit", player);
     }
 
-    private static void StatTooltip(Rectangle bounds, Point p, string loc, Terraria.Player target)
+    private static void StatTooltip(Rectangle bounds, Point p, string loc, Player target)
     {
         if (bounds.Contains(p))
         {
@@ -731,11 +798,6 @@ public class PlayerInfoState : UIState, ILoadable
         return n;
     }
     #endregion
-    private void Back_OnLeftClick(UIMouseEvent evt, UIElement listeningElement)
-    {
-        IngameFancyUI.Close();
-        if (_returnSnapshot.HasValue) { ChatSession.Restore(_returnSnapshot.Value); _returnSnapshot = null; }
-    }
 
     private static void DrawDebugRect(Rectangle r) => Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, r, Color.Red * 0.5f);
 }

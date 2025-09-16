@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using ChatPlus.Core.Chat;
-using ChatPlus.Core.Features.ModIcons.ModInfo;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
+using ChatPlus.Core.Features.Stats.Base;
+using ChatPlus.Core.Features.Stats.PlayerStats;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -194,6 +194,6 @@ public class PlayerIconPanel : BasePanel<PlayerIcon>
         // Optional: hide chat while modal is open
         Main.drawingPlayerChat = false;
 
-        IngameFancyUI.OpenUIState(s);
+        s.OpenForCurrentContext();
     }
 }

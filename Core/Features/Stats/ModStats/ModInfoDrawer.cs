@@ -15,7 +15,7 @@ using Terraria.ModLoader.Core;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Core.Features.ModIcons.ModInfo;
+namespace ChatPlus.Core.Features.Stats.ModStats;
 public static class ModInfoDrawer
 {
     /// <summary>
@@ -38,7 +38,7 @@ public static class ModInfoDrawer
         pos.Y = Math.Clamp(pos.Y, 0, Main.screenHeight - H);
         var rect = new Rectangle((int)pos.X, (int)pos.Y, W, H);
 
-        // Draw background and player
+        // DrawSystems background and player
         DrawFullBGPanel(sb, rect);
         DrawModNameText(sb, rect, mod);
         Vector2 cursor = pos + new Vector2(side, 32);
@@ -50,11 +50,11 @@ public static class ModInfoDrawer
         cursor += new Vector2(7, 110);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
 
-        // Draw stats rows
+        // DrawSystems stats rows
         cursor += new Vector2(0, 14);
         int left = (int)cursor.X;
 
-        // Draw rows
+        // DrawSystems rows
         DrawStat_ModSide(sb, new Rectangle(left, (int)cursor.Y, panelWidth, rowHeight), mod);
         DrawStat_FileSize(sb, new Rectangle(left, (int)cursor.Y + (rowHeight + 6) * 1, panelWidth, rowHeight), mod);
         DrawStat_LastUpdated(sb, new Rectangle(left, (int)cursor.Y + (rowHeight + 6) * 2, panelWidth, rowHeight), mod);
@@ -87,7 +87,7 @@ public static class ModInfoDrawer
 
         // icon
         sb.Draw(Ass.AuthorIcon.Value, new Vector2(rect.X, rect.Y + 5), Color.White);
-        //sb.Draw(Ass.FileSizeIcon.Value, new Vector2(rect.X, rect.Y - 2), null, Color.White, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
+        //sb.DrawSystems(Ass.FileSizeIcon.Value, new Vector2(rect.X, rect.Y - 2), null, Color.White, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
 
 
         // Resolve + cache author from build properties (no mod.Author in tML)
@@ -95,7 +95,7 @@ public static class ModInfoDrawer
         {
             try
             {
-                var localMod = ModHelper.GetLocalMod(mod); // your helper; returns LocalMod
+                var localMod = ModHelper.GetLocalMod(mod);
                 authorText = localMod?.properties?.author;
                 if (string.IsNullOrWhiteSpace(authorText))
                     authorText = "Unknown";
@@ -121,7 +121,7 @@ public static class ModInfoDrawer
 
         sb.Draw(Ass.FileSizeIcon.Value, new Vector2(rect.X-5, rect.Y -2), null, Color.White, 0f, Vector2.Zero, 1.5f, SpriteEffects.None, 0f);
 
-        // Uses your ModMetaCache (cached per-mod; no re-scan each frame)
+        // Uses ModMetaCache (cached per-mod; no re-scan each frame)
         var meta = ModMetaCache.Get(mod);
         string sizeText = meta.size > 0 ? $"{meta.size / 1024f / 1024f:0.00} MB" : "n/a";
         Utils.DrawBorderString(sb, $"Size: {sizeText}", new Vector2(rect2.X + 28, rect2.Y + 5), Color.White);
@@ -150,7 +150,7 @@ public static class ModInfoDrawer
         var rect2 = new Rectangle(rect.X, rect.Y, statPanelTexture.Width() * 2 + 7, statPanelTexture.Height());
         sb.Draw(statPanelTexture.Value, rect2, Color.White);
 
-        //sb.Draw(Ass.VersionIcon.Value, new Vector2(rect.X - 2, rect.Y - 1), Color.White);
+        //sb.DrawSystems(Ass.VersionIcon.Value, new Vector2(rect.X - 2, rect.Y - 1), Color.White);
         sb.Draw(Ass.VersionIcon.Value, new Vector2(rect.X+1, rect.Y +3), null, Color.White, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
 
 
@@ -239,7 +239,7 @@ public static class ModInfoDrawer
             color,
             0f,
             Vector2.Zero,
-            new Vector2((width - (edgeWidth * 2)) / (float)(texture.Width - (edgeWidth + edgeShove) * 2), 1f),
+            new Vector2((width - edgeWidth * 2) / (texture.Width - (edgeWidth + edgeShove) * 2), 1f),
             SpriteEffects.None,
             0f);
     }

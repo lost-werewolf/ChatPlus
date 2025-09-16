@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using ChatPlus.Core.Features.ModIcons.ModInfo;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Features.ModIcons;
+namespace ChatPlus.Core.Features.Stats.ModStats;
 
 /// <summary>
 /// Draws hovered Mod info panel above every other interface layer.

@@ -1,6 +1,6 @@
 ﻿using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.Stats.UploadStats;
 using ChatPlus.Core.Features.Uploads;
-using ChatPlus.Core.Features.Uploads.UploadInfo;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.UI.Chat;

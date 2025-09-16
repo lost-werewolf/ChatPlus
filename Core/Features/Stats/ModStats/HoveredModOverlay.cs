@@ -1,6 +1,6 @@
 using Terraria.ModLoader;
 
-namespace ChatPlus.Core.Features.ModIcons;
+namespace ChatPlus.Core.Features.Stats.ModStats;
 
 /// <summary>
 /// Global static storage for hovered mod to draw its info overlay last.

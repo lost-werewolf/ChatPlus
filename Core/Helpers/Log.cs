@@ -39,6 +39,10 @@ namespace ChatPlus.Core.Helpers
             }
         }
 
+        /// <summary>
+        /// Log info to the client log, useful for players and developers.
+        /// Tries to be non-intrusive by default.
+        /// </summary>
         public static void Info(object message, bool printCallerInMessage = true, [CallerFilePath] string callerFilePath = "")
         {
             //if (Conf.C != null && !Conf.C.ShowDebugMessages) return; 
@@ -56,7 +60,13 @@ namespace ChatPlus.Core.Helpers
                 instance.Logger.Info(message);
         }
 
-        public static void Warn(string message, [CallerFilePath] string callerFilePath = "")
+        /// <summary>
+        /// Log debugging information to client log.
+        /// Only to be used in debugging mode, may be noisy.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="callerFilePath"></param>
+        public static void Debug(string message, [CallerFilePath] string callerFilePath = "")
         {
             //if (Conf.C != null && !Conf.C.ShowDebugMessages) return; 
 
