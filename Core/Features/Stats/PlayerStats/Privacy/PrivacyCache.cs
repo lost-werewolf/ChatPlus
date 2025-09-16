@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ChatPlus.Common.Configs;
+﻿using ChatPlus.Common.Configs;
 using ChatPlus.Core.Helpers;
 using Terraria;
 
-namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy;
+namespace ChatPlus.Core.Features.Stats.PlayerStats.StatsPrivacy;
 public static class PrivacyCache
 {
     static readonly Config.Privacy[] values = new Config.Privacy[Main.maxPlayers];

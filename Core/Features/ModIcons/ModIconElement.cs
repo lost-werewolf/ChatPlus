@@ -1,4 +1,5 @@
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.Stats.ModStats;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -56,6 +57,6 @@ public class ModIconElement : BaseElement<ModIcon>
         }
 
         // debug
-        //sb.Draw(TextureAssets.MagicPixel.Value, bounds, Color.Red*0.5f);
+        //sb.DrawSystems(TextureAssets.MagicPixel.Value, bounds, Color.Red*0.5f);
     }
 }

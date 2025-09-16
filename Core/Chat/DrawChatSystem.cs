@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.TypingIndicators;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -13,6 +16,7 @@ using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.Chat;
 using Terraria.GameInput;
 using Terraria.ModLoader;
+using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Chat;
@@ -29,11 +33,11 @@ internal class DrawChatSystem : ModSystem
         {
             return;
         }
-
         On_Main.DrawPlayerChat += DrawChat;
         On_Main.DrawPlayerChat += DrawUIInFullscreenMap;
         On_Main.DrawPendingMouseText += DrawTopMostUIInFullscreenMap;
         On_RemadeChatMonitor.DrawChat += DrawMonitor;
+        On_Main.DrawMapFullscreenBackground += DrawTopMostStatesAfterFullscreenMap;
     }
 
     public override void Unload()
@@ -47,6 +51,13 @@ internal class DrawChatSystem : ModSystem
         On_Main.DrawPlayerChat -= DrawUIInFullscreenMap;
         On_Main.DrawPendingMouseText -= DrawTopMostUIInFullscreenMap;
         On_RemadeChatMonitor.DrawChat -= DrawMonitor;
+        On_Main.DrawMapFullscreenBackground += DrawTopMostStatesAfterFullscreenMap;
+    }
+
+    private void DrawTopMostStatesAfterFullscreenMap(On_Main.orig_DrawMapFullscreenBackground orig, Vector2 pos, int w, int h)
+    {
+        orig(pos, w, h);
+        Utils.DrawBorderString(Main.spriteBatch, "abc", new Vector2(50, 50), Color.White);
     }
 
     private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
@@ -72,7 +83,7 @@ internal class DrawChatSystem : ModSystem
                 .Select(kvp => Main.player[kvp.Key].name)
                 .ToList();
 
-            // TODO Debug Remove myself from the list
+            // to Debug: Remove myself from the list
             typingPlayers.Remove(Main.player[Main.myPlayer].name);
 
             bool anyTyping = typingPlayers.Any();
@@ -85,10 +96,10 @@ internal class DrawChatSystem : ModSystem
             if (delta > 0)
                 Main.screenHeight = Math.Max(0, oldH - delta);
 
-            // Draw chat history shifted up
+            // DrawSystems chat history shifted up
             orig(self, drawingPlayerChat);
 
-            // Draw typing line if needed
+            // DrawSystems typing line if needed
             if (anyTyping)
             {
                 TypingIndicatorSystem.DrawTypingLine();
@@ -106,7 +117,8 @@ internal class DrawChatSystem : ModSystem
 
         if (Main.mapFullscreen)
         {
-            DrawSystemsInFullscreenMap.Draw();
+            DrawSystemsInFullscreenMap.DrawSystems();
+            DrawSystemsInFullscreenMap.DrawInfoStatesTopMost();
         }
     }
 
@@ -116,10 +128,9 @@ internal class DrawChatSystem : ModSystem
 
         if (Main.mapFullscreen)
         {
-            DrawSystemsInFullscreenMap.DrawTopMostSystems();
+            DrawSystemsInFullscreenMap.DrawHoverInfoSystems();
         }
     }
-
     private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
     {
         if (!Conf.C.TextEditor)
@@ -250,7 +261,7 @@ internal class DrawChatSystem : ModSystem
         // Safety clamp to the text we actually draw
         caretVis = Math.Clamp(caretVis, 0, renderText.Length);
 
-        // 4) Draw the line using the text that still contains color tags (so ChatManager colors it)
+        // 4) DrawSystems the line using the text that still contains color tags (so ChatManager colors it)
         var snips = ChatManager.ParseMessage(renderText, Color.White).ToArray();
         ChatManager.DrawColorCodedStringWithShadow(
             Main.spriteBatch,
@@ -263,7 +274,7 @@ internal class DrawChatSystem : ModSystem
             out _
         );
 
-        // 5) Draw the caret at the visible position
+        // 5) DrawSystems the caret at the visible position
         if (Main.instance.textBlinkerState == 1)
         {
             var before = ChatManager.ParseMessage(renderText.Substring(0, caretVis), Color.White).ToArray();

@@ -16,7 +16,7 @@
 ----------------------TODO------------------------
 - [PRIO] Fix fullscreen map
 - Add proper bold text for typing indicators
-- Make mentions copy discord style with low yellow highlight background color and the entire text and icon clickable
+- Make mentions copy discord style with low yellow highlight background color
 
 ----------------------DONE------------------------
 - Links are clickable in chat

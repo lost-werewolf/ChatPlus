@@ -163,12 +163,12 @@ public class PlayerColorConfigElement : ConfigElement<string>
         Rectangle area = new((int)dims.X, (int)dims.Y, (int)dims.Width, (int)dims.Height);
         Color color = Main.hslToRgb(hsl);
        
-        // Draw hex text
+        // DrawSystems hex text
         string hexText = "#" + CurrentHex();
         Vector2 hexTextPos = new(area.X+173, area.Y+6);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, hexText, hexTextPos, Color.White, 0f, Vector2.Zero, new Vector2(1.0f));
 
-        // Draw player name
+        // DrawSystems player name
         string name = "PlayerName";
         if (Main.LocalPlayer != null)
             name = Main.LocalPlayer.name;
@@ -178,12 +178,12 @@ public class PlayerColorConfigElement : ConfigElement<string>
         if (name == "") name = "Player";
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, name, playerNamePos, color, 0f, Vector2.Zero, baseScale: new Vector2(0.8f));
 
-        // Draw hover
+        // DrawSystems hover
         Rectangle hoverRect = new(area.X, area.Y, 170, (int) Height.Pixels);
         bool hovered = hoverRect.Contains(Main.MouseScreen.ToPoint());
 
         // debug
-        //sb.Draw(TextureAssets.MagicPixel.Value, hoverRect, Color.Red);
+        //sb.DrawSystems(TextureAssets.MagicPixel.Value, hoverRect, Color.Red);
 
         // Tooltip assignment must never be null
         TooltipFunction = hovered

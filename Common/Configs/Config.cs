@@ -3,7 +3,7 @@ using System.ComponentModel;
 using ChatPlus.Common.Configs.ConfigElements;
 using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy;
+using ChatPlus.Core.Features.Stats.PlayerStats.StatsPrivacy;
 using ChatPlus.Core.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -128,11 +128,11 @@ public class Config : ModConfig
 
         if (Main.netMode == NetmodeID.MultiplayerClient)
         {
-            StatsPrivacyNetHandler.Instance.SendLocalPrivacy();
+            PrivacyNetHandler.Instance.SendLocalPrivacy();
         }
         else if (Main.netMode == NetmodeID.Server)
         {
-            StatsPrivacyNetHandler.Instance.BroadcastSingle(Main.myPlayer, StatsPrivacy);
+            PrivacyNetHandler.Instance.BroadcastSingle(Main.myPlayer, StatsPrivacy);
         }
     }
 

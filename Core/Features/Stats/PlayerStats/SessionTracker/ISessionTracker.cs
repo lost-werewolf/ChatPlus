@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ChatPlus.Core.Helpers;
 using Terraria;
 
-namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo.SessionTracker
+namespace ChatPlus.Core.Features.Stats.PlayerStats.SessionTracker
 {
     /// <summary>
     /// Interface for tracking player session start times.

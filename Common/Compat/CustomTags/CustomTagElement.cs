@@ -24,11 +24,11 @@ public class CustomTagElement : BaseElement<CustomTag>
         var dims = GetDimensions();
         Vector2 pos = dims.Position();
 
-        // Draw tag
+        // DrawSystems tag
         string tag = customTag.ActualTag;
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, tag, pos + new Vector2(3, 2), Color.White, 0f, Vector2.Zero, Vector2.One, -1f, 1.0f);
 
-        // Draw tag text, e.g [customTag:example]
+        // DrawSystems tag text, e.g [customTag:example]
         TextSnippet[] snip = [new TextSnippet(tag)];
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32, 3), 0f, Vector2.Zero, Vector2.One, out _);
     }

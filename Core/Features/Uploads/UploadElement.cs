@@ -1,4 +1,4 @@
-using ChatPlus.Core.Features.Uploads.UploadInfo;
+using ChatPlus.Core.Features.Stats.UploadStats;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -39,13 +39,6 @@ namespace ChatPlus.Core.Features.Uploads
             img._textScale = 0.3f;
             img.Left.Set(5, 0);
             img.Top.Set(8, 0);
-
-            Rectangle bounds = new Rectangle((int)pos.X, (int)pos.Y, 60, 60);
-            if (bounds.Contains(Main.MouseScreen.ToPoint()))
-            {
-                UICommon.TooltipMouseText($"Shift+click to delete {Data.FileName}");
-                HoveredUploadOverlay.SuppressThisFrame();
-            }
 
             string ToHashLabel(string tag)
             {

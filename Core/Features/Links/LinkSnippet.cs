@@ -59,13 +59,13 @@ public class LinkSnippet : TextSnippet
         isHovered = hoverRect.Contains(Main.MouseScreen.ToPoint());
 
         // debug draw
-        //sb.Draw(TextureAssets.MagicPixel.Value, hoverRect, Color.Red * 0.1f);
+        //sb.DrawSystems(TextureAssets.MagicPixel.Value, hoverRect, Color.Red * 0.1f);
 
         if (isHovered)
         {
             Main.LocalPlayer.mouseInterface = true;
 
-            // Draw a single 1px underline for this visible segment
+            // DrawSystems a single 1px underline for this visible segment
             int underlineY = (int)System.Math.Floor(p.Y + lineHeight - 10f);
             var underlineRect = new Rectangle((int)p.X, underlineY, width, 2);
             sb.Draw(TextureAssets.MagicPixel.Value, underlineRect, GetVisibleColor());

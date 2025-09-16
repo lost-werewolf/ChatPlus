@@ -58,7 +58,7 @@ namespace ChatPlus.Core.UI
         {
             if (isSelected)
             {
-                // Draw selection rectangle
+                // DrawSystems selection rectangle
                 DrawHelper.DrawSlices(sb, ele: this);
                 DrawHelper.DrawFill(sb, ele: this);
             }

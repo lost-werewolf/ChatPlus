@@ -1,7 +1,6 @@
 using Terraria;
 
-namespace ChatPlus.Core.Features.PlayerIcons
-.PlayerInfo;
+namespace ChatPlus.Core.Features.Stats.PlayerStats;
 
 /// <summary>
 /// Global static storage for the currently hovered player index whose info panel should be drawn last.

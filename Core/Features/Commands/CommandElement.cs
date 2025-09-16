@@ -40,7 +40,7 @@ namespace ChatPlus.Core.Features.Commands
             var dims = GetDimensions();
             var pos = dims.Position();
 
-            // Draw mod tag
+            // DrawSystems mod tag
             string tag = "";
             if (_command.Mod != null)
             {
@@ -55,7 +55,7 @@ namespace ChatPlus.Core.Features.Commands
             Utils.DrawBorderString(sb, tag, pos += new Vector2(14, 4), Color.White);
             //Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, tag, pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, 1.0f);
 
-            // Draw command name
+            // DrawSystems command name
             TextSnippet[] snip = [new TextSnippet(_command.Name)];
             ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos + new Vector2(26, 1), 0f, Vector2.Zero, Vector2.One, out _);
         }

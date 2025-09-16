@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo.SessionTracker;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy;
+using ChatPlus.Core.Features.Stats.PlayerStats.StatsPrivacy;
 using ChatPlus.Core.Features.TypingIndicators;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
@@ -23,21 +22,14 @@ namespace ChatPlus.Core.Netcode
                 case PlayerColorNetHandler.HandlerId:
                     PlayerColorNetHandler.Instance.HandlePacket(r, fromWho);
                     break;
-
-                case SessionTrackerNetHandler.HandlerId:
-                    SessionTrackerNetHandler.Instance.HandlePacket(r, fromWho);
+                case PrivacyNetHandler.HandlerId:
+                    PrivacyNetHandler.Instance.HandlePacket(r, fromWho);
                     break;
-
-                case StatsPrivacyNetHandler.HandlerId:
-                    StatsPrivacyNetHandler.Instance.HandlePacket(r, fromWho);
-                    break;
-
                 case TypingIndicatorNetHandler.HandlerId:
                     TypingIndicatorNetHandler.Instance.HandlePacket(r, fromWho);
                     break;
-
                 default:
-                    Log.Warn("Unknown packet handler type: " + handlerType);
+                    Log.Error("Unknown packet handler type: " + handlerType);
                     break;
             }
         }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using ChatPlus.Core.Features.ModIcons.ModInfo;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
+using ChatPlus.Core.Features.Stats.Base;
+using ChatPlus.Core.Features.Stats.PlayerStats;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -212,6 +212,6 @@ public sealed class MentionSnippet : TextSnippet
         state.SetReturnSnapshot(snap);
 
         Main.drawingPlayerChat = false;
-        IngameFancyUI.OpenUIState(state);
+        state.OpenForCurrentContext();
     }
 }

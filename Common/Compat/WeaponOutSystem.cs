@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
+using ChatPlus.Core.Features.Stats.PlayerStats;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

@@ -25,7 +25,7 @@ namespace ChatPlus.Core.Features.Colors
             Vector2 pos = dims.Position();
             string tag = color.Tag;
 
-            // Draw preview box
+            // DrawSystems preview box
             tag = tag.Replace("[c/", "");
             tag = tag.Replace(":", "");
             Color previewColor = HexToColor(tag);

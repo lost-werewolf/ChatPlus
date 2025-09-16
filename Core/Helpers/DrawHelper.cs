@@ -52,7 +52,7 @@ public static class DrawHelper
 
         Color color = Color.White;
 
-        // Draw fill
+        // DrawSystems fill
         sb.Draw(tex, new Rectangle(t.X + c, t.Y + c, t.Width - 2 * c, t.Height - 2 * c), ce, color * 0.3f);
 
         sb.Draw(tex, new Rectangle(t.X + c, t.Y, t.Width - 2 * c, c), eh, color);                                       // top

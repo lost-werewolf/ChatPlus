@@ -1,7 +1,8 @@
 ﻿using System;
 using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo.SessionTracker;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy;
+using ChatPlus.Core.Features.PlayerIcons;
+using ChatPlus.Core.Features.Stats.PlayerStats.SessionTracker;
+using ChatPlus.Core.Features.Stats.PlayerStats.StatsPrivacy;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -12,7 +13,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
+namespace ChatPlus.Core.Features.Stats.PlayerStats;
 
 public static class PlayerInfoDrawer
 {
@@ -38,7 +39,7 @@ public static class PlayerInfoDrawer
         pos.Y = Math.Clamp(pos.Y, 0, Main.screenHeight - H);
         var rect = new Rectangle((int)pos.X, (int)pos.Y, W, H);
 
-        // Draw BG panel
+        // DrawSystems BG panel
         DrawFullBGPanel(sb, rect);
 
         DrawHeaderText(sb, rect, player);
@@ -48,14 +49,14 @@ public static class PlayerInfoDrawer
         rect = new Rectangle((int)cursor.X, (int)cursor.Y, W - side * 2, 100);
         DrawSeparatorBorder(sb, rect);
 
-        // Draw background
+        // DrawSystems background
         rect = new Rectangle(rect.X + 2, rect.Y + 2, rect.Width - 4, rect.Height - 4);
         DrawMapFullscreenBackground(sb, rect, player);
 
-        // Draw player
+        // DrawSystems player
         DrawPlayer(sb, pos, player);
 
-        // Draw stats to the left of player
+        // DrawSystems stats to the left of player
         if (Main.netMode != NetmodeID.SinglePlayer && player.team != 0)
         {
             DrawTeamText(sb, cursor, player); // team x
@@ -65,31 +66,31 @@ public static class PlayerInfoDrawer
         cursor += new Vector2(0, 110);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
 
-        // Draw stats rows
+        // DrawSystems stats rows
         cursor += new Vector2(0, 10);
         int leftColumn = (int)cursor.X;
         int rightColumn = leftColumn + panelWidth + gutter;
 
-        // Draw row 1
+        // DrawSystems row 1
         DrawStat_HP(sb, new Rectangle(leftColumn, (int)cursor.Y, panelWidth, rowHeight), player);
         DrawStat_Mana(sb, new Rectangle(rightColumn, (int)cursor.Y, panelWidth, rowHeight), player);
 
-        // Draw row 2
+        // DrawSystems row 2
         int rowY2 = (int)cursor.Y + rowHeight + 6;
         DrawStat_Defense(sb, new Rectangle(leftColumn, rowY2, panelWidth, rowHeight), player);
         DrawStat_Attack(sb, new Rectangle(rightColumn, rowY2, panelWidth, rowHeight), player);
 
-        // Draw row 3
+        // DrawSystems row 3
         int rowY3 = (int)cursor.Y + rowHeight * 2 + 6 * 2;
         DrawStat_Coins(sb, new Rectangle(leftColumn, rowY3, panelWidth, rowHeight), player);
         DrawStat_Ammo(sb, new Rectangle(rightColumn, rowY3, panelWidth, rowHeight), player);
 
-        // Draw row 4
+        // DrawSystems row 4
         int rowY4 = (int)cursor.Y + rowHeight * 3 + 6 * 3;
         DrawStat_Minions(sb, new Rectangle(leftColumn, rowY4, panelWidth, rowHeight), player);
         DrawStat_Sentries(sb, new Rectangle(rightColumn, rowY4, panelWidth, rowHeight), player);
 
-        // Draw row 5
+        // DrawSystems row 5
         int rowY5 = (int)cursor.Y + rowHeight * 4 + 6 * 4;
         DrawStat_TimeInSession(sb, new Rectangle(leftColumn, rowY5, panelWidth, rowHeight), player);
         DrawStat_DaysInSession(sb, new Rectangle(rightColumn, rowY5, panelWidth, rowHeight), player);
@@ -118,7 +119,7 @@ public static class PlayerInfoDrawer
         ModifyPlayerDrawInfo.ForceFullBrightOnce = true;
         try
         {
-            // Draw player
+            // DrawSystems player
             pos += Main.screenPosition + new Vector2(100, 90);
 
             // Celestial starboard (45) sucks
@@ -138,7 +139,7 @@ public static class PlayerInfoDrawer
 
         if (!HasAccess(Main.LocalPlayer, p))
         {
-            // Draw surface
+            // DrawSystems surface
             var surfaceAsset = TextureAssets.MapBGs[0];
             sb.Draw(surfaceAsset.Value, rect, Color.YellowGreen * 0.5f);
             return;
@@ -167,9 +168,9 @@ public static class PlayerInfoDrawer
                 178 or 183 => 17,
                 62 or 263 => 18,
                 _ => player.ZoneGlowshroom ? 20 :
-                     player.ZoneCorrupt ? (player.ZoneDesert ? 39 : (player.ZoneSnow ? 33 : 22)) :
-                     player.ZoneCrimson ? (player.ZoneDesert ? 40 : (player.ZoneSnow ? 34 : 23)) :
-                     player.ZoneHallow ? (player.ZoneDesert ? 41 : (player.ZoneSnow ? 35 : 21)) :
+                     player.ZoneCorrupt ? player.ZoneDesert ? 39 : player.ZoneSnow ? 33 : 22 :
+                     player.ZoneCrimson ? player.ZoneDesert ? 40 : player.ZoneSnow ? 34 : 23 :
+                     player.ZoneHallow ? player.ZoneDesert ? 41 : player.ZoneSnow ? 35 : 21 :
                      player.ZoneSnow ? 3 :
                      player.ZoneJungle ? 12 :
                      player.ZoneDesert ? 14 :
@@ -204,17 +205,17 @@ public static class PlayerInfoDrawer
     #region Stats
     public static void DrawStat_DaysInSession(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background
+        // DrawSystems background
         var tex = Ass.StatPanel;
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        // Draw sun or moondial
+        // DrawSystems sun or moondial
         Item icon = new(Main.dayTime ? ItemID.Sundial : ItemID.Moondial);
         Vector2 pos = new(rect.X + 16, rect.Y + 14);
         ItemSlot.DrawItemIcon(icon, 31, sb, pos, 1.0f, 32f, Color.White);
 
-        // Draw days in session
+        // DrawSystems days in session
         var text = SessionTrackerSystem.GetSessionDurationIngameDays(player.whoAmI);
         int xOffset = 0;
         if (text == string.Empty)
@@ -235,17 +236,17 @@ public static class PlayerInfoDrawer
     }
     public static void DrawStat_TimeInSession(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background
+        // DrawSystems background
         var tex = Ass.StatPanel;
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        // Draw stopwatch
+        // DrawSystems stopwatch
         Item icon = new(ItemID.Stopwatch);
         Vector2 pos = new(rect.X + 16, rect.Y + 14);
         ItemSlot.DrawItemIcon(icon, 31, sb, pos, 0.8f, 32f, Color.White);
 
-        // Draw time in session
+        // DrawSystems time in session
         var text = SessionTrackerSystem.GetSessionDuration(player.whoAmI);
         int xOffset = 0;
         if (text == string.Empty)
@@ -278,7 +279,7 @@ public static class PlayerInfoDrawer
 
     public static void DrawStat_LastBossHit(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background
+        // DrawSystems background
         var tex = Ass.StatPanel;
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
@@ -286,7 +287,7 @@ public static class PlayerInfoDrawer
         int npcId = -1; // TODO!
         if (npcId == -1)
         {
-            // Draw question mark
+            // DrawSystems question mark
             var questionTex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Locked");
             var rect2 = new Rectangle(rect.X, rect.Y, questionTex.Width(), questionTex.Height());
             sb.Draw(questionTex.Value, new Vector2(rect.X + 6, rect.Y + 1), null, Color.White, 0f,
@@ -300,7 +301,7 @@ public static class PlayerInfoDrawer
         NPC npc = Main.npc[npcId];
         if (!npc.boss)
         {
-            // Draw question mark
+            // DrawSystems question mark
             var questionTex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Locked");
             var rect2 = new Rectangle(rect.X, rect.Y, questionTex.Width(), questionTex.Height());
             sb.Draw(questionTex.Value, new Vector2(rect.X + 6, rect.Y + 1), null, Color.White, 0f,
@@ -341,7 +342,7 @@ public static class PlayerInfoDrawer
 
     public static void DrawStat_LastEnemyHit(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background
+        // DrawSystems background
         var tex = Ass.StatPanel;
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
@@ -357,7 +358,7 @@ public static class PlayerInfoDrawer
 
         if (_lastValidId <= 0)
         {
-            // Draw question mark
+            // DrawSystems question mark
             var questionTex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Icon_Locked");
             var rect2 = new Rectangle(rect.X, rect.Y, questionTex.Width(), questionTex.Height());
             sb.Draw(questionTex.Value, new Vector2(rect.X + 6, rect.Y + 1), null, Color.White, 0f,
@@ -460,7 +461,7 @@ public static class PlayerInfoDrawer
     }
     public static void DrawStat_Defense(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background
+        // DrawSystems background
         var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_Defense");
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
@@ -471,7 +472,7 @@ public static class PlayerInfoDrawer
             return;
         }
 
-        // Draw defense NPCName
+        // DrawSystems defense NPCName
         var defenseText = $"{player.statDefense}";
         var snippets = ChatManager.ParseMessage(defenseText, Color.White).ToArray();
         var pos = new Vector2(rect.X + 45, rect.Y + 4);
@@ -499,12 +500,12 @@ public static class PlayerInfoDrawer
 
     public static void DrawStat_Mana(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background
+        // DrawSystems background
         var tex = Ass.StatPanel;
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
 
-        // Draw mana texture
+        // DrawSystems mana texture
         var manaTex = TextureAssets.Mana;
         var manaRect = new Rectangle(rect.X + 4, rect.Y + 2, manaTex.Width(), manaTex.Height());
         sb.Draw(TextureAssets.Mana.Value, manaRect, Color.White);
@@ -515,7 +516,7 @@ public static class PlayerInfoDrawer
             return;
         }
 
-        // Draw mana NPCName
+        // DrawSystems mana NPCName
         var manaText = $"{player.statMana}/{player.statManaMax2}";
         var size = FontAssets.MouseText.Value.MeasureString(manaText);
         var textPos = new Vector2(rect.X + rect.Width - size.X - 5, rect.Y + 5);
@@ -524,7 +525,7 @@ public static class PlayerInfoDrawer
 
     public static void DrawStat_Attack(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background
+        // DrawSystems background
         var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_Attack");
         var rect2 = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect2, Color.White);
@@ -547,7 +548,7 @@ public static class PlayerInfoDrawer
             damageText = "n/a";
         }
 
-        // Draw damage text
+        // DrawSystems damage text
         var size = FontAssets.MouseText.Value.MeasureString(damageText);
         var textPos = new Vector2(rect.X + 45, rect.Y + 4);
         Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, damageText, textPos.X, textPos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
@@ -555,7 +556,7 @@ public static class PlayerInfoDrawer
 
     public static void DrawStat_Coins(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background stat panel
+        // DrawSystems background stat panel
         var tex = Ass.StatPanel;
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
@@ -582,9 +583,9 @@ public static class PlayerInfoDrawer
                 if (it == null || it.IsAir) continue;
                 switch (it.type)
                 {
-                    case ItemID.PlatinumCoin: sum += (long)it.stack * 1_000_000L; break;
-                    case ItemID.GoldCoin: sum += (long)it.stack * 10_000L; break;
-                    case ItemID.SilverCoin: sum += (long)it.stack * 100L; break;
+                    case ItemID.PlatinumCoin: sum += it.stack * 1_000_000L; break;
+                    case ItemID.GoldCoin: sum += it.stack * 10_000L; break;
+                    case ItemID.SilverCoin: sum += it.stack * 100L; break;
                     case ItemID.CopperCoin: sum += it.stack; break;
                 }
             }
@@ -609,7 +610,7 @@ public static class PlayerInfoDrawer
 
         if (p <= 99)
         {
-            // Draw total for poor player
+            // DrawSystems total for poor player
             ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos, scale, iconSize, Color.White);
             Utils.DrawBorderStringFourWay(sb, font, p.ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
             pos.X += dx;
@@ -624,7 +625,7 @@ public static class PlayerInfoDrawer
         }
         else
         {
-            // Draw total for rich player
+            // DrawSystems total for rich player
             pos.X += 4; scale = 0.8f;
             ItemSlot.DrawItemIcon(new Item(ItemID.PlatinumCoin), 31, sb, pos + new Vector2(11, 0), scale, iconSize, Color.White);
             Utils.DrawBorderStringFourWay(sb, font, p.ToString(), pos.X - 5, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, scale);
@@ -639,7 +640,7 @@ public static class PlayerInfoDrawer
 
     public static void DrawStat_Ammo(SpriteBatch sb, Rectangle rect, Player player)
     {
-        // Draw background
+        // DrawSystems background
         var tex = Ass.StatPanel;
         rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height());
         sb.Draw(tex.Value, rect, Color.White);
@@ -659,7 +660,7 @@ public static class PlayerInfoDrawer
             }
         }
 
-        // Draw item
+        // DrawSystems item
         var pos = new Vector2(rect.X + 15, rect.Y + 15);
         ItemSlot.DrawItemIcon(highestStackItem, 31, sb, pos, 0.8f, 32f, Color.White);
 
@@ -669,7 +670,7 @@ public static class PlayerInfoDrawer
             return;
         }
 
-        // Draw ammo count
+        // DrawSystems ammo count
         string highestAmmoStack = highestStack.ToString();
         var size = FontAssets.MouseText.Value.MeasureString(highestAmmoStack);
         var textPos = new Vector2(rect.X + 45, rect.Y + 4);
@@ -763,7 +764,7 @@ public static class PlayerInfoDrawer
             color,
             0f,
             Vector2.Zero,
-            new Vector2((width - (edgeWidth * 2)) / (float)(texture.Width - (edgeWidth + edgeShove) * 2), 1f),
+            new Vector2((width - edgeWidth * 2) / (texture.Width - (edgeWidth + edgeShove) * 2), 1f),
             SpriteEffects.None,
             0f);
     }

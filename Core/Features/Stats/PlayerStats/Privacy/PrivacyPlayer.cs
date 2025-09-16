@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy
+namespace ChatPlus.Core.Features.Stats.PlayerStats.StatsPrivacy
 {
     public class PrivacyPlayer : ModPlayer
     {
@@ -14,12 +14,12 @@ namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy
 
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                StatsPrivacyNetHandler.Instance.SendLocalPrivacy();
+                PrivacyNetHandler.Instance.SendLocalPrivacy();
             }
 
             if (Main.netMode == NetmodeID.Server)
             {
-                StatsPrivacyNetHandler.Instance.ServerSyncTo(Player.whoAmI);
+                PrivacyNetHandler.Instance.ServerSyncTo(Player.whoAmI);
             }
         }
     }

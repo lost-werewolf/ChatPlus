@@ -2,8 +2,12 @@
 using ChatPlus.Core.Chat;
 using Terraria;
 
-namespace ChatPlus.Core.Features.ModIcons.ModInfo;
+namespace ChatPlus.Core.Features.Stats.Base;
 
+/// <summary>
+/// Stores a chat session snapshot (open state, text, caret position, selection)
+/// To be used when opening other UIs that close chat, so we can restore it later.
+/// </summary>
 public static class ChatSession
 {
     public readonly struct Snapshot
@@ -23,7 +27,7 @@ public static class ChatSession
     }
 
     public static Snapshot Capture()
-        => new Snapshot(
+        => new(
             Main.drawingPlayerChat,
             Main.chatText,
             HandleChatSystem.GetCaretPos(),

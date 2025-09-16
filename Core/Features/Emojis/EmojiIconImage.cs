@@ -37,7 +37,7 @@ namespace ChatPlus.Core.Features.Emojis
             var tex = emojiAsset?.Value;
             if (tex != null)
             {
-                // Draw the emoji icon
+                // DrawSystems the emoji icon
                 Rectangle target = GetDimensions().ToRectangle();
                 DrawTextureScaledToFit(sb, tex, target);
             }
