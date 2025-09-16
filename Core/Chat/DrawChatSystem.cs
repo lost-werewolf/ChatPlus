@@ -67,21 +67,11 @@ internal class DrawChatSystem : ModSystem
             orig(self, i);
             return;
         }
-        //var chat = ModContent.GetInstance<ChatScrollSystem>()?.chatScrollState;
 
-        // Reuse your existing signals
-        bool overInfo = Main.InGameUI?.CurrentState is BaseInfoState s && s.IsMouseOverRoot();
-        bool overScroll = DraggablePanel.IsAnyScrollbarHovering();
-        bool overPanel = DraggablePanel.AnyHovering;
+        bool blockZoom = ShouldBlockMapInput();
 
-        bool blockZoom = overInfo || overScroll || overPanel;
-
-        //Log.Debug($"{overInfo}{overScroll}{overPanel}");
-
-        // snapshot inputs
+        // snapshot
         int wheel = PlayerInput.ScrollWheelDelta;
-        bool plus = PlayerInput.Triggers.Current.HotbarPlus;
-        bool minus = PlayerInput.Triggers.Current.HotbarMinus;
         bool zoomIn = self.mapZoomIn;
         bool zoomOut = self.mapZoomOut;
 
@@ -93,12 +83,10 @@ internal class DrawChatSystem : ModSystem
                 self.mapZoomIn = false;
                 self.mapZoomOut = false;
             }
-
             orig(self, i);
         }
         finally
         {
-            // restore
             PlayerInput.ScrollWheelDelta = wheel;
             self.mapZoomIn = zoomIn;
             self.mapZoomOut = zoomOut;
@@ -112,35 +100,19 @@ internal class DrawChatSystem : ModSystem
             orig(self, gameTime);
             return;
         }
-        var chat = ModContent.GetInstance<ChatScrollSystem>()?.chatScrollState;
 
+        bool block = ShouldBlockMapInput();
 
-        bool overInfo = Main.InGameUI?.CurrentState is BaseInfoState s && s.IsMouseOverRoot();
-        bool overPanel = DraggablePanel.AnyHovering;
-        bool overChatScrollbar = (chat?.chatScrollbar?.IsMouseHovering ?? false);
-
-        bool block = overInfo || overPanel || overChatScrollbar;
-
-        // snapshot inputs/map state
+        // snapshot
         bool oldLeft = Main.mouseLeft;
-        bool oldMouseInterface = Main.LocalPlayer.mouseInterface;
-        float oldScale = Main.mapFullscreenScale;
-
-        int wheel = PlayerInput.ScrollWheelDelta;
-        if (wheel != 0)
-        {
-            wheel = 0;
-            //Log.Info(wheel);
-        }
-        //Log.Debug(Main.mapFullscreenScale);
-        //Log.Debug("info: " + overInfo + ", panel: " + overPanel + ", chatScroll: " + overChatScrollbar);
+        bool oldMI = Main.LocalPlayer.mouseInterface;
 
         try
         {
             if (block)
             {
                 Main.LocalPlayer.mouseInterface = true;
-                Main.mouseLeft = false; // prevent pan/grab
+                Main.mouseLeft = false; // prevent pan
                 PlayerInput.LockVanillaMouseScroll("ChatPlus/MapBlockScroll"); // prevent zoom
             }
 
@@ -149,16 +121,37 @@ internal class DrawChatSystem : ModSystem
         finally
         {
             Main.mouseLeft = oldLeft;
-            Main.LocalPlayer.mouseInterface = oldMouseInterface;
+            Main.LocalPlayer.mouseInterface = oldMI;
 
             if (block)
             {
-                // reset grab anchors so next frame doesn't compute a delta
                 Main.grabMapX = Main.mouseX;
                 Main.grabMapY = Main.mouseY;
             }
         }
     }
+
+    private static bool ShouldBlockMapInput()
+    {
+        if (!Main.mapFullscreen)
+            return false;
+
+        // check info states
+        bool overInfo = Main.InGameUI?.CurrentState is BaseInfoState s && s.IsMouseOverRoot();
+
+        // draggable panels
+        bool overPanel = DraggablePanel.AnyHovering;
+
+        // scrollbars
+        bool overScroll = DraggablePanel.IsAnyScrollbarHovering();
+
+        // chat history bits
+        var chat = ModContent.GetInstance<ChatScrollSystem>()?.chatScrollState;
+        bool overChatScrollbar = (chat?.chatScrollbar?.IsMouseHovering ?? false);
+
+        return overInfo || overPanel || overScroll || overChatScrollbar;
+    }
+
 
     private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
     {
