@@ -17,15 +17,17 @@ public class TopMostModInfoOverlaySystem : ModSystem
     {
         layers.Add(new LegacyGameInterfaceLayer(
             "ChatPlus: ModInfoOverlay_TopMost",
-            () =>
-            {
-                var mod = HoveredModOverlay.Consume();
-                if (mod != null)
-                {
-                    ModInfoDrawer.Draw(Main.spriteBatch, mod);
-                }
-                return true;
-            },
+            Draw,
             InterfaceScaleType.UI));
+    }
+
+    public bool Draw()
+    {
+        var mod = HoveredModOverlay.Consume();
+        if (mod != null)
+        {
+            ModInfoDrawer.Draw(Main.spriteBatch, mod);
+        }
+        return true;
     }
 }
