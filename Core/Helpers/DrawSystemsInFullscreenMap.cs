@@ -1,20 +1,18 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
+using ChatPlus.Core.Features.Scrollbar;
+using ChatPlus.Core.Features.Uploads.UploadInfo;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
 
 namespace ChatPlus.Core.Helpers;
 internal class DrawSystemsInFullscreenMap : ModSystem
 {
-    public override void PostDrawFullscreenMap(ref string mouseText)
+    public static void Draw()
     {
-        base.PostDrawFullscreenMap(ref mouseText);
-        //return;
-
-        // restart SB
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.UIScaleMatrix);
-
         var sm = ChatPlus.StateManager;
+        
         sm.CommandSystem?.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
         sm.ColorSystem?.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
         sm.CustomTagSystem?.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
@@ -26,9 +24,13 @@ internal class DrawSystemsInFullscreenMap : ModSystem
         sm.PlayerIconSystem?.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
         sm.UploadSystem?.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
 
-        // restart SB
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+        ModContent.GetInstance<ChatScrollSystem>().Draw();
     }
 
+    public static void DrawTopMostSystems()
+    {
+        ModContent.GetInstance<TopMostPlayerInfoOverlaySystem>().Draw();
+        ModContent.GetInstance<TopMostUploadInfoOverlaySystem>().Draw();
+        ModContent.GetInstance<TopMostModInfoOverlaySystem>().Draw();
+    }
 }

@@ -17,19 +17,21 @@ public class TopMostPlayerInfoOverlaySystem : ModSystem
         // Insert at the very end to be above everything.
         layers.Add(new LegacyGameInterfaceLayer(
             "ChatPlus: PlayerInfoOverlay_TopMost",
-            () =>
-            {
-                int idx = HoveredPlayerOverlay.Consume();
-                if (idx >= 0 && idx < Main.maxPlayers)
-                {
-                    var player = Main.player[idx];
-                    if (player?.active == true)
-                    {
-                        PlayerInfoDrawer.Draw(Main.spriteBatch, player);
-                    }
-                }
-                return true;
-            },
+            Draw,
             InterfaceScaleType.UI));
+    }
+
+    public bool Draw()
+    {
+        int idx = HoveredPlayerOverlay.Consume();
+        if (idx >= 0 && idx < Main.maxPlayers)
+        {
+            var player = Main.player[idx];
+            if (player?.active == true)
+            {
+                PlayerInfoDrawer.Draw(Main.spriteBatch, player);
+            }
+        }
+        return true;
     }
 }

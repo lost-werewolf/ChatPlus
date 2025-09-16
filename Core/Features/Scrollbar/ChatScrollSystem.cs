@@ -56,15 +56,17 @@ public class ChatScrollSystem : ModSystem
         {
             layers.Insert(index, new LegacyGameInterfaceLayer(
                 "ChatPlus: Chat Scrollbar",
-                () =>
-                {
-                    int show = Math.Clamp((int)Conf.C.ChatsVisible, 10, 20);
-                    bool moreThanVisible = ChatScrollList.GetTotalLines() > show;
-                    if (Main.drawingPlayerChat && chatScrollUI?.CurrentState != null && Conf.C.Scrollbar && moreThanVisible)
-                        chatScrollUI.Draw(Main.spriteBatch, Main.gameTimeCache);
-                    return true;
-                },
+                Draw,
                 InterfaceScaleType.UI));
         }
+    }
+
+    public bool Draw()
+    {
+        int show = Math.Clamp((int)Conf.C.ChatsVisible, 10, 20);
+        bool moreThanVisible = ChatScrollList.GetTotalLines() > show;
+        if (Main.drawingPlayerChat && chatScrollUI?.CurrentState != null && Conf.C.Scrollbar && moreThanVisible)
+            chatScrollUI.Draw(Main.spriteBatch, Main.gameTimeCache);
+        return true;
     }
 }

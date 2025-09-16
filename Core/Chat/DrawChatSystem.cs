@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.TypingIndicators;
 using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
@@ -30,6 +31,8 @@ internal class DrawChatSystem : ModSystem
         }
 
         On_Main.DrawPlayerChat += DrawChat;
+        On_Main.DrawPlayerChat += DrawUIInFullscreenMap;
+        On_Main.DrawPendingMouseText += DrawTopMostUIInFullscreenMap;
         On_RemadeChatMonitor.DrawChat += DrawMonitor;
     }
 
@@ -41,6 +44,8 @@ internal class DrawChatSystem : ModSystem
         }
 
         On_Main.DrawPlayerChat -= DrawChat;
+        On_Main.DrawPlayerChat -= DrawUIInFullscreenMap;
+        On_Main.DrawPendingMouseText -= DrawTopMostUIInFullscreenMap;
         On_RemadeChatMonitor.DrawChat -= DrawMonitor;
     }
 
@@ -92,6 +97,26 @@ internal class DrawChatSystem : ModSystem
         finally
         {
             Main.screenHeight = oldH;
+        }
+    }
+
+    private void DrawUIInFullscreenMap(On_Main.orig_DrawPlayerChat orig, Main self)
+    {
+        orig(self);
+
+        if (Main.mapFullscreen)
+        {
+            DrawSystemsInFullscreenMap.Draw();
+        }
+    }
+
+    private void DrawTopMostUIInFullscreenMap(On_Main.orig_DrawPendingMouseText orig)
+    {
+        orig();
+
+        if (Main.mapFullscreen)
+        {
+            DrawSystemsInFullscreenMap.DrawTopMostSystems();
         }
     }
 

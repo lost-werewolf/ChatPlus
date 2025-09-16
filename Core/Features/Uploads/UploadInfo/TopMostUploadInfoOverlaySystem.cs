@@ -20,16 +20,18 @@ public class TopMostUploadInfoOverlaySystem : ModSystem
     {
         layers.Add(new LegacyGameInterfaceLayer(
             "ChatPlus: UploadHoverOverlay_TopMost",
-            () =>
-            {
-                var tex = HoveredUploadOverlay.Consume();
-                if (tex != null)
-                {
-                    DrawUploadPreview(Main.spriteBatch, tex);
-                }
-                return true;
-            },
+            Draw,
             InterfaceScaleType.UI));
+    }
+
+    public bool Draw()
+    {
+        var tex = HoveredUploadOverlay.Consume();
+        if (tex != null)
+        {
+            DrawUploadPreview(Main.spriteBatch, tex);
+        }
+        return true;
     }
 
     private static void DrawUploadPreview(SpriteBatch sb, Texture2D tex)
