@@ -38,7 +38,7 @@ public class MentionElement : BaseElement<Mention>
             var p = Main.player[i];
             if (p?.active == true && p.name == playerName)
             {
-                if (AssignPlayerColorsSystem.PlayerColors.TryGetValue(i, out var syncedHex) && !string.IsNullOrWhiteSpace(syncedHex))
+                if (PlayerColorSystem.PlayerColors.TryGetValue(i, out var syncedHex) && !string.IsNullOrWhiteSpace(syncedHex))
                     hex = syncedHex;
                 else
                     hex = PlayerColorHandler.HexFromName(playerName);

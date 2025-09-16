@@ -724,8 +724,8 @@ public static class PlayerInfoDrawer
             var sp_privacy = PrivacyCache.Get(target.whoAmI);
             return sp_privacy switch
             {
-                Config.UserStatsPrivacy.Everyone => true,
-                Config.UserStatsPrivacy.Team => true,
+                Config.Privacy.Everyone => true,
+                Config.Privacy.Team => true,
                 _ => viewer == target // NoOne: only yourself
             };
         }
@@ -733,8 +733,8 @@ public static class PlayerInfoDrawer
         var privacy = PrivacyCache.Get(target.whoAmI);
         return privacy switch
         {
-            Config.UserStatsPrivacy.Everyone => true,
-            Config.UserStatsPrivacy.Team =>
+            Config.Privacy.Everyone => true,
+            Config.Privacy.Team =>
                 viewer != null && target != null &&
                 viewer.team != 0 && viewer.team == target.team,
             _ => viewer == target // NoOne: only yourself

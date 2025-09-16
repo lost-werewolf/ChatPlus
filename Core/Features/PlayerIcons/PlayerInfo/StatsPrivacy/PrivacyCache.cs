@@ -10,13 +10,13 @@ using Terraria;
 namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy;
 public static class PrivacyCache
 {
-    static readonly Config.UserStatsPrivacy[] values = new Config.UserStatsPrivacy[Main.maxPlayers];
+    static readonly Config.Privacy[] values = new Config.Privacy[Main.maxPlayers];
 
     static PrivacyCache()
     {
         for (int i = 0; i < values.Length; i++)
         {
-            values[i] = Config.UserStatsPrivacy.Everyone;
+            values[i] = Config.Privacy.Everyone;
         }
     }
 
@@ -34,17 +34,17 @@ public static class PrivacyCache
         }
     }
 
-    public static void Set(int whoAmI, Config.UserStatsPrivacy value)
+    public static void Set(int whoAmI, Config.Privacy value)
     {
         if (whoAmI < 0) return;
         if (whoAmI >= values.Length) return;
         values[whoAmI] = value;
     }
 
-    public static Config.UserStatsPrivacy Get(int whoAmI)
+    public static Config.Privacy Get(int whoAmI)
     {
-        if (whoAmI < 0) return Config.UserStatsPrivacy.Everyone;
-        if (whoAmI >= values.Length) return Config.UserStatsPrivacy.Everyone;
+        if (whoAmI < 0) return Config.Privacy.Everyone;
+        if (whoAmI >= values.Length) return Config.Privacy.Everyone;
         return values[whoAmI];
     }
 }

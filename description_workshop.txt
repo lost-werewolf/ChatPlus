@@ -10,13 +10,19 @@ Chat+ is a massive overhaul to Terraria's chat system — enhancing both its app
 6. [b]Player and mod stats📊[/b]: A stat viewer is available when hovering over player and mod icons.
 7. [b]Text Editor✍️[/b]: Highlight text, copy & paste words, and more!
 8. [b]Scrollbar[/b]: Scroll through chat history.
+9. [b]Typing Indicators[/b]: See who's currently typing.
 
 [h3] 🏷️ Autocomplete [/h3] 
 Press / to open commands.
 Press : to open emojis.
 Press @ to open player mentions.
 Press # to upload an image.
-All other tags have their own prefixes, like [c for colors, [i for items, etc. See all tags with /tags.
+Press [c to open colors.
+Press [g to open glyphs.
+Press [i to open items.
+Press [m to open mod icons.
+Press [p to open player icons.
+Looking to add autocomplete to your own mod? Read the [url=https://github.com/emyhrberg/ChatPlus] Wiki on GitHub. [/url]
 
 [h3] 🤝Credits [/h3] 
 Thanks to Neptune for making the icon!

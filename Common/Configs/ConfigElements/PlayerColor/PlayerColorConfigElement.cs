@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using ChatPlus.Common.Configs.ConfigElements.PlayerColor;
-using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,9 +31,13 @@ public class PlayerColorConfigElement : ConfigElement<string>
     private CustomColoredSlider saturationSlider;
     private CustomColoredSlider luminanceSlider;
 
+    public string LiveValue => Value;
+    public static PlayerColorConfigElement Instance { get; private set; }
+
     public override void OnBind()
     {
         base.OnBind();
+        Instance = this;
         var hex = NormalizeHex(Value);
         if (!TryParseHex(hex, out var c)) c = Color.White;
         hsl = Main.rgbToHsl(c);
@@ -170,18 +172,23 @@ public class PlayerColorConfigElement : ConfigElement<string>
         string name = "PlayerName";
         if (Main.LocalPlayer != null)
             name = Main.LocalPlayer.name;
+        else
+            name = "Player";
         Vector2 playerNamePos = new(area.X + 173, area.Y + 72);
+        if (name == "") name = "Player";
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, name, playerNamePos, color, 0f, Vector2.Zero, baseScale: new Vector2(0.8f));
 
         // Draw hover
         Rectangle hoverRect = new(area.X, area.Y, 170, (int) Height.Pixels);
         bool hovered = hoverRect.Contains(Main.MouseScreen.ToPoint());
 
-        // Show tooltip if hovered
-        if (hovered)
-        {
-        }
-        //else TooltipFunction = null;
+        // debug
+        //sb.Draw(TextureAssets.MagicPixel.Value, hoverRect, Color.Red);
+
+        // Tooltip assignment must never be null
+        TooltipFunction = hovered
+            ? () => "Set your own player color."
+            : () => null;
     }
 
     private CustomColoredSlider MakeHslSlider(HSLSliderId id, int top)
@@ -209,7 +216,7 @@ public class PlayerColorConfigElement : ConfigElement<string>
             Value = hex;
 
             // keep the synced table up to date
-            AssignPlayerColorsSystem.PlayerColors[Main.myPlayer] = hex;
+            PlayerColorSystem.PlayerColors[Main.myPlayer] = hex;
 
             // 🔁 invalidate mention caches for my name
             //MentionSnippet.InvalidateCachesFor(Main.LocalPlayer?.name);
@@ -219,7 +226,6 @@ public class PlayerColorConfigElement : ConfigElement<string>
                 PlayerColorNetHandler.ClientHello(Main.myPlayer, hex);
         }
     }
-
 
     private void ApplyHex(string hex)
     {

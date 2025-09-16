@@ -83,7 +83,7 @@ public sealed class MentionSnippet : TextSnippet
             var p = Main.player[i];
             if (p?.active == true &&
                 string.Equals(p.name, name, StringComparison.OrdinalIgnoreCase) &&
-                AssignPlayerColorsSystem.PlayerColors.TryGetValue(i, out var synced) &&
+                PlayerColorSystem.PlayerColors.TryGetValue(i, out var synced) &&
                 !string.IsNullOrWhiteSpace(synced))
             {
                 _nameToHex[name] = synced;
@@ -133,18 +133,11 @@ public sealed class MentionSnippet : TextSnippet
         // bold if this client is the mentioned player
         if (string.Equals(name, Main.LocalPlayer.name))
         {
-            Vector2 off = pos + new Vector2(1, 0);
-            ChatManager.DrawColorCodedStringShadow(sb, font, display, off, Color.Black, 0f, Vector2.Zero, Vector2.One);
-            ChatManager.DrawColorCodedStringShadow(sb, font, display, off, Color.Black, 0f, Vector2.Zero, Vector2.One);
-            off = pos + new Vector2(-1, 0);
-            ChatManager.DrawColorCodedStringShadow(sb, font, display, off, Color.Black, 0f, Vector2.Zero, Vector2.One);
-            ChatManager.DrawColorCodedStringShadow(sb, font, display, off, Color.Black, 0f, Vector2.Zero, Vector2.One);
+            DrawColorCodedStringWithBOLD(sb, font,
+                display, pos, textColor, 0f, Vector2.Zero, Vector2.One);
+           
         }
-        Utils.DrawBorderString(sb, display, pos, textColor);
-
-        // Draw outer and inner
-        //ChatManager.DrawColorCodedStringShadow(sb, font, display, pos, Color.Black, 0f, Vector2.Zero, Vector2.One);
-        //ChatManager.DrawColorCodedString(sb, font, display, pos, textColor, 0f, Vector2.Zero, Vector2.One);
+        //Utils.DrawBorderString(sb, display, pos, textColor);
 
         // hover (like links)
         int width = (int)Math.Ceiling(size.X);
@@ -170,6 +163,22 @@ public sealed class MentionSnippet : TextSnippet
         }
 
         return true;
+    }
+
+    public static Vector2 DrawColorCodedStringWithBOLD(SpriteBatch spriteBatch, DynamicSpriteFont font, string text, Vector2 position, Color baseColor, float rotation, Vector2 origin, Vector2 baseScale, float maxWidth = -1f, float spread = 2f)
+    {
+        TextSnippet[] snippets = ChatManager.ParseMessage(text, baseColor).ToArray();
+        ChatManager.ConvertNormalSnippets(snippets);
+        ChatManager.DrawColorCodedStringShadow(spriteBatch, font, snippets, position + Vector2.UnitX * spread, new Color(0, 0, 0, baseColor.A), rotation, origin, baseScale, maxWidth, spread);
+        ChatManager.DrawColorCodedStringShadow(spriteBatch, font, snippets, position + Vector2.UnitY * spread, new Color(0, 0, 0, baseColor.A), rotation, origin, baseScale, maxWidth, spread);
+        ChatManager.DrawColorCodedStringShadow(spriteBatch, font, snippets, position - Vector2.UnitX * spread, new Color(0, 0, 0, baseColor.A), rotation, origin, baseScale, maxWidth, spread);
+        ChatManager.DrawColorCodedStringShadow(spriteBatch, font, snippets, position - Vector2.UnitY * spread, new Color(0, 0, 0, baseColor.A), rotation, origin, baseScale, maxWidth, spread);
+        for (int i = 0; i < ChatManager.ShadowDirections.Length; i++)
+        {
+            //ChatManager.DrawColorCodedString(spriteBatch, font, text, position + ChatManager.ShadowDirections[i] * spread, Color.White, rotation, origin, baseScale, out int _, maxWidth, ignoreColors: false);
+        }
+        int hoveredSnippet;
+        return ChatManager.DrawColorCodedString(spriteBatch, font, snippets, position, Color.White, rotation, origin, baseScale, out hoveredSnippet, maxWidth);
     }
 
     public override void OnClick()

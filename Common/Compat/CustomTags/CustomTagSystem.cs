@@ -15,6 +15,7 @@ public class CustomTagSystem : ModSystem
     public UserInterface ui;
     public static readonly Dictionary<string, CustomTagState> States = [];
     public static List<CustomTag> CustomTags = [];
+    public static readonly Dictionary<string, Func<string, IEnumerable<(string insert, UIElement view)>>> Providers = [];
 
     public override void Load()
     {

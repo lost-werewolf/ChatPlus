@@ -7,6 +7,9 @@ internal class DrawSystemsInFullscreenMap : ModSystem
 {
     public override void PostDrawFullscreenMap(ref string mouseText)
     {
+        base.PostDrawFullscreenMap(ref mouseText);
+        //return;
+
         // restart SB
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Main.UIScaleMatrix);

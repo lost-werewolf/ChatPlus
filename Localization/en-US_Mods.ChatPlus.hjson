@@ -49,12 +49,12 @@ Configs: {
 
 		ModIcons: {
 			Label: Mod Icon
-			Tooltip: Shows which mod writes stuff to chat.
+			Tooltip: Shows which mod writes to chat.
 		}
 
 		PlayerIcons: {
 			Label: Player Icon
-			Tooltip: Shows who writes stuff to chat.
+			Tooltip: Shows who writes to chat.
 		}
 
 		PlayerColor: {
@@ -103,8 +103,13 @@ Configs: {
 		}
 
 		timestampSettings: {
-			Label: Timestamp Format
+			Label: Timestamp
 			Tooltip: Shows when a chat was written.
+		}
+
+		TypingIndicators: {
+			Label: Typing Indicators
+			Tooltip: Shows when a player is currently writing a chat.
 		}
 	}
 
@@ -122,6 +127,13 @@ Configs: {
 		HourAndMinuteAndSeconds12Hours.Label: Hour And Minute And Seconds12 Hours
 		HourAndMinute24Hours.Label: Hour And Minute24 Hours
 		HourAndMinuteAndSeconds24Hours.Label: Hour And Minute And Seconds24 Hours
+	}
+
+	Privacy: {
+		Tooltip: ""
+		NoOne.Label: No One
+		Team.Label: Team
+		Everyone.Label: Everyone
 	}
 }
 
@@ -182,4 +194,10 @@ PlayerInfo: {
 		LastBossHit: Last Boss Hit
 		Locked: Locked
 	}
+}
+
+TypingIndicators: {
+	IsTyping: "{0} is typing..."
+	FewPlayersAreTyping: "{0} are typing..."
+	MultiplePlayersAreTyping: "{0} players are typing..."
 }

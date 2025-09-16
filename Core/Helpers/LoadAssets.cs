@@ -17,6 +17,8 @@ namespace ChatPlus.Core.Helpers
         public static Asset<Texture2D> VersionIcon;
         public static Asset<Texture2D> ClientIcon; // side
         public static Asset<Texture2D> ServerIcon; // side
+        public static Asset<Texture2D> TypingIndicator; // spritesheet w: 32, h: 26, count: 10
+        public static Asset<Texture2D> TypingIndicatorDotsOnly; // spritesheet w: 32, h: 26, count: 10
 
         public static Asset<Texture2D> Hitbox;
         public static Asset<Texture2D> StatPanel;

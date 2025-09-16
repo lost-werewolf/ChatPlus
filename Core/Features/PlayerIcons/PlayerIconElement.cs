@@ -34,7 +34,7 @@ public class PlayerIconElement : BaseElement<PlayerIcon>
 
         // Draw player name in synced color
         string hex = "FFFFFF";
-        if (AssignPlayerColorsSystem.PlayerColors.TryGetValue(Data.PlayerIndex, out var syncedHex))
+        if (PlayerColorSystem.PlayerColors.TryGetValue(Data.PlayerIndex, out var syncedHex))
             hex = syncedHex ?? "FFFFFF";
 
         var coloredSnips = ChatManager.ParseMessage($"[c/{hex}:{Data.PlayerName}]", Color.White).ToArray();

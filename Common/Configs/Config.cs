@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using ChatPlus.Common.Configs.ConfigElements;
 using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.PlayerColors;
@@ -18,7 +17,7 @@ namespace ChatPlus.Common.Configs;
 public class Config : ModConfig
 {
     #region Enums
-    public enum UserStatsPrivacy
+    public enum Privacy
     {
         NoOne,
         Team,
@@ -40,6 +39,8 @@ public class Config : ModConfig
     [BackgroundColor(255, 192, 8)] // Golden Yellow
     [DefaultValue(true)]
     public bool Autocomplete = true;
+
+    
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
     [Range(10f, 20f)]
@@ -63,28 +64,38 @@ public class Config : ModConfig
     [DrawTicks]
     public float ChatsVisible = 10f;
 
+    // -----------------------------------------------------------
+
     [Header("ChatFormat")]
 
     [CustomModConfigItem(typeof(EnumStringOptionElement<TimestampSettings>))]
-    [BackgroundColor(85, 111, 64)] // Damp Green
+    [BackgroundColor(128, 255, 128)] // Grass Green
     [DefaultValue(TimestampSettings.Off)]
     [JsonConverter(typeof(StringEnumConverter))]
     public TimestampSettings timestampSettings;
 
+    [CustomModConfigItem(typeof(TypingIndicatorsConfigElement))]
+    [BackgroundColor(128, 255, 128)] // Grass Green
+    [DefaultValue(true)]
+    public bool TypingIndicators = true;
+
     [CustomModConfigItem(typeof(ModIconsConfigElement))]
-    [BackgroundColor(85, 111, 64)] // Damp Green
+    [BackgroundColor(128, 255, 128)] // Grass Green
+
     [DefaultValue(true)]
     public bool ModIcons;
 
     [CustomModConfigItem(typeof(PlayerIconsConfigElement))]
-    [BackgroundColor(85, 111, 64)] // Damp Green
+    [BackgroundColor(128, 255, 128)] // Grass Green
     [DefaultValue(true)]
     public bool PlayerIcons;
 
-    [BackgroundColor(85, 111, 64)] // Damp Green
+    [BackgroundColor(128, 255, 128)] // Grass Green
     [CustomModConfigItem(typeof(PlayerColorConfigElement))]
     [DefaultValue("FFFFFF")]
     public string PlayerColor;
+
+    // -----------------------------------------------------------
 
     [Header("StatsViewer")]
 
@@ -101,9 +112,9 @@ public class Config : ModConfig
     public bool ShowStatsWhenBossIsAlive;
 
     [BackgroundColor(192, 54, 64)] // Calamity Red
-    [DefaultValue(UserStatsPrivacy.Everyone)]
+    [DefaultValue(Privacy.Everyone)]
     [JsonConverter(typeof(StringEnumConverter))]
-    public UserStatsPrivacy StatsPrivacy;
+    public Privacy StatsPrivacy;
 
     public override void OnChanged()
     {
@@ -136,9 +147,9 @@ public class Config : ModConfig
 
             if (Main.LocalPlayer != null)
             {
-                AssignPlayerColorsSystem.PlayerColors[Main.myPlayer] = hex;
+                PlayerColorSystem.PlayerColors[Main.myPlayer] = hex;
                 MentionSnippet.InvalidateCachesFor(Main.LocalPlayer.name);
-                Log.Info("updated player color to: " + hex + " for: " + Main.LocalPlayer.name);
+                Log.Info("Player color updated to: " + hex + " for: " + Main.LocalPlayer.name);
             }
 
             if (Main.netMode == NetmodeID.MultiplayerClient && Main.LocalPlayer != null)
@@ -149,7 +160,7 @@ public class Config : ModConfig
         }
         catch (Exception e)
         {
-            Log.Error("[AssignPlayerColor] UpdatePlayerColor exception: " + e);
+            Log.Error("[AssignPlayerColor] UpdatePlayerColor Exception: " + e);
         }
     }
 }

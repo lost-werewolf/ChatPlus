@@ -32,7 +32,7 @@ namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy
             packet.Send();
         }
 
-        public void BroadcastSingle(int who, Config.UserStatsPrivacy privacy)
+        public void BroadcastSingle(int who, Config.Privacy privacy)
         {
             if (Main.netMode != NetmodeID.Server) return;
 
@@ -67,7 +67,7 @@ namespace ChatPlus.Core.Features.PlayerIcons.PlayerInfo.StatsPrivacy
             if (op != Op.PrivacyUpdate) return;
 
             int playerId = reader.ReadByte();
-            var privacy = (Config.UserStatsPrivacy)reader.ReadByte();
+            var privacy = (Config.Privacy)reader.ReadByte();
 
             PrivacyCache.Set(playerId, privacy);
 

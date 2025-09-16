@@ -13,8 +13,9 @@ using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using ChatPlus.Core.Netcode;
-using ChatPlus.Core.UI;
+using Terraria;
 using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace ChatPlus;
 
@@ -53,38 +54,51 @@ public sealed class ChatPlus : Mod
     /// </summary>
     public override object Call(params object[] args)
     {
-        // First, check that we have at least one argument and that it's a string command.
         if (args.Length == 0 || args[0] is not string command)
-            throw new ArgumentException("Error with ChatPlus Mod Call: First argument must be a command string.");
+            throw new ArgumentException("ChatPlus Mod Call: First argument must be a command string.");
 
-        if (args.Length != 3)
-            throw new ArgumentException("Error with ChatPlus Mod Call: Expected exactly 3 arguments: RegisterTag, .");
-
-        // Handle the "RegisterTag" command.
         if (string.Equals(command, "RegisterTag"))
         {
-            // Get the second argument as a string tag, e.g [example:smile] means that tag = "example"
+            if (args.Length != 3)
+                throw new ArgumentException("ChatPlus Mod Call: RegisterTag expects 3 args.");
+
             if (args[1] is not string tag)
-                throw new ArgumentException("Error with ChatPlus Mod Call: Second argument must be a string representing the tag.");
+                throw new ArgumentException("ChatPlus Mod Call: Second arg must be tag string.");
 
-            // Get the third argument as a List<string> to populate with tags, e.g ["[e:example]"]
-            if (args[2] is not IEnumerable<string> tagsToAdd)
-                throw new ArgumentException("Error with ChatPlus Mod Call: Third argument must be a List<string> to populate with tags.");
+            if (args[2] is not IEnumerable<(string actualTag, UIElement view)> tagsToAdd)
+                throw new ArgumentException("ChatPlus Mod Call: Third arg must be IEnumerable<(string, UIElement)>.");
 
-            foreach (var tagToAdd in tagsToAdd)
+            foreach (var (actualTag, view) in tagsToAdd)
             {
-                Log.Info($"Registering custom tag: {tagToAdd} with prefix: {tag}");
-                CustomTagSystem.CustomTags.Add(new CustomTag(tag, tagToAdd));
+                var ct = new CustomTag(tag, actualTag, view);
+                CustomTagSystem.CustomTags.Add(ct);
             }
 
-            // Ensure a state + panel exists for this prefix
             if (!CustomTagSystem.States.ContainsKey(tag))
-            {
                 CustomTagSystem.States[tag] = new CustomTagState(tag);
-                Log.Info($"Created CustomTagState for prefix [{tag}:...]");
-            }
+
+            return null;
         }
 
-        return base.Call(args);
+        if (string.Equals(command, "RegisterTagProvider"))
+        {
+            if (args.Length != 3)
+                throw new ArgumentException("ChatPlus Mod Call: RegisterTagProvider expects 3 args.");
+
+            if (args[1] is not string tag)
+                throw new ArgumentException("ChatPlus Mod Call: Second arg must be tag string.");
+
+            if (args[2] is not Func<string, IEnumerable<(string, UIElement)>> provider)
+                throw new ArgumentException("ChatPlus Mod Call: Third arg must be Func<string, IEnumerable<(string, UIElement)>>.");
+
+            CustomTagSystem.Providers[tag] = provider;
+
+            if (!CustomTagSystem.States.ContainsKey(tag))
+                CustomTagSystem.States[tag] = new CustomTagState(tag);
+
+            return null;
+        }
+
+        throw new ArgumentException($"ChatPlus Mod Call: Unknown command '{command}'.");
     }
 }

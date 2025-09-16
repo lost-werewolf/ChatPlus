@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Reflection;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
-using ChatPlus.Common.Compat;
-using ChatPlus.Core.Features.Emojis;
-using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.TypingIndicators;
 using ChatPlus.Core.Features.Uploads;
-using ChatPlus.Core.Helpers;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.Chat;
 using Terraria.GameInput;
 using Terraria.ModLoader;
@@ -17,6 +16,10 @@ using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Chat;
 
+/// <summary>
+/// Draws the entire chat
+/// Including the chatbox background, input line, caret, selection rectangle, upload preview, and the chat messages.
+/// </summary>
 internal class DrawChatSystem : ModSystem
 {
     public override void Load()
@@ -43,23 +46,48 @@ internal class DrawChatSystem : ModSystem
 
     private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
     {
-        bool hasUpload = drawingPlayerChat && UploadTagHandler.ContainsUploadTag(Main.chatText);
-        if (!hasUpload)
-        {
-            orig(self, drawingPlayerChat);
-            return;
-        }
-        PlayerInput.WritingText = false;
-
         int oldH = Main.screenHeight;
+        int delta = 0;
         try
         {
-            float ui = Main.UIScaleMatrix.M11;
-            if (ui <= 0f) ui = 1f;
-            int delta = (int)Math.Round(147f / ui);
+            // Upload adjustment (your existing code)
+            if (drawingPlayerChat && UploadTagHandler.ContainsUploadTag(Main.chatText))
+            {
+                float ui = Main.UIScaleMatrix.M11;
+                if (ui <= 0f) ui = 1f;
+                delta += (int)Math.Round(147f / ui);
+            }
 
-            Main.screenHeight = Math.Max(0, oldH - delta);
+            // Typing indicator adjustment
+            List<string> typingPlayers = TypingIndicatorSystem.TypingPlayers
+                .Where(kvp => kvp.Value
+                              && kvp.Key >= 0
+                              && kvp.Key < Main.maxPlayers
+                              && Main.player[kvp.Key].active)
+                .Select(kvp => Main.player[kvp.Key].name)
+                .ToList();
+
+            // TODO Debug Remove myself from the list
+            typingPlayers.Remove(Main.player[Main.myPlayer].name);
+
+            bool anyTyping = typingPlayers.Any();
+
+            if (anyTyping)
+            {
+                delta += 21;
+            }
+
+            if (delta > 0)
+                Main.screenHeight = Math.Max(0, oldH - delta);
+
+            // Draw chat history shifted up
             orig(self, drawingPlayerChat);
+
+            // Draw typing line if needed
+            if (anyTyping)
+            {
+                TypingIndicatorSystem.DrawTypingLine();
+            }
         }
         finally
         {
@@ -69,6 +97,12 @@ internal class DrawChatSystem : ModSystem
 
     private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
     {
+        if (!Conf.C.TextEditor)
+        {
+            orig(self);
+            return;
+        }
+
         if (!Main.drawingPlayerChat)
         {
             orig(self);
@@ -83,8 +117,11 @@ internal class DrawChatSystem : ModSystem
             Main.instance.textBlinkerCount = 0;
         }
 
+        // Determine height
         bool hasUpload = UploadTagHandler.ContainsUploadTag(Main.chatText);
-        int height = hasUpload ? 147 + 21 : 32;
+        int height = 32;
+        if (hasUpload)
+            height = 147 + 21;
 
         const int x = 0;
         const int y = 0;
@@ -106,8 +143,6 @@ internal class DrawChatSystem : ModSystem
 
         Main.chatMonitor.DrawChat(true);
     }
-
-    private static float animationSpeed;
     private static int DrawUploadAndGetTextOffset(int totalHeight)
     {
         if (!TryGetFirstUploadTexture(Main.chatText, out var tex)) return 0;

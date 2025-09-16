@@ -44,7 +44,7 @@ namespace ChatPlus.Core.Features.PlayerColors
                             byte who = reader.ReadByte();
                             string hex = reader.ReadString();
 
-                            AssignPlayerColorsSystem.PlayerColors[who] = SanHex(hex);
+                            PlayerColorSystem.PlayerColors[who] = SanHex(hex);
 
                             var name = Main.player[who]?.name;
                             if (!string.IsNullOrWhiteSpace(name))
@@ -60,13 +60,13 @@ namespace ChatPlus.Core.Features.PlayerColors
 
                     case Msg.SyncAll:
                         {
-                            AssignPlayerColorsSystem.PlayerColors.Clear();
+                            PlayerColorSystem.PlayerColors.Clear();
                             int count = reader.ReadByte();
                             for (int i = 0; i < count; i++)
                             {
                                 byte who = reader.ReadByte();
                                 string hex = reader.ReadString();
-                                AssignPlayerColorsSystem.PlayerColors[who] = SanHex(hex);
+                                PlayerColorSystem.PlayerColors[who] = SanHex(hex);
                             }
                             MentionSnippet.ClearAllCaches();
                             break;
@@ -87,16 +87,16 @@ namespace ChatPlus.Core.Features.PlayerColors
 
                             if (assigned == "FFFFFF")
                             {
-                                AssignPlayerColorsSystem.PlayerColors.Remove(who);
+                                PlayerColorSystem.PlayerColors.Remove(who);
                             }
                             else
                             {
-                                AssignPlayerColorsSystem.PlayerColors[who] = assigned;
+                                PlayerColorSystem.PlayerColors[who] = assigned;
                             }
 
                             // Send full table back to the joiner
                             var all = Instance.GetPacket((byte)Msg.SyncAll);
-                            var map = AssignPlayerColorsSystem.PlayerColors;
+                            var map = PlayerColorSystem.PlayerColors;
                             all.Write((byte)map.Count);
                             foreach (var kv in map)
                             {

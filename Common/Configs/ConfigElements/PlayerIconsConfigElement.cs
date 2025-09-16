@@ -1,58 +1,25 @@
-﻿using ChatPlus.Core.Features.ModIcons;
+﻿using ChatPlus.Common.Configs.ConfigElements.Base;
 using ChatPlus.Core.Features.PlayerIcons;
-using ChatPlus.Core.Features.PlayerIcons.PlayerInfo;
 using ChatPlus.Core.Helpers;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using Stubble.Core.Classes;
 using Terraria;
-using Terraria.GameContent;
-using Terraria.ModLoader;
-using Terraria.ModLoader.Config.UI;
-using Terraria.UI;
-using Terraria.UI.Chat;
 
 namespace ChatPlus.Common.Configs.ConfigElements;
 
-public class PlayerIconsConfigElement : ConfigElement<bool>
+public class PlayerIconsConfigElement : BaseBoolConfigElement
 {
-    private Asset<Texture2D> _toggleTexture = Asset<Texture2D>.Empty;
-
-    // Called once when the config UI binds this element to your Width property
-    public override void OnBind()
+    protected override void OnToggled(bool newValue)
     {
-        base.OnBind();
-
-        _toggleTexture = Main.Assets.Request<Texture2D>("Images/UI/Settings_Toggle");
-
-        // Toggle the value when clicked
-        OnLeftClick += delegate
-        {
-            Value = !Value;
-
-            Conf.C.PlayerIcons = Value;
-        };
+        Conf.C.PlayerIcons = newValue;
     }
 
-    public override void OnInitialize()
+    protected override void DrawPreview(SpriteBatch sb)
     {
-        base.OnInitialize();
-    }
+        if (!Value) return;
 
-    public override void Draw(SpriteBatch sb)
-    {
-        base.Draw(sb);
-        DrawPlayerIcon(sb);
-        DrawToggleTexture(sb);
-        DrawOnOffText(sb);
-    }
-
-    private void DrawPlayerIcon(SpriteBatch sb)
-    {
         var dims = GetDimensions();
-        Vector2 pos = new(dims.X + 175+3, dims.Y + 11);
-        Rectangle rect = new((int)pos.X-8, (int)pos.Y-6, 22, 22);
+        Vector2 pos = new(dims.X + 175 + 3, dims.Y + 11);
+        Rectangle rect = new((int)pos.X - 8, (int)pos.Y - 6, 22, 22);
 
         var player = Main.LocalPlayer;
 
@@ -74,64 +41,11 @@ public class PlayerIconsConfigElement : ConfigElement<bool>
             MapHeadRendererHook.shouldFlipHeadDraw = false;
         }
 
-        // Check bounds
+        // Tooltip (doesnt work)
         bool hovered = rect.Contains(Main.MouseScreen.ToPoint());
-
-        // Show tooltip if hovered
         if (hovered)
         {
             if (Main.LocalPlayer == null) return;
         }
-    }
-
-    private void DrawToggleTexture(SpriteBatch sb)
-    {
-        // Draw toggle texture
-        Rectangle sourceRectangle = new Rectangle(
-            Value ? (_toggleTexture.Width() - 2) / 2 + 2 : 0,
-            0,
-            (_toggleTexture.Width() - 2) / 2,
-            _toggleTexture.Height()
-        );
-
-        // Get the dimensions of the parent element
-        CalculatedStyle dimensions = GetDimensions();
-
-        // Calculate the position to draw the toggle texture
-        sb.Draw(
-            _toggleTexture.Value,
-            new Vector2(
-                dimensions.X + dimensions.Width - sourceRectangle.Width - 10f,
-                dimensions.Y + 8f
-            ),
-            sourceRectangle,
-            Color.White
-        );
-    }
-
-    private void DrawOnOffText(SpriteBatch sb)
-    {
-        CalculatedStyle dimensions = GetDimensions();
-
-        string label = Value ? Lang.menu[126].Value : Lang.menu[124].Value; // On / Off
-
-        // Shift to a position you know is visible
-        Vector2 pos = new Vector2(dimensions.X + dimensions.Width - 60f, dimensions.Y + 8f);
-        ChatManager.DrawColorCodedStringWithShadow(
-            sb,
-            FontAssets.ItemStack.Value,
-            label,
-            pos,
-            Color.White,
-            0f,
-            Vector2.Zero,
-            new Vector2(0.8f)
-        );
-    }
-
-    // Called every frame while the in-game config UI is open
-    public override void Update(GameTime gameTime)
-    {
-        base.Update(gameTime);
     }
 }

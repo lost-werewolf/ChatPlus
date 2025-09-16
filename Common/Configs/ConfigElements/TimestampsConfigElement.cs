@@ -54,7 +54,7 @@ namespace ChatPlus.Common.Configs.ConfigElements
                 if (i < 0) i = 0;
                 if (i >= values.Length) i = values.Length - 1;
 
-                return label + ": " + GetLiveLabel(values[i]);
+                return label + "                      " + GetLiveLabel(values[i]);
             };
         }
 
@@ -88,7 +88,7 @@ namespace ChatPlus.Common.Configs.ConfigElements
                 var v = (Config.TimestampSettings)(object)value;
                 if (v == Config.TimestampSettings.Off) return "Off";
 
-                string fmt = GetFormat(v);
+                string fmt = "[" + GetFormat(v) + "]";
                 return DateTime.Now.ToString(fmt);
             }
 

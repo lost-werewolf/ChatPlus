@@ -1,9 +1,11 @@
-﻿namespace ChatPlus.Common.Compat.CustomTags;
+﻿using Terraria.UI;
+
+namespace ChatPlus.Common.Compat.CustomTags;
 
 /// <summary>
-/// Represents a custom tag that can be registered with the CustomTagSystem.
+/// 
 /// </summary>
-/// <param name="tag"></param> The tag code prefix used in chat, e.g. "t"
-/// <param name="ActualTag"></param> The actual tag string, e.g. "[t:smile]"
-public readonly record struct CustomTag(string tag, string ActualTag);
-
+/// <param name="tag"></param> The main registered tag, e.g "t"
+/// <param name="ActualTag"></param> The tag that actually affects chat, e.g "[t:1]" or "[t:2]"
+/// <param name="DisplayElement"></param>
+public readonly record struct CustomTag(string tag, string ActualTag, UIElement DisplayElement);

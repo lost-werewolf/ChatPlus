@@ -111,7 +111,7 @@ namespace ChatPlus.Core.Chat
                 string hex = "FFFFFF";
                 int who = Array.FindIndex(Main.player, p => p?.active == true && p.name == senderName);
                 if (who >= 0 &&
-                    AssignPlayerColorsSystem.PlayerColors.TryGetValue(who, out var syncedHex) &&
+                    PlayerColorSystem.PlayerColors.TryGetValue(who, out var syncedHex) &&
                     !string.IsNullOrWhiteSpace(syncedHex))
                 {
                     hex = syncedHex.ToUpperInvariant();

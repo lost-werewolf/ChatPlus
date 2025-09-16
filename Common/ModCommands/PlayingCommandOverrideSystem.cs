@@ -42,7 +42,7 @@ namespace ChatPlus.Common.ModCommands
                 string iconTag = PlayerIconTagHandler.GenerateTag(player.name);
 
                 string hex = "FFFFFF";
-                if (AssignPlayerColorsSystem.PlayerColors.TryGetValue(player.whoAmI, out var assignedHex))
+                if (PlayerColorSystem.PlayerColors.TryGetValue(player.whoAmI, out var assignedHex))
                 {
                     if (!string.IsNullOrWhiteSpace(assignedHex))
                     {
