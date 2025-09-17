@@ -162,13 +162,13 @@ public sealed class ModIconSnippet : TextSnippet
         // Priority: icon_small.* -> icon.*
         if (mod.FileExists("icon_small.png") || mod.FileExists("icon_small.rawimg"))
         {
-            tex = mod.Assets.Request<Texture2D>("icon_small", AssetRequestMode.ImmediateLoad).Value;
+            tex = mod.Assets.Request<Texture2D>("icon_small").Value;
             return tex != null;
         }
 
         if (mod.FileExists("icon.png"))
         {
-            tex = mod.Assets.Request<Texture2D>("icon", AssetRequestMode.ImmediateLoad).Value;
+            tex = mod.Assets.Request<Texture2D>("icon").Value;
             return tex != null;
         }
 

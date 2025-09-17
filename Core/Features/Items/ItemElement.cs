@@ -1,5 +1,6 @@
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader.UI;
@@ -24,6 +25,11 @@ namespace ChatPlus.Core.Features.Items
 
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
+
+            if (TextureAssets.Item[item.ID] is var asset && asset.State == AssetState.NotLoaded)
+            {
+                Main.Assets.Request<Texture2D>(asset.Name);
+            }
 
             // Render tag
             string tag = item.Tag;
