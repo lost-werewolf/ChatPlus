@@ -128,5 +128,8 @@ public class MentionPanel : BasePanel<Mention>
             char[] stops = [' ', '\t', '\n', '\r', ']', ',', '.', ':', ';', '!', '?'];
             return s.IndexOfAny(stops, start);
         }
+
+        var sys = Terraria.ModLoader.ModContent.GetInstance<MentionSystem>();
+        sys?.ui?.SetState(null);
     }
 }

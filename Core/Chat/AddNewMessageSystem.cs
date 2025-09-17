@@ -2,10 +2,6 @@
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.Xna.Framework;
-using Terraria;
-using Terraria.GameContent.UI.Chat;
-using Terraria.ModLoader;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.Mentions;
@@ -13,6 +9,13 @@ using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Helpers;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.GameContent;
+using Terraria.GameContent.UI.Chat;
+using Terraria.ModLoader;
+using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Chat
 {
@@ -103,7 +106,10 @@ namespace ChatPlus.Core.Chat
             }
 
             // 6) Mentions: transform @name -> [mention:name]
-            resultText = TransformMentions(resultText);
+            var font = FontAssets.MouseText.Value;
+            int lineWidth = (int)Math.Ceiling(
+                ChatManager.GetStringSize(font, resultText, Vector2.One, widthLimitInPixels).X);
+            resultText = TransformMentions(resultText, lineWidth);
 
             // 7) Name color formatting
             if (!string.IsNullOrEmpty(senderName) && !string.IsNullOrEmpty(nameTagFull))
@@ -119,6 +125,10 @@ namespace ChatPlus.Core.Chat
 
                 resultText = resultText.Replace(nameTagFull, $"[c/{hex}:{senderName}:]");
             }
+
+#if DEBUG
+            Log.Info("New chat: " + resultText, false);
+#endif
 
             // Hand off to vanilla
             orig(self, resultText, color, widthLimitInPixels);
@@ -148,11 +158,8 @@ namespace ChatPlus.Core.Chat
         /// <summary>
         /// Transforms every @x to [mention:x], skipping inside [ ... ] tags.
         /// </summary>
-        private static string TransformMentions(string input)
+        private static string TransformMentions(string input, int lineWidth)
         {
-            if (string.IsNullOrEmpty(input) || input.IndexOf('@') == -1)
-                return input;
-
             var sb = new StringBuilder(input.Length + 16);
             bool insideTag = false;
 
@@ -165,10 +172,7 @@ namespace ChatPlus.Core.Chat
 
                 if (!insideTag && c == '@')
                 {
-                    int start = i + 1;
-                    int j = start;
-
-                    // Stop at whitespace or tag delimiters
+                    int start = i + 1, j = start;
                     while (j < input.Length &&
                            !char.IsWhiteSpace(input[j]) &&
                            input[j] != ':' && input[j] != '[' && input[j] != ']')
@@ -177,7 +181,8 @@ namespace ChatPlus.Core.Chat
                     if (j > start)
                     {
                         string name = input.Substring(start, j - start);
-                        sb.Append(MentionTagHandler.GenerateTag(name)); // [mention:Name]
+                        // -> [mention:name/width:###]
+                        sb.Append(MentionTagHandler.GenerateTag(name, lineWidth));
                         i = j - 1;
                         continue;
                     }
@@ -185,7 +190,6 @@ namespace ChatPlus.Core.Chat
 
                 sb.Append(c);
             }
-
             return sb.ToString();
         }
     }

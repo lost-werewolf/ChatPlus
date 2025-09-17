@@ -12,9 +12,10 @@ internal class TypingIndicatorPlayer : ModPlayer
         if (Player.whoAmI != Main.myPlayer) return;
         if (!Conf.C.TypingIndicators) return;
 
-        bool isTyping = Main.hasFocus && 
-            Main.instance.IsActive
-            && Main.drawingPlayerChat
+        bool isTyping = 
+            //Main.hasFocus && 
+            //Main.instance.IsActive && 
+            Main.drawingPlayerChat
             && Main.chatText.Length > 0
             && !Main.blockInput;
 

@@ -2,22 +2,23 @@
 using System.Collections.Generic;
 using System.Globalization;
 using ChatPlus.Core.Features.PlayerColors;
-using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.Stats.PlayerStats;
 using ChatPlus.Core.Helpers;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using ReLogic.Graphics;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.UI;
 using Terraria.UI.Chat;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ChatPlus.Core.Features.Mentions;
 
 public sealed class MentionSnippet : TextSnippet
 {
     private bool isHovered;
+    public int CurrentLineWidth;
+    private readonly int _lineWidthUnscaled; // from tag
 
     // cache maps (case-insensitive)
     private static readonly Dictionary<string, string> _nameToHex = new(StringComparer.OrdinalIgnoreCase);
@@ -27,9 +28,11 @@ public sealed class MentionSnippet : TextSnippet
     private int _lastIndex = -1;
     private string _lastName = string.Empty;
 
-    public MentionSnippet(TextSnippet src) : base(src.Text, src.Color, src.Scale)
+    public MentionSnippet(TextSnippet src, int lineWidthUnscaled = -1)
+        : base(src.Text, src.Color, src.Scale)
     {
-        CheckForHover = true;
+        CheckForHover = false; // pure highlight
+        _lineWidthUnscaled = lineWidthUnscaled;
     }
 
     public static void InvalidateCachesFor(string name)
@@ -108,38 +111,43 @@ public sealed class MentionSnippet : TextSnippet
         _lastName = name;
         _lastIndex = ResolveIndex(name);
 
-        string display = "@" + name;
+        string playerName = "@" + name;
 
         var font = FontAssets.MouseText.Value;
-        size = font.MeasureString(display) * scale;
+        size = font.MeasureString(playerName) * scale;
         if (justCheckingString) return true;
 
         // skip shadow pass
         if (passColor.R + passColor.G + passColor.B <= 5)
             return true;
 
-        // text color from cached hex
+        // playerName color from cached hex
         string hex = ResolveHex(name);
         //Log.Info($"hex: {hex} for: {name}");
-        Color textColor = Color.White;
+        Color playerColor = Color.White;
         if (hex.Length == 6 &&
             byte.TryParse(hex[..2], NumberStyles.HexNumber, null, out var r) &&
             byte.TryParse(hex.Substring(2, 2), NumberStyles.HexNumber, null, out var g) &&
             byte.TryParse(hex.Substring(4, 2), NumberStyles.HexNumber, null, out var b))
-            textColor = new Color(r, g, b);
+            playerColor = new Color(r, g, b);
 
-        Vector2 p = new((float)Math.Floor(pos.X), (float)Math.Floor(pos.Y));
+        Vector2 p = new((float)Math.Floor(pos.X-5), (float)Math.Floor(pos.Y-1));
 
-        // bold if this client is the mentioned player
-        if (string.Equals(name, Main.LocalPlayer.name))
+        // measure size of snippet playerName
+        size = font.MeasureString(playerName) * scale;
+
+        if (string.Equals(name, Main.LocalPlayer.name, StringComparison.OrdinalIgnoreCase))
         {
-            DrawColorCodedStringWithBOLD(sb, font,
-                display, pos, textColor, 0f, Vector2.Zero, Vector2.One);
-           
-        }
-        //Utils.DrawBorderString(sb, display, pos, textColor);
+            var boldFont = FontHelper.BoldMedium;
 
-        // hover (like links)
+            ChatManager.DrawColorCodedStringWithShadow(sb, boldFont,
+            playerName, p, playerColor, 0f, Vector2.Zero, Vector2.One);
+            //Utils.DrawBorderString(sb, playerName, pos, playerColor);
+        }
+
+        //Utils.DrawBorderString(sb, playerName, pos, playerColor);
+
+        // hover (acts like links)
         int width = (int)Math.Ceiling(size.X);
         int lineH = (int)Math.Ceiling(font.LineSpacing * scale);
         var hoverR = new Rectangle((int)p.X, (int)p.Y, width, Math.Max(1, lineH - 7));
@@ -151,8 +159,9 @@ public sealed class MentionSnippet : TextSnippet
         {
             Main.LocalPlayer.mouseInterface = true;
 
-            // underline slightly darker than text color
-            Color ul = new((byte)(textColor.R * 0.85f), (byte)(textColor.G * 0.85f), (byte)(textColor.B * 0.85f));
+            // underline slightly darker than playerName color
+            float dark = 0.35f;
+            Color ul = new((byte)(playerColor.R * dark), (byte)(playerColor.G * dark), (byte)(playerColor.B * dark));
             int underlineY = (int)Math.Floor(p.Y + lineH - 10f);
             sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)p.X, underlineY, width, 2), ul);
 
@@ -165,21 +174,48 @@ public sealed class MentionSnippet : TextSnippet
         return true;
     }
 
-    public static Vector2 DrawColorCodedStringWithBOLD(SpriteBatch spriteBatch, DynamicSpriteFont font, string text, Vector2 position, Color baseColor, float rotation, Vector2 origin, Vector2 baseScale, float maxWidth = -1f, float spread = 2f)
-    {
-        TextSnippet[] snippets = ChatManager.ParseMessage(text, baseColor).ToArray();
-        ChatManager.ConvertNormalSnippets(snippets);
-        ChatManager.DrawColorCodedStringShadow(spriteBatch, font, snippets, position + Vector2.UnitX * spread, new Color(0, 0, 0, baseColor.A), rotation, origin, baseScale, maxWidth, spread);
-        ChatManager.DrawColorCodedStringShadow(spriteBatch, font, snippets, position + Vector2.UnitY * spread, new Color(0, 0, 0, baseColor.A), rotation, origin, baseScale, maxWidth, spread);
-        ChatManager.DrawColorCodedStringShadow(spriteBatch, font, snippets, position - Vector2.UnitX * spread, new Color(0, 0, 0, baseColor.A), rotation, origin, baseScale, maxWidth, spread);
-        ChatManager.DrawColorCodedStringShadow(spriteBatch, font, snippets, position - Vector2.UnitY * spread, new Color(0, 0, 0, baseColor.A), rotation, origin, baseScale, maxWidth, spread);
-        for (int i = 0; i < ChatManager.ShadowDirections.Length; i++)
-        {
-            //ChatManager.DrawColorCodedString(spriteBatch, font, text, position + ChatManager.ShadowDirections[i] * spread, Color.White, rotation, origin, baseScale, out int _, maxWidth, ignoreColors: false);
-        }
-        int hoveredSnippet;
-        return ChatManager.DrawColorCodedString(spriteBatch, font, snippets, position, Color.White, rotation, origin, baseScale, out hoveredSnippet, maxWidth);
-    }
+    //private void DrawYellowBackgroundHighlightRectangle(SpriteBatch sb, Rectangle rect)
+    //{
+    //    var font = FontAssets.MouseText.Value;
+    //    int lineHeight = (int)Math.Ceiling(font.LineSpacing * 1f);
+    //    int w = 300;
+    //    //if (_lineWidthUnscaled > 0)
+    //    //{
+    //    //    w = _lineWidthUnscaled;
+    //    //}
+    //    //w = (int)font.MeasureString(Main.LocalPlayer.name).X + 25;
+    //    //rect = new(
+    //        //(int)p.X - 2,
+    //        //(int)Math.Floor(pos.Y) + 1,
+    //        //w - 7,
+    //        //lineHeight - 9
+    //    //);
+    //    Color bgColor = new Color(250, 230, 160) * 0.7f;
+
+    //    // load the rounded panel texture (31x31 with rounded edges)
+    //    var tex = Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Stat_Panel").Value;
+
+    //    int c = 5; // corner size
+    //    Rectangle corner = new(0, 0, c, c);
+    //    Rectangle rightEdge = new(c, 0, tex.Width - 2 * c, c);
+    //    Rectangle leftEdge = new(0, c, c, tex.Height - 2 * c);
+    //    Rectangle center = new(c, c, tex.Width - 2 * c, tex.Height - 2 * c);
+
+    //    //center fill
+    //    sb.Draw(tex, new Rectangle(rect.X + c, rect.Y + c, rect.Width - 2 * c, rect.Height - 2 * c), center, bgColor);
+
+    //    //edges
+    //    sb.Draw(tex, new Rectangle(rect.X + c, rect.Y, rect.Width - 2 * c, c), rightEdge, bgColor);
+    //    sb.Draw(tex, new Rectangle(rect.X + c, rect.Bottom - c, rect.Width - 2 * c, c), rightEdge, bgColor, 0, Vector2.Zero, SpriteEffects.FlipVertically, 0);
+    //    sb.Draw(tex, new Rectangle(rect.X, rect.Y + c, c, rect.Height - 2 * c), leftEdge, bgColor);
+    //    sb.Draw(tex, new Rectangle(rect.Right - c, rect.Y + c, c, rect.Height - 2 * c), leftEdge, bgColor, 0, Vector2.Zero, SpriteEffects.FlipHorizontally, 0);
+
+    //    // corners
+    //    sb.Draw(tex, new Rectangle(rect.X, rect.Y, c, c), corner, bgColor);
+    //    sb.Draw(tex, new Rectangle(rect.Right - c, rect.Y, c, c), corner, bgColor, 0, Vector2.Zero, SpriteEffects.FlipHorizontally, 0);
+    //    sb.Draw(tex, new Rectangle(rect.Right - c, rect.Bottom - c, c, c), corner, bgColor, 0, Vector2.Zero, SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically, 0);
+    //    sb.Draw(tex, new Rectangle(rect.X, rect.Bottom - c, c, c), corner, bgColor, 0, Vector2.Zero, SpriteEffects.FlipVertically, 0);
+    //}
 
     public override void OnClick()
     {

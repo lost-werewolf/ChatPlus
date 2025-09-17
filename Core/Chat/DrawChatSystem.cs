@@ -7,9 +7,11 @@ using ChatPlus.Core.Features.Scrollbar;
 using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.TypingIndicators;
 using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Helpers;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI;
@@ -26,8 +28,6 @@ namespace ChatPlus.Core.Chat;
 /// </summary>
 internal class DrawChatSystem : ModSystem
 {
-    private static bool _uiLeftCapture;
-
     public override void Load()
     {
         if (ModLoader.TryGetMod("ChatImprover", out Mod _))
@@ -144,7 +144,8 @@ internal class DrawChatSystem : ModSystem
 
         // chat history bits
         var chat = ModContent.GetInstance<ChatScrollSystem>()?.chatScrollState;
-        bool overChatScrollbar = (chat?.chatScrollbar?.IsMouseHovering ?? false);
+        bool overChatScrollbar = (chat?.chatScrollbar?.IsMouseHovering ?? false)
+            || (chat?.chatScrollList.IsMouseHovering ?? false);
 
         return overInfo || overPanel || overScroll || overChatScrollbar;
     }
@@ -194,7 +195,7 @@ internal class DrawChatSystem : ModSystem
                 .ToList();
 
             // to debug, comment below line out
-            //typingPlayers.Remove(Main.player[Main.myPlayer].name);
+            typingPlayers.Remove(Main.player[Main.myPlayer].name);
 
             delta += 30;
 
@@ -216,10 +217,14 @@ internal class DrawChatSystem : ModSystem
             Main.screenHeight = oldH;
         }
     }
-
+    DynamicSpriteFont boldFont;
     
     private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
     {
+        // testing
+        //Main.spriteBatch.DrawString(FontHelper.BoldMedium, "Hello, bold world!", new Vector2(200, 200), Color.White);
+        //Main.spriteBatch.DrawString(FontAssets.MouseText.Value, "Hello, thin world!", new Vector2(200, 170), Color.White);
+
         if (!Conf.C.TextEditor)
         {
             orig(self);

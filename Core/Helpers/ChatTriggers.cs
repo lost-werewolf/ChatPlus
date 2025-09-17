@@ -48,6 +48,47 @@ public static class ChatTriggers
         });
     }
 
+    public static ITrigger AtMentionWord()
+    {
+        return new PredicateTrigger((text, caret) =>
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+
+            // Clamp caret
+            int i = Math.Max(0, Math.Min(caret - 1, text.Length - 1));
+
+            // Find word start (stop at whitespace or bracket)
+            int start = i;
+            while (start > 0)
+            {
+                char ch = text[start - 1];
+                if (char.IsWhiteSpace(ch) || ch == '[' || ch == ']') break;
+                start--;
+            }
+
+            if (start >= text.Length || text[start] != '@') return false;
+
+            // Ensure we are not inside a [tag]
+            int lb = text.LastIndexOf('[', i);
+            int rb = text.LastIndexOf(']', i);
+            bool insideTag = lb > rb;
+            if (insideTag) return false;
+
+            // Find word end (first stop char)
+            int end = start + 1;
+            while (end < text.Length)
+            {
+                char ch = text[end];
+                if (char.IsWhiteSpace(ch) || ch == '[' || ch == ']' || ch == ':' || ch == ',' || ch == '.' || ch == ';' || ch == '!' || ch == '?')
+                    break;
+                end++;
+            }
+
+            // True only if caret is within the @word bounds
+            return caret > start && caret <= end;
+        });
+    }
+
     public static ITrigger CharOutsideTags(char character)
     {
         return new PredicateTrigger((text, caret) =>
@@ -65,26 +106,6 @@ public static class ChatTriggers
             bool insideTag = lb > rb;
 
             return !insideTag;
-        });
-    }
-
-    public static ITrigger AtMentionWord()
-    {
-        return new PredicateTrigger((text, caret) =>
-        {
-            if (string.IsNullOrEmpty(text))
-                return false;
-
-            int searchStart = Math.Min(Math.Max(caret - 1, 0), text.Length - 1);
-            int at = text.LastIndexOf('@', searchStart);
-            if (at < 0)
-                return false;
-
-            int space = text.IndexOf(' ', at + 1);
-            if (space == -1)
-                return true;
-
-            return space > caret;
         });
     }
 

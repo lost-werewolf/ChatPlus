@@ -22,7 +22,7 @@ Press [g to open glyphs.
 Press [i to open items.
 Press [m to open mod icons.
 Press [p to open player icons.
-Looking to add autocomplete to your own mod? Read the [url=https://github.com/emyhrberg/ChatPlus] Wiki on GitHub. [/url]
+Looking to add autocomplete to your own mod? Read the [url=https://github.com/emyhrberg/ChatPlus/wiki/Mod-Call] Wiki on GitHub. [/url]
 
 [h3] 🤝Credits [/h3] 
 Thanks to Neptune for making the icon!

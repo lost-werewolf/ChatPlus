@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -30,15 +30,16 @@ public class MentionSystem : ModSystem
 
     public override void UpdateUI(GameTime gameTime)
     {
+        // (we’ll add the suppression guard here in step 2)
         ChatPlus.StateManager.OpenStateByTriggers(
             gameTime,
             ui,
             state,
-            ChatTriggers.UnclosedTag("[mention"),   
-            ChatTriggers.CharOutsideTags('@'),        
+            ChatTriggers.UnclosedTag("[mention"),
             ChatTriggers.AtMentionWord()             
         );
     }
+
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
     {

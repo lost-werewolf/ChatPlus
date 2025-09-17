@@ -16,6 +16,7 @@ namespace ChatPlus.Core.UI
     {
         // Variables
         private bool isSelected;
+        public bool GetIsSelected => isSelected;
         public bool SetSelected(bool value) => isSelected = value;
 
         // Properties
