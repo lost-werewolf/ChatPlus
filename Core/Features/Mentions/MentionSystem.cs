@@ -19,7 +19,6 @@ public class MentionSystem : ModSystem
         ui = new UserInterface();
         state = new MentionState();
         ui.SetState(null);
-        ChatManager.Register<MentionTagHandler>("mention");
     }
 
     public override void Unload()

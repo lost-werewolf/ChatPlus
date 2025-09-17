@@ -4,11 +4,13 @@ using System.Globalization;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.Stats.PlayerStats;
 using ChatPlus.Core.Helpers;
+using ChatPlus.Core.Systems;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.Graphics;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ModLoader;
 using Terraria.UI.Chat;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -131,16 +133,17 @@ public sealed class MentionSnippet : TextSnippet
             byte.TryParse(hex.Substring(4, 2), NumberStyles.HexNumber, null, out var b))
             playerColor = new Color(r, g, b);
 
-        Vector2 p = new((float)Math.Floor(pos.X-5), (float)Math.Floor(pos.Y-1));
+        Vector2 p = new((float)Math.Floor(pos.X-5), (float)Math.Floor(pos.Y+5));
 
         // measure size of snippet playerName
         size = font.MeasureString(playerName) * scale;
 
         if (string.Equals(name, Main.LocalPlayer.name, StringComparison.OrdinalIgnoreCase))
         {
-            var boldFont = FontHelper.BoldMedium;
+            //DynamicSpriteFont boldFont = FontSystem.BoldFont;
+            DynamicSpriteFont superboldFont = FontSystem.Bold;
 
-            ChatManager.DrawColorCodedStringWithShadow(sb, boldFont,
+            ChatManager.DrawColorCodedStringWithShadow(sb, superboldFont,
             playerName, p, playerColor, 0f, Vector2.Zero, Vector2.One);
             //Utils.DrawBorderString(sb, playerName, pos, playerColor);
         }

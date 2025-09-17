@@ -26,6 +26,7 @@ Looking to add autocomplete to your own mod? Read the [url=https://github.com/em
 
 [h3] 🤝Credits [/h3] 
 Thanks to Neptune for making the icon!
+Thanks to nog for helping make bold text!
 
 [h3] ❤️ Support the Project [/h3]
 Check out the source code at [url=https://github.com/emyhrberg/ChatPlus] GitHub [/url]

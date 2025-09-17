@@ -1,5 +1,6 @@
 ﻿using System;
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.BoldText;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
 using Terraria;
@@ -114,9 +115,11 @@ namespace ChatPlus.Core.Chat
             HandleCharacterKeyPressed(); // Input text is entered here
             HandleLeftRightArrowKeysPressed(); // Caret navigation with left right keys
 
-            // More functionality
             HandleClipboardKeys();
             HandleCtrlAPressed();
+            HandleCtrlBPressed();
+            HandleCtrlIPressed(); 
+            HandleCtrlUPressed(); 
             HandleTabKeyPressed();
             HandleBackKeyPressed();
 
@@ -124,6 +127,128 @@ namespace ChatPlus.Core.Chat
             caretPos = Math.Clamp(caretPos, 0, Main.chatText.Length);
 
             return Main.chatText;
+        }
+
+        private void HandleCtrlIPressed()
+        {
+            bool ctrl = Main.keyState.IsKeyDown(Keys.LeftControl) || Main.keyState.IsKeyDown(Keys.RightControl);
+            bool pressedNow = Main.keyState.IsKeyDown(Keys.I) && !Main.oldKeyState.IsKeyDown(Keys.I);
+
+            if (!ctrl || !pressedNow)
+                return;
+
+            var sel = GetSelection();
+            if (sel != null)
+            {
+                int start = Math.Clamp(sel.Value.start, 0, Main.chatText.Length);
+                int end = Math.Clamp(sel.Value.end, 0, Main.chatText.Length);
+
+                if (end > start)
+                {
+                    string before = Main.chatText.Substring(0, start);
+                    string mid = Main.chatText.Substring(start, end - start);
+                    string after = end < Main.chatText.Length ? Main.chatText.Substring(end) : string.Empty;
+
+                    string wrapped = ItalicsTagHandler.GenerateTag(mid);
+
+                    Main.chatText = before + wrapped + after;
+                    caretPos = before.Length + wrapped.Length;
+                    selectionAnchor = -1;
+                    selectAll = false;
+                    return;
+                }
+            }
+
+            // No selection: insert empty [italics:] and place caret inside
+            string emptyTag = ItalicsTagHandler.GenerateTag(string.Empty);
+            int innerOffset = emptyTag.LastIndexOf(':') + 1;
+
+            Main.chatText = Main.chatText.Insert(caretPos, emptyTag);
+            caretPos += innerOffset;
+            selectionAnchor = -1;
+            selectAll = false;
+        }
+
+        private void HandleCtrlUPressed()
+        {
+            bool ctrl = Main.keyState.IsKeyDown(Keys.LeftControl) || Main.keyState.IsKeyDown(Keys.RightControl);
+            bool pressedNow = Main.keyState.IsKeyDown(Keys.U) && !Main.oldKeyState.IsKeyDown(Keys.U);
+
+            if (!ctrl || !pressedNow)
+                return;
+
+            var sel = GetSelection();
+            if (sel != null)
+            {
+                int start = Math.Clamp(sel.Value.start, 0, Main.chatText.Length);
+                int end = Math.Clamp(sel.Value.end, 0, Main.chatText.Length);
+
+                if (end > start)
+                {
+                    string before = Main.chatText.Substring(0, start);
+                    string mid = Main.chatText.Substring(start, end - start);
+                    string after = end < Main.chatText.Length ? Main.chatText.Substring(end) : string.Empty;
+
+                    string wrapped = $"[underline:{mid}]"; // no handler yet, so just wrap
+
+                    Main.chatText = before + wrapped + after;
+                    caretPos = before.Length + wrapped.Length;
+                    selectionAnchor = -1;
+                    selectAll = false;
+                    return;
+                }
+            }
+
+            // No selection: insert empty [u:] and place caret inside
+            string emptyTag = "[underline:]";
+            int innerOffset = emptyTag.LastIndexOf(':') + 1;
+
+            Main.chatText = Main.chatText.Insert(caretPos, emptyTag);
+            caretPos += innerOffset;
+            selectionAnchor = -1;
+            selectAll = false;
+        }
+
+        private void HandleCtrlBPressed()
+        {
+            bool ctrl = Main.keyState.IsKeyDown(Keys.LeftControl) || Main.keyState.IsKeyDown(Keys.RightControl);
+            bool pressedBNow = Main.keyState.IsKeyDown(Keys.B) && !Main.oldKeyState.IsKeyDown(Keys.B);
+
+            if (!ctrl || !pressedBNow)
+            {
+                return;
+            }
+
+            var sel = GetSelection();
+            if (sel != null)
+            {
+                int start = Math.Clamp(sel.Value.start, 0, Main.chatText.Length);
+                int end = Math.Clamp(sel.Value.end, 0, Main.chatText.Length);
+
+                if (end > start)
+                {
+                    string before = Main.chatText.Substring(0, start);
+                    string mid = Main.chatText.Substring(start, end - start);
+                    string after = end < Main.chatText.Length ? Main.chatText.Substring(end) : string.Empty;
+
+                    string wrapped = BoldTagHandler.GenerateTag(mid);
+
+                    Main.chatText = before + wrapped + after;
+                    caretPos = before.Length + wrapped.Length;
+                    selectionAnchor = -1;
+                    selectAll = false;
+                    return;
+                }
+            }
+
+            // No selection: insert empty [bold:] and place caret inside
+            string emptyTag = BoldTagHandler.GenerateTag(string.Empty); // "[b:]"
+            int innerOffset = emptyTag.LastIndexOf(':') + 1;            // position after ':'
+
+            Main.chatText = Main.chatText.Insert(caretPos, emptyTag);
+            caretPos += innerOffset;
+            selectionAnchor = -1;
+            selectAll = false;
         }
 
         private void HandleClipboardKeys()
@@ -332,7 +457,7 @@ namespace ChatPlus.Core.Chat
             else _backspaceHoldFrames = 0;
         }
 
-        #region helpers
+        #region Helpers
         private int MoveCaretWordLeft(int pos, string text)
         {
             if (pos <= 0) return 0;

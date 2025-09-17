@@ -35,9 +35,7 @@ namespace ChatPlus.Core.Helpers
             {
                 if (field.FieldType == typeof(Asset<Texture2D>))
                 {
-                    string modName = "ChatPlus";
-                    string path = field.Name;
-                    var asset = ModContent.Request<Texture2D>($"{modName}/Assets/{path}", AssetRequestMode.AsyncLoad);
+                    var asset = ModContent.Request<Texture2D>($"ChatPlus/Assets/{field.Name}", AssetRequestMode.AsyncLoad);
                     field.SetValue(null, asset);
                 }
             }

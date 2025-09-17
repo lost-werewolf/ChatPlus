@@ -11,7 +11,6 @@ internal class ModIconManager : ModSystem
 
     public override void PostSetupContent()
     {
-        ChatManager.Register<ModIconTagHandler>("m");
         BuildModIconList();
     }
 

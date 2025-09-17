@@ -11,22 +11,17 @@ namespace ChatPlus.Core.Features.Links;
 public class LinkSnippet : TextSnippet
 {
     private bool isHovered;
-    private int lastUnderlineDrawFrame;
     public LinkSnippet(TextSnippet src) : base(src.Text, src.Color, src.Scale)
     {
-        CheckForHover = true;
+        CheckForHover = false;
     }
 
     public override Color GetVisibleColor()
     {
-        if (isHovered) return new Color(6, 69, 173);
+        if (isHovered) 
+            return new Color(6, 69, 173);
 
         return new Color(0, 125, 255);
-    }
-
-    public override void OnHover()
-    {
-        // No-op; we compute hover ourselves each draw.
     }
 
     public override bool UniqueDraw(bool justCheckingString, out Vector2 size,
@@ -50,7 +45,7 @@ public class LinkSnippet : TextSnippet
         }
 
         // Snap to pixels to avoid drift
-        Vector2 p = new Vector2((float)Math.Floor(pos.X), (float)Math.Floor(pos.Y));
+        Vector2 p = new ((float)Math.Floor(pos.X), (float)Math.Floor(pos.Y));
 
         int width = (int)System.Math.Ceiling(size.X);
         int lineHeight = (int)System.Math.Ceiling(font.LineSpacing * scale);
@@ -65,8 +60,8 @@ public class LinkSnippet : TextSnippet
         {
             Main.LocalPlayer.mouseInterface = true;
 
-            // DrawSystems a single 1px underline for this visible segment
-            int underlineY = (int)System.Math.Floor(p.Y + lineHeight - 10f);
+            // draw a single 1px underline for this visible segment
+            int underlineY = (int)Math.Floor(p.Y + lineHeight - 10f);
             var underlineRect = new Rectangle((int)p.X, underlineY, width, 2);
             sb.Draw(TextureAssets.MagicPixel.Value, underlineRect, GetVisibleColor());
 
@@ -77,13 +72,7 @@ public class LinkSnippet : TextSnippet
             }
         }
 
-        // Let vanilla draw glyphs using our GetVisibleColor()
         return false;
-    }
-
-    public override void OnClick()
-    {
-        base.OnClick();
     }
 
     public void OpenLink(string url)

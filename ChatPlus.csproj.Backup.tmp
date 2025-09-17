@@ -19,7 +19,6 @@
 		<EffectFiles Include="**\*.fx" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Assets\Fonts\" />
 	  <Folder Include="Core\Features\Mentions\NewFolder\" />
 	</ItemGroup>
 

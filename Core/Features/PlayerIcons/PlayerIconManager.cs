@@ -17,11 +17,6 @@ internal class PlayerIconManager : ModSystem
 
     public static string GenerateTag(string name) => $"[p:{name}]";
 
-    public override void Load()
-    {
-        ChatManager.Register<PlayerIconTagHandler>("p");
-    }
-
     public override void PostUpdatePlayers()
     {
         Refresh();

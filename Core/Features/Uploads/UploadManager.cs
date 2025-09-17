@@ -17,7 +17,6 @@ namespace ChatPlus.Core.Features.Uploads
 
         public override void PostSetupContent()
         {
-            ChatManager.Register<UploadTagHandler>("u");
             InitializeUploadedTextures();
         }
 

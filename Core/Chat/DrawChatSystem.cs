@@ -217,14 +217,8 @@ internal class DrawChatSystem : ModSystem
             Main.screenHeight = oldH;
         }
     }
-    DynamicSpriteFont boldFont;
-    
     private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
     {
-        // testing
-        //Main.spriteBatch.DrawString(FontHelper.BoldMedium, "Hello, bold world!", new Vector2(200, 200), Color.White);
-        //Main.spriteBatch.DrawString(FontAssets.MouseText.Value, "Hello, thin world!", new Vector2(200, 170), Color.White);
-
         if (!Conf.C.TextEditor)
         {
             orig(self);

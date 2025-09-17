@@ -18,6 +18,6 @@
 			"executablePath": "$(DotNetName)",
 			"commandLineArgs": "$(tMLPath) -skipselect",
 			"workingDirectory": "$(tMLSteamPath)"
-		},
+		}
 	}
 }
