@@ -96,7 +96,6 @@ public sealed class ModIconSnippet : TextSnippet
     public override void OnClick()
     {
         base.OnClick();
-        Main.NewText("c");
 
         var state = ModInfoState.Instance;
         if (state == null)
