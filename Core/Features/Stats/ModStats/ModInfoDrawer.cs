@@ -180,11 +180,11 @@ public static class ModInfoDrawer
 
         // Priority: icon_workshop
         if (mod.FileExists("icon_workshop.rawimg"))
-            tex = mod.Assets.Request<Texture2D>("icon_workshop", AssetRequestMode.ImmediateLoad).Value;
+            tex = mod.Assets.Request<Texture2D>("icon_workshop").Value;
         else if (mod.FileExists("icon.png"))
-            tex = mod.Assets.Request<Texture2D>("icon", AssetRequestMode.ImmediateLoad).Value;
+            tex = mod.Assets.Request<Texture2D>("icon").Value;
         else if (mod.FileExists("icon_small.rawimg"))
-            tex = mod.Assets.Request<Texture2D>("icon_small", AssetRequestMode.ImmediateLoad).Value;
+            tex = mod.Assets.Request<Texture2D>("icon_small").Value;
 
         if (tex != null)
         {
