@@ -8,7 +8,7 @@ namespace ChatPlus.Core.Features.Items
     {
         public static List<ItemEntry> Items { get; private set; } = [];
 
-        public override void PostSetupContent()
+        public override void PostSetupRecipes()
         {
             InitializeItems();
         }
