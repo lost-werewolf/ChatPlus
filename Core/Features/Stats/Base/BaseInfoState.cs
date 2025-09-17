@@ -34,7 +34,7 @@ public abstract class BaseInfoState : UIState
         Root = new UIElement
         {
             Width = { Percent = 0.8f },
-            MaxWidth = new StyleDimension(800f, 0f),
+            MaxWidth = new StyleDimension(1000f, 0f),
             Top = { Pixels = TopOffsetPx },
             Height = { Pixels = -TopOffsetPx, Percent = 1f },
             HAlign = 0.5f
