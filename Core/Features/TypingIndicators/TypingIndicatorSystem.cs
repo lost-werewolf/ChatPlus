@@ -126,23 +126,25 @@ public class TypingIndicatorSystem : ModSystem
     /// <summary>
     /// Draws the chat bubble just above the chat box
     /// </summary>
-    public static void DrawTypingLine()
+    public static void DrawTypingLine(int yOffset=0)
     {
         if (!Conf.C.TypingIndicators) return;
 
         // Show chatline ONLY for other players (never for myself).
-        var otherTypers = TypingIndicatorSystem.TypingPlayers
+        var otherTypers = TypingPlayers
             .Where(kvp => kvp.Value
-                         && kvp.Key != Main.myPlayer
                          && kvp.Key >= 0
                          && kvp.Key < Main.maxPlayers
                          && Main.player[kvp.Key].active)
             .Select(kvp => kvp.Key)
             .ToList();
 
+        // remove myself if present
+        otherTypers.Remove(Main.myPlayer);
+
         if (otherTypers.Count == 0) return;
 
-        List<string> coloredNames = new List<string>();
+        List<string> coloredNames = [];
         for (int n = 0; n < otherTypers.Count; n++)
         {
             int idx = otherTypers[n];
@@ -159,7 +161,8 @@ public class TypingIndicatorSystem : ModSystem
                 hex = PlayerColorHandler.HexFromName(name);
             }
 
-            coloredNames.Add($"[c/{hex}:{name}]");
+            //coloredNames.Add($"[c/{hex}:{name}]");
+            coloredNames.Add(name);
         }
 
         string message;
@@ -176,22 +179,22 @@ public class TypingIndicatorSystem : ModSystem
             message = Loc.Get("TypingIndicators.MultiplePlayersAreTyping", coloredNames.Count);
         }
 
-        Vector2 pos = new Vector2(88, Main.screenHeight - 38);
+        Vector2 pos = new(65, Main.screenHeight - 38 + yOffset);
 
         Texture2D tex = Ass.TypingIndicator.Value;
         Rectangle src = GetTypingSourceRect();
         Vector2 innerPos = pos + new Vector2(4, 4);
         Main.spriteBatch.Draw(tex, innerPos, src, Color.White, 0f, Vector2.Zero, 0.73f, 0f, 0f);
 
-        var snippets = ChatManager.ParseMessage(message, Color.White).ToArray();
+        var snippets = ChatManager.ParseMessage(message, Color.Gray).ToArray();
         ChatManager.DrawColorCodedStringWithShadow(
             Main.spriteBatch,
             FontAssets.MouseText.Value,
             snippets,
-            pos + new Vector2(30, 0),
+            pos + new Vector2(30, 3),
             0f,
             Vector2.Zero,
-            Vector2.One,
+            new Vector2(0.9f),
             out _
         );
     }

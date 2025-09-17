@@ -8,10 +8,10 @@
 - Add config preview
 - Add equipment toggle like vanilla for PlayerInfoState
 - Add enemy and boss tracker
-- Fix ModInfoDrawer mod icon size showing "n/a" bug sometimes
 - Add grid view to autocomplete
 - Add option for typing indicator to be drawn below chat
 - [HARD] Make player spectate with full background and proper player drawing
+- Add italics and underline and stuff
 
 ----------------------TODO------------------------
 - Add proper bold text for typing indicators

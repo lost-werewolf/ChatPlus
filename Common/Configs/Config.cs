@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Reflection;
 using ChatPlus.Common.Configs.ConfigElements;
 using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.PlayerColors;
@@ -8,6 +9,7 @@ using ChatPlus.Core.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Terraria;
+using Terraria.GameContent.UI.Chat;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
@@ -31,6 +33,7 @@ public class Config : ModConfig
         HourAndMinute24Hours,
         HourAndMinuteAndSeconds24Hours,
     }
+
     #endregion
     public override ConfigScope Mode => ConfigScope.ClientSide;
 
@@ -39,8 +42,6 @@ public class Config : ModConfig
     [BackgroundColor(255, 192, 8)] // Golden Yellow
     [DefaultValue(true)]
     public bool Autocomplete = true;
-
-    
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
     [Range(10f, 20f)]
@@ -121,6 +122,14 @@ public class Config : ModConfig
         base.OnChanged();
 
         if (Conf.C == null) return;
+
+        var field = typeof(RemadeChatMonitor)
+        .GetField("_showCount", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        if (field != null)
+        {
+            field.SetValue(Main.chatMonitor, (int) Conf.C.ChatsVisible);
+        }
 
         UpdatePlayerColor();
 

@@ -18,7 +18,7 @@ namespace ChatPlus.Core.Features.Uploads
         public UploadElement(Upload data) : base(data)
         {
             Element = data;
-            Height.Set(90, 0);
+            Height.Set(60, 0);
             Width.Set(0, 1);
 
             img = new(Element.Tag);

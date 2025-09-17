@@ -74,7 +74,9 @@ public class ChatScrollList : UIElement
 
         Sync();
 
-        if (IsMouseHovering) PlayerInput.LockVanillaMouseScroll("ChatPlus/ChatScroll");
+        // disable crafting window scroll etc while hovering above the entire chat history list
+        if (IsMouseHovering) 
+            PlayerInput.LockVanillaMouseScroll("ChatPlus/ChatScroll");
     }
 
     public override void Draw(SpriteBatch sb)

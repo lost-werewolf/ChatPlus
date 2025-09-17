@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.Scrollbar;
 using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.TypingIndicators;
 using ChatPlus.Core.Features.Uploads;
-using ChatPlus.Core.Helpers;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,7 +16,6 @@ using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.Chat;
 using Terraria.GameInput;
 using Terraria.ModLoader;
-using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Chat;
@@ -59,7 +56,7 @@ internal class DrawChatSystem : ModSystem
         On_Main.DrawMap -= PreventMapDrag;
         On_Player.Update -= PreventMapZoom;
     }
-
+    #region Fullscreen Map Fixes
     private void PreventMapZoom(On_Player.orig_Update orig, Player self, int i)
     {
         if (i != Main.myPlayer || !Main.mapFullscreen)
@@ -151,59 +148,6 @@ internal class DrawChatSystem : ModSystem
 
         return overInfo || overPanel || overScroll || overChatScrollbar;
     }
-
-
-    private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
-    {
-        int oldH = Main.screenHeight;
-        int delta = 0;
-        try
-        {
-            // Upload adjustment (your existing code)
-            if (drawingPlayerChat && UploadTagHandler.ContainsUploadTag(Main.chatText))
-            {
-                float ui = Main.UIScaleMatrix.M11;
-                if (ui <= 0f) ui = 1f;
-                delta += (int)Math.Round(147f / ui);
-            }
-
-            // Typing indicator adjustment
-            List<string> typingPlayers = TypingIndicatorSystem.TypingPlayers
-                .Where(kvp => kvp.Value
-                              && kvp.Key >= 0
-                              && kvp.Key < Main.maxPlayers
-                              && Main.player[kvp.Key].active)
-                .Select(kvp => Main.player[kvp.Key].name)
-                .ToList();
-
-            // to Debug: Remove myself from the list
-            typingPlayers.Remove(Main.player[Main.myPlayer].name);
-
-            bool anyTyping = typingPlayers.Any();
-
-            if (anyTyping)
-            {
-                delta += 21;
-            }
-
-            if (delta > 0)
-                Main.screenHeight = Math.Max(0, oldH - delta);
-
-            // DrawSystems chat history shifted up
-            orig(self, drawingPlayerChat);
-
-            // DrawSystems typing line if needed
-            if (anyTyping)
-            {
-                TypingIndicatorSystem.DrawTypingLine();
-            }
-        }
-        finally
-        {
-            Main.screenHeight = oldH;
-        }
-    }
-
     private void DrawUIInFullscreenMap(On_Main.orig_DrawPlayerChat orig, Main self)
     {
         orig(self);
@@ -224,6 +168,56 @@ internal class DrawChatSystem : ModSystem
             DrawSystemsInFullscreenMap.DrawHoverInfoSystems();
         }
     }
+    #endregion
+    private void DrawMonitor(On_RemadeChatMonitor.orig_DrawChat orig, RemadeChatMonitor self, bool drawingPlayerChat)
+    {
+        int oldH = Main.screenHeight;
+        int delta = 0;
+
+        try
+        {
+            // Upload adjustment
+            if (drawingPlayerChat && UploadTagHandler.ContainsUploadTag(Main.chatText))
+            {
+                float ui = Main.UIScaleMatrix.M11;
+                if (ui <= 0f) ui = 1f;
+                delta += (int)Math.Round(147f / ui);
+            }
+
+            // Collect other typers (exclude self)
+            var typingPlayers = TypingIndicatorSystem.TypingPlayers
+                .Where(kvp =>
+                    kvp.Value &&
+                    kvp.Key >= 0 && kvp.Key < Main.maxPlayers &&
+                    Main.player[kvp.Key].active)
+                .Select(kvp => Main.player[kvp.Key].name)
+                .ToList();
+
+            // to debug, comment below line out
+            //typingPlayers.Remove(Main.player[Main.myPlayer].name);
+
+            delta += 30;
+
+            bool anyTyping = typingPlayers.Any();
+
+            if (delta > 0)
+                Main.screenHeight = Math.Max(0, oldH - delta);
+
+            // Draw chat history
+            orig(self, drawingPlayerChat);
+            // Draw typing line
+            if (anyTyping)
+            {
+                TypingIndicatorSystem.DrawTypingLine(yOffset: 38);
+            }
+        }
+        finally
+        {
+            Main.screenHeight = oldH;
+        }
+    }
+
+    
     private void DrawChat(On_Main.orig_DrawPlayerChat orig, Main self)
     {
         if (!Conf.C.TextEditor)
@@ -252,8 +246,9 @@ internal class DrawChatSystem : ModSystem
         if (hasUpload)
             height = 147 + 21;
 
-        const int x = 0;
-        const int y = 0;
+        int x = 0;
+        int y = 0;
+        y -= 27;
 
         DrawChatbox(height, x, y);
 
@@ -265,7 +260,7 @@ internal class DrawChatSystem : ModSystem
         else
         {
             // reserve horizontal space for the upload preview and shift both text & caret
-            int textOffsetX = DrawUploadAndGetTextOffset(height);
+            int textOffsetX = DrawUploadAndGetTextOffset(height-y-5);
             DrawInputLine(height, hasUpload, textOffsetX, y);
             DrawSelectionRectangle(height, textOffsetX, y);
         }

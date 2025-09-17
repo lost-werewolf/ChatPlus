@@ -319,7 +319,7 @@ public abstract class BasePanel<TData> : DraggablePanel
         int itemCount = 10;
         if (Conf.C != null)
             itemCount = (int)Conf.C.AutocompleteItemsVisible;
-        Top.Set(-38, 0);
+        Top.Set(-64, 0);
         Height.Set(itemCount * 30, 0);
         scrollbar.Top.Set(6, 0);
         list.Height.Set(itemCount * 30, 0f);

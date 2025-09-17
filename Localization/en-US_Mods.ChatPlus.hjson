@@ -109,7 +109,12 @@ Configs: {
 
 		TypingIndicators: {
 			Label: Typing Indicators
-			Tooltip: Shows when a player is currently writing a chat.
+			Tooltip: Shows when a player is currently writing a chat and shares when you are writing a chat.
+		}
+
+		typingIndicatorPosition: {
+			Tooltip: ""
+			Label: Typing Indicator Position
 		}
 	}
 
@@ -134,6 +139,12 @@ Configs: {
 		NoOne.Label: No One
 		Team.Label: Team
 		Everyone.Label: Everyone
+	}
+
+	TypingIndicatorPosition: {
+		BelowChat.Label: Below Chat
+		AboveChat.Label: Above Chat
+		Tooltip: Set the position of the typing indicator.
 	}
 }
 

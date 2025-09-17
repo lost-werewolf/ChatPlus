@@ -3,15 +3,10 @@ using ChatPlus.Core.Features.Colors;
 using ChatPlus.Core.Features.Commands;
 using ChatPlus.Core.Features.Emojis;
 using ChatPlus.Core.Features.Glyphs;
-using ChatPlus.Core.Features.Items;
-using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.ModIcons;
-using ChatPlus.Core.Features.PlayerIcons
-;
+using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.Features.Uploads;
-using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
@@ -27,7 +22,7 @@ namespace ChatPlus.Core.UI
         {
             get
             {
-                int pad = 2;
+                int pad = 26;
                 int itemCount = 10;
                 if (Conf.C != null) itemCount = (int)Conf.C.AutocompleteItemsVisible;
                 return -itemCount * 30 - pad; // sit above the base panel

@@ -60,8 +60,6 @@ public class ChatScrollbar : UIElement
         viewPosition = MathHelper.Clamp(viewPosition, 0f, Math.Max(0f, maxViewSize - viewSize));
     }
 
-    public float GetValue() => viewPosition;
-
     private Rectangle GetHandleRectangle()
     {
         var inner = GetInnerDimensions();
@@ -91,7 +89,7 @@ public class ChatScrollbar : UIElement
         }
 
         isHoveringHandle = GetHandleRectangle().Contains(Main.MouseScreen.ToPoint());
-        
+
         // draw track and handle
         DrawBar(sb, trackTexture.Value, GetDimensions().ToRectangle(), Color.White*0.7f);
         DrawBar(sb, handleTexture.Value, GetHandleRectangle(),Color.White * (isDragging || isHoveringHandle ? 1f : 0.65f));
@@ -136,8 +134,8 @@ public class ChatScrollbar : UIElement
         int show = f != null ? Math.Clamp((int)f.GetValue(Main.chatMonitor), 10, 20) : 10;
 
         const float line = 21f;
-        float h = show * line;
-        float top = Main.screenHeight - (h + 37f); // keep bottom edge at screenHeight-37
+        float h = show * line+8;
+        float top = Main.screenHeight - (h + 37f)-23; // keep bottom edge at screenHeight-37
 
         Left.Set(50, 0);
         Top.Set(top, 0f);
