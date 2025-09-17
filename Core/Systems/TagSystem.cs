@@ -4,6 +4,7 @@ using ChatPlus.Core.Features.Links;
 using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerIcons;
+using ChatPlus.Core.Features.UnderlineText;
 using ChatPlus.Core.Features.Uploads;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
@@ -30,6 +31,6 @@ internal class TagSystem : ModSystem
         ChatManager.Register<ModIconTagHandler>(["m", "mod"]);
         ChatManager.Register<PlayerIconTagHandler>(["p", "player"]);
         ChatManager.Register<UploadTagHandler>(["u", "upload"]); // or #
-        ChatManager.Register<UploadTagHandler>(["underline"]); // or #
+        ChatManager.Register<UnderlineTagHandler>(["underline"]); // or #
     }
 }

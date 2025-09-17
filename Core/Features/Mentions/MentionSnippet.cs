@@ -133,7 +133,7 @@ public sealed class MentionSnippet : TextSnippet
             byte.TryParse(hex.Substring(4, 2), NumberStyles.HexNumber, null, out var b))
             playerColor = new Color(r, g, b);
 
-        Vector2 p = new((float)Math.Floor(pos.X-5), (float)Math.Floor(pos.Y+5));
+        Vector2 p = new((float)Math.Floor(pos.X - 3), (float)Math.Floor(pos.Y));
 
         // measure size of snippet playerName
         size = font.MeasureString(playerName) * scale;
