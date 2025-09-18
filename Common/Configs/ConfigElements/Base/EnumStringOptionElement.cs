@@ -1,14 +1,14 @@
 ﻿using System;
-using ChatPlus.Common.Configs;
+using ChatPlus.Core.Helpers;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria.ModLoader.Config.UI;
 using Terraria.ModLoader.UI;
 
-namespace ChatPlus.Common.Configs.ConfigElements
+namespace ChatPlus.Common.Configs.ConfigElements.Base
 {
     public class EnumStringOptionElement<TEnum> : RangeElement where TEnum : struct, Enum
     {
         private TEnum[] values;
-        private string[] labels;
 
         public override int NumberTicks => values.Length;
 
@@ -19,6 +19,27 @@ namespace ChatPlus.Common.Configs.ConfigElements
                 int denom = values.Length - 1;
                 if (denom <= 0) denom = 1;
                 return 1f / denom;
+            }
+        }
+
+        public override void Draw(SpriteBatch sb)
+        {
+            base.Draw(sb);
+
+            // Position
+            var dims = GetDimensions();
+            Vector2 pos = dims.Position();
+            Rectangle rect = new((int)pos.X+175, (int)pos.Y, 30, 30);
+
+            var current = values[GetIndex()];
+
+            if (current.ToString().Contains("Grid"))
+            {
+                sb.Draw(Ass.FilterGrid.Value, rect, Color.White);
+            }
+            else if (current.ToString().Contains("List"))
+            {
+                sb.Draw(Ass.FilterList.Value, rect, Color.White);
             }
         }
 
@@ -56,9 +77,9 @@ namespace ChatPlus.Common.Configs.ConfigElements
 
                 if (label.Length < 20)
                 {
-                    return label + "                       " + GetLiveLabel(values[i]);
+                    return label + ": " + GetLiveLabel(values[i]);
                 }
-                return label + "    " + GetLiveLabel(values[i]);
+                return label + ": " + GetLiveLabel(values[i]);
             };
         }
 

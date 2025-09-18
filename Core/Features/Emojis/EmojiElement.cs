@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
+using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.Features.Emojis;
 
@@ -24,6 +25,14 @@ public class EmojiElement : BaseElement<Emoji>
     {
         base.Draw(sb);
 
+        if (GetViewmode() == Viewmode.ListView)
+            DrawListElement(sb);
+        else
+            DrawGridElement(sb);
+    }
+
+    private void DrawListElement(SpriteBatch sb)
+    {
         var dims = GetDimensions();
         Vector2 pos = dims.Position() + new Vector2(32, 4);
 
@@ -54,32 +63,17 @@ public class EmojiElement : BaseElement<Emoji>
             string simple = ExtractSimpleName(emoji.Tag, emoji.Description);
             var snip = new TextSnippet[] { new TextSnippet(":" + simple) };
 
-            ChatManager.DrawColorCodedStringWithShadow(
-                sb,
-                FontAssets.MouseText.Value,
-                snip,
-                pos,
-                0f,
-                Vector2.Zero,
-                Vector2.One,
-                out _
-            );
+            ChatManager.DrawColorCodedStringWithShadow(sb,FontAssets.MouseText.Value,snip,pos,0f, Vector2.Zero,Vector2.One,out _);
         }
         else
         {
             var tagSnip = new TextSnippet[] { new TextSnippet(emoji.Tag) };
 
-            ChatManager.DrawColorCodedStringWithShadow(
-                sb,
-                FontAssets.MouseText.Value,
-                tagSnip,
-                pos,
-                0f,
-                Vector2.Zero,
-                Vector2.One,
-                out _
-            );
+            ChatManager.DrawColorCodedStringWithShadow(sb,FontAssets.MouseText.Value, tagSnip,pos,0f, Vector2.Zero,Vector2.One,out _ );
         }
     }
-
+    private void DrawGridElement(SpriteBatch sb)
+    {
+        // do nothing!
+    }
 }

@@ -1,11 +1,11 @@
-using ChatPlus.Core.Features.Stats.UploadStats;
+using System;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
+using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.Features.Uploads
 {
@@ -33,6 +33,24 @@ namespace ChatPlus.Core.Features.Uploads
             Height.Set(60, 0);
             base.Draw(sb);
 
+            if (GetViewmode() == Viewmode.ListView)
+                DrawListElement(sb);
+            else
+                DrawGridElement(sb);
+        }
+
+        private void DrawGridElement(SpriteBatch sb)
+        {
+            var dims = GetDimensions();
+            Vector2 pos = dims.Position();
+
+            img._textScale = 0.3f;
+            img.Left.Set(5, 0);
+            img.Top.Set(8, 0);
+        }
+
+        private void DrawListElement(SpriteBatch sb)
+        {
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
 
@@ -40,7 +58,7 @@ namespace ChatPlus.Core.Features.Uploads
             img.Left.Set(5, 0);
             img.Top.Set(8, 0);
 
-            string ToHashLabel(string tag)
+            static string ToHashLabel(string tag)
             {
                 if (string.IsNullOrEmpty(tag))
                     return "#";
@@ -64,16 +82,7 @@ namespace ChatPlus.Core.Features.Uploads
             TextSnippet[] snip = [new TextSnippet(display)];
             Vector2 textPos = pos + new Vector2(65, 5);
 
-            ChatManager.DrawColorCodedStringWithShadow(
-                sb,
-                FontAssets.MouseText.Value,
-                snip,
-                textPos,
-                0f,
-                Vector2.Zero,
-                Vector2.One,
-                out _
-            );
+            ChatManager.DrawColorCodedStringWithShadow(sb,FontAssets.MouseText.Value,snip,textPos,0f,Vector2.Zero, Vector2.One, out _);
         }
     }
 }

@@ -22,17 +22,16 @@ namespace ChatPlus.Core.UI
         {
             get
             {
-                int pad = 26;
-                int itemCount = 10;
-                if (Conf.C != null) itemCount = (int)Conf.C.AutocompleteItemsVisible;
-                return -itemCount * 30 - pad; // sit above the base panel
+                const float pad = 26f;
+                float visible = Conf.C?.autocompleteSettings?.AutocompleteItemsVisible ?? 10f;
+                return -(visible * 30f) - pad; // sit above the base panel
             }
         }
 
         public DescriptionPanel(string initialText = null)
         {
             // Size
-            Width.Set(320, 0);
+            Width.Set(300, 0);
             Height.Set(60, 0);
             BackgroundColor = new Color(33, 43, 79) * 1.0f;
             VAlign = 1f;

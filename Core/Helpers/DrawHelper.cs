@@ -66,4 +66,45 @@ public static class DrawHelper
         sb.Draw(tex, new Rectangle(t.Right - c, t.Bottom - c, c, c), sc, color, 0, Vector2.Zero, SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally, 0); // BR
         sb.Draw(tex, new Rectangle(t.X, t.Bottom - c, c, c), sc, color, 0, Vector2.Zero, SpriteEffects.FlipVertically, 0); // BL
     }
+
+    public static void DrawPixelatedBorder(SpriteBatch sb, Rectangle r, Color c, int size = 2, int stroke = 1)
+    {
+        var t = TextureAssets.MagicPixel.Value;
+
+        // --- Edges (minus the corners) ---
+        for (int s = 0; s < stroke; s++)
+        {
+            // Top
+            sb.Draw(t, new Rectangle(r.X + size, r.Y + s, r.Width - size * 2, 1), c);
+            // Bottom
+            sb.Draw(t, new Rectangle(r.X + size, r.Bottom - 1 - s, r.Width - size * 2, 1), c);
+            // Left
+            sb.Draw(t, new Rectangle(r.X + s, r.Y + size, 1, r.Height - size * 2), c);
+            // Right
+            sb.Draw(t, new Rectangle(r.Right - 1 - s, r.Y + size, 1, r.Height - size * 2), c);
+        }
+
+        // --- Pixelated corners ---
+        for (int i = 0; i < size; i++)
+        {
+            for (int s = 0; s < stroke; s++)
+            {
+                // Top-left
+                sb.Draw(t, new Rectangle(r.X + i, r.Y + s, 1, i + 1), c);
+                sb.Draw(t, new Rectangle(r.X + s, r.Y + i, i + 1, 1), c);
+
+                // Top-right
+                sb.Draw(t, new Rectangle(r.Right - 1 - i, r.Y + s, 1, i + 1), c);
+                sb.Draw(t, new Rectangle(r.Right - 1 - s, r.Y + i, i + 1, 1), c);
+
+                // Bottom-left
+                sb.Draw(t, new Rectangle(r.X + i, r.Bottom - 1 - s, 1, i + 1), c);
+                sb.Draw(t, new Rectangle(r.X + s, r.Bottom - 1 - i, i + 1, 1), c);
+
+                // Bottom-right
+                sb.Draw(t, new Rectangle(r.Right - 1 - i, r.Bottom - 1 - s, 1, i + 1), c);
+                sb.Draw(t, new Rectangle(r.Right - 1 - s, r.Bottom - 1 - i, i + 1, 1), c);
+            }
+        }
+    }
 }

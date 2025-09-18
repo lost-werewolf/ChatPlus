@@ -1,3 +1,4 @@
+using System;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.UI;
@@ -5,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
+using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.Features.PlayerIcons;
 
@@ -19,6 +21,27 @@ public class PlayerIconElement : BaseElement<PlayerIcon>
     public override void Draw(SpriteBatch sb)
     {
         base.Draw(sb);
+
+        if (GetViewmode() == Viewmode.ListView)
+            DrawListElement(sb);
+        else
+            DrawGridElement(sb);
+    }
+
+    private void DrawGridElement(SpriteBatch sb)
+    {
+        var dims = GetDimensions();
+        Vector2 pos = dims.Position();
+        TextSnippet[] snip = [new TextSnippet(Data.PlayerName)];
+        string tag = Data.Tag;
+
+        // Draw player head
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, tag,
+            pos + new Vector2(0, 3), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
+    }
+
+    private void DrawListElement(SpriteBatch sb)
+    {
         var dims = GetDimensions();
         Vector2 pos = dims.Position();
         TextSnippet[] snip = [new TextSnippet(Data.PlayerName)];

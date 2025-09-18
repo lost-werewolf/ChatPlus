@@ -1,4 +1,5 @@
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.UI;
@@ -6,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
+using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.Features.Mentions;
 
@@ -20,6 +22,27 @@ public class MentionElement : BaseElement<Mention>
     public override void Draw(SpriteBatch sb)
     {
         base.Draw(sb);
+
+        if (GetViewmode() == Viewmode.ListView)
+            DrawListElement(sb);
+        else
+            DrawGridElement(sb);
+    }
+
+    private void DrawGridElement(SpriteBatch sb)
+    {
+        var dims = GetDimensions();
+        Vector2 pos = dims.Position();
+        string playerName = Data.Tag;
+
+        // Player head
+        string headTag = PlayerIconTagHandler.GenerateTag(playerName);
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, headTag,
+            pos + new Vector2(0, 3), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
+    }
+
+    private void DrawListElement(SpriteBatch sb)
+    {
         var dims = GetDimensions();
         Vector2 pos = dims.Position();
         string playerName = Data.Tag;

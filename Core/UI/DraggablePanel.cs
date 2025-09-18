@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using ChatPlus.Common.Compat.CustomTags;
-using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
@@ -24,8 +23,7 @@ public abstract class DraggablePanel : UIPanel
     private const float dragThreshold = 3f;
     private Vector2 mouseDownPos;
     public bool IsDragging => dragging;
-    public static bool AnyDragging
-        => live.Any(p => p.dragging);
+    public static bool AnyDragging=> live.Any(p => p.dragging);
     public static bool AnyHovering;
 
     public DraggablePanel ConnectedPanel { get; set; }
@@ -65,15 +63,8 @@ public abstract class DraggablePanel : UIPanel
     {
         if (IsMouseHovering)
         {
-            //Log.Debug("hover dragpanel type: " + GetType());
-            //AnyHovering = true;
             Main.LocalPlayer.mouseInterface = true;
         }
-        else
-        {
-            //AnyHovering = false;
-        }
-        //Log.Info("any hovering: " + AnyHovering);
 
         // keep snapped when not dragging
         if (!dragging && sharedInitialized)

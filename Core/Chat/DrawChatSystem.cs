@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ChatPlus.Common.Configs;
@@ -7,14 +6,11 @@ using ChatPlus.Core.Features.Scrollbar;
 using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.TypingIndicators;
 using ChatPlus.Core.Features.Uploads;
-using ChatPlus.Core.Helpers;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Graphics;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.Chat;
 using Terraria.GameInput;
 using Terraria.ModLoader;
@@ -246,8 +242,7 @@ internal class DrawChatSystem : ModSystem
             height = 147 + 21;
 
         int x = 0;
-        int y = 0;
-        y -= 27;
+        int y = -27;
 
         DrawChatbox(height, x, y);
 

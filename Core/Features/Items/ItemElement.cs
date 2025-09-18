@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
+using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.Features.Items
 {
@@ -23,6 +24,64 @@ namespace ChatPlus.Core.Features.Items
         {
             base.Draw(sb);
 
+            if (GetViewmode() == Viewmode.ListView)
+            {
+                DrawListElement(sb);
+            }
+            else
+            {
+                DrawGridElement(sb);
+            }
+        }
+
+        private void DrawGridElement(SpriteBatch sb)
+        {
+            var dims = GetDimensions();
+            Vector2 pos = dims.Position();
+
+            if (TextureAssets.Item[item.ID] is var asset && asset.State == AssetState.NotLoaded)
+            {
+                Main.Assets.Request<Texture2D>(asset.Name);
+            }
+
+            // Render tag
+            string tag = item.Tag;
+            float scale = 1.1f;
+            ChatManager.DrawColorCodedStringWithShadow(
+                sb,
+                FontAssets.MouseText.Value,
+                tag,
+                pos + new Vector2(3, 2),
+                Color.White,
+                0f,
+                Vector2.Zero,
+                new Vector2(scale),
+                -1f,
+                1.0f
+            );
+
+            // Draw tooltip on hover
+            var hoverRect = new Rectangle((int)pos.X+4, (int)pos.Y, 26, 26);
+
+            // debug
+            //sb.Draw(TextureAssets.MagicPixel.Value, hoverRect, Color.Red * 0.5f);
+
+            if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
+            {
+                UICommon.TooltipMouseText("");
+                Main.LocalPlayer.mouseInterface = true;
+
+                var hoverItem = new Terraria.Item();
+                hoverItem.SetDefaults(item.ID); // use the netID
+                if (hoverItem.stack <= 0) hoverItem.stack = 1;
+
+                Main.HoverItem = hoverItem;
+                Main.hoverItemName = hoverItem.Name;
+            }
+        }
+
+        private void DrawListElement(SpriteBatch sb)
+        {
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
 
@@ -67,7 +126,6 @@ namespace ChatPlus.Core.Features.Items
                 Main.HoverItem = hoverItem;
                 Main.hoverItemName = hoverItem.Name;
             }
-
         }
     }
 }

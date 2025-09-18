@@ -1,11 +1,23 @@
 ﻿using System;
+using ChatPlus.Common.Compat.CustomTags;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.BoldText;
+using ChatPlus.Core.Features.Colors;
+using ChatPlus.Core.Features.Commands;
+using ChatPlus.Core.Features.Emojis;
+using ChatPlus.Core.Features.Glyphs;
+using ChatPlus.Core.Features.Items;
+using ChatPlus.Core.Features.Mentions;
+using ChatPlus.Core.Features.ModIcons;
+using ChatPlus.Core.Features.PlayerIcons;
+using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
+using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.Chat
 {
@@ -375,6 +387,14 @@ namespace ChatPlus.Core.Chat
 
         private void HandleLeftRightArrowKeysPressed()
         {
+            if (StateManager.IsAnyGridPanelActive())
+            {
+                _leftArrowHoldFrames = 0;
+                _rightArrowHoldFrames = 0;
+                selectionAnchor = -1;
+                return;
+            }
+
             bool shift = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift);
             bool ctrl = Main.keyState.IsKeyDown(Keys.LeftControl) || Main.keyState.IsKeyDown(Keys.RightControl);
 
@@ -457,7 +477,6 @@ namespace ChatPlus.Core.Chat
             else _backspaceHoldFrames = 0;
         }
 
-        #region Helpers
         private int MoveCaretWordLeft(int pos, string text)
         {
             if (pos <= 0) return 0;
@@ -475,7 +494,5 @@ namespace ChatPlus.Core.Chat
             while (i < text.Length && char.IsWhiteSpace(text[i])) i++;
             return i;
         }
-
-        #endregion
     }
 }

@@ -25,6 +25,8 @@ namespace ChatPlus.Core.Helpers
         public static Asset<Texture2D> SmallPanelHighlight;
         public static Asset<Texture2D> TerrariaIcon;
         public static Asset<Texture2D> tModLoaderIcon;
+        public static Asset<Texture2D> FilterGrid;
+        public static Asset<Texture2D> FilterList;
 
         // This bool automatically initializes all specified assets
         public static bool Initialized { get; set; }

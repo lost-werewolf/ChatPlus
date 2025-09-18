@@ -1,3 +1,4 @@
+using System;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.Stats.ModStats;
 using ChatPlus.Core.UI;
@@ -5,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
+using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.Features.ModIcons;
 
@@ -19,27 +21,38 @@ public class ModIconElement : BaseElement<ModIcon>
     public override void Draw(SpriteBatch sb)
     {
         base.Draw(sb);
+
+        if (GetViewmode() == Viewmode.ListView)
+            DrawListElement(sb);
+        else
+            DrawGridElement(sb);
+    }
+
+    private void DrawGridElement(SpriteBatch sb)
+    {
         var dims = GetDimensions();
         Vector2 pos = dims.Position();
 
         // mod icon tag
         string tag = Data.Tag;
         float scale = 1.0f; // 150% bigger
-        ChatManager.DrawColorCodedStringWithShadow(
-            sb,
-            FontAssets.MouseText.Value,
-            tag,
-            pos + new Vector2(13, 5),
-            Color.White,
-            0f,
-            Vector2.Zero,
-            new Vector2(scale),
-            -1f,
-            1f
-        );
+        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, tag, pos + new Vector2(7, 5),
+            Color.White, 0f, Vector2.Zero, new Vector2(scale), -1f, 1f);
+    }
+
+    private void DrawListElement(SpriteBatch sb)
+    {
+        var dims = GetDimensions();
+        Vector2 pos = dims.Position();
+
+        // mod icon tag
+        string tag = Data.Tag;
+        float scale = 1.0f; // 150% bigger
+        ChatManager.DrawColorCodedStringWithShadow(sb,FontAssets.MouseText.Value,tag,pos + new Vector2(13, 5),
+            Color.White,0f,Vector2.Zero,new Vector2(scale),-1f,1f);
 
         // mod icon display name
-        TextSnippet[] snip = [new TextSnippet(Data.Tag)];
+        TextSnippet[] snip = [new TextSnippet(Data.mod.DisplayNameClean)];
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(40, 4), 0f, Vector2.Zero, Vector2.One, out _);
 
         // tag hover tooltip of mod name

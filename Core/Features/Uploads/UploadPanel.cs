@@ -16,6 +16,10 @@ namespace ChatPlus.Core.Features.Uploads
 {
     public class UploadPanel : BasePanel<Upload>
     {
+        protected override int GridColumns => 4;
+        protected override int GridCellWidth => 60;
+        protected override int GridCellHeight => 60;
+        protected override int GridCellPadding => 6;
         protected override BaseElement<Upload> BuildElement(Upload data) => new UploadElement(data);
         protected override IEnumerable<Upload> GetSource() => UploadManager.Uploads;
         protected override string GetDescription(Upload data) => data.FileName;
@@ -176,7 +180,7 @@ namespace ChatPlus.Core.Features.Uploads
             var extensions = new ExtensionFilter
             {
                 Name = "Images",
-                Extensions = ["png", "jpg", "jpeg"]
+                Extensions = ["png", "jpg", "jpeg", "gif"]
             };
 
             // Concatenate extensions for NFD: "png,jpg,jpeg"

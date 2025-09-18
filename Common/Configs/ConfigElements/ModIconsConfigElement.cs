@@ -2,7 +2,6 @@
 using ChatPlus.Core.Features.ModIcons;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Common.Configs.ConfigElements;

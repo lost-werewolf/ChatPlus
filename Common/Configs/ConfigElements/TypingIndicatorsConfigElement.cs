@@ -24,7 +24,7 @@ public class TypingIndicatorsConfigElement : BaseBoolConfigElement
 
 
         var tex = Ass.TypingIndicator; // w: 32, h: 26, frames: 10
-        int frame = 2; 
+        int frame = 1; 
         Rectangle rect = new(32 * frame, 0, 32, 26);
         sb.Draw(Ass.TypingIndicator.Value, pos, 
             rect, Color.White, 0f, Vector2.Zero, 0.9f, 0f, 0f);

@@ -27,7 +27,7 @@ public class ModIconPanel : BasePanel<ModIcon>
                 LocalMod localMod = ModHelper.GetLocalMod(mod);
                 if (localMod != null && localMod.properties != null)
                 {
-                    result = data.mod.DisplayNameClean + " v" + localMod.properties.version;
+                    result = data.mod.Name + " v" + localMod.properties.version;
                 }
             }
         }

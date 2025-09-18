@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 using ChatPlus.Common.Configs.ConfigElements;
+using ChatPlus.Common.Configs.ConfigElements.Base;
 using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.Stats.PlayerStats.StatsPrivacy;
@@ -33,22 +34,20 @@ public class Config : ModConfig
         HourAndMinute24Hours,
         HourAndMinuteAndSeconds24Hours,
     }
+    public enum Viewmode
+    {
+        ListView,
+        GridView
+    }
 
     #endregion
     public override ConfigScope Mode => ConfigScope.ClientSide;
 
     [Header("ChatSettings")]
 
+    [Expand(false,false)]
     [BackgroundColor(255, 192, 8)] // Golden Yellow
-    [DefaultValue(true)]
-    public bool Autocomplete = true;
-
-    [BackgroundColor(255, 192, 8)] // Golden Yellow
-    [Range(10f, 20f)]
-    [Increment(1f)]
-    [DefaultValue(10f)]
-    [DrawTicks]
-    public float AutocompleteItemsVisible = 10f;
+    public AutocompleteSettings autocompleteSettings;
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
     [DefaultValue(true)]
@@ -117,6 +116,76 @@ public class Config : ModConfig
     [JsonConverter(typeof(StringEnumConverter))]
     public Privacy StatsPrivacy;
 
+    // -----------------------------------------------------------
+
+    public class AutocompleteSettings
+    {
+        [BackgroundColor(255, 192, 8)]
+        [DefaultValue(true)]
+        public bool Autocomplete = true;
+
+        [BackgroundColor(255, 192, 8)]
+        [Range(10f, 20f)]
+        [Increment(1f)]
+        [DefaultValue(10f)]
+        [DrawTicks]
+        public float AutocompleteItemsVisible = 10f;
+
+        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
+        [BackgroundColor(255, 192, 8)]
+        [DefaultValue(Viewmode.ListView)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Viewmode View_Commands;
+
+        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
+        [BackgroundColor(255, 192, 8)]
+        [DefaultValue(Viewmode.GridView)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Viewmode View_Colors;
+
+        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
+        [BackgroundColor(255, 192, 8)]
+        [DefaultValue(Viewmode.GridView)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Viewmode View_Emojis;
+
+        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
+        [BackgroundColor(255, 192, 8)]
+        [DefaultValue(Viewmode.GridView)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Viewmode View_Glyphs;
+
+        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
+        [BackgroundColor(255, 192, 8)]
+        [DefaultValue(Viewmode.GridView)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Viewmode View_Items;
+
+        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
+        [BackgroundColor(255, 192, 8)]
+        [DefaultValue(Viewmode.ListView)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Viewmode View_ModIcons;
+
+        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
+        [BackgroundColor(255, 192, 8)]
+        [DefaultValue(Viewmode.ListView)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Viewmode View_Mentions;
+
+        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
+        [BackgroundColor(255, 192, 8)]
+        [DefaultValue(Viewmode.ListView)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Viewmode View_PlayerIcons;
+
+        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
+        [BackgroundColor(255, 192, 8)]
+        [DefaultValue(Viewmode.ListView)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Viewmode View_Uploads;
+    }
+
     public override void OnChanged()
     {
         base.OnChanged();
@@ -169,7 +238,7 @@ public class Config : ModConfig
         }
         catch (Exception e)
         {
-            Log.Error("[AssignPlayerColor] UpdatePlayerColor Exception: " + e);
+            Log.Error("UpdatePlayerColor Exception: " + e);
         }
     }
 }

@@ -131,4 +131,20 @@ public class StateManager
         Close(MentionSystem?.ui);
         Close(CustomTagSystem?.ui);
     }
+    public static bool IsAnyGridPanelActive()
+    {
+        var sm = ChatPlus.StateManager;
+        if (sm == null) return false;
+
+        return
+            sm.CommandSystem?.state?.Panel?.IsGridModeEnabled == true ||
+            sm.ColorSystem?.state?.Panel?.IsGridModeEnabled == true ||
+            sm.EmojiSystem?.state?.Panel?.IsGridModeEnabled == true ||
+            sm.GlyphSystem?.state?.Panel?.IsGridModeEnabled == true ||
+            sm.ItemSystem?.state?.Panel?.IsGridModeEnabled == true ||
+            sm.ModIconSystem?.state?.Panel?.IsGridModeEnabled == true ||
+            sm.PlayerIconSystem?.state?.Panel?.IsGridModeEnabled == true ||
+            sm.UploadSystem?.state?.Panel?.IsGridModeEnabled == true ||
+            sm.MentionSystem?.state?.Panel?.IsGridModeEnabled == true;
+    }
 }

@@ -16,22 +16,6 @@ Configs: {
 			StatsViewer: Stats
 		}
 
-		Autocomplete: {
-			Label: Autocomplete
-			Tooltip:
-				'''
-				Opens an autocomplete window for the following prefixes:
-				/ for commands
-				[c for colors
-				[e or : for emojis
-				[g for glyphs
-				[i for items
-				[m for mod icons
-				[p or @ for player mentions
-				[u or # for uploads
-				'''
-		}
-
 		Scrollbar: {
 			Label: Scrollbar
 			Tooltip: Shows a scrollbar when the number of messages exceed the visible limit.
@@ -40,11 +24,6 @@ Configs: {
 		ChatsVisible: {
 			Label: Chats Visible
 			Tooltip: Set the number of chat messages that can be visible at one time.
-		}
-
-		AutocompleteItemsVisible: {
-			Label: Autocomplete Items Visible
-			Tooltip: Set the number of items in the autocomplete window that can be visible at one time.
 		}
 
 		ModIcons: {
@@ -116,6 +95,16 @@ Configs: {
 			Tooltip: ""
 			Label: Typing Indicator Position
 		}
+
+		viewmode: {
+			Label: viewmode
+			Tooltip: ""
+		}
+
+		autocompleteSettings: {
+			Label: Autocomplete Settings
+			Tooltip: ""
+		}
 	}
 
 	UserStatsPrivacy: {
@@ -146,6 +135,87 @@ Configs: {
 		AboveChat.Label: Above Chat
 		Tooltip: Set the position of the typing indicator.
 	}
+
+	Viewmode: {
+		Tooltip:
+			'''
+			List View: Displays content vertically in a single column.
+			Grid View: Displays content in a horizontal and vertical arrangement of cells.
+			'''
+		ListView.Label: List View
+		GridView.Label: Grid View
+	}
+
+	AutocompleteSettings: {
+		Tooltip: ""
+
+		Autocomplete: {
+			Label: Autocomplete
+			Tooltip:
+				'''
+				Opens an autocomplete window for the following prefixes:
+				/ for commands
+				: for emojis
+				@ for player mentions
+				# for uploads
+				[c for colors
+				[g for glyphs
+				[i for items
+				[m for mod icons
+				[p for player icons
+				'''
+		}
+
+		AutocompleteItemsVisible: {
+			Label: Autocomplete Items Visible
+			Tooltip: Set the number of items in the autocomplete window that can be visible at one time.
+		}
+
+		View_Commands: {
+			Label: Commands
+			Tooltip: ""
+		}
+
+		View_Colors: {
+			Label: Colors
+			Tooltip: ""
+		}
+
+		View_Emojis: {
+			Label: Emojis
+			Tooltip: ""
+		}
+
+		View_Glyphs: {
+			Label: Glyphs
+			Tooltip: ""
+		}
+
+		View_Items: {
+			Label: Items
+			Tooltip: ""
+		}
+
+		View_ModIcons: {
+			Label: Mod Icons
+			Tooltip: ""
+		}
+
+		View_Mentions: {
+			Label: Mentions
+			Tooltip: ""
+		}
+
+		View_PlayerIcons: {
+			Label: Player Icons
+			Tooltip: ""
+		}
+
+		View_Uploads: {
+			Label: Uploads
+			Tooltip: ""
+		}
+	}
 }
 
 ConfigPlayerColor: {
@@ -164,7 +234,7 @@ Commands: {
 		Tag_3: Glyphs      [g
 		Tag_4: Items        [i
 		Tag_5: Mod Icons  [m
-		Tag_6: Players      [p
+		Tag_6: Players      [p or @
 		Tag_7: Uploads     [u or #
 	}
 
