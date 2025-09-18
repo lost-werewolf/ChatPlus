@@ -22,8 +22,8 @@ namespace ChatPlus.Core.UI
         {
             get
             {
-                const float pad = 26f;
-                float visible = Conf.C?.autocompleteSettings?.AutocompleteItemsVisible ?? 10f;
+                const float pad = 0f;
+                float visible = Conf.C?.AutocompleteItemsVisible ?? 10f;
                 return -(visible * 30f) - pad; // sit above the base panel
             }
         }
@@ -62,7 +62,7 @@ namespace ChatPlus.Core.UI
             if (IsDragging)
                 return;
 
-            // Uploads
+            // ShowUploadButton
             if (typeof(TData) == typeof(Upload) && ConnectedPanel is UploadPanel up)
             {
                 up.UploadImage();
@@ -90,7 +90,7 @@ namespace ChatPlus.Core.UI
             if (IsDragging)
                 return;
 
-            // Uploads
+            // ShowUploadButton
             if (typeof(TData) == typeof(Upload) && ConnectedPanel is UploadPanel up)
             {
                 up.OpenUploadsFolder();
@@ -172,9 +172,9 @@ namespace ChatPlus.Core.UI
                 MaxHeight.Set(62, 0);
                 Height.Set(62, 0);
 
-                text.VAlign = 0f;            // disable auto vertical alignment
-                text.Top.Set(0, 0);          // now this will stick
-                text.Recalculate();           // re-compute layout of 'text'
+                text.VAlign = 0f;           
+                text.Top.Set(0, 0);         
+                text.Recalculate();          
             }
 
             base.Draw(sb);

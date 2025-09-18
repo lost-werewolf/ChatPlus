@@ -17,8 +17,19 @@ public sealed class PlayerIconTagHandler : ITagHandler
 
     TextSnippet ITagHandler.Parse(string text, Color baseColor, string options)
     {
-        // text contains name portion after prefix
+        // Handle optional "/gray" suffix
+        bool gray = false;
         string name = (text ?? string.Empty).Trim();
+
+
+        int slashIndex = name.IndexOf('/');
+        if (slashIndex >= 0)
+        {
+            string suffix = name[(slashIndex + 1)..].Trim().ToLowerInvariant();
+            name = name[..slashIndex];
+            if (suffix == "gray" || suffix == "grayscale")
+                gray = true;
+        }
 
         if (!PlayerIconManager.TryGetIndex(name, out int idx))
         {
@@ -37,9 +48,9 @@ public sealed class PlayerIconTagHandler : ITagHandler
         if (idx < 0 || idx >= Main.maxPlayers)
             return new TextSnippet(name);
 
-        return new PlayerIconSnippet(idx)
+        return new PlayerIconSnippet(idx, gray)
         {
-            Text = GenerateTag(name)
+            Text = GenerateTag(name + (gray ? "/gray" : string.Empty))
         };
     }
 }

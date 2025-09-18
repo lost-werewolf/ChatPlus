@@ -31,7 +31,11 @@ namespace ChatPlus.Core.Features.Uploads
         public override void Draw(SpriteBatch sb)
         {
             Height.Set(60, 0);
+            // When drawing uploads inside this element, suppress the global hover overlay
+            bool prev = UploadSnippet.SuppressHoverUI;
+            UploadSnippet.SuppressHoverUI = true;
             base.Draw(sb);
+            UploadSnippet.SuppressHoverUI = prev;
 
             if (GetViewmode() == Viewmode.ListView)
                 DrawListElement(sb);
@@ -82,7 +86,7 @@ namespace ChatPlus.Core.Features.Uploads
             TextSnippet[] snip = [new TextSnippet(display)];
             Vector2 textPos = pos + new Vector2(65, 5);
 
-            ChatManager.DrawColorCodedStringWithShadow(sb,FontAssets.MouseText.Value,snip,textPos,0f,Vector2.Zero, Vector2.One, out _);
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, textPos, 0f, Vector2.Zero, Vector2.One, out _);
         }
     }
 }

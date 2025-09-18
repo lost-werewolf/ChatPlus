@@ -24,6 +24,12 @@ namespace ChatPlus.Core.Features.Emojis
 
         public override void UpdateUI(GameTime gameTime)
         {
+            if (!Main.drawingPlayerChat)
+            {
+                ui?.SetState(null);
+                return;
+            }
+
             string text = Main.chatText ?? string.Empty;
             int caret = text.Length;
 
@@ -32,20 +38,6 @@ namespace ChatPlus.Core.Features.Emojis
 
             // Colon mode only if ':' is active and an [e tag is NOT active
             OpenedFromColon = colonWord.ShouldOpen(text, caret) && !unclosedTag.ShouldOpen(text, caret);
-
-            // Custom
-            if (EmojiState.WasOpenedByButton)
-            {
-                if (ui.CurrentState == null)
-                {
-                    ui.SetState(state);
-                }
-
-                // Still allow it to update properly
-                ui.Update(gameTime);
-
-                return;
-            }
 
             ChatPlus.StateManager.OpenStateByTriggers(
                 gameTime,

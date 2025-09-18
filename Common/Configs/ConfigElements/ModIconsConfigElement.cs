@@ -10,7 +10,7 @@ public class ModIconsConfigElement : BaseBoolConfigElement
 {
     protected override void OnToggled(bool newValue)
     {
-        Conf.C.ModIcons = newValue;
+        Conf.C.ShowModIconButton = newValue;
     }
 
     protected override void DrawPreview(SpriteBatch sb)

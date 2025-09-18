@@ -14,13 +14,47 @@ namespace ChatPlus.Core.Features.Emojis
     {
         public static List<Emoji> Emojis { get; private set; } = [];
         public static Dictionary<string, List<string>> EmojiMap { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
-
         public override void Load()
         {
             ChatManager.Register<EmojiTagHandler>(["e", "emoji"]);
 
             InitializeEmojiMap();
             InitializeEmojis();
+        }
+        public static List<Emoji> FindEmojis(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword))
+                return new List<Emoji>();
+
+            keyword = keyword.Trim();
+            var results = new List<Emoji>();
+
+            foreach (var emoji in Emojis)
+            {
+                // Match description
+                if (!string.IsNullOrEmpty(emoji.Description) &&
+                    emoji.Description.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                {
+                    results.Add(emoji);
+                    continue;
+                }
+
+                // Match synonyms
+                if (emoji.Synonyms != null)
+                {
+                    foreach (var syn in emoji.Synonyms)
+                    {
+                        if (!string.IsNullOrEmpty(syn) &&
+                            syn.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                        {
+                            results.Add(emoji);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return results;
         }
 
         private void InitializeEmojiMap()

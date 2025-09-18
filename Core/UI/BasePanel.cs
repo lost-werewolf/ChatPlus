@@ -17,31 +17,16 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader.UI.Elements;
 using Terraria.UI;
 using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.UI;
+
 public abstract class BasePanel<TData> : DraggablePanel
 {
     // Viewmode settings
-    public Viewmode CurrentViewMode
-    {
-        get
-        {
-            var a = Conf.C?.autocompleteSettings;
-            if (this is CommandPanel) return a?.View_Commands ?? Viewmode.ListView;
-            if (this is ColorPanel) return a?.View_Colors ?? Viewmode.ListView;
-            if (this is EmojiPanel) return a?.View_Emojis ?? Viewmode.ListView;
-            if (this is GlyphPanel) return a?.View_Glyphs ?? Viewmode.ListView;
-            if (this is ItemPanel) return a?.View_Items ?? Viewmode.ListView;
-            if (this is ModIconPanel) return a?.View_ModIcons ?? Viewmode.ListView;
-            if (this is MentionPanel) return a?.View_Mentions ?? Viewmode.ListView;
-            if (this is PlayerIconPanel) return a?.View_PlayerIcons ?? Viewmode.ListView;
-            if (this is UploadPanel) return a?.View_Uploads ?? Viewmode.ListView;
-            return Viewmode.ListView;
-        }
-    }
+    public Viewmode CurrentViewMode => Conf.C?.viewmode ?? Viewmode.ListView;
+    private Viewmode appliedViewMode;
     public bool IsGridModeEnabled => CurrentViewMode == Viewmode.GridView;
     protected CustomGrid grid; // only used in grid mode
     protected virtual int GridColumns => 8;
@@ -74,6 +59,7 @@ public abstract class BasePanel<TData> : DraggablePanel
 
     // Navigation
     protected int currentIndex = 0; // first item
+    private float _lastPanelHeightPx = -1f;
 
     // Holding keys
     private double repeatTimer;
@@ -86,7 +72,10 @@ public abstract class BasePanel<TData> : DraggablePanel
 
         VAlign = 1f;
         Top.Set(-64, 0);
-        Left.Set(190, 0);
+        if (Main.screenWidth <= 0)
+            Left.Set(300, 0);
+        else
+            Left.Set(Main.screenWidth - 522, 0);
 
         OverflowHidden = true;
         BackgroundColor = new Color(33, 43, 79) * 1.0f;
@@ -97,6 +86,7 @@ public abstract class BasePanel<TData> : DraggablePanel
             ListPadding = 0f,
             Width = { Pixels = -20f, Percent = 1f },
             Top = { Pixels = 3f },
+            Height = { Pixels = -14f, Percent = 1f },
             Left = { Pixels = 3f },
             ManualSortMethod = _ => { },
         };
@@ -123,7 +113,7 @@ public abstract class BasePanel<TData> : DraggablePanel
         };
 
         list.SetScrollbar(scrollbar);
-        grid.SetScrollbar(scrollbar); 
+        grid.SetScrollbar(scrollbar);
 
         Append(list);
         Append(scrollbar);
@@ -133,14 +123,8 @@ public abstract class BasePanel<TData> : DraggablePanel
     {
         base.OnActivate();
 
+        appliedViewMode = CurrentViewMode;
         PopulatePanel();
-
-        // Update height
-        int itemCount = (int)(Conf.C?.autocompleteSettings?.AutocompleteItemsVisible ?? 10f);
-        Top.Set(-64, 0f);
-        Height.Set(itemCount * 30, 0f);
-        list.Height.Set(itemCount * 30, 0f);
-        grid.Height.Set(itemCount * 30, 0f);
 
         list.ViewPosition = 0f;
         if (grid._scrollbar != null)
@@ -155,10 +139,7 @@ public abstract class BasePanel<TData> : DraggablePanel
         }
 
         Recalculate();
-
         Main.oldKeyState = Main.keyState;
-
-        scrollbar.SetView(0, scrollbar.MaxViewSize);
     }
 
     public override void LeftClick(UIMouseEvent evt)
@@ -214,6 +195,15 @@ public abstract class BasePanel<TData> : DraggablePanel
                 element.MarginRight = GridCellPadding;
                 element.MarginBottom = GridCellPadding;
             }
+            else
+            {
+                element.Width.Set(0, 1f);
+                element.Height.Set(30, 0f);
+                element.MarginLeft = 0f;
+                element.MarginTop = 0f;
+                element.MarginRight = 0f;
+                element.MarginBottom = 0f;
+            }
 
             items.Add(element);
             built.Add(element);
@@ -223,6 +213,7 @@ public abstract class BasePanel<TData> : DraggablePanel
         {
             if (list.Parent == this)
             {
+                // Do NOT RemoveAllChildren() on UIList; it removes its internal inner list.
                 list.Remove();
             }
             if (grid.Parent != this)
@@ -230,6 +221,7 @@ public abstract class BasePanel<TData> : DraggablePanel
                 Append(grid);
             }
 
+            grid.Clear();
             grid.AddRange(new List<UIElement>(built));
             grid.Recalculate();
         }
@@ -237,6 +229,7 @@ public abstract class BasePanel<TData> : DraggablePanel
         {
             if (grid.Parent == this)
             {
+                // Do NOT RemoveAllChildren() on CustomGrid; it removes its internal inner list.
                 grid.Remove();
             }
             if (list.Parent != this)
@@ -244,9 +237,12 @@ public abstract class BasePanel<TData> : DraggablePanel
                 Append(list);
             }
 
+            list.Clear();
             list.AddRange(new List<UIElement>(built));
             list.Recalculate();
         }
+
+        Recalculate();
     }
 
     #region Filter
@@ -385,23 +381,67 @@ public abstract class BasePanel<TData> : DraggablePanel
     }
 
     #endregion
-
+    private bool _initialLeftSet;
     public override void Update(GameTime gt)
     {
         base.Update(gt);
 
-        // Update height
-        int itemCount = (int)(Conf.C?.autocompleteSettings?.AutocompleteItemsVisible ?? 10f);
+        // Left set
+        if (!_initialLeftSet && Main.screenWidth > 0)
+        {
+            float desiredX = Main.screenWidth - 300 - GetDimensions().Width - 12f; // 12px margin
+            Left.Set(desiredX, 0f);
+            Recalculate();
+
+            sharedPos = new Vector2(desiredX, Top.Pixels - SharedYOffset);
+            sharedInitialized = true;
+            _initialLeftSet = true;
+        }
+
+        // Top set
+        int itemCount = (int)(Conf.C?.AutocompleteItemsVisible ?? 10f);
         Top.Set(-64, 0);
-        Height.Set(itemCount * 30, 0);
+        float desiredHeight = itemCount * 30f;
+        if (Math.Abs(desiredHeight - _lastPanelHeightPx) > 0.1f)
+        {
+            Height.Set(desiredHeight, 0f);
+            Recalculate();
+            _lastPanelHeightPx = desiredHeight;
+        }
 
-        // Navigation
+        if (CurrentViewMode != appliedViewMode)
+        {
+            appliedViewMode = CurrentViewMode;
+
+            PopulatePanel();
+
+            if (IsGridModeEnabled)
+            {
+                if (grid._scrollbar != null)
+                {
+                    grid._scrollbar.ViewPosition = 0f;
+                }
+            }
+            else
+            {
+                list.ViewPosition = 0f;
+            }
+
+            if (items.Count > 0)
+            {
+                SetSelectedIndex(Math.Clamp(currentIndex, 0, items.Count - 1));
+            }
+        }
+
         if (IsGridModeEnabled)
+        {
             HandleGridNavigationKeys(gt);
+        }
         else
+        {
             HandleListNavigationKeys(gt);
+        }
 
-        // Key presses
         HandleKeyPressed();
         HandleTabKeyPressed();
     }
@@ -532,9 +572,7 @@ public abstract class BasePanel<TData> : DraggablePanel
             }
         }
 
-        // hotfix for weird bug
-        //Log.Info("scrollbar pos: " + scrollbar.ViewPosition);
-        if (currentIndex == 0) scrollbar.SetView(0, scrollbar.MaxViewSize);
+        // Ensure we don't start scrolled past top on first select
         if (currentIndex == 0) list.ViewPosition = 0f;
     }
 

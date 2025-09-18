@@ -4,6 +4,7 @@ namespace ChatPlus.Core.UI;
 
 public class BaseState<TData> : UIState
 {
+    public static bool WasOpenedByButton;
     public BasePanel<TData> Panel { get; }
     public DescriptionPanel<TData> Description { get; }
 

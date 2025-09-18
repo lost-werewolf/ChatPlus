@@ -8,6 +8,12 @@
 		<!-- Ignore warning -->
 		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 	</PropertyGroup>
+	<ItemGroup>
+	  <AdditionalFiles Remove="Core\Features\Mentions\NewFolder\**" />
+	  <Compile Remove="Core\Features\Mentions\NewFolder\**" />
+	  <EmbeddedResource Remove="Core\Features\Mentions\NewFolder\**" />
+	  <None Remove="Core\Features\Mentions\NewFolder\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1" />
@@ -21,7 +27,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Assets\Fonts\" />
-	  <Folder Include="Core\Features\Mentions\NewFolder\" />
 	</ItemGroup>
 
 	<!-- Locate FXC (Shader compiler) -->

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using ChatPlus.Common.Configs;
-using ChatPlus.Core.Features.Emojis.EmojiButton;
 using ChatPlus.Core.Features.Scrollbar;
 using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.TypingIndicators;

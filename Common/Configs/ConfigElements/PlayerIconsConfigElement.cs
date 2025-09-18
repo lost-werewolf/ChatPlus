@@ -10,7 +10,7 @@ public class PlayerIconsConfigElement : BaseBoolConfigElement
 {
     protected override void OnToggled(bool newValue)
     {
-        Conf.C.PlayerIcons = newValue;
+        Conf.C.ShowPlayerIconButton = newValue;
     }
 
     protected override void DrawPreview(SpriteBatch sb)

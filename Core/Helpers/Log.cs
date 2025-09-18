@@ -77,7 +77,7 @@ namespace ChatPlus.Core.Helpers
                 return; // Skip logging if the mod is unloading or null
 
             // Prepend the class name to the log message.
-            instance.Logger.Warn($"[{className}] {message}");
+            instance.Logger.Debug($"[{className}] {message}");
         }
     }
 }

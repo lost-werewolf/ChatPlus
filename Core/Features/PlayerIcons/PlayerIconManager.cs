@@ -8,7 +8,7 @@ namespace ChatPlus.Core.Features.PlayerIcons
 ;
 
 /// <summary>
-/// Maintains a refreshed list of active players for the PlayerIcons UI.
+/// Maintains a refreshed list of active players for the PlayerIcon UI.
 /// </summary>
 internal class PlayerIconManager : ModSystem
 {

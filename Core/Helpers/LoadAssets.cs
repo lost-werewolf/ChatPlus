@@ -27,6 +27,8 @@ namespace ChatPlus.Core.Helpers
         public static Asset<Texture2D> tModLoaderIcon;
         public static Asset<Texture2D> FilterGrid;
         public static Asset<Texture2D> FilterList;
+        public static Asset<Texture2D> ButtonColor;
+        public static Asset<Texture2D> ButtonUpload;
 
         // This bool automatically initializes all specified assets
         public static bool Initialized { get; set; }

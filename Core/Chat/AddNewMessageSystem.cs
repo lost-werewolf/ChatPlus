@@ -21,7 +21,7 @@ namespace ChatPlus.Core.Chat
 {
     internal class AddNewMessageSystem : ModSystem
     {
-        // Strip both [p:Name] and [playericon:Name] tags when this client has PlayerIcons disabled
+        // Strip both [p:Name] and [playericon:Name] tags when this client has PlayerIcon disabled
         private static readonly Regex _playerIconTagRx =
             new(@"\[(?:p|playericon):[^\]]+\]", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
@@ -58,9 +58,9 @@ namespace ChatPlus.Core.Chat
             if (UploadTagHandler.ContainsUploadTag(resultText))
                 resultText += string.Concat(Enumerable.Repeat("\n", 6));
 
-            // Client-only visibility: if this client has PlayerIcons disabled,
+            // Client-only visibility: if this client has PlayerIcon disabled,
             // strip any existing player-icon tags already in the message.
-            if (!Conf.C.PlayerIcons)
+            if (!Conf.C.ShowPlayerIconButton)
                 resultText = _playerIconTagRx.Replace(resultText, string.Empty);
 
             // Extract sender name from [n:Name]
@@ -74,14 +74,14 @@ namespace ChatPlus.Core.Chat
             }
 
             // 3) Add player icon (only when this client wants them)
-            if (Conf.C.PlayerIcons && !string.IsNullOrEmpty(senderName))
+            if (Conf.C.ShowPlayerIconButton && !string.IsNullOrEmpty(senderName))
             {
                 string playerTag = PlayerIconTagHandler.GenerateTag(senderName);
                 resultText = playerTag + " " + resultText;
             }
 
             // 4) Add mod icon for system/mod messages (no sender)
-            if (Conf.C.ModIcons && string.IsNullOrEmpty(senderName) && !resultText.StartsWith("[m:"))
+            if (Conf.C.ShowModIconButton && string.IsNullOrEmpty(senderName) && !resultText.StartsWith("[m:"))
             {
                 string modTag = ModIconTagHandler.GenerateTag(ModIconSnippet.GetModSource());
                 resultText = " " + modTag + " " + resultText;
@@ -105,7 +105,7 @@ namespace ChatPlus.Core.Chat
                 resultText = bracket1 + whiteTimestamp + bracket2 + resultText;
             }
 
-            // 6) Mentions: transform @name -> [mention:name]
+            // 6) ShowMentionButton: transform @name -> [mention:name]
             var font = FontAssets.MouseText.Value;
             int lineWidth = (int)Math.Ceiling(
                 ChatManager.GetStringSize(font, resultText, Vector2.One, widthLimitInPixels).X);

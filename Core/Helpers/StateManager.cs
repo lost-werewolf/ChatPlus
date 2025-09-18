@@ -61,6 +61,28 @@ public class StateManager
             return;
         }
 
+        if ((state is EmojiState && EmojiState.WasOpenedByButton) ||
+    (state is UploadState && UploadState.WasOpenedByButton) ||
+    (state is ColorState && ColorState.WasOpenedByButton) ||
+    (state is ItemState && ItemState.WasOpenedByButton) ||
+    (state is CommandState && CommandState.WasOpenedByButton) ||
+    (state is GlyphState && GlyphState.WasOpenedByButton) ||
+    (state is MentionState && MentionState.WasOpenedByButton) ||
+    (state is ModIconState && ModIconState.WasOpenedByButton) ||
+    (state is PlayerIconState && PlayerIconState.WasOpenedByButton) ||
+    (state is CustomTagState && CustomTagState.WasOpenedByButton))
+        {
+            if (ui.CurrentState != state)
+            {
+                CloseOthers(ui);
+                ui.SetState(state);
+                ui.CurrentState.Recalculate();
+            }
+
+            ui.Update(gameTime);
+            return;
+        }
+
         string text = Main.chatText ?? string.Empty;
         int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
 
@@ -146,5 +168,19 @@ public class StateManager
             sm.PlayerIconSystem?.state?.Panel?.IsGridModeEnabled == true ||
             sm.UploadSystem?.state?.Panel?.IsGridModeEnabled == true ||
             sm.MentionSystem?.state?.Panel?.IsGridModeEnabled == true;
+    }
+
+    public void ResetAllWasOpenedByButton()
+    {
+        CommandState.WasOpenedByButton = false;
+        ColorState.WasOpenedByButton = false;
+        EmojiState.WasOpenedByButton = false;
+        GlyphState.WasOpenedByButton = false;
+        ItemState.WasOpenedByButton = false;
+        ModIconState.WasOpenedByButton = false;
+        MentionState.WasOpenedByButton = false;
+        PlayerIconState.WasOpenedByButton = false;
+        UploadState.WasOpenedByButton = false;
+        CustomTagState.WasOpenedByButton = false;
     }
 }

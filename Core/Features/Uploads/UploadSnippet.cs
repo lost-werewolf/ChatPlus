@@ -8,6 +8,8 @@ using static System.Net.Mime.MediaTypeNames;
 
 public class UploadSnippet : TextSnippet
 {
+    public static bool SuppressHoverUI { get; set; }
+
     private readonly Texture2D tex;
     private readonly string key;
 
@@ -33,7 +35,7 @@ public class UploadSnippet : TextSnippet
         Rectangle bounds = new((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
         bool hovering = bounds.Contains(Main.MouseScreen.ToPoint());
 
-        if (Conf.C != null && Conf.C.ShowUploadsWhenHovering && hovering)
+        if (Conf.C != null && Conf.C.ShowUploadsWhenHovering && hovering && !SuppressHoverUI)
         {
             HoveredUploadOverlay.Set(tex);
         }

@@ -17,7 +17,6 @@ namespace ChatPlus.Core.UI;
 public abstract class BaseElement<TData> : UIElement
 {
     private bool isSelected;
-    public bool GetIsSelected => isSelected;              
     public bool SetSelected(bool value) => isSelected = value;
 
     public TData Data { get; }

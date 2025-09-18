@@ -14,8 +14,8 @@ namespace ChatPlus.Core.UI;
 public abstract class DraggablePanel : UIPanel
 {
     private static readonly HashSet<DraggablePanel> live = [];
-    private static Vector2 sharedPos;
-    private static bool sharedInitialized;
+    protected static Vector2 sharedPos;
+    protected static bool sharedInitialized;
 
     private bool dragging;
     private bool pendingDrag; // mouse down occurred but threshold not yet exceeded
@@ -57,6 +57,27 @@ public abstract class DraggablePanel : UIPanel
     {
         base.MouseOut(evt);
         AnyHovering = false;
+    }
+
+    public void SnapRightAlignedTo(Vector2 buttonPos, int buttonSize)
+    {
+        // align right edge of panel to right edge of button
+        float panelWidth = GetDimensions().Width;
+        float rightEdge = buttonPos.X + buttonSize;
+        float newX = rightEdge - panelWidth;
+
+        Left.Set(newX, 0f);
+        Recalculate();
+
+        sharedPos = new Vector2(newX, sharedPos.Y);
+        sharedInitialized = true;
+
+        foreach (var p in live)
+        {
+            if (p == this) continue;
+            p.Left.Set(sharedPos.X, 0f);
+            p.Recalculate();
+        }
     }
 
     public override void Update(GameTime gameTime)

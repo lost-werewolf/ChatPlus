@@ -14,6 +14,8 @@ Configs: {
 			ChatSettings: Chat Settings
 			ChatFormat: Chat Format
 			StatsViewer: Stats
+			ShowButtons: Show Buttons
+			Preview: Preview
 		}
 
 		Scrollbar: {
@@ -26,12 +28,12 @@ Configs: {
 			Tooltip: Set the number of chat messages that can be visible at one time.
 		}
 
-		ModIcons: {
+		ModIcon: {
 			Label: Mod Icon
 			Tooltip: Shows which mod writes to chat.
 		}
 
-		PlayerIcons: {
+		PlayerIcon: {
 			Label: Player Icon
 			Tooltip: Shows who writes to chat.
 		}
@@ -91,19 +93,105 @@ Configs: {
 			Tooltip: Shows when a player is currently writing a chat and shares when you are writing a chat.
 		}
 
-		typingIndicatorPosition: {
-			Tooltip: ""
-			Label: Typing Indicator Position
-		}
-
 		viewmode: {
-			Label: viewmode
+			Label: View Mode
+			Tooltip:
+				'''
+				List View: Displays content vertically in a single column.
+				Grid View: Displays content in a horizontal and vertical arrangement of cells.
+				'''
+		}
+
+		Autocomplete: {
+			Label: Autocomplete
+			Tooltip:
+				'''
+				Opens an autocomplete window for the following prefixes:
+				/ for commands
+				: for emojis
+				# for uploads
+				@ for player mentions
+				[c for colors
+				[g for glyphs
+				[i for items
+				[m for mod icons
+				[p for player icons
+				'''
+		}
+
+		AutocompleteItemsVisible: {
+			Label: Autocomplete Items Visible
+			Tooltip: Set the number of items in the autocomplete window that can be visible at one time.
+		}
+
+		ShowModIcon: {
+			Label: Show Mod Icon
 			Tooltip: ""
 		}
 
-		autocompleteSettings: {
-			Label: Autocomplete Settings
+		ShowPlayerIcon: {
+			Label: Show Player Icon
 			Tooltip: ""
+		}
+
+		ShowCommandButton: {
+			Label: Show Command Button
+			Tooltip: ""
+		}
+
+		ShowColorButton: {
+			Label: Show Color Button
+			Tooltip: ""
+		}
+
+		ShowEmojiButton: {
+			Label: Show Emoji Button
+			Tooltip: ""
+		}
+
+		ShowGlyphButton: {
+			Label: Show Glyph Button
+			Tooltip: ""
+		}
+
+		ShowItemButton: {
+			Label: Show Item Button
+			Tooltip: ""
+		}
+
+		ShowModIconButton: {
+			Label: Show Mod Icon Button
+			Tooltip: ""
+		}
+
+		ShowMentionButton: {
+			Label: Show Mention Button
+			Tooltip: ""
+		}
+
+		ShowPlayerIconButton: {
+			Label: Show Player Icon Button
+			Tooltip: ""
+		}
+
+		ShowUploadButton: {
+			Label: Show Upload Button
+			Tooltip: ""
+		}
+
+		ChatBoxPreview: {
+			Label: Chat Box Preview
+			Tooltip: ""
+		}
+
+		ShowLastUpdatedButton: {
+			Label: Show Last Updated Button
+			Tooltip: ""
+		}
+
+		ShowSettingsButton: {
+			Tooltip: ""
+			Label: Show Settings Button
 		}
 	}
 
@@ -144,77 +232,6 @@ Configs: {
 			'''
 		ListView.Label: List View
 		GridView.Label: Grid View
-	}
-
-	AutocompleteSettings: {
-		Tooltip: ""
-
-		Autocomplete: {
-			Label: Autocomplete
-			Tooltip:
-				'''
-				Opens an autocomplete window for the following prefixes:
-				/ for commands
-				: for emojis
-				@ for player mentions
-				# for uploads
-				[c for colors
-				[g for glyphs
-				[i for items
-				[m for mod icons
-				[p for player icons
-				'''
-		}
-
-		AutocompleteItemsVisible: {
-			Label: Autocomplete Items Visible
-			Tooltip: Set the number of items in the autocomplete window that can be visible at one time.
-		}
-
-		View_Commands: {
-			Label: Commands
-			Tooltip: ""
-		}
-
-		View_Colors: {
-			Label: Colors
-			Tooltip: ""
-		}
-
-		View_Emojis: {
-			Label: Emojis
-			Tooltip: ""
-		}
-
-		View_Glyphs: {
-			Label: Glyphs
-			Tooltip: ""
-		}
-
-		View_Items: {
-			Label: Items
-			Tooltip: ""
-		}
-
-		View_ModIcons: {
-			Label: Mod Icons
-			Tooltip: ""
-		}
-
-		View_Mentions: {
-			Label: Mentions
-			Tooltip: ""
-		}
-
-		View_PlayerIcons: {
-			Label: Player Icons
-			Tooltip: ""
-		}
-
-		View_Uploads: {
-			Label: Uploads
-			Tooltip: ""
-		}
 	}
 }
 

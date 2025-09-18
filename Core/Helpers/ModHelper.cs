@@ -27,16 +27,26 @@ public static class ModHelper
 }
 public static class ModMetaCache
 {
-    // name -> (size bytes, lastWriteUtc, tmodPath)
+    // name -> (size, lastWriteUtc, path)
     private static readonly Dictionary<string, (long size, DateTime lastWriteUtc, string path)> _cache = new();
 
     public static (long size, DateTime lastWriteUtc, string path) Get(Mod mod)
     {
         if (mod == null) return default;
-        if (_cache.TryGetValue(mod.Name, out var v)) return v;
 
-        // Resolve once. DO NOT call any ModOrganizer/FindMods here.
-        string path = TryGuessTmodPath(mod.Name);
+        if (_cache.TryGetValue(mod.Name, out var v))
+            return v;
+
+        LocalMod local = ModOrganizer.FindAllMods().FirstOrDefault(m =>
+            m.Name.Equals(mod.Name, StringComparison.OrdinalIgnoreCase));
+
+        if (local == null)
+        {
+            _cache[mod.Name] = default;
+            return default;
+        }
+
+        string path = local.modFile?.path ?? string.Empty;
         long size = 0;
         DateTime last = DateTime.MinValue;
 
@@ -51,22 +61,6 @@ public static class ModMetaCache
         _cache[mod.Name] = v;
         return v;
     }
-
-    private static string TryGuessTmodPath(string modName)
-    {
-        // Best-effort without poking ModOrganizer:
-        // ModLoader.ModPath typically points to .../tModLoader/Mods
-        // Sometimes it already includes "Mods"; handle both.
-        var root = Terraria.ModLoader.ModLoader.ModPath; // public API
-        // common locations to try
-        var c1 = Path.Combine(root, modName + ".tmod");
-        if (File.Exists(c1)) return c1;
-
-        var c2 = Path.Combine(root, "Mods", modName + ".tmod");
-        if (File.Exists(c2)) return c2;
-
-        // Last resort: a one-time, narrow search (no global “find mods” call)
-        var found = Directory.EnumerateFiles(root, modName + ".tmod", SearchOption.AllDirectories).FirstOrDefault();
-        return found;
-    }
 }
+
+

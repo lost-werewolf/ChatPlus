@@ -428,7 +428,9 @@ public static class PlayerInfoDrawer
     }
     public static void DrawStat_Sentries(SpriteBatch sb, Rectangle rect, Player player)
     {
-        var tex = Ass.StatPanel; rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); sb.Draw(tex.Value, rect, Color.White);
+        var tex = Ass.StatPanel; 
+        rect = new Rectangle(rect.X, rect.Y, tex.Width(), tex.Height()); 
+        sb.Draw(tex.Value, rect, Color.White);
         int max = player.maxTurrets; int cur = 0; int bestProj = -1; int bestCount = 0;
         for (int t = 0; t < player.ownedProjectileCounts.Length; t++)
         {

@@ -1,7 +1,10 @@
-﻿using ChatPlus.Common.Configs;
+﻿using System;
+using ChatPlus.Common.Configs;
+using ChatPlus.Core.Chat.MiniChatButtons;
 using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.Stats.PlayerStats;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
@@ -17,57 +20,50 @@ namespace ChatPlus.Core.Features.PlayerIcons
 public class PlayerIconSnippet : TextSnippet
 {
     private readonly int _playerIndex;
+    private readonly bool _isGray;
 
-    public PlayerIconSnippet(int idx)
+    public PlayerIconSnippet(int idx, bool isGray = false)
     {
         _playerIndex = idx;
+        _isGray = isGray;
         CheckForHover = true;
     }
 
+    // Effect
+    private static readonly Lazy<Asset<Effect>> grayscaleEffect =
+        new(() => ModContent.Request<Effect>("ChatPlus/Assets/Effects/Grayscale", AssetRequestMode.ImmediateLoad));
+
     public override bool UniqueDraw(bool justCheckingString, out Vector2 size, SpriteBatch sb,
-    Vector2 pos = default, Color color = default, float scale = 1f)
+        Vector2 pos = default, Color color = default, float scale = 1f)
     {
         const float box = 26f;
         scale = 0.75f;
 
-        // reserve enough horizontal space (slightly more than icon width)
         size = new Vector2(box * scale + 4f, box * scale);
-
         if (justCheckingString || color == Color.Black) return true;
 
         if (_playerIndex < 0 || _playerIndex >= Main.maxPlayers) return true;
         Player player = Main.player[_playerIndex];
         if (player == null || !player.active) return true;
 
-        // draw head
-        sb.End();
-        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap,
-                 DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
-
-        // shift head right/down inside its box
         Vector2 drawPos = new(pos.X + 12f, pos.Y + 8f);
+
+        sb.End();
+        sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp,
+                 DepthStencilState.Default, RasterizerState.CullNone,
+                 _isGray ? grayscaleEffect.Value.Value : null,
+                 Main.UIScaleMatrix);
 
         MapHeadRendererHook.shouldFlipHeadDraw = player.direction == -1;
         Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, drawPos, 1f, scale, Color.White);
         MapHeadRendererHook.shouldFlipHeadDraw = false;
 
-        // hover rect aligned with reserved box
-        var hoverRect = new Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
-        if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
-        {
-            if (Conf.C.ShowStatsWhenHovering &&
-                (Conf.C.ShowStatsWhenBossIsAlive || !Main.CurrentFrameFlags.AnyActiveBossNPC))
-            {
-                Main.LocalPlayer.mouseInterface = true;
-                HoveredPlayerOverlay.Set(_playerIndex);
-
-                if (Main.mouseLeft && Main.mouseLeftRelease)
-                    OnClick();
-            }
-        }
+        sb.End();
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
         return true;
     }
+
     public override void OnClick()
     {
         base.OnClick();

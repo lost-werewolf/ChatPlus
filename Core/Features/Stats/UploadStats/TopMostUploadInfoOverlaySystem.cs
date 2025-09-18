@@ -28,7 +28,7 @@ public class TopMostUploadInfoOverlaySystem : ModSystem
         var tex = HoveredUploadOverlay.Consume();
         if (tex != null)
         {
-            DrawUploadPreview(Main.spriteBatch, tex);
+            //DrawUploadPreview(Main.spriteBatch, tex);
         }
         return true;
     }

@@ -3,6 +3,9 @@ using System.ComponentModel;
 using System.Reflection;
 using ChatPlus.Common.Configs.ConfigElements;
 using ChatPlus.Common.Configs.ConfigElements.Base;
+using ChatPlus.Common.Configs.ConfigElements.ButtonConfigElements;
+using ChatPlus.Core.Chat.MiniChatButtons;
+using ChatPlus.Core.Chat.MiniChatButtons.Shared;
 using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.Stats.PlayerStats.StatsPrivacy;
@@ -14,6 +17,7 @@ using Terraria.GameContent.UI.Chat;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
+using Terraria.UI;
 
 namespace ChatPlus.Common.Configs;
 
@@ -45,9 +49,22 @@ public class Config : ModConfig
 
     [Header("ChatSettings")]
 
-    [Expand(false,false)]
-    [BackgroundColor(255, 192, 8)] // Golden Yellow
-    public AutocompleteSettings autocompleteSettings;
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(true)]
+    public bool Autocomplete = true;
+
+    [BackgroundColor(255, 192, 8)]
+    [Range(10f, 20f)]
+    [Increment(1f)]
+    [DefaultValue(10f)]
+    [DrawTicks]
+    public float AutocompleteItemsVisible = 10f;
+
+    [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(Viewmode.ListView)]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public Viewmode viewmode;
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
     [DefaultValue(true)]
@@ -81,14 +98,13 @@ public class Config : ModConfig
 
     [CustomModConfigItem(typeof(ModIconsConfigElement))]
     [BackgroundColor(128, 255, 128)] // Grass Green
-
     [DefaultValue(true)]
-    public bool ModIcons;
+    public bool ModIcon;
 
     [CustomModConfigItem(typeof(PlayerIconsConfigElement))]
     [BackgroundColor(128, 255, 128)] // Grass Green
     [DefaultValue(true)]
-    public bool PlayerIcons;
+    public bool PlayerIcon;
 
     [BackgroundColor(128, 255, 128)] // Grass Green
     [CustomModConfigItem(typeof(PlayerColorConfigElement))]
@@ -118,73 +134,62 @@ public class Config : ModConfig
 
     // -----------------------------------------------------------
 
-    public class AutocompleteSettings
-    {
-        [BackgroundColor(255, 192, 8)]
-        [DefaultValue(true)]
-        public bool Autocomplete = true;
+    [Header("ShowButtons")]
 
-        [BackgroundColor(255, 192, 8)]
-        [Range(10f, 20f)]
-        [Increment(1f)]
-        [DefaultValue(10f)]
-        [DrawTicks]
-        public float AutocompleteItemsVisible = 10f;
+    [CustomModConfigItem(typeof(EmojiButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(true)]
+    public bool ShowEmojiButton;
 
-        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
-        [BackgroundColor(255, 192, 8)]
-        [DefaultValue(Viewmode.ListView)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Viewmode View_Commands;
+    [CustomModConfigItem(typeof(UploadButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(false)]
+    public bool ShowUploadButton;
 
-        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
-        [BackgroundColor(255, 192, 8)]
-        [DefaultValue(Viewmode.GridView)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Viewmode View_Colors;
+    [CustomModConfigItem(typeof(MentionButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(true)]
+    public bool ShowMentionButton;
 
-        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
-        [BackgroundColor(255, 192, 8)]
-        [DefaultValue(Viewmode.GridView)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Viewmode View_Emojis;
+    [CustomModConfigItem(typeof(ItemButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(false)]
+    public bool ShowItemButton;
 
-        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
-        [BackgroundColor(255, 192, 8)]
-        [DefaultValue(Viewmode.GridView)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Viewmode View_Glyphs;
+    [CustomModConfigItem(typeof(GlyphButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(false)]
+    public bool ShowGlyphButton;
 
-        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
-        [BackgroundColor(255, 192, 8)]
-        [DefaultValue(Viewmode.GridView)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Viewmode View_Items;
+    [CustomModConfigItem(typeof(ColorButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(false)]
+    public bool ShowColorButton;
 
-        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
-        [BackgroundColor(255, 192, 8)]
-        [DefaultValue(Viewmode.ListView)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Viewmode View_ModIcons;
+    [CustomModConfigItem(typeof(CommandButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(true)]
+    public bool ShowCommandButton;
 
-        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
-        [BackgroundColor(255, 192, 8)]
-        [DefaultValue(Viewmode.ListView)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Viewmode View_Mentions;
+    [CustomModConfigItem(typeof(ModIconButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(false)]
+    public bool ShowModIconButton;
 
-        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
-        [BackgroundColor(255, 192, 8)]
-        [DefaultValue(Viewmode.ListView)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Viewmode View_PlayerIcons;
+    [CustomModConfigItem(typeof(PlayerIconButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(false)]
+    public bool ShowPlayerIconButton;
 
-        [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
-        [BackgroundColor(255, 192, 8)]
-        [DefaultValue(Viewmode.ListView)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Viewmode View_Uploads;
-    }
+    [CustomModConfigItem(typeof(SettingsButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(false)]
+    public bool ShowSettingsButton;
+
+    [Header("Preview")]
+
+    [CustomModConfigItem(typeof(ChatBoxPreviewElement))]
+    public int ChatBoxPreview;
 
     public override void OnChanged()
     {
@@ -197,8 +202,10 @@ public class Config : ModConfig
 
         if (field != null)
         {
-            field.SetValue(Main.chatMonitor, (int) Conf.C.ChatsVisible);
+            field.SetValue(Main.chatMonitor, (int)Conf.C.ChatsVisible);
         }
+
+        UpdateMiniChatButtons();
 
         UpdatePlayerColor();
 
@@ -211,6 +218,32 @@ public class Config : ModConfig
         else if (Main.netMode == NetmodeID.Server)
         {
             PrivacyNetHandler.Instance.BroadcastSingle(Main.myPlayer, StatsPrivacy);
+        }
+    }
+
+    private void UpdateMiniChatButtons()
+    {
+        if (!Main.gameMenu)
+        {
+            var sys = ModContent.GetInstance<ChatButtonsSystem>();
+            if (sys == null) return;
+
+            var state = new UIState();
+            var cfg = Conf.C;
+
+            if (cfg?.ShowEmojiButton ?? true) state.Append(new EmojiButton());
+            if (cfg?.ShowUploadButton ?? true) state.Append(new UploadButton());
+            if (cfg?.ShowColorButton ?? true) state.Append(new ColorButton());
+            if (cfg?.ShowCommandButton ?? true) state.Append(new CommandButton());
+            if (cfg?.ShowGlyphButton ?? true) state.Append(new GlyphButton());
+            if (cfg?.ShowItemButton ?? true) state.Append(new ItemButton());
+            if (cfg?.ShowMentionButton ?? true) state.Append(new MentionButton());
+            if (cfg?.ShowSettingsButton ?? true) state.Append(new SettingsButton());
+            if (cfg?.ShowModIconButton ?? true) state.Append(new ModIconButton());
+            if (cfg?.ShowPlayerIconButton ?? true) state.Append(new PlayerIconButton());
+
+            sys.ui?.SetState(state);
+            sys.state = state; // update reference
         }
     }
 

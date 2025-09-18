@@ -15,12 +15,10 @@
 - Make PlayerInfoState look much better
 
 ----------------------TODO------------------------
-- Add emoji button right aligned in the chat input box
-- Add upload button right aligned in the chat input box
-- Add settings button right aligned in the chat input box
 - Add gif support
 
 ----------------------DONE------------------------
+- Add buttons in the chat input box
 - Add grid view to autocomplete
 - Added support for clicking links in chat
 - Added support for timestamps before every chat message
