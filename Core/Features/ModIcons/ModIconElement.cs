@@ -31,9 +31,9 @@ public class ModIconElement : BaseElement<ModIcon>
             tag,
             pos + new Vector2(13, 5),
             Color.White,
-            0f,           
-            Vector2.Zero, 
-            new Vector2(scale), 
+            0f,
+            Vector2.Zero,
+            new Vector2(scale),
             -1f,
             1f
         );
@@ -47,7 +47,7 @@ public class ModIconElement : BaseElement<ModIcon>
 
         if (bounds.Contains(Main.MouseScreen.ToPoint()))
         {
-            if (!Conf.C.ShowStatsWhenHovering) 
+            if (!Conf.C.ShowStatsWhenHovering)
                 return;
 
             if (!Conf.C.ShowStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
@@ -57,6 +57,6 @@ public class ModIconElement : BaseElement<ModIcon>
         }
 
         // debug
-        //sb.DrawSystems(TextureAssets.MagicPixel.Value, bounds, Color.Red*0.5f);
+        //sb.Draw(TextureAssets.MagicPixel.Value, bounds, Color.Red*0.5f);
     }
 }

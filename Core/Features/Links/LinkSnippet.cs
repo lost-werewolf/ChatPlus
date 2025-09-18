@@ -18,7 +18,7 @@ public class LinkSnippet : TextSnippet
 
     public override Color GetVisibleColor()
     {
-        if (isHovered) 
+        if (isHovered)
             return new Color(6, 69, 173);
 
         return new Color(0, 125, 255);
@@ -45,16 +45,16 @@ public class LinkSnippet : TextSnippet
         }
 
         // Snap to pixels to avoid drift
-        Vector2 p = new ((float)Math.Floor(pos.X), (float)Math.Floor(pos.Y));
+        Vector2 p = new((float)Math.Floor(pos.X), (float)Math.Floor(pos.Y));
 
         int width = (int)System.Math.Ceiling(size.X);
         int lineHeight = (int)System.Math.Ceiling(font.LineSpacing * scale);
 
-        var hoverRect = new Rectangle((int)p.X, (int)p.Y-0, width, lineHeight-7);
+        var hoverRect = new Rectangle((int)p.X, (int)p.Y - 0, width, lineHeight - 7);
         isHovered = hoverRect.Contains(Main.MouseScreen.ToPoint());
 
         // debug draw
-        //sb.DrawSystems(TextureAssets.MagicPixel.Value, hoverRect, Color.Red * 0.1f);
+        //sb.Draw(TextureAssets.MagicPixel.Value, hoverRect, Color.Red * 0.1f);
 
         if (isHovered)
         {

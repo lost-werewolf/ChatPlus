@@ -16,6 +16,7 @@ using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.Stats.ModStats;
+
 public static class ModInfoDrawer
 {
     /// <summary>
@@ -38,23 +39,23 @@ public static class ModInfoDrawer
         pos.Y = Math.Clamp(pos.Y, 0, Main.screenHeight - H);
         var rect = new Rectangle((int)pos.X, (int)pos.Y, W, H);
 
-        // DrawSystems background and player
+        // Draw background and player
         DrawFullBGPanel(sb, rect);
         DrawModNameText(sb, rect, mod);
         Vector2 cursor = pos + new Vector2(side, 32);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
         cursor += new Vector2(-side, 10);
-        rect = new Rectangle((W-100)/2, (int)cursor.Y, 100, 100);
+        rect = new Rectangle((W - 100) / 2, (int)cursor.Y, 100, 100);
         //DrawSeparatorBorder(sb, texRect);
         DrawBigModIcon(sb, cursor, W, mod);
         cursor += new Vector2(7, 110);
         DrawHorizontalSeparator(sb, cursor, W - side * 2);
 
-        // DrawSystems stats rows
+        // Draw stats rows
         cursor += new Vector2(0, 14);
         int left = (int)cursor.X;
 
-        // DrawSystems rows
+        // Draw rows
         DrawStat_ModSide(sb, new Rectangle(left, (int)cursor.Y, panelWidth, rowHeight), mod);
         DrawStat_FileSize(sb, new Rectangle(left, (int)cursor.Y + (rowHeight + 6) * 1, panelWidth, rowHeight), mod);
         DrawStat_LastUpdated(sb, new Rectangle(left, (int)cursor.Y + (rowHeight + 6) * 2, panelWidth, rowHeight), mod);
@@ -68,14 +69,14 @@ public static class ModInfoDrawer
     public static void DrawStat_ModSide(SpriteBatch sb, Rectangle rect, Mod mod)
     {
         var statPanelTexture = Ass.StatPanel;
-        var rect2 = new Rectangle(rect.X, rect.Y, statPanelTexture.Width() * 2+7, statPanelTexture.Height());
+        var rect2 = new Rectangle(rect.X, rect.Y, statPanelTexture.Width() * 2 + 7, statPanelTexture.Height());
         sb.Draw(statPanelTexture.Value, rect2, Color.White);
 
         var sideTex = Ass.ServerIcon;
         if (mod.Side.ToString().Equals("Client", StringComparison.InvariantCultureIgnoreCase))
             sideTex = Ass.ClientIcon;
 
-        sb.Draw(sideTex.Value, new Vector2(rect.X+2, rect.Y + 5), Color.White);
+        sb.Draw(sideTex.Value, new Vector2(rect.X + 2, rect.Y + 5), Color.White);
         Utils.DrawBorderString(sb, $"Side: {mod.Side}", new Vector2(rect2.X + 28, rect2.Y + 5), Color.White);
     }
 
@@ -87,7 +88,7 @@ public static class ModInfoDrawer
 
         // icon
         sb.Draw(Ass.AuthorIcon.Value, new Vector2(rect.X, rect.Y + 5), Color.White);
-        //sb.DrawSystems(Ass.FileSizeIcon.Value, new Vector2(rect.X, rect.Y - 2), null, Color.White, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
+        //sb.Draw(Ass.FileSizeIcon.Value, new Vector2(rect.X, rect.Y - 2), null, Color.White, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
 
 
         // Resolve + cache author from build properties (no mod.Author in tML)
@@ -119,7 +120,7 @@ public static class ModInfoDrawer
         var rect2 = new Rectangle(rect.X, rect.Y, statPanelTexture.Width() * 2 + 7, statPanelTexture.Height());
         sb.Draw(statPanelTexture.Value, rect2, Color.White);
 
-        sb.Draw(Ass.FileSizeIcon.Value, new Vector2(rect.X-5, rect.Y -2), null, Color.White, 0f, Vector2.Zero, 1.5f, SpriteEffects.None, 0f);
+        sb.Draw(Ass.FileSizeIcon.Value, new Vector2(rect.X - 5, rect.Y - 2), null, Color.White, 0f, Vector2.Zero, 1.5f, SpriteEffects.None, 0f);
 
         // Uses ModMetaCache (cached per-mod; no re-scan each frame)
         var meta = ModMetaCache.Get(mod);
@@ -134,7 +135,7 @@ public static class ModInfoDrawer
         sb.Draw(statPanelTexture.Value, rect2, Color.White);
 
         var tex = Main.Assets.Request<Texture2D>("Images/UI/VK_Shift").Value;
-        sb.Draw(tex, new Vector2(rect.X-0, rect.Y +1), Color.ForestGreen);
+        sb.Draw(tex, new Vector2(rect.X - 0, rect.Y + 1), Color.ForestGreen);
 
         var (size, lastWriteUtc, path) = ModMetaCache.Get(mod);
         string ago = lastWriteUtc == DateTime.MinValue
@@ -150,8 +151,8 @@ public static class ModInfoDrawer
         var rect2 = new Rectangle(rect.X, rect.Y, statPanelTexture.Width() * 2 + 7, statPanelTexture.Height());
         sb.Draw(statPanelTexture.Value, rect2, Color.White);
 
-        //sb.DrawSystems(Ass.VersionIcon.Value, new Vector2(rect.X - 2, rect.Y - 1), Color.White);
-        sb.Draw(Ass.VersionIcon.Value, new Vector2(rect.X+1, rect.Y +3), null, Color.White, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
+        //sb.Draw(Ass.VersionIcon.Value, new Vector2(rect.X - 2, rect.Y - 1), Color.White);
+        sb.Draw(Ass.VersionIcon.Value, new Vector2(rect.X + 1, rect.Y + 3), null, Color.White, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
 
 
         Utils.DrawBorderString(sb, $"Version: {mod.Version}", new Vector2(rect2.X + 28, rect2.Y + 5), Color.White);
@@ -189,7 +190,7 @@ public static class ModInfoDrawer
         if (tex != null)
         {
             float scale = Math.Min(100 / (float)tex.Width, 100 / (float)tex.Height);
-            pos += new Vector2((W-100)/2, 0);
+            pos += new Vector2((W - 100) / 2, 0);
 
             sb.Draw(tex, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             return;

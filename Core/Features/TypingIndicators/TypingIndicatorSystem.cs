@@ -201,11 +201,11 @@ public class TypingIndicatorSystem : ModSystem
 
     public static Rectangle GetTypingSourceRect()
     {
-        // change speed here.
-        // 2-5 = fast
-        // 5-8 = medium
-        // 8-12 = slow
-        int frame = (int)((Main.GameUpdateCount / 8) % 10);
-        return new Rectangle(frame * 32, 0, 32, 26);
+        int speed = 8; // <5 is fast, 5-8 = medium, >8 is slow
+        int frameCount = 8; 
+        int w = 32;
+        int h = 26;
+        int frame = (int)((Main.GameUpdateCount / speed) % frameCount);
+        return new Rectangle(frame * 32, 0, w, h);
     }
 }

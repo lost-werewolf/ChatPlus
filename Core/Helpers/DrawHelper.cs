@@ -3,9 +3,10 @@ using Terraria.GameContent;
 using Terraria.UI;
 
 namespace ChatPlus.Core.Helpers;
+
 public static class DrawHelper
 {
-    public static void DrawFill(SpriteBatch sb, UIElement ele=null, Rectangle rect = default)
+    public static void DrawFill(SpriteBatch sb, UIElement ele = null, Rectangle rect = default)
     {
         Rectangle t = new(0, 0, 0, 0);
 
@@ -13,13 +14,13 @@ public static class DrawHelper
         if (ele != null)
         {
             CalculatedStyle dims = ele.GetDimensions();
-             t = new((int)dims.X + 4, (int)dims.Y + 4, (int)dims.Width - 8, (int)dims.Height - 6);
+            t = new((int)dims.X + 4, (int)dims.Y + 4, (int)dims.Width - 8, (int)dims.Height - 6);
         }
         if (rect != default)
         {
             t = rect;
         }
-        
+
 
         Texture2D pixel = TextureAssets.MagicPixel.Value;
 
@@ -34,9 +35,9 @@ public static class DrawHelper
         sb.Draw(pixel, new Rectangle(t.Right - b, t.Y, b, t.Height), Color.White);        // right
     }
 
-    public static void DrawSlices(SpriteBatch sb, UIElement ele=null, Rectangle rect = default)
+    public static void DrawSlices(SpriteBatch sb, UIElement ele = null, Rectangle rect = default)
     {
-        Rectangle t = new(0,0,0,0);
+        Rectangle t = new(0, 0, 0, 0);
 
         if (ele != null)
             t = ele.GetDimensions().ToRectangle();
@@ -52,7 +53,7 @@ public static class DrawHelper
 
         Color color = Color.White;
 
-        // DrawSystems fill
+        // Draw fill
         sb.Draw(tex, new Rectangle(t.X + c, t.Y + c, t.Width - 2 * c, t.Height - 2 * c), ce, color * 0.3f);
 
         sb.Draw(tex, new Rectangle(t.X + c, t.Y, t.Width - 2 * c, c), eh, color);                                       // top

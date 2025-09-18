@@ -308,7 +308,7 @@ public class PlayerInfoState : BaseInfoState, ILoadable
         PlayerInfoDrawer.DrawSeparatorBorder(sb, bgRect);
         PlayerInfoDrawer.DrawMapFullscreenBackground(sb, bgRect, player);
 
-        // DrawSystems stats to the left of player
+        // Draw stats to the left of player
         Vector2 bgTopLeft = new(bgRect.X, bgRect.Y);
         if (Main.netMode != NetmodeID.SinglePlayer)
         {
@@ -317,7 +317,7 @@ public class PlayerInfoState : BaseInfoState, ILoadable
             PlayerInfoDrawer.DrawTeamText(sb, bgTopLeft, player);
         }
 
-        // DrawSystems player
+        // Draw player
         PlayerInfoDrawer.DrawPlayer(sb, playerPos, player, 1.8f);
 
         Vector2 statsHeaderPos = new(leftColumn, y0 - 4);
@@ -409,7 +409,7 @@ public class PlayerInfoState : BaseInfoState, ILoadable
 
     private static void DrawInventory(SpriteBatch sb, Vector2 start, Player player, Rectangle viewport)
     {
-        
+
 
         int size = Main.screenWidth < 1200 ? 36 : 40;
         int pad = 4;
@@ -433,7 +433,7 @@ public class PlayerInfoState : BaseInfoState, ILoadable
             else
                 sb.Draw(TextureAssets.InventoryBack.Value, r, Color.White);
 
-            Vector2 slotPos = new(r.X+7, r.Y+7);
+            Vector2 slotPos = new(r.X + 7, r.Y + 7);
             //DrawLockSlot(sb, slotPos, 1.0f);
 
             if (!item.IsAir)
@@ -594,7 +594,7 @@ public class PlayerInfoState : BaseInfoState, ILoadable
 
             // draw 3 armor dye slots
             DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, r, x0, y, player);
-            
+
             // draw 3 vanity slots
             DrawLoaderSlot(player.armor, ItemSlot.Context.InWorld, 10 + r, x1, y, player);
 
@@ -624,11 +624,11 @@ public class PlayerInfoState : BaseInfoState, ILoadable
                 if (r < player.armor.Length && !player.armor[r].IsAir)
                     DrawLockSlot(sb, new Vector2(x2 + 7, y + 7), 1.0f);
             }
-            
+
 
             Main.inventoryScale = scaleBackup;
 
-            bool SlotHasItem(Item[] arr, int index) 
+            bool SlotHasItem(Item[] arr, int index)
                 => index >= 0 && index < arr.Length && !arr[index].IsAir;
         }
 
@@ -655,10 +655,10 @@ public class PlayerInfoState : BaseInfoState, ILoadable
 
             // draw accessory dye slots
             DrawLoaderSlot(player.dye, ItemSlot.Context.EquipDye, dyeIndex, x0, y, player);
-            
+
             // draw accessory vanity slots
             DrawLoaderSlot(player.armor, ItemSlot.Context.EquipAccessoryVanity, vanityIndex, x1, y, player);
-            
+
             // draw accessory slots
             DrawLoaderSlot(player.armor, ItemSlot.Context.EquipAccessory, equipIndex, x2, y, player);
         }
@@ -737,7 +737,7 @@ public class PlayerInfoState : BaseInfoState, ILoadable
                 {
                     sb.Draw(TextureAssets.Buff[203].Value, iconRect, Color.White * alpha);
                 }
-                DrawLockSlot(sb, new Vector2(iconRect.X+5, iconRect.Y+4), 1.0f);
+                DrawLockSlot(sb, new Vector2(iconRect.X + 5, iconRect.Y + 4), 1.0f);
             }
 
 

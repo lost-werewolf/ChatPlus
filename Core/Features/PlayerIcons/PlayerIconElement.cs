@@ -24,15 +24,15 @@ public class PlayerIconElement : BaseElement<PlayerIcon>
         TextSnippet[] snip = [new TextSnippet(Data.PlayerName)];
         string tag = Data.Tag;
 
-        // DrawSystems player head
+        // Draw player head
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, tag,
             pos + new Vector2(4, 3), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
 
-        // DrawSystems outline
+        // Draw outline
         pos += new Vector2(35, 4);
         ChatManager.DrawColorCodedStringShadow(sb, FontAssets.MouseText.Value, snip, pos, Color.Black, 0f, Vector2.Zero, Vector2.One);
 
-        // DrawSystems player name in synced color
+        // Draw player name in synced color
         string hex = "FFFFFF";
         if (PlayerColorSystem.PlayerColors.TryGetValue(Data.PlayerIndex, out var syncedHex))
             hex = syncedHex ?? "FFFFFF";

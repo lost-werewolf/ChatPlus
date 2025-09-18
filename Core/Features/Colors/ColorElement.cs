@@ -25,12 +25,12 @@ namespace ChatPlus.Core.Features.Colors
             Vector2 pos = dims.Position();
             string tag = color.Tag;
 
-            // DrawSystems preview box
+            // Draw preview box
             tag = tag.Replace("[c/", "");
             tag = tag.Replace(":", "");
             Color previewColor = HexToColor(tag);
             var boxSize = 24;
-            var box = new Rectangle((int)pos.X +4, (int)pos.Y +3, boxSize, boxSize);
+            var box = new Rectangle((int)pos.X + 4, (int)pos.Y + 3, boxSize, boxSize);
             Color c = Color.Black; //box outline color
             sb.Draw(TextureAssets.MagicPixel.Value, box, previewColor);
 
@@ -41,9 +41,9 @@ namespace ChatPlus.Core.Features.Colors
                 sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X, box.Bottom - 1 - i, box.Width, 1), c);
                 sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.X + i, box.Y, 1, box.Height), c);
                 //if (GetIsSelected)
-                    //sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.Right - 1 - i, box.Y, 2, box.Height), c);
+                //sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.Right - 1 - i, box.Y, 2, box.Height), c);
                 //else
-                    sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.Right - 1 - i, box.Y, 1, box.Height), c);
+                sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle(box.Right - 1 - i, box.Y, 1, box.Height), c);
             }
 
             // Render color tag name

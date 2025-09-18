@@ -56,7 +56,7 @@ public class PlayerColorConfigElement : ConfigElement<string>
         // Make buttons
         copyButton = MakeButton("Copy", Loc.Get("ConfigPlayerColor.Copy"), 0, Copy);
         pasteButton = MakeButton("Paste", Loc.Get("ConfigPlayerColor.Paste"), 36, Paste);
-        randomizeButton = MakeButton("Randomize", Loc.Get("ConfigPlayerColor.Randomize"), 36*2, Randomize);
+        randomizeButton = MakeButton("Randomize", Loc.Get("ConfigPlayerColor.Randomize"), 36 * 2, Randomize);
 
         // Make sliders
         hueSlider = MakeHslSlider(HSLSliderId.Hue, 0);
@@ -66,15 +66,15 @@ public class PlayerColorConfigElement : ConfigElement<string>
 
     private void Copy()
     {
-        var clip = Platform.Get<IClipboard>(); 
-        if (clip != null) 
-            clip.Value = "#" + CurrentHex(); 
+        var clip = Platform.Get<IClipboard>();
+        if (clip != null)
+            clip.Value = "#" + CurrentHex();
     }
 
     private void Paste()
     {
-        var s = Platform.Get<IClipboard>()?.Value ?? string.Empty; 
-        ApplyHex(NormalizeHex(s)); 
+        var s = Platform.Get<IClipboard>()?.Value ?? string.Empty;
+        ApplyHex(NormalizeHex(s));
     }
 
     public static string[] PlayerColors =
@@ -138,9 +138,10 @@ public class PlayerColorConfigElement : ConfigElement<string>
         base.Update(gameTime);
 
         var hex = NormalizeHex(Value);
-        if (hex != lastHex && TryParseHex(hex, out var c)) {
+        if (hex != lastHex && TryParseHex(hex, out var c))
+        {
             hsl = Main.rgbToHsl(c);
-            lastHex = hex; 
+            lastHex = hex;
         }
     }
 
@@ -162,13 +163,13 @@ public class PlayerColorConfigElement : ConfigElement<string>
         var dims = GetDimensions();
         Rectangle area = new((int)dims.X, (int)dims.Y, (int)dims.Width, (int)dims.Height);
         Color color = Main.hslToRgb(hsl);
-       
-        // DrawSystems hex text
+
+        // Draw hex text
         string hexText = "#" + CurrentHex();
-        Vector2 hexTextPos = new(area.X+173, area.Y+6);
+        Vector2 hexTextPos = new(area.X + 173, area.Y + 6);
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, hexText, hexTextPos, Color.White, 0f, Vector2.Zero, new Vector2(1.0f));
 
-        // DrawSystems player name
+        // Draw player name
         string name = "PlayerName";
         if (Main.LocalPlayer != null)
             name = Main.LocalPlayer.name;
@@ -178,12 +179,9 @@ public class PlayerColorConfigElement : ConfigElement<string>
         if (name == "") name = "Player";
         ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, name, playerNamePos, color, 0f, Vector2.Zero, baseScale: new Vector2(0.8f));
 
-        // DrawSystems hover
-        Rectangle hoverRect = new(area.X, area.Y, 170, (int) Height.Pixels);
+        // Draw hover
+        Rectangle hoverRect = new(area.X, area.Y, 170, (int)Height.Pixels);
         bool hovered = hoverRect.Contains(Main.MouseScreen.ToPoint());
-
-        // debug
-        //sb.DrawSystems(TextureAssets.MagicPixel.Value, hoverRect, Color.Red);
 
         // Tooltip assignment must never be null
         TooltipFunction = hovered
@@ -196,9 +194,9 @@ public class PlayerColorConfigElement : ConfigElement<string>
         Func<float> get = () => id == HSLSliderId.Hue ? hsl.X : id == HSLSliderId.Saturation ? hsl.Y : hsl.Z;
         Action<float> set = v => { if (id == HSLSliderId.Hue) hsl.X = v; else if (id == HSLSliderId.Saturation) hsl.Y = v; else hsl.Z = v; PushFromHsl(); };
         Func<float, Color> grad = x => id == HSLSliderId.Hue ? Main.hslToRgb(x, 1, 0.5f) : id == HSLSliderId.Saturation ? Main.hslToRgb(hsl.X, x, hsl.Z) : Main.hslToRgb(hsl.X, hsl.Y, x);
-        CustomColoredSlider slider = new(LocalizedText.Empty, get, set, () => { }, grad, Color.Transparent) 
-        { 
-            Left = StyleDimension.FromPixels(5), 
+        CustomColoredSlider slider = new(LocalizedText.Empty, get, set, () => { }, grad, Color.Transparent)
+        {
+            Left = StyleDimension.FromPixels(5),
             Top = StyleDimension.FromPixels(top),
             Width = StyleDimension.FromPercent(1)
         };

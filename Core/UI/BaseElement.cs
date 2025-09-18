@@ -38,9 +38,9 @@ namespace ChatPlus.Core.UI
             // so we dont want to insert the tag when we delete an image
             bool leftShiftDown = Main.keyState.IsKeyDown(Keys.LeftShift);
             if (leftShiftDown) return;
-               
-           // Walk up until we find the panel, usually 3 steps: from InnerList -> List -> EmojiPanel
-                UIElement parent = Parent;
+
+            // Walk up until we find the panel, usually 3 steps: from InnerList -> List -> EmojiPanel
+            UIElement parent = Parent;
             while (parent != null && parent is not BasePanel<TData>)
                 parent = parent.Parent;
 
@@ -59,13 +59,13 @@ namespace ChatPlus.Core.UI
         {
             if (isSelected)
             {
-                // DrawSystems selection rectangle
+                // Draw selection rectangle
                 DrawHelper.DrawSlices(sb, ele: this);
                 DrawHelper.DrawFill(sb, ele: this);
             }
 
             base.Draw(sb);
         }
-        
+
     }
 }

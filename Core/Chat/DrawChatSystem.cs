@@ -155,7 +155,7 @@ internal class DrawChatSystem : ModSystem
 
         if (Main.mapFullscreen)
         {
-            DrawSystemsInFullscreenMap.DrawSystems();
+            DrawSystemsInFullscreenMap.Draw();
             DrawSystemsInFullscreenMap.DrawInfoStatesTopMost();
         }
     }
@@ -259,7 +259,7 @@ internal class DrawChatSystem : ModSystem
         else
         {
             // reserve horizontal space for the upload preview and shift both text & caret
-            int textOffsetX = DrawUploadAndGetTextOffset(height-y-5);
+            int textOffsetX = DrawUploadAndGetTextOffset(height - y - 5);
             DrawInputLine(height, hasUpload, textOffsetX, y);
             DrawSelectionRectangle(height, textOffsetX, y);
         }
@@ -348,7 +348,7 @@ internal class DrawChatSystem : ModSystem
         // Safety clamp to the text we actually draw
         caretVis = Math.Clamp(caretVis, 0, renderText.Length);
 
-        // 4) DrawSystems the line using the text that still contains color tags (so ChatManager colors it)
+        // 4) Draw the line using the text that still contains color tags (so ChatManager colors it)
         var snips = ChatManager.ParseMessage(renderText, Color.White).ToArray();
         ChatManager.DrawColorCodedStringWithShadow(
             Main.spriteBatch,
@@ -361,7 +361,7 @@ internal class DrawChatSystem : ModSystem
             out _
         );
 
-        // 5) DrawSystems the caret at the visible position
+        // 5) Draw the caret at the visible position
         if (Main.instance.textBlinkerState == 1)
         {
             var before = ChatManager.ParseMessage(renderText.Substring(0, caretVis), Color.White).ToArray();

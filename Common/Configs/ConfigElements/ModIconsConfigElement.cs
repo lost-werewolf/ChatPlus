@@ -23,7 +23,7 @@ public class ModIconsConfigElement : BaseBoolConfigElement
 
         string tag = ModIconTagHandler.GenerateTag("Terraria");
 
-        // DrawSystems the icon
+        // Draw the icon
         TextSnippet[] snippets = ChatManager.ParseMessage(tag, Color.White).ToArray();
         ChatManager.DrawColorCodedStringWithShadow(
             sb,

@@ -40,7 +40,7 @@ namespace ChatPlus.Core.Features.Commands
             var dims = GetDimensions();
             var pos = dims.Position();
 
-            // DrawSystems mod tag
+            // Draw mod tag
             string tag = "";
             if (_command.Mod != null)
             {
@@ -48,14 +48,14 @@ namespace ChatPlus.Core.Features.Commands
             }
             else
             {
-                var dest = new Rectangle((int)pos.X + 6, (int)(pos.Y +4), (int)20, (int)24);
+                var dest = new Rectangle((int)pos.X + 6, (int)(pos.Y + 4), (int)20, (int)24);
                 sb.Draw(Ass.TerrariaIcon.Value, dest, Color.White);
             }
 
             Utils.DrawBorderString(sb, tag, pos += new Vector2(14, 4), Color.White);
             //Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, tag, pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, 1.0f);
 
-            // DrawSystems command name
+            // Draw command name
             TextSnippet[] snip = [new TextSnippet(_command.Name)];
             ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos + new Vector2(26, 1), 0f, Vector2.Zero, Vector2.One, out _);
         }

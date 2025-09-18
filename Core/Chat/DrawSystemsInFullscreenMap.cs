@@ -10,6 +10,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace ChatPlus.Core.Chat;
+
 public static class DrawSystemsInFullscreenMap
 {
     public static void DrawInfoStatesTopMost()
@@ -20,17 +21,17 @@ public static class DrawSystemsInFullscreenMap
 
         // restore sb
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,SamplerState.LinearClamp,DepthStencilState.None,Main.Rasterizer,null,Main.UIScaleMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
 
         ui.Update(Main._drawInterfaceGameTime);
         ui.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
 
         // restore sb to SamplerStateForCursor
         Main.spriteBatch.End();
-        Main.spriteBatch.Begin(SpriteSortMode.Deferred,BlendState.AlphaBlend,Main.SamplerStateForCursor,DepthStencilState.None,null,null,Main.UIScaleMatrix);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, null, null, Main.UIScaleMatrix);
     }
 
-    public static void DrawSystems()
+    public static void Draw()
     {
         var sm = ChatPlus.StateManager;
 

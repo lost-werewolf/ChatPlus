@@ -51,9 +51,9 @@ namespace ChatPlus.Core.Features.Items
             TextSnippet[] snip = [new TextSnippet(item.Tag)];
             ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32, 3), 0f, Vector2.Zero, Vector2.One, out _);
 
-            // DrawSystems tooltip on hover
-            var hoverRect = new Rectangle((int)pos.X -28, (int)pos.Y, 26, 26);
-            //sb.DrawSystems(TextureAssets.MagicPixel.Value, hoverRect, Color.Red * 0.5f);
+            // Draw tooltip on hover
+            var hoverRect = new Rectangle((int)pos.X - 28, (int)pos.Y, 26, 26);
+            //sb.Draw(TextureAssets.MagicPixel.Value, hoverRect, Color.Red * 0.5f);
 
             if (hoverRect.Contains(Main.MouseScreen.ToPoint()))
             {
