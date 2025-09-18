@@ -85,7 +85,7 @@ public abstract class BasePanel<TData> : DraggablePanel
         Width.Set(300, 0);
 
         VAlign = 1f;
-        Top.Set(-38, 0);
+        Top.Set(-64, 0);
         Left.Set(190, 0);
 
         OverflowHidden = true;
@@ -137,7 +137,7 @@ public abstract class BasePanel<TData> : DraggablePanel
 
         // Update height
         int itemCount = (int)(Conf.C?.autocompleteSettings?.AutocompleteItemsVisible ?? 10f);
-        Top.Set(-38, 0f);
+        Top.Set(-64, 0f);
         Height.Set(itemCount * 30, 0f);
         list.Height.Set(itemCount * 30, 0f);
         grid.Height.Set(itemCount * 30, 0f);

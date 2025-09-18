@@ -151,6 +151,8 @@ namespace ChatPlus.Core.Features.Emojis
 
         public override void InsertSelectedTag()
         {
+            EmojiState.WasOpenedByButton = false;
+
             if (items.Count == 0)
             {
                 return;

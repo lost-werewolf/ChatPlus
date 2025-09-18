@@ -80,7 +80,7 @@ public abstract class BaseElement<TData> : UIElement
             }
 
             Rectangle r = GetDimensions().ToRectangle();
-            DrawHelper.DrawPixelatedBorder(sb, r, Color.Black * 0.75f, 2,2);
+            DrawHelper.DrawPixelatedBorder(sb, r, Color.Black * 0.75f, 2,1);
         }
 
         base.Draw(sb);

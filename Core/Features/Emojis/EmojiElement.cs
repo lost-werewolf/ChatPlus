@@ -62,7 +62,6 @@ public class EmojiElement : BaseElement<Emoji>
 
             string simple = ExtractSimpleName(emoji.Tag, emoji.Description);
             var snip = new TextSnippet[] { new TextSnippet(":" + simple) };
-
             ChatManager.DrawColorCodedStringWithShadow(sb,FontAssets.MouseText.Value,snip,pos,0f, Vector2.Zero,Vector2.One,out _);
         }
         else

@@ -2,27 +2,26 @@
 - Add config preview
 - Bug where draw player compat for weaponOut is too dark for ale
 - Add enemy and boss tracker
-
-----------------------BACKLOG---------------------
+- Refactor hex color helpers and global colors to one helper class, they are currently scattered in ColorElement and ColorConfigElement and such
 - Add example images to UploadManager
 - Add steam workshop button next to Back button in ModInfoState
-- React to message: highlights the chat message, shows options: reply, quick emojis, or emoji panel.
-- Drag top of scrollbar to resize height of chats. Should be hardcoded to force whole number chat heights.
 - Add equipment toggle like vanilla for PlayerInfoState
+
+----------------------BACKLOG---------------------
+- React to message: highlights the chat message, shows options: reply, quick emojis, or emoji panel.
+- Drag top of scrollbar to resize height of chats or some other resize. Should be hardcoded to force whole number chat heights.
+- Toggle list and grid view with a button.
 - Make player spectate with full background and proper player drawing (hard)
 - Make PlayerInfoState look much better
 
 ----------------------TODO------------------------
-- Add grid view to autocomplete
 - Add emoji button right aligned in the chat input box
 - Add upload button right aligned in the chat input box
 - Add settings button right aligned in the chat input box
 - Add gif support
-- Refactor hex color helpers and global colors to one helper class, they are currently scattered in ColorElement and ColorConfigElement and such
-- Fix width and height of autocomplete panel
-- Fix don't set dimensions in update methods
 
 ----------------------DONE------------------------
+- Add grid view to autocomplete
 - Added support for clicking links in chat
 - Added support for timestamps before every chat message
 - Added support for player icons before every chat message

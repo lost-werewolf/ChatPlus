@@ -35,13 +35,26 @@ namespace ChatPlus.Core.Features.Emojis
 
         TextSnippet ITagHandler.Parse(string text, Color baseColor, string options)
         {
-            if (!Registry.TryGetValue(text, out var texture))
+            // Handle optional "/gray" suffix
+            bool gray = false;
+            string key = text;
+
+            int slashIndex = text.IndexOf('/');
+            if (slashIndex >= 0)
+            {
+                string suffix = text[(slashIndex + 1)..].Trim().ToLowerInvariant();
+                key = text[..slashIndex];
+                if (suffix == "gray" || suffix == "grayscale")
+                    gray = true;
+            }
+
+            if (!Registry.TryGetValue(key, out var texture))
             {
                 return new TextSnippet(text);
             }
 
             string tag = GenerateEmojiTag(text);
-            EmojiSnippet snippet = new(texture, tag);
+            EmojiSnippet snippet = new(texture, tag, gray);
             return snippet;
         }
 

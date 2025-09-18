@@ -35,7 +35,7 @@ public static class DrawHelper
         sb.Draw(pixel, new Rectangle(t.Right - b, t.Y, b, t.Height), Color.White);        // right
     }
 
-    public static void DrawSlices(SpriteBatch sb, UIElement ele = null, Rectangle rect = default)
+    public static void DrawSlices(SpriteBatch sb, UIElement ele = null, Rectangle rect = default, int extraSize = 0)
     {
         Rectangle t = new(0, 0, 0, 0);
 
@@ -43,6 +43,12 @@ public static class DrawHelper
             t = ele.GetDimensions().ToRectangle();
         if (rect != default)
             t = rect;
+
+        // expand rectangle outward, centered
+        if (extraSize > 0)
+        {
+            t.Inflate(extraSize, extraSize);
+        }
 
         var tex = Ass.Hitbox.Value;
         int c = 5;
@@ -53,18 +59,20 @@ public static class DrawHelper
 
         Color color = Color.White;
 
-        // Draw fill
+        // Fill
         sb.Draw(tex, new Rectangle(t.X + c, t.Y + c, t.Width - 2 * c, t.Height - 2 * c), ce, color * 0.3f);
 
-        sb.Draw(tex, new Rectangle(t.X + c, t.Y, t.Width - 2 * c, c), eh, color);                                       // top
-        sb.Draw(tex, new Rectangle(t.X + c, t.Bottom - c, t.Width - 2 * c, c), eh, color, 0, Vector2.Zero, SpriteEffects.FlipVertically, 0); // bottom
-        sb.Draw(tex, new Rectangle(t.X, t.Y + c, c, t.Height - 2 * c), ev, color);                                       // left
-        sb.Draw(tex, new Rectangle(t.Right - c, t.Y + c, c, t.Height - 2 * c), ev, color, 0, Vector2.Zero, SpriteEffects.FlipHorizontally, 0); // right
+        // Edges
+        sb.Draw(tex, new Rectangle(t.X + c, t.Y, t.Width - 2 * c, c), eh, color);
+        sb.Draw(tex, new Rectangle(t.X + c, t.Bottom - c, t.Width - 2 * c, c), eh, color, 0, Vector2.Zero, SpriteEffects.FlipVertically, 0);
+        sb.Draw(tex, new Rectangle(t.X, t.Y + c, c, t.Height - 2 * c), ev, color);
+        sb.Draw(tex, new Rectangle(t.Right - c, t.Y + c, c, t.Height - 2 * c), ev, color, 0, Vector2.Zero, SpriteEffects.FlipHorizontally, 0);
 
-        sb.Draw(tex, new Rectangle(t.X, t.Y, c, c), sc, color);                                                          // TL
-        sb.Draw(tex, new Rectangle(t.Right - c, t.Y, c, c), sc, color, 0, Vector2.Zero, SpriteEffects.FlipHorizontally, 0); // TR
-        sb.Draw(tex, new Rectangle(t.Right - c, t.Bottom - c, c, c), sc, color, 0, Vector2.Zero, SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally, 0); // BR
-        sb.Draw(tex, new Rectangle(t.X, t.Bottom - c, c, c), sc, color, 0, Vector2.Zero, SpriteEffects.FlipVertically, 0); // BL
+        // Corners
+        sb.Draw(tex, new Rectangle(t.X, t.Y, c, c), sc, color);
+        sb.Draw(tex, new Rectangle(t.Right - c, t.Y, c, c), sc, color, 0, Vector2.Zero, SpriteEffects.FlipHorizontally, 0);
+        sb.Draw(tex, new Rectangle(t.Right - c, t.Bottom - c, c, c), sc, color, 0, Vector2.Zero, SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally, 0);
+        sb.Draw(tex, new Rectangle(t.X, t.Bottom - c, c, c), sc, color, 0, Vector2.Zero, SpriteEffects.FlipVertically, 0);
     }
 
     public static void DrawPixelatedBorder(SpriteBatch sb, Rectangle r, Color c, int size = 2, int stroke = 1)
