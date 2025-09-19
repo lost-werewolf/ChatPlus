@@ -4,8 +4,8 @@ using System.Reflection;
 using ChatPlus.Common.Configs.ConfigElements;
 using ChatPlus.Common.Configs.ConfigElements.Base;
 using ChatPlus.Common.Configs.ConfigElements.ButtonConfigElements;
-using ChatPlus.Core.Chat.MiniChatButtons;
-using ChatPlus.Core.Chat.MiniChatButtons.Shared;
+using ChatPlus.Core.Chat.ChatButtons;
+using ChatPlus.Core.Chat.ChatButtons.Shared;
 using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.PlayerColors;
 using ChatPlus.Core.Features.Stats.PlayerStats.StatsPrivacy;
@@ -40,11 +40,12 @@ public class Config : ModConfig
     }
     public enum Viewmode
     {
-        ListView,
-        GridView
+        List,
+        Grid
     }
 
     #endregion
+    #region Fields
     public override ConfigScope Mode => ConfigScope.ClientSide;
 
     [Header("ChatSettings")]
@@ -59,12 +60,6 @@ public class Config : ModConfig
     [DefaultValue(10f)]
     [DrawTicks]
     public float AutocompleteItemsVisible = 10f;
-
-    [CustomModConfigItem(typeof(EnumStringOptionElement<Viewmode>))]
-    [BackgroundColor(255, 192, 8)]
-    [DefaultValue(Viewmode.ListView)]
-    [JsonConverter(typeof(StringEnumConverter))]
-    public Viewmode viewmode;
 
     [BackgroundColor(255, 192, 8)] // Golden Yellow
     [DefaultValue(true)]
@@ -121,7 +116,7 @@ public class Config : ModConfig
 
     [BackgroundColor(192, 54, 64)] // Calamity Red
     [DefaultValue(true)]
-    public bool ShowUploadsWhenHovering;
+    public bool OpenImageWhenClicking;
 
     [BackgroundColor(192, 54, 64)] // Calamity Red
     [DefaultValue(false)]
@@ -136,34 +131,19 @@ public class Config : ModConfig
 
     [Header("ShowButtons")]
 
-    [CustomModConfigItem(typeof(EmojiButtonConfigElement))]
+    [CustomModConfigItem(typeof(ConfigButtonConfigElement))]
     [BackgroundColor(255, 192, 8)]
     [DefaultValue(true)]
-    public bool ShowEmojiButton;
+    public bool ShowConfigButton;
 
-    [CustomModConfigItem(typeof(UploadButtonConfigElement))]
-    [BackgroundColor(255, 192, 8)]
-    [DefaultValue(false)]
-    public bool ShowUploadButton;
-
-    [CustomModConfigItem(typeof(MentionButtonConfigElement))]
+    [CustomModConfigItem(typeof(ViewmodeButtonConfigElement))]
     [BackgroundColor(255, 192, 8)]
     [DefaultValue(true)]
-    public bool ShowMentionButton;
-
-    [CustomModConfigItem(typeof(ItemButtonConfigElement))]
-    [BackgroundColor(255, 192, 8)]
-    [DefaultValue(false)]
-    public bool ShowItemButton;
-
-    [CustomModConfigItem(typeof(GlyphButtonConfigElement))]
-    [BackgroundColor(255, 192, 8)]
-    [DefaultValue(false)]
-    public bool ShowGlyphButton;
+    public bool ShowViewmodeButton;
 
     [CustomModConfigItem(typeof(ColorButtonConfigElement))]
     [BackgroundColor(255, 192, 8)]
-    [DefaultValue(false)]
+    [DefaultValue(true)]
     public bool ShowColorButton;
 
     [CustomModConfigItem(typeof(CommandButtonConfigElement))]
@@ -171,32 +151,61 @@ public class Config : ModConfig
     [DefaultValue(true)]
     public bool ShowCommandButton;
 
+    [CustomModConfigItem(typeof(EmojiButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(true)]
+    public bool ShowEmojiButton;
+
+    [CustomModConfigItem(typeof(GlyphButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(true)]
+    public bool ShowGlyphButton;
+
+    [CustomModConfigItem(typeof(ItemButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(true)]
+    public bool ShowItemButton;
+
+    [CustomModConfigItem(typeof(MentionButtonConfigElement))]
+    [BackgroundColor(255, 192, 8)]
+    [DefaultValue(true)]
+    public bool ShowMentionButton;
+
     [CustomModConfigItem(typeof(ModIconButtonConfigElement))]
     [BackgroundColor(255, 192, 8)]
-    [DefaultValue(false)]
+    [DefaultValue(true)]
     public bool ShowModIconButton;
 
     [CustomModConfigItem(typeof(PlayerIconButtonConfigElement))]
     [BackgroundColor(255, 192, 8)]
-    [DefaultValue(false)]
+    [DefaultValue(true)]
     public bool ShowPlayerIconButton;
 
-    [CustomModConfigItem(typeof(SettingsButtonConfigElement))]
+    [CustomModConfigItem(typeof(UploadButtonConfigElement))]
     [BackgroundColor(255, 192, 8)]
-    [DefaultValue(false)]
-    public bool ShowSettingsButton;
+    [DefaultValue(true)]
+    public bool ShowUploadButton;
 
     [Header("Preview")]
 
     [CustomModConfigItem(typeof(ChatBoxPreviewElement))]
     public int ChatBoxPreview;
-
+    #endregion Fields
+    #region OnChanged
     public override void OnChanged()
     {
         base.OnChanged();
 
         if (Conf.C == null) return;
 
+        UpdateShowCount();
+        UpdateChatButtons();
+        UpdatePlayerColor();
+        UpdateStatsPrivacy();
+    }
+
+    private void UpdateShowCount()
+    {
         var field = typeof(RemadeChatMonitor)
         .GetField("_showCount", BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -204,11 +213,10 @@ public class Config : ModConfig
         {
             field.SetValue(Main.chatMonitor, (int)Conf.C.ChatsVisible);
         }
+    }
 
-        UpdateMiniChatButtons();
-
-        UpdatePlayerColor();
-
+    private void UpdateStatsPrivacy()
+    {
         PrivacyCache.Set(Main.myPlayer, StatsPrivacy);
 
         if (Main.netMode == NetmodeID.MultiplayerClient)
@@ -221,7 +229,7 @@ public class Config : ModConfig
         }
     }
 
-    private void UpdateMiniChatButtons()
+    private void UpdateChatButtons()
     {
         if (!Main.gameMenu)
         {
@@ -238,7 +246,7 @@ public class Config : ModConfig
             if (cfg?.ShowGlyphButton ?? true) state.Append(new GlyphButton());
             if (cfg?.ShowItemButton ?? true) state.Append(new ItemButton());
             if (cfg?.ShowMentionButton ?? true) state.Append(new MentionButton());
-            if (cfg?.ShowSettingsButton ?? true) state.Append(new SettingsButton());
+            if (cfg?.ShowConfigButton ?? true) state.Append(new ConfigButton());
             if (cfg?.ShowModIconButton ?? true) state.Append(new ModIconButton());
             if (cfg?.ShowPlayerIconButton ?? true) state.Append(new PlayerIconButton());
 
@@ -275,7 +283,7 @@ public class Config : ModConfig
         }
     }
 }
-
+#endregion
 public static class Conf
 {
     public static Config C => ModContent.GetInstance<Config>();

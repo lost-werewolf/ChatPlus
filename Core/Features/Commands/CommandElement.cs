@@ -33,18 +33,7 @@ namespace ChatPlus.Core.Features.Commands
             int chatLength = Main.chatText.Length;
             HandleChatSystem.SetCaretPos(chatLength);
         }
-
-        public override void Draw(SpriteBatch sb)
-        {
-            base.Draw(sb);
-
-            if (GetViewmode() == Viewmode.ListView)
-                DrawListElement(sb);
-            else
-                DrawGridElement(sb);
-        }
-
-        private void DrawListElement(SpriteBatch sb)
+        protected override void DrawListElement(SpriteBatch sb)
         {
             var dims = GetDimensions();
             var pos = dims.Position();
@@ -57,11 +46,11 @@ namespace ChatPlus.Core.Features.Commands
             }
             else
             {
-                var dest = new Rectangle((int)pos.X + 6, (int)(pos.Y + 4), (int)20, (int)24);
+                var dest = new Rectangle((int)pos.X + 5, (int)(pos.Y + 4), (int)20, (int)24);
                 sb.Draw(Ass.TerrariaIcon.Value, dest, Color.White);
             }
 
-            Utils.DrawBorderString(sb, tag, pos += new Vector2(14, 4), Color.White);
+            Utils.DrawBorderString(sb, tag, pos += new Vector2(8, 4), Color.White);
             //Utils.DrawBorderStringFourWay(sb, FontAssets.MouseText.Value, tag, pos.X - 8, pos.Y + 6, Color.White, Color.Black, Vector2.Zero, 1.0f);
 
             // Draw command name
@@ -69,7 +58,7 @@ namespace ChatPlus.Core.Features.Commands
             ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos + new Vector2(26, 1), 0f, Vector2.Zero, Vector2.One, out _);
         }
 
-        private void DrawGridElement(SpriteBatch sb)
+        protected override void DrawGridElement(SpriteBatch sb)
         {
             var dims = GetDimensions();
             var pos = dims.Position();

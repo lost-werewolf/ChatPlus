@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.UI;
 using static ChatPlus.Common.Configs.Config;
 
@@ -34,7 +33,12 @@ public abstract class BaseElement<TData> : UIElement
     protected Viewmode GetViewmode()
     {
         var parent = GetParentPanel();
-        return parent != null ? parent.CurrentViewMode : Viewmode.ListView;  
+        return parent != null ? parent.CurrentViewMode : Viewmode.List;  
+    }
+    protected bool IsGridSwitchSuppressed()
+    {
+        var parent = GetParentPanel();
+        return parent?.IsGridSwitchSuppressed == true;
     }
 
     protected BaseElement(TData data)
@@ -62,9 +66,28 @@ public abstract class BaseElement<TData> : UIElement
         }
     }
 
+    public override void Update(GameTime gameTime)
+    {
+        //base.Update(gameTime);
+        Log.Info("u");
+        if (IsMouseHovering)
+        {
+            var panel = GetParentPanel();
+            Log.Info("p: " + panel);
+            if (panel != null)
+            {
+                int index = panel.items.IndexOf(this);
+                if (index >= 0 && panel.CurrentIndex != index)
+                {
+                    panel.SetSelectedIndex(index);
+                }
+            }
+        }
+    }
+
     public override void Draw(SpriteBatch sb)
     {
-
+        // selection visuals
         if (isSelected)
         {
             DrawHelper.DrawSlices(sb, ele: this);
@@ -72,18 +95,25 @@ public abstract class BaseElement<TData> : UIElement
         }
         else
         {
-            if (this is EmojiElement)
-            {
-                base.Draw(sb);
-                return;
-            }
-
             Rectangle r = GetDimensions().ToRectangle();
-            DrawHelper.DrawPixelatedBorder(sb, r, Color.Black * 0.75f, 2,1);
+            DrawHelper.DrawPixelatedBorder(sb, r, Color.Black * 0.75f, 2, 1);
         }
 
-        base.Draw(sb);
+        // always call into subclass rendering
+        if (this is not UploadElement)
+            base.Draw(sb);
+
+        // unified list vs grid
+        bool forceGrid = IsGridSwitchSuppressed();
+        if (!forceGrid && GetViewmode() == Viewmode.List)
+            DrawListElement(sb);
+        else
+            DrawGridElement(sb);
     }
+
+    // subclasses must provide these
+    protected abstract void DrawListElement(SpriteBatch sb);
+    protected abstract void DrawGridElement(SpriteBatch sb);
 }
 
 

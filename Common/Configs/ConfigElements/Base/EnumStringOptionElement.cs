@@ -31,16 +31,16 @@ namespace ChatPlus.Common.Configs.ConfigElements.Base
             Vector2 pos = dims.Position();
             Rectangle rect = new((int)pos.X+175, (int)pos.Y, 30, 30);
 
-            var current = values[GetIndex()];
+            //var current = values[GetIndex()];
 
-            if (current.ToString().Contains("Grid"))
-            {
-                sb.Draw(Ass.FilterGrid.Value, rect, Color.White);
-            }
-            else if (current.ToString().Contains("List"))
-            {
-                sb.Draw(Ass.FilterList.Value, rect, Color.White);
-            }
+            //if (current.ToString().Contains("Grid"))
+            //{
+            //    sb.Draw(Ass.FilterGrid.Value, rect, Color.White);
+            //}
+            //else if (current.ToString().Contains("List"))
+            //{
+            //    sb.Draw(Ass.FilterList.Value, rect, Color.White);
+            //}
         }
 
         protected override float Proportion

@@ -1,13 +1,11 @@
-﻿using System.Reflection;
+﻿using ChatPlus.Core.Chat.ChatButtons.Shared;
 using ChatPlus.Core.Features.Scrollbar;
 using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.Stats.ModStats;
 using ChatPlus.Core.Features.Stats.PlayerStats;
-using ChatPlus.Core.Features.Stats.UploadStats;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using Terraria.UI;
 
 namespace ChatPlus.Core.Chat;
 
@@ -46,13 +44,19 @@ public static class DrawSystemsInFullscreenMap
         sm.PlayerIconSystem?.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
         sm.UploadSystem?.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
 
+        if (Main.drawingPlayerChat)
+        {
+            var buttons = ModContent.GetInstance<ChatButtonsSystem>();
+            buttons.ui?.Update(Main._drawInterfaceGameTime);
+            buttons.ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
+        }
+
         ModContent.GetInstance<ChatScrollSystem>().Draw();
     }
 
     public static void DrawHoverInfoSystems()
     {
         ModContent.GetInstance<TopMostPlayerInfoOverlaySystem>().Draw();
-        ModContent.GetInstance<TopMostUploadInfoOverlaySystem>().Draw();
         ModContent.GetInstance<TopMostModInfoOverlaySystem>().Draw();
     }
 }

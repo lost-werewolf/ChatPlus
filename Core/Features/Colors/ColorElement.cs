@@ -17,18 +17,7 @@ namespace ChatPlus.Core.Features.Colors
             Height.Set(30, 0);
             Width.Set(0, 1);
         }
-
-        public override void Draw(SpriteBatch sb)
-        {
-            base.Draw(sb);
-
-            if (GetViewmode() == Viewmode.ListView)
-                DrawListElement(sb);
-            else
-                DrawGridElement(sb);
-        }
-
-        private void DrawListElement(SpriteBatch sb)
+        protected override void DrawListElement(SpriteBatch sb)
         {
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
@@ -61,7 +50,7 @@ namespace ChatPlus.Core.Features.Colors
             );
         }
 
-        private void DrawGridElement(SpriteBatch sb)
+        protected override void DrawGridElement(SpriteBatch sb)
         {
             var dims = GetDimensions();
             Vector2 pos = dims.Position();

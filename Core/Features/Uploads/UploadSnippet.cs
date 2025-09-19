@@ -3,13 +3,12 @@ using ChatPlus.Core.Features.Stats.UploadStats;
 using ChatPlus.Core.Features.Uploads;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
 using static System.Net.Mime.MediaTypeNames;
 
 public class UploadSnippet : TextSnippet
 {
-    public static bool SuppressHoverUI { get; set; }
-
     private readonly Texture2D tex;
     private readonly string key;
 
@@ -35,16 +34,15 @@ public class UploadSnippet : TextSnippet
         Rectangle bounds = new((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
         bool hovering = bounds.Contains(Main.MouseScreen.ToPoint());
 
-        if (Conf.C != null && Conf.C.ShowUploadsWhenHovering && hovering && !SuppressHoverUI)
+        if (hovering && Conf.C.OpenImageWhenClicking)
         {
-            HoveredUploadOverlay.Set(tex);
-        }
-
-        if (hovering && Main.mouseLeft && Main.mouseLeftRelease)
-        {
-            Main.mouseLeftRelease = false;
-            var upload = new Upload(Text, key, $"InMemory:{key}", tex);
-            UploadInfoState.Instance?.Show(upload);
+            UICommon.TooltipMouseText(Text);
+            if (Main.mouseLeft && Main.mouseLeftRelease)
+            {
+                Main.mouseLeftRelease = false;
+                var upload = new Upload(Text, key, $"InMemory:{key}", tex);
+                UploadInfoState.Instance?.Show(upload);
+            }
         }
 
         return true;

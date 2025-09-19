@@ -193,6 +193,21 @@ Configs: {
 			Tooltip: ""
 			Label: Show Settings Button
 		}
+
+		OpenImageWhenClicking: {
+			Label: Open Image When Clicking
+			Tooltip: ""
+		}
+
+		ShowViewmodeButton: {
+			Label: Show Viewmode Button
+			Tooltip: ""
+		}
+
+		ShowConfigButton: {
+			Label: Show Config Button
+			Tooltip: ""
+		}
 	}
 
 	UserStatsPrivacy: {

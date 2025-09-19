@@ -5,7 +5,6 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
-using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.Features.Items
 {
@@ -19,22 +18,7 @@ namespace ChatPlus.Core.Features.Items
             Height.Set(30, 0);
             Width.Set(0, 1);
         }
-
-        public override void Draw(SpriteBatch sb)
-        {
-            base.Draw(sb);
-
-            if (GetViewmode() == Viewmode.ListView)
-            {
-                DrawListElement(sb);
-            }
-            else
-            {
-                DrawGridElement(sb);
-            }
-        }
-
-        private void DrawGridElement(SpriteBatch sb)
+        protected override void DrawGridElement(SpriteBatch sb)
         {
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
@@ -80,7 +64,7 @@ namespace ChatPlus.Core.Features.Items
             }
         }
 
-        private void DrawListElement(SpriteBatch sb)
+        protected override void DrawListElement(SpriteBatch sb)
         {
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
@@ -107,7 +91,7 @@ namespace ChatPlus.Core.Features.Items
             );
 
             // Render display name
-            TextSnippet[] snip = [new TextSnippet(item.Tag)];
+            TextSnippet[] snip = [new TextSnippet(item.DisplayName)];
             ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, pos += new Vector2(32, 3), 0f, Vector2.Zero, Vector2.One, out _);
 
             // Draw tooltip on hover

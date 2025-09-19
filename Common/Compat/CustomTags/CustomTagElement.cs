@@ -30,10 +30,18 @@ namespace ChatPlus.Common.Compat.CustomTags
             }
         }
 
-        public override void Draw(SpriteBatch sb)
+        protected override void DrawGridElement(SpriteBatch sb)
         {
-            base.Draw(sb); // selection background + children
+            CustomDraw(sb);
+        }
 
+        protected override void DrawListElement(SpriteBatch sb)
+        {
+            CustomDraw(sb);
+        }
+
+        private void CustomDraw(SpriteBatch sb)
+        {
             var dims = GetDimensions();
 
             float textX = dims.X + padding;
@@ -74,6 +82,13 @@ namespace ChatPlus.Common.Compat.CustomTags
             float textY = centerY - size.Y * 0.5f;
 
             sb.DrawString(font, label, new Vector2(textX, textY), Color.White);
+        }
+
+        public override void Draw(SpriteBatch sb)
+        {
+            base.Draw(sb); // selection background + children
+
+            CustomDraw(sb);
         }
     }
 }

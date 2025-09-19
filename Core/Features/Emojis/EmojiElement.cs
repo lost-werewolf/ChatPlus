@@ -1,4 +1,5 @@
-﻿using ChatPlus.Core.UI;
+﻿using System.Linq;
+using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
@@ -20,18 +21,7 @@ public class EmojiElement : BaseElement<Emoji>
         Height.Set(30, 0);
         Width.Set(0, 1f);
     }
-
-    public override void Draw(SpriteBatch sb)
-    {
-        base.Draw(sb);
-
-        if (GetViewmode() == Viewmode.ListView)
-            DrawListElement(sb);
-        else
-            DrawGridElement(sb);
-    }
-
-    private void DrawListElement(SpriteBatch sb)
+    protected override void DrawListElement(SpriteBatch sb)
     {
         var dims = GetDimensions();
         Vector2 pos = dims.Position() + new Vector2(32, 4);
@@ -66,12 +56,12 @@ public class EmojiElement : BaseElement<Emoji>
         }
         else
         {
-            var tagSnip = new TextSnippet[] { new TextSnippet(emoji.Tag) };
+            var tagSnip = new TextSnippet[] { new TextSnippet(emoji.Synonyms.FirstOrDefault()) };
 
             ChatManager.DrawColorCodedStringWithShadow(sb,FontAssets.MouseText.Value, tagSnip,pos,0f, Vector2.Zero,Vector2.One,out _ );
         }
     }
-    private void DrawGridElement(SpriteBatch sb)
+    protected override void DrawGridElement(SpriteBatch sb)
     {
         // do nothing!
     }

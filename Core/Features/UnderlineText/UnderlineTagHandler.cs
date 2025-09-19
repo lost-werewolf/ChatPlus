@@ -1,4 +1,5 @@
 ﻿using System;
+using ChatPlus.Core.Helpers;
 using ChatPlus.Core.Systems;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
@@ -27,8 +28,7 @@ public class UnderlineTagHandler : ITagHandler
 
             // draw text
             //sb.DrawString(font, Text, pos, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-            ChatManager.DrawColorCodedStringWithShadow(sb, font,
-            Text, pos, color, 0f, Vector2.Zero, Vector2.One);
+            DrawHelper.DrawText(sb, Text, pos, color);
 
             // underline rect
             Vector2 p = new((float)Math.Floor(pos.X), (float)Math.Floor(pos.Y));

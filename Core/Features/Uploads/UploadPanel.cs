@@ -25,14 +25,6 @@ namespace ChatPlus.Core.Features.Uploads
         protected override string GetDescription(Upload data) => data.FileName;
         protected override string GetTag(Upload data) => data.Tag;
 
-        public override void Update(GameTime gt)
-        {
-            if (items.Count == 0)
-                PopulatePanel();
-
-            base.Update(gt);
-        }
-
         public override void InsertSelectedTag()
         {
             if (items.Count == 0)
@@ -117,7 +109,6 @@ namespace ChatPlus.Core.Features.Uploads
                 return s.IndexOfAny(stops, start);
             }
         }
-
         public void UploadImage()
         {
             string fullFilePath = OpenFileDialog();

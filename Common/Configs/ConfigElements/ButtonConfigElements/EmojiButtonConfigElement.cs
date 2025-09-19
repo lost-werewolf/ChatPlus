@@ -1,8 +1,6 @@
 using ChatPlus.Common.Configs.ConfigElements.Base;
-using ChatPlus.Core.Chat.MiniChatButtons.Shared;
+using ChatPlus.Core.Chat.ChatButtons.Shared;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria.GameContent;
-using Terraria.UI.Chat;
 
 namespace ChatPlus.Common.Configs.ConfigElements.ButtonConfigElements;
 
@@ -19,8 +17,8 @@ internal class EmojiButtonConfigElement : BaseBoolConfigElement
     protected override void DrawPreview(SpriteBatch sb)
     {
         var dims = GetDimensions();
-        Vector2 pos = new(dims.X + 175 - 6, dims.Y + 5);
+        Vector2 pos = new(dims.X + 175 - 6, dims.Y + 4);
 
-        ChatButtonRenderer.Draw(sb, ChatButtonType.Emojis, pos, 24, grayscale: true);
+        ChatButtonRenderer.Draw(sb, ChatButtonType.Emojis, pos, 24, grayscale: true, preview: true);
     }
 }

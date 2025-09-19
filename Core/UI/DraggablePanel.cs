@@ -6,16 +6,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader;
 using Terraria.UI;
+using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.UI;
 
 public abstract class DraggablePanel : UIPanel
 {
-    private static readonly HashSet<DraggablePanel> live = [];
-    protected static Vector2 sharedPos;
-    protected static bool sharedInitialized;
+    public virtual void SetViewmode(Viewmode vm) { }
 
     private bool dragging;
     private bool pendingDrag; // mouse down occurred but threshold not yet exceeded
@@ -23,7 +21,6 @@ public abstract class DraggablePanel : UIPanel
     private const float dragThreshold = 3f;
     private Vector2 mouseDownPos;
     public bool IsDragging => dragging;
-    public static bool AnyDragging=> live.Any(p => p.dragging);
     public static bool AnyHovering;
 
     public DraggablePanel ConnectedPanel { get; set; }
@@ -32,18 +29,10 @@ public abstract class DraggablePanel : UIPanel
     public override void OnActivate()
     {
         base.OnActivate();
-        live.Add(this);
-        if (!sharedInitialized) 
-            sharedPos = new Vector2(Left.Pixels, Top.Pixels - SharedYOffset); sharedInitialized = true; 
-        
-        Left.Set(sharedPos.X, 0f);
-        Top.Set(sharedPos.Y + SharedYOffset, 0f);
-        Recalculate();
     }
 
     public override void OnDeactivate()
     {
-        live.Remove(this);
         base.OnDeactivate();
     }
 
@@ -59,45 +48,54 @@ public abstract class DraggablePanel : UIPanel
         AnyHovering = false;
     }
 
+    #region Snap
+    private static bool hasPendingSnap;
+    private static Vector2 pendingSnapPos;
+    private static int pendingSnapSize;
+
+    public static void RequestNextSnap(Vector2 buttonPos, int buttonSize)
+    {
+        pendingSnapPos = buttonPos;
+        pendingSnapSize = buttonSize;
+        hasPendingSnap = true;
+    }
+
+    public static bool TryConsumeNextSnap(out Vector2 buttonPos, out int buttonSize)
+    {
+        if (hasPendingSnap)
+        {
+            hasPendingSnap = false;
+            buttonPos = pendingSnapPos;
+            buttonSize = pendingSnapSize;
+            return true;
+        }
+
+        buttonPos = default;
+        buttonSize = 0;
+        return false;
+    }
+
     public void SnapRightAlignedTo(Vector2 buttonPos, int buttonSize)
     {
-        // align right edge of panel to right edge of button
-        float panelWidth = GetDimensions().Width;
+        float panelWidth = Width.Pixels;
+        if (panelWidth <= 0f)
+        {
+            Recalculate();
+            panelWidth = GetOuterDimensions().Width;
+        }
+
         float rightEdge = buttonPos.X + buttonSize;
         float newX = rightEdge - panelWidth;
 
-        Left.Set(newX, 0f);
+        Left.Set((float)Math.Round(newX), 0f);
         Recalculate();
-
-        sharedPos = new Vector2(newX, sharedPos.Y);
-        sharedInitialized = true;
-
-        foreach (var p in live)
-        {
-            if (p == this) continue;
-            p.Left.Set(sharedPos.X, 0f);
-            p.Recalculate();
-        }
     }
+    #endregion
 
     public override void Update(GameTime gameTime)
     {
         if (IsMouseHovering)
-        {
             Main.LocalPlayer.mouseInterface = true;
-        }
-
-        // keep snapped when not dragging
-        if (!dragging && sharedInitialized)
-        {
-            float exX = sharedPos.X, exY = sharedPos.Y + SharedYOffset;
-            if (Math.Abs(Left.Pixels - exX) > 0.5f || Math.Abs(Top.Pixels - exY) > 0.5f)
-            {
-                Left.Set(exX, 0f);
-                Top.Set(exY, 0f);
-                Recalculate();
-            }
-        }
 
         // Determine if we should enter dragging after surpassing threshold
         if (pendingDrag && !dragging)
@@ -126,7 +124,6 @@ public abstract class DraggablePanel : UIPanel
 
         float dx = MathHelper.Clamp(rawDx, dxMin, dxMax);
 
-        // ► Move X only during drag; never touch Top here
         Left.Set(oldX + dx, 0f);
         Recalculate();
 
@@ -134,16 +131,6 @@ public abstract class DraggablePanel : UIPanel
         {
             ConnectedPanel.Left.Set(ConnectedPanel.Left.Pixels + dx, 0f);
             ConnectedPanel.Recalculate();
-        }
-
-        // update shared X only; keep shared Y unchanged while dragging
-        sharedPos = new Vector2(Left.Pixels, sharedPos.Y);
-
-        foreach (var p in live)
-        {
-            if (p == this) continue;
-            p.Left.Set(sharedPos.X, 0f);
-            p.Recalculate(); // no Top changes while dragging
         }
     }
 
@@ -166,17 +153,6 @@ public abstract class DraggablePanel : UIPanel
         base.LeftMouseUp(evt);
         dragging = false;
         pendingDrag = false;
-
-        // Persist only X; Y stays whatever each panel’s layout dictates.
-        sharedPos = new Vector2(Left.Pixels, sharedPos.Y);
-
-        foreach (var p in live)
-        {
-            if (p == this) continue;
-            p.Left.Set(sharedPos.X, 0f);
-            p.Top.Set(sharedPos.Y + p.SharedYOffset, 0f); // safe to reapply Y after drag
-            p.Recalculate();
-        }
     }
 
     public static bool IsAnyScrollbarHovering()

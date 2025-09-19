@@ -60,7 +60,7 @@ namespace ChatPlus.Core.Chat
 
             // Client-only visibility: if this client has PlayerIcon disabled,
             // strip any existing player-icon tags already in the message.
-            if (!Conf.C.ShowPlayerIconButton)
+            if (!Conf.C.PlayerIcon)
                 resultText = _playerIconTagRx.Replace(resultText, string.Empty);
 
             // Extract sender name from [n:Name]
@@ -74,14 +74,14 @@ namespace ChatPlus.Core.Chat
             }
 
             // 3) Add player icon (only when this client wants them)
-            if (Conf.C.ShowPlayerIconButton && !string.IsNullOrEmpty(senderName))
+            if (Conf.C.PlayerIcon && !string.IsNullOrEmpty(senderName))
             {
                 string playerTag = PlayerIconTagHandler.GenerateTag(senderName);
                 resultText = playerTag + " " + resultText;
             }
 
             // 4) Add mod icon for system/mod messages (no sender)
-            if (Conf.C.ShowModIconButton && string.IsNullOrEmpty(senderName) && !resultText.StartsWith("[m:"))
+            if (Conf.C.ModIcon && string.IsNullOrEmpty(senderName) && !resultText.StartsWith("[m:"))
             {
                 string modTag = ModIconTagHandler.GenerateTag(ModIconSnippet.GetModSource());
                 resultText = " " + modTag + " " + resultText;

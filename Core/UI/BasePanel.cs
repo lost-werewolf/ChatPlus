@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Chat;
+using ChatPlus.Core.Chat.ChatButtons.Shared;
 using ChatPlus.Core.Features.Colors;
 using ChatPlus.Core.Features.Commands;
 using ChatPlus.Core.Features.Emojis;
@@ -14,6 +15,7 @@ using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
@@ -24,11 +26,19 @@ namespace ChatPlus.Core.UI;
 
 public abstract class BasePanel<TData> : DraggablePanel
 {
-    // Viewmode settings
-    public Viewmode CurrentViewMode => Conf.C?.viewmode ?? Viewmode.ListView;
+    // Viewmode
+    public virtual Viewmode CurrentViewMode
+    {
+        get
+        {
+            return ChatButtonLayout.GetViewmodeFor(GetType());
+        }
+    }
     private Viewmode appliedViewMode;
-    public bool IsGridModeEnabled => CurrentViewMode == Viewmode.GridView;
+    public bool IsGridModeEnabled => CurrentViewMode == Viewmode.Grid;
     protected CustomGrid grid; // only used in grid mode
+
+    // Grid settings
     protected virtual int GridColumns => 8;
     protected virtual int GridCellWidth => 30;
     protected virtual int GridCellHeight => 30;
@@ -58,6 +68,7 @@ public abstract class BasePanel<TData> : DraggablePanel
     }
 
     // Navigation
+    public int CurrentIndex => currentIndex;
     protected int currentIndex = 0; // first item
     private float _lastPanelHeightPx = -1f;
 
@@ -119,9 +130,24 @@ public abstract class BasePanel<TData> : DraggablePanel
         Append(scrollbar);
     }
 
+    private bool positionReady;
+
     public override void OnActivate()
     {
         base.OnActivate();
+
+        // If a chat button opened us, snap now BEFORE any first draw.
+        if (DraggablePanel.TryConsumeNextSnap(out var anchorPos, out var anchorSize))
+        {
+            SnapRightAlignedTo(anchorPos, anchorSize);
+        }
+        else
+        {
+            // Fallback to your default placement computed in the ctor.
+            Recalculate();
+        }
+
+        positionReady = true;
 
         appliedViewMode = CurrentViewMode;
         PopulatePanel();
@@ -141,6 +167,15 @@ public abstract class BasePanel<TData> : DraggablePanel
         Recalculate();
         Main.oldKeyState = Main.keyState;
     }
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        if (!positionReady)
+            return;
+
+        base.Draw(spriteBatch);
+    }
+
 
     public override void LeftClick(UIMouseEvent evt)
     {
@@ -213,7 +248,6 @@ public abstract class BasePanel<TData> : DraggablePanel
         {
             if (list.Parent == this)
             {
-                // Do NOT RemoveAllChildren() on UIList; it removes its internal inner list.
                 list.Remove();
             }
             if (grid.Parent != this)
@@ -229,7 +263,6 @@ public abstract class BasePanel<TData> : DraggablePanel
         {
             if (grid.Parent == this)
             {
-                // Do NOT RemoveAllChildren() on CustomGrid; it removes its internal inner list.
                 grid.Remove();
             }
             if (list.Parent != this)
@@ -386,18 +419,6 @@ public abstract class BasePanel<TData> : DraggablePanel
     {
         base.Update(gt);
 
-        // Left set
-        if (!_initialLeftSet && Main.screenWidth > 0)
-        {
-            float desiredX = Main.screenWidth - 300 - GetDimensions().Width - 12f; // 12px margin
-            Left.Set(desiredX, 0f);
-            Recalculate();
-
-            sharedPos = new Vector2(desiredX, Top.Pixels - SharedYOffset);
-            sharedInitialized = true;
-            _initialLeftSet = true;
-        }
-
         // Top set
         int itemCount = (int)(Conf.C?.AutocompleteItemsVisible ?? 10f);
         Top.Set(-64, 0);
@@ -409,8 +430,29 @@ public abstract class BasePanel<TData> : DraggablePanel
             _lastPanelHeightPx = desiredHeight;
         }
 
+        // Update viewmode
+        UpdateViewmode();
+
+        // Handle navigation keys
+        if (IsGridModeEnabled)
+            HandleGridNavigationKeys(gt);
+        else
+            HandleListNavigationKeys(gt);
+
+        // Handle key presses
+        HandleKeyPressed();
+        HandleTabKeyPressed();
+    }
+
+    #region Viewmode
+    private int gridSwitchSuppressFrames;
+    public bool IsGridSwitchSuppressed => gridSwitchSuppressFrames > 0;
+    private void UpdateViewmode()
+    {
         if (CurrentViewMode != appliedViewMode)
         {
+            bool switchingToGrid = CurrentViewMode == Viewmode.Grid;
+
             appliedViewMode = CurrentViewMode;
 
             PopulatePanel();
@@ -418,33 +460,27 @@ public abstract class BasePanel<TData> : DraggablePanel
             if (IsGridModeEnabled)
             {
                 if (grid._scrollbar != null)
-                {
                     grid._scrollbar.ViewPosition = 0f;
-                }
             }
             else
-            {
                 list.ViewPosition = 0f;
-            }
 
             if (items.Count > 0)
-            {
                 SetSelectedIndex(Math.Clamp(currentIndex, 0, items.Count - 1));
+
+            if (switchingToGrid)
+            {
+                gridSwitchSuppressFrames = 0; // adjust to taste. 1-10 is reasonable
             }
         }
-
-        if (IsGridModeEnabled)
+        if (gridSwitchSuppressFrames > 0)
         {
-            HandleGridNavigationKeys(gt);
+            gridSwitchSuppressFrames--;
         }
-        else
-        {
-            HandleListNavigationKeys(gt);
-        }
-
-        HandleKeyPressed();
-        HandleTabKeyPressed();
+        if (IsGridSwitchSuppressed)
+            Log.Debug(gridSwitchSuppressFrames);
     }
+    #endregion
 
     #region Navigation
 
@@ -634,8 +670,8 @@ public abstract class BasePanel<TData> : DraggablePanel
 
         string text = Main.chatText ?? string.Empty;
         int caret = Math.Clamp(HandleChatSystem.GetCaretPos(), 0, text.Length);
-        char[] stops = [' ', '\t', '\n', '\r', ']'];
 
+        // panel-specific prefix to detect the fragment/token
         string prefix = this switch
         {
             ColorPanel => "[c",
@@ -647,21 +683,47 @@ public abstract class BasePanel<TData> : DraggablePanel
             _ => "[e"
         };
 
-        int start = text.LastIndexOf(prefix, StringComparison.OrdinalIgnoreCase);
-        if (start < 0)
+        // find the last prefix before/at the caret
+        int start = text.LastIndexOf(prefix, Math.Max(0, caret - 1), StringComparison.OrdinalIgnoreCase);
+
+        if (start >= 0)
         {
-            Main.chatText += tag;
-            HandleChatSystem.SetCaretPos(Main.chatText.Length);
-            return;
+            // Is there already a closing bracket for that token?
+            int close = text.IndexOf(']', start);
+
+            // CASE A: Open fragment or caret is inside the token => REPLACE that fragment/token
+            // (close == -1 -> still typing; or caret <= close+1 -> caret inside or at end of token)
+            if (close == -1 || caret <= close + 1)
+            {
+                int replaceEnd = (close == -1) ? caret : close + 1; // include ']'
+                string before = text.Substring(0, start);
+                string after = text.Substring(replaceEnd);
+
+                // Avoid piling spaces after repeated replacements
+                after = after.TrimStart();
+
+                Main.chatText = before + tag + after;
+
+                // Put caret right after the inserted tag
+                HandleChatSystem.SetCaretPos((before + tag).Length);
+                return;
+            }
+
+            // CASE B: caret is past the finished token => append a new one, preserving spacing
+            {
+                bool needSpace = (text.Length > 0 && !char.IsWhiteSpace(text[text.Length - 1]));
+                Main.chatText = text + (needSpace ? " " : "") + tag + " ";
+                HandleChatSystem.SetCaretPos(Main.chatText.Length);
+                return;
+            }
         }
 
-        int end2 = text.IndexOfAny(stops, start);
-        if (end2 < 0) end2 = text.Length;
-
-        string before2 = text[..start];
-        string after2 = text[end2..];
-        Main.chatText = before2 + tag + after2;
-        HandleChatSystem.SetCaretPos(before2.Length + tag.Length);
+        // No fragment found -> just append with clean spacing
+        {
+            bool needSpace = (text.Length > 0 && !char.IsWhiteSpace(text[text.Length - 1]));
+            Main.chatText = text + (needSpace ? " " : "") + tag + " ";
+            HandleChatSystem.SetCaretPos(Main.chatText.Length);
+        }
     }
 
     private void HandleListNavigationKeys(GameTime gt)
@@ -704,6 +766,12 @@ public abstract class BasePanel<TData> : DraggablePanel
     {
         int cols = GridColumns;
         int total = items.Count;
+        if (cols <= 0 || total <= 0 || currentIndex < 0) return;
+
+        int currentRow = currentIndex / cols;
+        int lastRow = (total - 1) / cols;
+
+        bool moved = false;
 
         if (JustPressed(Keys.Left))
         {
@@ -713,6 +781,7 @@ public abstract class BasePanel<TData> : DraggablePanel
                 SetSelectedIndex(currentIndex - 1);
                 heldKey = Keys.Left;
                 repeatTimer = 0.35;
+                moved = true;
             }
         }
         else if (JustPressed(Keys.Right))
@@ -724,6 +793,7 @@ public abstract class BasePanel<TData> : DraggablePanel
                 SetSelectedIndex(currentIndex + 1);
                 heldKey = Keys.Right;
                 repeatTimer = 0.35;
+                moved = true;
             }
         }
         else if (JustPressed(Keys.Up))
@@ -733,30 +803,25 @@ public abstract class BasePanel<TData> : DraggablePanel
                 SetSelectedIndex(currentIndex - cols);
                 heldKey = Keys.Up;
                 repeatTimer = 0.35;
+                moved = true;
             }
         }
         else if (JustPressed(Keys.Down))
         {
+            // Clamp at bottom: only move if not on last row and target exists
             int candidate = currentIndex + cols;
-            if (candidate < total)
+            if (currentRow < lastRow && candidate < total)
             {
                 SetSelectedIndex(candidate);
                 heldKey = Keys.Down;
                 repeatTimer = 0.35;
-            }
-            else
-            {
-                if (currentIndex < total - 1)
-                {
-                    SetSelectedIndex(total - 1);
-                    heldKey = Keys.Down;
-                    repeatTimer = 0.35;
-                }
+                moved = true;
             }
         }
 
         double dt = gt.ElapsedGameTime.TotalSeconds;
-        if (Main.keyState.IsKeyDown(heldKey))
+
+        if (moved == false && heldKey != Keys.None && Main.keyState.IsKeyDown(heldKey))
         {
             repeatTimer -= dt;
             if (repeatTimer <= 0)
@@ -767,43 +832,32 @@ public abstract class BasePanel<TData> : DraggablePanel
                 {
                     int col = currentIndex % cols;
                     if (col > 0)
-                    {
                         SetSelectedIndex(currentIndex - 1);
-                    }
                 }
                 else if (Main.keyState.IsKeyDown(Keys.Right))
                 {
                     int col = currentIndex % cols;
                     bool hasNext = currentIndex < total - 1;
                     if (col < cols - 1 && hasNext)
-                    {
                         SetSelectedIndex(currentIndex + 1);
-                    }
                 }
                 else if (Main.keyState.IsKeyDown(Keys.Up))
                 {
                     if (currentIndex - cols >= 0)
-                    {
                         SetSelectedIndex(currentIndex - cols);
-                    }
                 }
                 else if (Main.keyState.IsKeyDown(Keys.Down))
                 {
                     int candidate = currentIndex + cols;
-                    if (candidate < total)
-                    {
+                    int row = currentIndex / cols;
+                    int last = (total - 1) / cols;
+
+                    if (row < last && candidate < total)
                         SetSelectedIndex(candidate);
-                    }
-                    else
-                    {
-                        if (currentIndex < total - 1)
-                        {
-                            SetSelectedIndex(total - 1);
-                        }
-                    }
                 }
             }
         }
     }
+
     #endregion
 }

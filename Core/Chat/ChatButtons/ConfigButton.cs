@@ -1,20 +1,15 @@
 using System;
 using ChatPlus.Common.Configs;
-using ChatPlus.Core.Chat.MiniChatButtons.Shared;
-using ChatPlus.Core.Helpers;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
+using ChatPlus.Core.Chat.ChatButtons.Shared;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Chat.MiniChatButtons;
+namespace ChatPlus.Core.Chat.ChatButtons;
 
-internal class SettingsButton : BaseChatButton
+internal class ConfigButton : BaseChatButton
 {
-    protected override ChatButtonType Type => ChatButtonType.Settings;
+    public ConfigButton() : base(ChatButtonType.Config) { }
 
     // This button opens the mod config instead of toggling a UI state
     protected override UserInterface UI => ModContent.GetInstance<ChatButtonsSystem>().ui; // unused
@@ -34,12 +29,5 @@ internal class SettingsButton : BaseChatButton
         {
             // ignore; Open may throw if UI not ready
         }
-    }
-
-    protected override void DrawCustom(SpriteBatch sb, Vector2 pos)
-    {
-        var dims = GetDimensions();
-        bool forceNormal = IsMouseHovering || UI.CurrentState == State; // maintain hover-to-color behavior
-        ChatButtonRenderer.Draw(sb, Type, dims.Position(), 24, grayscale: !forceNormal);
     }
 }

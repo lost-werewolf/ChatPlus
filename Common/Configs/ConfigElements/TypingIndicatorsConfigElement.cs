@@ -26,50 +26,6 @@ public class TypingIndicatorsConfigElement : BaseBoolConfigElement
         var tex = Ass.TypingIndicator; // w: 32, h: 26, frames: 10
         int frame = 1; 
         Rectangle rect = new(32 * frame, 0, 32, 26);
-        sb.Draw(Ass.TypingIndicator.Value, pos, 
-            rect, Color.White, 0f, Vector2.Zero, 0.9f, 0f, 0f);
-
-        return;
-
-        string playerName = "a";
-        var player = Main.LocalPlayer;
-
-        // Fallback if no player found
-        if (player == null || !player.active || player.name == "" || Main.gameMenu)
-        {
-            playerName = "Player";
-        }
-        else
-        {
-            playerName = Main.LocalPlayer.name;
-        }
-
-        // Colorized player name
-        pos += new Vector2(-0, 0);
-        string hex = "FFFFFF";
-        // Try resolve active player index for synced color
-        for (int i = 0; i < Main.maxPlayers; i++)
-        {
-            var p = Main.player[i];
-            if (p?.active == true && p.name == playerName)
-            {
-                if (PlayerColorSystem.PlayerColors.TryGetValue(i, out var syncedHex) && !string.IsNullOrWhiteSpace(syncedHex))
-                    hex = syncedHex;
-                else
-                    hex = PlayerColorHandler.HexFromName(playerName);
-                break;
-            }
-        }
-
-        if (playerName == "Player")
-        {
-            // Read live config value
-            hex = PlayerColorConfigElement.Instance?.LiveValue ?? "FFFFFF";
-            //Log.Info("live: " + hex);
-        }
-
-        var coloredSnips = ($"[c/{hex}:{playerName}]");
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.ItemStack.Value, 
-            Loc.Get("TypingIndicators.IsTyping", coloredSnips), pos, Color.White, 0f, Vector2.Zero, new Vector2(0.85f));
+        sb.Draw(tex.Value, pos, rect, Color.White, 0f, Vector2.Zero, 0.9f, 0f, 0f);
     }
 }

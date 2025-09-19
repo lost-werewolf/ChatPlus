@@ -1,5 +1,7 @@
-﻿using ChatPlus.Core.Features.Stats.Base;
+﻿using System;
+using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.ModLoader;
 using Terraria.UI; 
@@ -18,15 +20,33 @@ public class UploadInfoState : BaseInfoState, ILoadable
         if (_current == null || _current.Value.Texture == null)
             return;
 
-        var tex = _current.Value.Texture;
+        var upload = _current.Value;
+        if (TitlePanel.Text != upload.FileName)
+            TitlePanel.SetText(upload.FileName);
 
-        float scale = System.MathF.Min(
-            inner.Width / (float)tex.Width,
-            inner.Height / (float)tex.Height
+        var tex = _current.Value.Texture;
+        int srcW = tex.Width;
+        int srcH = tex.Height;
+
+        // Normal fit scale
+        float fitScale = MathF.Min(
+            inner.Width / (float)srcW,
+            inner.Height / (float)srcH
         );
 
-        int drawW = (int)(tex.Width * scale);
-        int drawH = (int)(tex.Height * scale);
+        // If image is "small" (both dimensions under 100), don’t upscale
+        float scale;
+        if (srcW < 100 && srcH < 100)
+        {
+            scale = Math.Min(10f, fitScale); // don’t exceed 1x
+        }
+        else
+        {
+            scale = fitScale;
+        }
+
+        int drawW = (int)(srcW * scale);
+        int drawH = (int)(srcH * scale);
 
         var pos = new Vector2(
             inner.X + (inner.Width - drawW) / 2f,

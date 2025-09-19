@@ -1,9 +1,10 @@
 using System;
+using System.IO;
+using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader.UI;
 using Terraria.UI.Chat;
 using static ChatPlus.Common.Configs.Config;
 
@@ -27,66 +28,72 @@ namespace ChatPlus.Core.Features.Uploads
             img.Top.Set(8, 0);
             Append(img);
         }
-
-        public override void Draw(SpriteBatch sb)
-        {
-            Height.Set(60, 0);
-            // When drawing uploads inside this element, suppress the global hover overlay
-            bool prev = UploadSnippet.SuppressHoverUI;
-            UploadSnippet.SuppressHoverUI = true;
-            base.Draw(sb);
-            UploadSnippet.SuppressHoverUI = prev;
-
-            if (GetViewmode() == Viewmode.ListView)
-                DrawListElement(sb);
-            else
-                DrawGridElement(sb);
-        }
-
-        private void DrawGridElement(SpriteBatch sb)
+        protected override void DrawGridElement(SpriteBatch sb)
         {
             var dims = GetDimensions();
-            Vector2 pos = dims.Position();
+            Rectangle cell = dims.ToRectangle();
 
-            img._textScale = 0.3f;
-            img.Left.Set(5, 0);
-            img.Top.Set(8, 0);
-        }
+            int pad = 4;
+            int innerW = Math.Max(0, cell.Width - pad * 2);
+            int innerH = Math.Max(0, cell.Height - pad * 2);
 
-        private void DrawListElement(SpriteBatch sb)
-        {
-            var dims = GetDimensions();
-            Vector2 pos = dims.Position();
+            Texture2D tex = Data.Texture;
+            if (tex == null)
+                return;
 
-            img._textScale = 0.3f;
-            img.Left.Set(5, 0);
-            img.Top.Set(8, 0);
+            int srcW = tex.Width;
+            int srcH = tex.Height;
 
-            static string ToHashLabel(string tag)
+            if (srcW <= 0 || srcH <= 0 || innerW <= 0 || innerH <= 0)
             {
-                if (string.IsNullOrEmpty(tag))
-                    return "#";
-
-                if (tag.StartsWith("[u:") && tag.EndsWith("]"))
-                {
-                    int colon = tag.IndexOf(':');
-                    int close = tag.LastIndexOf(']');
-                    if (colon >= 0 && close > colon + 1)
-                        return "#" + tag.Substring(colon + 1, close - colon - 1);
-                }
-
-                if (tag.StartsWith("#"))
-                    return tag;
-
-                return "#" + tag.Trim('[', ']');
+                return;
             }
 
-            string display = UploadSystem.OpenedFromHash ? ToHashLabel(Data.Tag) : Data.Tag;
+            // Scale to fit inside the inner rectangle (letterbox)
+            float scaleX = (float)innerW / (float)srcW;
+            float scaleY = (float)innerH / (float)srcH;
+            float scale = Math.Min(scaleX, scaleY);
 
-            TextSnippet[] snip = [new TextSnippet(display)];
-            Vector2 textPos = pos + new Vector2(65, 5);
+            if (scale > 1f)
+                scale = 1f;
 
-            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, snip, textPos, 0f, Vector2.Zero, Vector2.One, out _);
+            int drawW = (int)Math.Round(srcW * scale);
+            int drawH = (int)Math.Round(srcH * scale);
+
+            // Center within the cell
+            int drawX = cell.X + (cell.Width - drawW) / 2;
+            int drawY = cell.Y + (cell.Height - drawH) / 2;
+
+            var dest = new Rectangle(drawX, drawY, drawW, drawH);
+            sb.Draw(tex, dest, Color.White);
         }
+
+        protected override void DrawListElement(SpriteBatch sb)
+        {
+            var dims = GetDimensions();
+            Vector2 pos = dims.Position();
+
+            Texture2D tex = Data.Texture;
+            if (tex != null && tex.Height > 0)
+            {
+                float scale = 30f / tex.Height;
+                scale *= 0.8f;
+                if (scale > 1f)
+                    scale = 1f;
+
+                int drawW = (int)(tex.Width * scale);
+                int drawH = (int)(tex.Height * scale);
+
+                var dest = new Rectangle((int)pos.X + 3, (int)pos.Y + 3, drawW, drawH);
+                sb.Draw(tex, dest, Color.White);
+            }
+
+            string fileName = Path.GetFileNameWithoutExtension(Data.FileName);
+            ChatManager.DrawColorCodedStringWithShadow(
+                sb, FontAssets.MouseText.Value, fileName,
+                pos + new Vector2(65, 5), Color.White, 0f, Vector2.Zero, Vector2.One
+            );
+        }
+
     }
 }

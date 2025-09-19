@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using ChatPlus.Common.Configs;
+using ChatPlus.Core.Helpers;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace ChatPlus.Core.Chat.MiniChatButtons.Shared;
+namespace ChatPlus.Core.Chat.ChatButtons.Shared;
 
 /// <summary>
 /// Central system that manages all chat buttons (emoji, uploads, glyphs, etc).
@@ -14,6 +15,8 @@ public class ChatButtonsSystem : ModSystem
 {
     public UserInterface ui;
     public UIState state;
+    private ViewmodeButton _viewmodeBtn;
+    private bool _lastShowViewmode;
 
     public override void OnWorldLoad()
     {
@@ -29,9 +32,17 @@ public class ChatButtonsSystem : ModSystem
         if (cfg?.ShowGlyphButton ?? true) state.Append(new GlyphButton());
         if (cfg?.ShowItemButton ?? true) state.Append(new ItemButton());
         if (cfg?.ShowMentionButton ?? true) state.Append(new MentionButton());
-        if (cfg?.ShowSettingsButton ?? true) state.Append(new SettingsButton());
+        if (cfg?.ShowConfigButton ?? true) state.Append(new ConfigButton());
         if (cfg?.ShowModIconButton ?? true) state.Append(new ModIconButton());
         if (cfg?.ShowPlayerIconButton ?? true) state.Append(new PlayerIconButton());
+
+        _viewmodeBtn = new ViewmodeButton();
+        if (cfg?.ShowViewmodeButton ?? true)
+        {
+            state.Append(_viewmodeBtn);
+        }
+
+        _lastShowViewmode = cfg?.ShowViewmodeButton ?? true;
 
         ui.SetState(state);
     }
@@ -40,6 +51,27 @@ public class ChatButtonsSystem : ModSystem
     {
         ui = null;
         state = null;
+    }
+    private void EnsureButtonsMatchConfig()
+    {
+        bool want = Conf.C?.ShowViewmodeButton ?? true;
+        if (want == _lastShowViewmode) return;
+        _lastShowViewmode = want;
+
+        if (_viewmodeBtn == null)
+            _viewmodeBtn = new ViewmodeButton(); // safety
+
+        if (want)
+        {
+            if (_viewmodeBtn.Parent != state)
+                state.Append(_viewmodeBtn);
+        }
+        else
+        {
+            _viewmodeBtn.Remove();
+        }
+
+        state.Recalculate();
     }
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -51,8 +83,9 @@ public class ChatButtonsSystem : ModSystem
             "ChatPlus: Chat Buttons",
             () =>
             {
-                if (Main.drawingPlayerChat) // only when chat is open
+                if (Main.drawingPlayerChat)
                 {
+                    EnsureButtonsMatchConfig();
                     ui?.Update(Main._drawInterfaceGameTime);
                     ui?.Draw(Main.spriteBatch, Main._drawInterfaceGameTime);
                 }

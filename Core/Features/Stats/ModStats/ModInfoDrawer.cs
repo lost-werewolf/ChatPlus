@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.Core;
-using Terraria.UI;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Features.Stats.ModStats;

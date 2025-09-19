@@ -1,44 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
-using ChatPlus.Core.Chat.MiniChatButtons.Shared;
-using Microsoft.Xna.Framework;
+using ChatPlus.Core.Chat.ChatButtons.Shared;
+using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.ModLoader;
+using Terraria.GameInput;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using Terraria.GameContent.UI.Chat;
-using ChatPlus.Core.Helpers;
 
 namespace ChatPlus.Common.Configs.ConfigElements;
 
 public class ChatBoxPreviewElement : ConfigElement
 {
-    private readonly ChatButtonType[] orderRightToLeft =
-    [
-        ChatButtonType.Emojis,
-        ChatButtonType.Uploads,
-        ChatButtonType.Mentions,
-        ChatButtonType.Items,
-        ChatButtonType.Glyphs,
-        ChatButtonType.Colors,
-        ChatButtonType.Commands,
-        ChatButtonType.ModIcons,
-        ChatButtonType.PlayerIcons,
-        ChatButtonType.Settings,
-    ];
-    private static readonly Lazy<Asset<Texture2D>> settingsIcon =
-        new(() => ModContent.Request<Texture2D>("ChatPlus/Assets/LastUpdatedIcon", AssetRequestMode.ImmediateLoad));
-
-    private static readonly Lazy<Asset<Texture2D>> colorIcon =
-        new(() => ModContent.Request<Texture2D>("ChatPlus/Assets/ButtonColor", AssetRequestMode.ImmediateLoad));
-
-    private static readonly Lazy<Asset<Texture2D>> uploadIcon =
-        new(() => ModContent.Request<Texture2D>("ChatPlus/Assets/ButtonUpload", AssetRequestMode.ImmediateLoad));
+    // Blinker state
+    private int textBlinkerCount;
+    private bool textBlinkerVisible;
 
     public override void OnBind()
     {
@@ -50,51 +28,125 @@ public class ChatBoxPreviewElement : ConfigElement
         Label = string.Empty;
     }
 
-    public override void Draw(SpriteBatch spriteBatch)
+    public override void Draw(SpriteBatch sb)
     {
-        base.Draw(spriteBatch);
+        MinHeight.Set(45, 0);
+        MaxHeight.Set(45, 0);
+        Top.Set(5, 0);
+        base.Draw(sb);
 
-        var types = GetEnabledOrderLive();
-        if (types.Count == 0)
+        DrawChatbox(sb);
+        DrawButtons(sb);
+    }
+
+    private void DrawBlinker(SpriteBatch sb, Vector2 pos)
+    {
+        // Update blinker
+        textBlinkerCount++;
+        if (textBlinkerCount >= 20)
         {
-            return;
+            textBlinkerVisible = !textBlinkerVisible;
+            textBlinkerCount = 0;
         }
 
-        var dims = GetDimensions();
-        float size = 24f;
-        float gap = 6f;
+        // Draw blinker
+        if (IsMouseHovering && textBlinkerVisible)
+            ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, "|", pos + new Vector2(6, 6), Color.White, 0f, Vector2.Zero, Vector2.One);
+    }
 
-        float baseX = dims.X + dims.Width - size - 4;
-        float y = dims.Y + dims.Height - size - 2f;
+    private void DrawChatbox(SpriteBatch sb)
+    {
+        var rect = GetDimensions().ToRectangle();
+        int w = rect.Width - 20;
+        int h = 32;
+        int x = rect.X + 10;
+        int y = rect.Y + 6;
+        DrawNineSlice(sb, x, y, w, h, TextureAssets.TextBack.Value, new Color(100, 100, 100, 100));
+        DrawBlinker(sb, new Vector2(x, y));
+    }
+
+    private void DrawNineSlice(SpriteBatch sb, int x, int y, int w, int h, Texture2D tex, Color color)
+    {
+        int c = 10;
+        int ew = tex.Width - c * 2;
+        int eh = tex.Height - c * 2;
+
+        sb.Draw(tex, new Vector2(x, y), new Rectangle(0, 0, c, c), color);
+        sb.Draw(tex, new Rectangle(x + c, y, w - c * 2, c), new Rectangle(c, 0, ew, c), color);
+        sb.Draw(tex, new Vector2(x + w - c, y), new Rectangle(tex.Width - c, 0, c, c), color);
+
+        sb.Draw(tex, new Rectangle(x, y + c, c, h - c * 2), new Rectangle(0, c, c, eh), color);
+        sb.Draw(tex, new Rectangle(x + c, y + c, w - c * 2, h - c * 2), new Rectangle(c, c, ew, eh), color);
+        sb.Draw(tex, new Rectangle(x + w - c, y + c, c, h - c * 2), new Rectangle(tex.Width - c, c, c, eh), color);
+
+        sb.Draw(tex, new Vector2(x, y + h - c), new Rectangle(0, tex.Height - c, c, c), color);
+        sb.Draw(tex, new Rectangle(x + c, y + h - c, w - c * 2, c), new Rectangle(c, tex.Height - c, ew, c), color);
+        sb.Draw(tex, new Vector2(x + w - c, y + h - c), new Rectangle(tex.Width - c, tex.Height - c, c, c), color);
+    }
+
+    private void DrawButtons(SpriteBatch sb)
+    {
+        List<ChatButtonType> types = [];
+        foreach (var type in ChatButtonLayout.OrderRightToLeft)
+        {
+            if (IsEnabledLive(type))
+                types.Add(type);
+        }
+        if (types.Count == 0) return;
+
+        var dims = GetDimensions();
+        int size = 24;
+        float gap = 2f;
+
+        float baseX = dims.X + dims.Width - size - 20f;
+        float y = dims.Y + dims.Height - size - 11f;
+
+        bool anyHover = false;
+        var mouse = Main.MouseScreen.ToPoint(); // UI-scaled mouse pos
 
         for (int i = 0; i < types.Count; i++)
         {
+            var type = types[i];
+            gap = (type == ChatButtonType.Config || type == ChatButtonType.Viewmode) ? 2 : 2; // same for now
             float x = baseX - i * (size + gap);
-            ChatButtonRenderer.Draw(spriteBatch, types[i], new Vector2(x, y), (int)size, grayscale: false);
-        }
-    }
+            var pos = new Vector2(x, y);
+            var hit = new Rectangle((int)x, (int)y, size, size);
 
-    private List<ChatButtonType> GetEnabledOrderLive()
-    {
-        var list = new List<ChatButtonType>(orderRightToLeft.Length);
-        foreach (var type in orderRightToLeft)
-        {
-            if (IsEnabledLive(type))
+            bool hovered = hit.Contains(mouse);
+            anyHover |= hovered;
+
+            ChatButtonRenderer.Draw(sb, types[i], pos, size, grayscale: !hovered, preview: true);
+
+            // hover border
+            if (hovered)
             {
-                list.Add(type);
+                var r = hit;
+                r.Inflate(2, 2);
+                DrawHelper.DrawPixelatedBorder(sb, r, Color.Gray, 2, 2);
             }
         }
-        return list;
+
+        // restart sb with UIScaleMatrix (doesnt fix anything)
+        sb.End();
+        sb.Begin(
+            SpriteSortMode.Deferred,
+            BlendState.AlphaBlend,
+            SamplerState.LinearClamp,
+            DepthStencilState.None,
+            Main.Rasterizer,
+            null,
+            Main.UIScaleMatrix
+        );
     }
 
-    private bool IsEnabledLive(ChatButtonType kind)
+    private bool IsEnabledLive(ChatButtonType type)
     {
         if (Item == null)
         {
             return true;
         }
 
-        string fieldName = kind switch
+        string fieldName = type switch
         {
             ChatButtonType.Commands => "ShowCommandButton",
             ChatButtonType.Colors => "ShowColorButton",
@@ -105,7 +157,8 @@ public class ChatBoxPreviewElement : ConfigElement
             ChatButtonType.Mentions => "ShowMentionButton",
             ChatButtonType.PlayerIcons => "ShowPlayerIconButton",
             ChatButtonType.Uploads => "ShowUploadButton",
-            ChatButtonType.Settings => "ShowSettingsButton",
+            ChatButtonType.Config => "ShowConfigButton",
+            ChatButtonType.Viewmode => "ShowViewmodeButton",
             _ => string.Empty
         };
 
@@ -114,27 +167,16 @@ public class ChatBoxPreviewElement : ConfigElement
             return true;
         }
 
-        var type = Item.GetType();
+        var itemType = Item.GetType();
 
-        var field = type.GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var field = itemType.GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         if (field != null)
         {
             var value = field.GetValue(Item);
             if (value is bool b1)
             {
-                if (value is null) Log.Info("null1");
+                if (value is null) Log.Error("config item type field value is null");
                 return b1;
-            }
-        }
-
-        var prop = type.GetProperty(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        if (prop != null)
-        {
-            var value = prop.GetValue(Item, null);
-            if (value is bool b2)
-            {
-                if (value is null) Log.Info("null2");
-                return b2;
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using ChatPlus.Common.Configs;
 
 namespace ChatPlus.Core.Helpers;
 

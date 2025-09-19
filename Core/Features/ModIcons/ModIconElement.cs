@@ -6,7 +6,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
-using static ChatPlus.Common.Configs.Config;
 
 namespace ChatPlus.Core.Features.ModIcons;
 
@@ -18,17 +17,7 @@ public class ModIconElement : BaseElement<ModIcon>
         Width.Set(0, 1);
     }
 
-    public override void Draw(SpriteBatch sb)
-    {
-        base.Draw(sb);
-
-        if (GetViewmode() == Viewmode.ListView)
-            DrawListElement(sb);
-        else
-            DrawGridElement(sb);
-    }
-
-    private void DrawGridElement(SpriteBatch sb)
+    protected override void DrawGridElement(SpriteBatch sb)
     {
         var dims = GetDimensions();
         Vector2 pos = dims.Position();
@@ -40,7 +29,7 @@ public class ModIconElement : BaseElement<ModIcon>
             Color.White, 0f, Vector2.Zero, new Vector2(scale), -1f, 1f);
     }
 
-    private void DrawListElement(SpriteBatch sb)
+    protected override void DrawListElement(SpriteBatch sb)
     {
         var dims = GetDimensions();
         Vector2 pos = dims.Position();
@@ -66,7 +55,7 @@ public class ModIconElement : BaseElement<ModIcon>
             if (!Conf.C.ShowStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
                 return;
 
-            //HoveredModOverlay.Set(Data.mod);
+            HoveredModOverlay.Set(Data.mod);
         }
 
         // debug

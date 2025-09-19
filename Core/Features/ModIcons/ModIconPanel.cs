@@ -14,26 +14,21 @@ namespace ChatPlus.Core.Features.ModIcons;
 
 public class ModIconPanel : BasePanel<ModIcon>
 {
+    private static IReadOnlyList<LocalMod> cachedMods;
+    private static double lastCacheUpdate = -1;
+
+    private static IReadOnlyList<LocalMod> GetCachedMods()
+    {
+        // Refresh only once per session or if you want, after some time
+        if (cachedMods == null || lastCacheUpdate < 0)
+        {
+            cachedMods = ModOrganizer.FindAllMods();
+            lastCacheUpdate = Main.gameTimeCache.TotalGameTime.TotalSeconds;
+        }
+        return cachedMods;
+    }
     protected override IEnumerable<ModIcon> GetSource() => ModIconManager.ModIcons;
     protected override BaseElement<ModIcon> BuildElement(ModIcon data) => new ModIconElement(data);
-    protected override string GetDescription(ModIcon data)
-    {
-        string result = data.mod.Name;
-
-        if (data.mod != null)
-        {
-            if (ModLoader.TryGetMod(data.mod.Name, out Mod mod))
-            {
-                LocalMod localMod = ModHelper.GetLocalMod(mod);
-                if (localMod != null && localMod.properties != null)
-                {
-                    result = data.mod.Name + " v" + localMod.properties.version;
-                }
-            }
-        }
-
-        return result;
-    }
     protected override string GetTag(ModIcon data) => data.Tag;
 
     public override void Update(GameTime gt)
@@ -138,19 +133,32 @@ public class ModIconPanel : BasePanel<ModIcon>
         }
     }
 
+    protected override string GetDescription(ModIcon data)
+    {
+        string result = data.mod.Name;
+
+        if (data.mod != null && ModLoader.TryGetMod(data.mod.Name, out Mod mod))
+        {
+            LocalMod localMod = GetCachedMods()
+                .FirstOrDefault(m => m != null && string.Equals(m.Name, mod.Name, StringComparison.OrdinalIgnoreCase));
+
+            if (localMod?.properties != null)
+            {
+                result = data.mod.Name + " v" + localMod.properties.version;
+            }
+        }
+
+        return result;
+    }
+
     private string GetDescriptionForMod(Mod mod)
     {
         if (mod == null) return "No description available.";
 
-        // Find the matching LocalMod
-        IReadOnlyList<LocalMod> all = ModOrganizer.FindAllMods();
-        LocalMod localMod = all?.FirstOrDefault(m => m != null && string.Equals(m.Name, mod.Name, StringComparison.OrdinalIgnoreCase));
+        LocalMod localMod = GetCachedMods()
+            .FirstOrDefault(m => m != null && string.Equals(m.Name, mod.Name, StringComparison.OrdinalIgnoreCase));
 
-        // Get description
         string desc = localMod?.properties?.description;
-        if (!string.IsNullOrWhiteSpace(desc))
-            return desc;
-
-        return "";
+        return string.IsNullOrWhiteSpace(desc) ? "" : desc;
     }
 }

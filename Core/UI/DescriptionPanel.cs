@@ -1,4 +1,5 @@
-﻿using ChatPlus.Common.Configs;
+﻿using System;
+using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.Colors;
 using ChatPlus.Core.Features.Commands;
 using ChatPlus.Core.Features.Emojis;
@@ -6,7 +7,9 @@ using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.Features.Uploads;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
@@ -27,7 +30,6 @@ namespace ChatPlus.Core.UI
                 return -(visible * 30f) - pad; // sit above the base panel
             }
         }
-
         public DescriptionPanel(string initialText = null)
         {
             // Size
@@ -178,6 +180,45 @@ namespace ChatPlus.Core.UI
             }
 
             base.Draw(sb);
+        }
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+
+            if (ConnectedPanel == null)
+            {
+                return;
+            }
+
+            // Always use absolute pixel positioning when attached
+            HAlign = 0f;
+            VAlign = 0f;
+
+            var baseRect = ConnectedPanel.GetDimensions().ToRectangle();
+            float gap = 4f;
+
+            float desiredLeft = baseRect.Left;
+            float desiredTop = baseRect.Top - Height.Pixels - gap;
+
+            if (desiredLeft < 0f)
+            {
+                desiredLeft = 0f;
+            }
+            if (desiredLeft + Width.Pixels > Main.screenWidth)
+            {
+                desiredLeft = Main.screenWidth - Width.Pixels;
+            }
+            if (desiredTop < 0f)
+            {
+                desiredTop = 0f;
+            }
+
+            if (Math.Abs(Left.Pixels - desiredLeft) > 0.5f || Math.Abs(Top.Pixels - desiredTop) > 0.5f)
+            {
+                Left.Set(desiredLeft, 0f);
+                Top.Set(desiredTop, 0f);
+                Recalculate();
+            }
         }
     }
 }

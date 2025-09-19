@@ -1,11 +1,6 @@
 using ChatPlus.Common.Configs.ConfigElements.Base;
-using ChatPlus.Core.Chat.MiniChatButtons.Shared;
-using ChatPlus.Core.Helpers;
-using Microsoft.Xna.Framework;
+using ChatPlus.Core.Chat.ChatButtons.Shared;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
-using Terraria.GameContent;
-using Terraria.UI.Chat;
 
 namespace ChatPlus.Common.Configs.ConfigElements.ButtonConfigElements;
 

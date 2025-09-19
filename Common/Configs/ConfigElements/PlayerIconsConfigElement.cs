@@ -27,6 +27,7 @@ public class PlayerIconsConfigElement : BaseBoolConfigElement
         if (player == null || !player.active || player.name == "" || Main.gameMenu)
         {
             var guide = Ass.AuthorIcon.Value;
+            rect.X += 2;
             sb.Draw(guide, rect, Color.White);
             return;
         }
@@ -39,13 +40,6 @@ public class PlayerIconsConfigElement : BaseBoolConfigElement
         finally
         {
             MapHeadRendererHook.shouldFlipHeadDraw = false;
-        }
-
-        // Tooltip (doesnt work)
-        bool hovered = rect.Contains(Main.MouseScreen.ToPoint());
-        if (hovered)
-        {
-            if (Main.LocalPlayer == null) return;
         }
     }
 }

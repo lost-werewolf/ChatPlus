@@ -1,11 +1,34 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Graphics;
 using Terraria.GameContent;
 using Terraria.UI;
+using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Helpers;
 
 public static class DrawHelper
 {
+    /// <summary>
+    /// Draw text with less boilerplate.
+    /// Only spritebatch, text, and position is required.
+    /// </summary>
+    public static void DrawText(SpriteBatch sb, string text, Vector2 pos, Color color = default, Vector2 scale = default, DynamicSpriteFont font = default)
+    {
+        if (scale == default) scale = Vector2.One;
+        if (color == default) color = Color.White;
+        if (font == default) font = FontAssets.MouseText.Value;
+
+        ChatManager.DrawColorCodedStringWithShadow(
+            spriteBatch: sb, 
+            font: font, 
+            text: text, 
+            position: pos, 
+            baseColor: color, 
+            rotation: 0f, 
+            origin: Vector2.Zero, 
+            baseScale: scale);
+    }
+
     public static void DrawFill(SpriteBatch sb, UIElement ele = null, Rectangle rect = default)
     {
         Rectangle t = new(0, 0, 0, 0);

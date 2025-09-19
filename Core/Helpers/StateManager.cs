@@ -1,5 +1,6 @@
 ﻿using System;
 using ChatPlus.Common.Compat.CustomTags;
+using ChatPlus.Common.Configs;
 using ChatPlus.Core.Chat;
 using ChatPlus.Core.Features.Colors;
 using ChatPlus.Core.Features.Commands;
@@ -10,6 +11,7 @@ using ChatPlus.Core.Features.Mentions;
 using ChatPlus.Core.Features.ModIcons;
 using ChatPlus.Core.Features.PlayerIcons;
 using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.UI;
@@ -52,34 +54,31 @@ public class StateManager
         CustomTagSystem = customTagSystem;
     }
 
-    public void OpenStateByTriggers(GameTime gameTime,UserInterface ui,UIState state,params ITrigger[] triggers)
+    public void OpenStateByTriggers(GameTime gameTime, UserInterface ui, UIState state, params ITrigger[] triggers)
     {
         if (!Main.drawingPlayerChat)
         {
-            if (ui.CurrentState != null)
-                ui.SetState(null);
+            CloseAll();
             return;
         }
 
-        if ((state is EmojiState && EmojiState.WasOpenedByButton) ||
-    (state is UploadState && UploadState.WasOpenedByButton) ||
-    (state is ColorState && ColorState.WasOpenedByButton) ||
-    (state is ItemState && ItemState.WasOpenedByButton) ||
-    (state is CommandState && CommandState.WasOpenedByButton) ||
-    (state is GlyphState && GlyphState.WasOpenedByButton) ||
-    (state is MentionState && MentionState.WasOpenedByButton) ||
-    (state is ModIconState && ModIconState.WasOpenedByButton) ||
-    (state is PlayerIconState && PlayerIconState.WasOpenedByButton) ||
-    (state is CustomTagState && CustomTagState.WasOpenedByButton))
+        if (!Conf.C.Autocomplete)
         {
-            if (ui.CurrentState != state)
+            if (IsOpenedByButton(state))
             {
-                CloseOthers(ui);
-                ui.SetState(state);
-                ui.CurrentState.Recalculate();
+                if (ui.CurrentState != state)
+                {
+                    OpenExclusive(ui, state);
+                }
+                ui.Update(gameTime);
             }
-
-            ui.Update(gameTime);
+            else
+            {
+                if (ui.CurrentState == state)
+                {
+                    ui.SetState(null);
+                }
+            }
             return;
         }
 
@@ -89,35 +88,113 @@ public class StateManager
         bool shouldOpen = false;
         if (triggers != null && triggers.Length > 0)
         {
-            foreach (var trigger in triggers)
+            for (int i = 0; i < triggers.Length; i++)
             {
-                if (trigger.ShouldOpen(text, caret))
+                if (triggers[i] != null && triggers[i].ShouldOpen(text, caret))
                 {
                     shouldOpen = true;
                     break;
                 }
             }
         }
-        // debug test for fullscreen map
-        //if (state.GetType() == typeof(ItemState))
-            //Log.Info(shouldOpen);
 
         if (shouldOpen)
         {
+            // Prefix wins: replace whatever is open with this state
+            ResetAllWasOpenedByButton();
             if (ui.CurrentState != state)
             {
-                CloseOthers(ui);
-                ui.SetState(state);
-                ui.CurrentState.Recalculate();
+                OpenExclusive(ui, state);
             }
-
             ui.Update(gameTime);
+            return;
         }
-        else
+
+        // No active prefix: only keep this panel if it was opened by its button
+        if (IsOpenedByButton(state))
         {
-            if (ui.CurrentState == state)
-                ui.SetState(null);
+            if (ui.CurrentState != state)
+            {
+                OpenExclusive(ui, state);
+            }
+            ui.Update(gameTime);
+            return;
         }
+
+        if (ui.CurrentState == state)
+        {
+            ui.SetState(null);
+        }
+    }
+
+    public void OpenExclusive(UserInterface ui, UIState state)
+    {
+        CloseAll();
+        if (ui != null && state != null)
+        {
+            ui.SetState(state);
+        }
+    }
+
+    private void CloseAll()
+    {
+        void Close(UserInterface u)
+        {
+            if (u != null && u.CurrentState != null)
+            {
+                u.SetState(null);
+            }
+        }
+
+        Close(CommandSystem?.ui);
+        Close(ColorSystem?.ui);
+        Close(EmojiSystem?.ui);
+        Close(GlyphSystem?.ui);
+        Close(ItemSystem?.ui);
+        Close(ModIconSystem?.ui);
+        Close(PlayerIconSystem?.ui);
+        Close(UploadSystem?.ui);
+        Close(MentionSystem?.ui);
+        Close(CustomTagSystem?.ui);
+    }
+
+    private static bool IsOpenedByButton(UIState state)
+    {
+        if (state is EmojiState) return EmojiState.WasOpenedByButton;
+        if (state is UploadState) return UploadState.WasOpenedByButton;
+        if (state is ColorState) return ColorState.WasOpenedByButton;
+        if (state is ItemState) return ItemState.WasOpenedByButton;
+        if (state is CommandState) return CommandState.WasOpenedByButton;
+        if (state is GlyphState) return GlyphState.WasOpenedByButton;
+        if (state is MentionState) return MentionState.WasOpenedByButton;
+        if (state is ModIconState) return ModIconState.WasOpenedByButton;
+        if (state is PlayerIconState) return PlayerIconState.WasOpenedByButton;
+        if (state is CustomTagState) return CustomTagState.WasOpenedByButton;
+        return false;
+    }
+
+    public DraggablePanel GetActivePanel()
+    {
+        DraggablePanel Try(UIState st)
+        {
+            if (st == null) return null;
+            var prop = st.GetType().GetProperty("Panel",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+            return prop?.GetValue(st) as DraggablePanel;
+        }
+
+        // return the panel for whichever UI is currently open
+        if (CommandSystem?.ui?.CurrentState == CommandSystem?.state) return Try(CommandSystem.state);
+        if (ColorSystem?.ui?.CurrentState == ColorSystem?.state) return Try(ColorSystem.state);
+        if (EmojiSystem?.ui?.CurrentState == EmojiSystem?.state) return Try(EmojiSystem.state);
+        if (GlyphSystem?.ui?.CurrentState == GlyphSystem?.state) return Try(GlyphSystem.state);
+        if (ItemSystem?.ui?.CurrentState == ItemSystem?.state) return Try(ItemSystem.state);
+        if (ModIconSystem?.ui?.CurrentState == ModIconSystem?.state) return Try(ModIconSystem.state);
+        if (PlayerIconSystem?.ui?.CurrentState == PlayerIconSystem?.state) return Try(PlayerIconSystem.state);
+        if (UploadSystem?.ui?.CurrentState == UploadSystem?.state) return Try(UploadSystem.state);
+        if (MentionSystem?.ui?.CurrentState == MentionSystem?.state) return Try(MentionSystem.state);
+
+        return null;
     }
 
     public bool IsAnyStateActive()

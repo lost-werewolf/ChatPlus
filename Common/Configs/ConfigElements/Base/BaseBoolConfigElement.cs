@@ -32,6 +32,18 @@ public abstract class BaseBoolConfigElement : ConfigElement<bool>
         base.Draw(sb);
 
         DrawPreview(sb);
+
+        sb.End();
+        sb.Begin(
+            SpriteSortMode.Deferred,
+            BlendState.AlphaBlend,
+            SamplerState.LinearClamp,
+            DepthStencilState.None,
+            Main.Rasterizer,
+            null,
+            Main.UIScaleMatrix
+        );
+
         DrawToggleTexture(sb);
         DrawOnOffText(sb);
     }

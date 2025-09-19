@@ -25,7 +25,6 @@ namespace ChatPlus.Core.Helpers
         public static Asset<Texture2D> SmallPanelHighlight;
         public static Asset<Texture2D> TerrariaIcon;
         public static Asset<Texture2D> tModLoaderIcon;
-        public static Asset<Texture2D> FilterGrid;
         public static Asset<Texture2D> FilterList;
         public static Asset<Texture2D> ButtonColor;
         public static Asset<Texture2D> ButtonUpload;

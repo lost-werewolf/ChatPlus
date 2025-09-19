@@ -18,17 +18,7 @@ public class PlayerIconElement : BaseElement<PlayerIcon>
         Width.Set(0, 1);
     }
 
-    public override void Draw(SpriteBatch sb)
-    {
-        base.Draw(sb);
-
-        if (GetViewmode() == Viewmode.ListView)
-            DrawListElement(sb);
-        else
-            DrawGridElement(sb);
-    }
-
-    private void DrawGridElement(SpriteBatch sb)
+    protected override void DrawGridElement(SpriteBatch sb)
     {
         var dims = GetDimensions();
         Vector2 pos = dims.Position();
@@ -40,7 +30,7 @@ public class PlayerIconElement : BaseElement<PlayerIcon>
             pos + new Vector2(0, 3), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
     }
 
-    private void DrawListElement(SpriteBatch sb)
+    protected override void DrawListElement(SpriteBatch sb)
     {
         var dims = GetDimensions();
         Vector2 pos = dims.Position();

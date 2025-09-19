@@ -13,9 +13,13 @@
 - Toggle list and grid view with a button.
 - Make player spectate with full background and proper player drawing (hard)
 - Make PlayerInfoState look much better
+- Add gif support
+- Bug: Double cursor in systemsinfullscreenmap?
+- Bug: Chat monitor bug offset in different UIScales
+- Bug: Sometimes multiple images renders, and multiple images always breaks on new lines. Maybe set a max number of uploads per chat msg?
 
 ----------------------TODO------------------------
-- Add gif support
+- Add hovering over BaseElements to update description and selected index
 
 ----------------------DONE------------------------
 - Add buttons in the chat input box

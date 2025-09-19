@@ -1,6 +1,5 @@
 ﻿using System;
 using ChatPlus.Common.Configs;
-using ChatPlus.Core.Chat.MiniChatButtons;
 using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.Stats.PlayerStats;
 using Microsoft.Xna.Framework.Graphics;
@@ -98,7 +97,7 @@ public class PlayerIconSnippet : TextSnippet
 
         if (_playerIndex >= 0 && _playerIndex < Main.maxPlayers)
         {
-            if (!Conf.C.ShowStatsWhenHovering) 
+            if (!Conf.C.ShowStatsWhenHovering)
                 return;
 
             if (!Conf.C.ShowStatsWhenBossIsAlive && Main.CurrentFrameFlags.AnyActiveBossNPC)
