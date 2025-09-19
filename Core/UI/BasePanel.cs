@@ -475,10 +475,9 @@ public abstract class BasePanel<TData> : DraggablePanel
         }
         if (gridSwitchSuppressFrames > 0)
         {
+            //Log.Debug(gridSwitchSuppressFrames);
             gridSwitchSuppressFrames--;
         }
-        if (IsGridSwitchSuppressed)
-            Log.Debug(gridSwitchSuppressFrames);
     }
     #endregion
 

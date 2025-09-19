@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using ChatPlus.Core.Chat.ChatButtons.Shared;
 using ChatPlus.Core.Helpers;
@@ -7,6 +8,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.GameInput;
 using Terraria.ModLoader.Config.UI;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -24,8 +26,22 @@ public class ChatBoxPreviewElement : ConfigElement
         Width = StyleDimension.Fill;
         HAlign = 0.5f;
         VAlign = 0.5f;
-        MinHeight = new StyleDimension(30, 0);
         Label = string.Empty;
+
+        MinHeight.Set(45, 0);
+        MaxHeight.Set(45, 0);
+        Top.Set(5, 0);
+    }
+
+    public override void OnDeactivate()
+    {
+        base.OnDeactivate();
+
+        // Prevent inventory from being forced open
+        if (Main.playerInventory)
+        {
+            Main.playerInventory = false;
+        }
     }
 
     public override void Draw(SpriteBatch sb)
@@ -117,12 +133,25 @@ public class ChatBoxPreviewElement : ConfigElement
 
             ChatButtonRenderer.Draw(sb, types[i], pos, size, grayscale: !hovered, preview: true);
 
-            // hover border
+            // draw border and tooltip around hovered item
             if (hovered)
             {
                 var r = hit;
                 r.Inflate(2, 2);
                 DrawHelper.DrawPixelatedBorder(sb, r, Color.Gray, 2, 2);
+
+                string tt = type.ToString();
+
+                if (type == ChatButtonType.PlayerIcons) tt = "Player Icons";
+                if (type == ChatButtonType.ModIcons) tt = "Mod Icons";
+
+                UICommon.TooltipMouseText(tt);
+            }
+
+            if (hovered && Main.mouseLeft && Main.mouseLeftRelease && type == ChatButtonType.Viewmode)
+            {
+                // don't do this, it's confusing for users
+                //ChatButtonRenderer.TogglePreviewViewmode();
             }
         }
 

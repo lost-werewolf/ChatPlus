@@ -17,7 +17,7 @@ internal class ModIconButtonConfigElement : BaseBoolConfigElement
     protected override void DrawPreview(SpriteBatch sb)
     {
         var dims = GetDimensions();
-        Vector2 pos = new(dims.X + 175 - 6, dims.Y + 4);
-        ChatButtonRenderer.Draw(sb, ChatButtonType.ModIcons, pos, 24, grayscale: true);
+        Vector2 pos = new(dims.X + 175 - 7, dims.Y + 3);
+        ChatButtonRenderer.Draw(sb, ChatButtonType.ModIcons, pos, 24, grayscale: !Value);
     }
 }

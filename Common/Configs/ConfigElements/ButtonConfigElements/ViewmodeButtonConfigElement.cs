@@ -18,7 +18,7 @@ internal class ViewmodeButtonConfigElement : BaseBoolConfigElement
         var dims = GetDimensions();
         Vector2 pos = new(dims.X + 175 - 7, dims.Y + 3);
 
-        ChatButtonRenderer.Draw(sb, ChatButtonType.Viewmode, pos, 24, grayscale: true, preview: true);
+        ChatButtonRenderer.Draw(sb, ChatButtonType.Viewmode, pos, 24, grayscale: !Value, preview: true);
     }
 }
 

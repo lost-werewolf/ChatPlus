@@ -6,22 +6,21 @@
 - Add example images to UploadManager
 - Add steam workshop button next to Back button in ModInfoState
 - Add equipment toggle like vanilla for PlayerInfoState
-
-----------------------BACKLOG---------------------
 - React to message: highlights the chat message, shows options: reply, quick emojis, or emoji panel.
 - Drag top of scrollbar to resize height of chats or some other resize. Should be hardcoded to force whole number chat heights.
-- Toggle list and grid view with a button.
 - Make player spectate with full background and proper player drawing (hard)
 - Make PlayerInfoState look much better
+
+----------------------BACKLOG---------------------
 - Add gif support
 - Bug: Double cursor in systemsinfullscreenmap?
-- Bug: Chat monitor bug offset in different UIScales
 - Bug: Sometimes multiple images renders, and multiple images always breaks on new lines. Maybe set a max number of uploads per chat msg?
 
 ----------------------TODO------------------------
-- Add hovering over BaseElements to update description and selected index
 
 ----------------------DONE------------------------
+- Add right click UploadElement to delete it
+- Add hovering over BaseElements to update description and selected index
 - Add buttons in the chat input box
 - Add grid view to autocomplete
 - Added support for clicking links in chat

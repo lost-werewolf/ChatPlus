@@ -22,17 +22,93 @@ namespace ChatPlus.Core.Features.Uploads
 
         public override void Unload()
         {
-            // Dispose all textures on unload
             if (Uploads != null)
             {
                 foreach (var u in Uploads)
-                {
-                    try { u.Texture?.Dispose(); } catch { }
-                }
+                    DisposeLater(u.Texture);
             }
-
             Uploads = null;
             UploadTagHandler.Clear();
+        }
+        private static void UnbindAllSamplers()
+        {
+            var gd = Main.instance.GraphicsDevice;
+            for (int i = 0; i < 8; i++)
+                gd.Textures[i] = null;
+        }
+        private static readonly Queue<Texture2D> pendingDispose = new();
+
+        public override void PreUpdatePlayers()
+        {
+            if (pendingDispose.Count == 0)
+            {
+                return;
+            }
+
+            UnbindAllSamplers();
+
+            while (pendingDispose.Count > 0)
+            {
+                var t = pendingDispose.Dequeue();
+                try
+                {
+                    if (t != null && !t.IsDisposed)
+                    {
+                        t.Dispose();
+                    }
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        private static void DisposeLater(Texture2D t)
+        {
+            if (t != null && !t.IsDisposed)
+                pendingDispose.Enqueue(t);
+        }
+        public static bool TryDelete(Upload upload)
+        {
+            try
+            {
+                if (upload == null)
+                {
+                    return false;
+                }
+
+                // Remove from in-memory lists first so UI stops referencing it
+                int removed = Uploads.RemoveAll(u =>
+                    (!string.IsNullOrEmpty(upload.Tag) && string.Equals(u.Tag, upload.Tag, StringComparison.OrdinalIgnoreCase)) ||
+                    (!string.IsNullOrEmpty(upload.FullFilePath) && string.Equals(u.FullFilePath, upload.FullFilePath, StringComparison.OrdinalIgnoreCase)));
+
+                // Best-effort: remove tag mapping so stale chat tags won’t resolve to a disposed texture
+                try
+                {
+                    UploadTagHandler.Remove(upload.Tag);
+                }
+                catch
+                {
+                    // no-op if your handler doesn’t expose Remove; safe to ignore
+                }
+
+                // Queue GPU object for safe disposal next tick
+                DisposeLater(upload.Texture);
+
+                // Try to delete the file on disk after we’ve detached from UI/state
+                if (!string.IsNullOrEmpty(upload.FullFilePath) && File.Exists(upload.FullFilePath))
+                {
+                    File.Delete(upload.FullFilePath);
+                }
+
+                return removed > 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("TryDelete failed: " + ex);
+                Main.NewText("Delete failed.", Color.Red);
+                return false;
+            }
         }
 
         public static void AddNewUpload(Upload upload)
@@ -76,31 +152,31 @@ namespace ChatPlus.Core.Features.Uploads
                         {
                             string key = Path.GetFileNameWithoutExtension(file);
                             using var fs = File.OpenRead(file);
-                            Texture2D texture = Texture2D.FromStream(Main.instance.GraphicsDevice, fs);
+                            var tex = Texture2D.FromStream(Main.instance.GraphicsDevice, fs);
 
-                            if (UploadTagHandler.Register(key, texture))
+                            if (UploadTagHandler.Register(key, tex))
                             {
                                 fresh.Add(new Upload(
                                     Tag: UploadTagHandler.GenerateTag(key),
                                     FileName: Path.GetFileName(file),
                                     FullFilePath: file,
-                                    Texture: texture
+                                    Texture: tex
                                 ));
                             }
                         }
-                        catch
-                        {
-                            // ignore bad file
-                        }
+                        catch { /* ignore bad file */ }
                     }
 
-                    // swap atomically
-                    foreach (var old in Uploads)
-                    {
-                        try { old.Texture?.Dispose(); } catch { }
-                    }
-                    Uploads.Clear();
-                    Uploads.AddRange(fresh);
+                    // Swap atomically first so UI stops referencing old textures
+                    var old = Uploads;
+                    Uploads = fresh;
+
+                    // Unbind any samplers that may still reference old textures
+                    UnbindAllSamplers();
+
+                    // Dispose old textures on next Update tick (not right now)
+                    foreach (var u in old)
+                        DisposeLater(u.Texture);
 
                     Log.Info($"Uploads refreshed: {Uploads.Count} files");
                 }

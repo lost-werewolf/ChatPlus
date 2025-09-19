@@ -1,32 +1,21 @@
 ﻿[h1] Chat+ [/h1] 
-Chat+ is a massive overhaul to Terraria's chat system — enhancing both its appearance and functionality with powerful new features.
+Chat+ is a major overhaul to Terraria's chat system — enhancing both its appearance and functionality with powerful new features.
 
 [h3] ✨ What’s New? [/h3] 
-1. [b]Emojis😎[/b]: Access 4000+ emojis directly in chat!
-2. [b]Images📷[/b]: Upload and send your own images!
-3. [b]Links🔗[/b]: All links in chat become instantly clickable.
-4. [b]Autocomplete!🏷️[/b]: Type any command or tag prefix to autocomplete [url=https://terraria.wiki.gg/wiki/Chat#Tags] tags. [/url]
-5. [b]Player and mod icons🧑[/b]: Add player icons, mod icons and customize your own player color! 
-6. [b]Player and mod stats📈[/b]: A stat viewer is available when hovering over player and mod icons.
-7. [b]Text Editor✍️[/b]: Highlight text, copy & paste words, and more!
-8. [b]Scrollbar📜[/b]: Scroll through chat history.
-9. [b]Typing Indicators💬[/b]: See who's currently typing.
+1. [b]Emojis😎[/b]: Access 4000+ emojis directly in chat.
+2. [b]Images📷[/b]: Upload and send your own images.
+3. [b]Scrollbar📜[/b]: Use the brand new scrollbar to scroll through chat history.
+4. [b]Autocomplete🏷️[/b]: Autocomplete tags, commands, emojis, etc.
+5. [b]Text Editor✍️[/b]: Highlight text, copy & paste words, etc.
+6. [b]Typing Indicators💬[/b]: See who's currently typing.
+7. [b]Chat Formatting[/b]: Bold, italics, underline, player heads, mod icons, links, colors, etc.
+8. [b]Stats[/b]: Share stats with your friends (configurable).
 
-[h3] 🏷️ Autocomplete [/h3] 
-Press / to open commands.
-Press : to open emojis.
-Press @ to open player mentions.
-Press # to upload an image.
-Press [c to open colors.
-Press [g to open glyphs.
-Press [i to open items.
-Press [m to open mod icons.
-Press [p to open player icons.
-Looking to add autocomplete to your own mod? Read the [url=https://github.com/emyhrberg/ChatPlus/wiki/Mod-Call] Wiki on GitHub. [/url]
+That's pretty much it, hope you enjoy the mod!
 
 [h3] 🤝Credits [/h3] 
-Thanks to Neptune for making the icon!
-Thanks to nog for helping make bold text!
+Icon by Neptune
+(Special thanks to nog, jadams, and everyone else who playtested and gave me dev help!)
 
 [h3] ❤️ Support the Project [/h3]
 Check out the source code at [url=https://github.com/emyhrberg/ChatPlus] GitHub [/url]

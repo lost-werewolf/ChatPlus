@@ -1,0 +1,5 @@
+v1.4:
+
+- Added chat buttons
+- Added grid view
+- Added bold, italics and underlined text

@@ -1,16 +1,6 @@
 ﻿using System;
-using ChatPlus.Common.Compat.CustomTags;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.BoldText;
-using ChatPlus.Core.Features.Colors;
-using ChatPlus.Core.Features.Commands;
-using ChatPlus.Core.Features.Emojis;
-using ChatPlus.Core.Features.Glyphs;
-using ChatPlus.Core.Features.Items;
-using ChatPlus.Core.Features.Mentions;
-using ChatPlus.Core.Features.ModIcons;
-using ChatPlus.Core.Features.PlayerIcons;
-using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.OS;
@@ -126,7 +116,6 @@ namespace ChatPlus.Core.Chat
 
             HandleCharacterKeyPressed(); // Input text is entered here
             HandleLeftRightArrowKeysPressed(); // Caret navigation with left right keys
-
             HandleClipboardKeys();
             HandleCtrlAPressed();
             HandleCtrlBPressed();
@@ -387,16 +376,16 @@ namespace ChatPlus.Core.Chat
 
         private void HandleLeftRightArrowKeysPressed()
         {
-            if (StateManager.IsAnyGridPanelActive())
+            bool shift = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift);
+            bool ctrl = Main.keyState.IsKeyDown(Keys.LeftControl) || Main.keyState.IsKeyDown(Keys.RightControl);
+            bool anyStateActive = ChatPlus.StateManager.IsAnyStateActive();
+
+            if (!shift && !ctrl && anyStateActive && selectionAnchor != -1)
             {
                 _leftArrowHoldFrames = 0;
                 _rightArrowHoldFrames = 0;
-                selectionAnchor = -1;
                 return;
             }
-
-            bool shift = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift);
-            bool ctrl = Main.keyState.IsKeyDown(Keys.LeftControl) || Main.keyState.IsKeyDown(Keys.RightControl);
 
             if (Main.keyState.IsKeyDown(Keys.Left))
             {

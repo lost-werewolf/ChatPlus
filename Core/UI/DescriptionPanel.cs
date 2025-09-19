@@ -20,6 +20,7 @@ namespace ChatPlus.Core.UI
     {
         private readonly UIText text;
         public UIText GetText() => text;
+        private bool initialized;
 
         protected override float SharedYOffset
         {
@@ -49,7 +50,7 @@ namespace ChatPlus.Core.UI
                 else if (typeof(TData) == typeof(Features.Items.ItemEntry)) initialText = "[c/FFF014:Items]";
                 else if (typeof(TData) == typeof(ModIcon)) initialText = "[c/FFF014:Mods]";
                 else if (typeof(TData) == typeof(PlayerIcon)) initialText = "[c/FFF014:Players]";
-                else if (typeof(TData) == typeof(Upload)) initialText = "[c/FFF014:Uploads]: Click here to upload images \nRight click to open folder";
+                else if (typeof(TData) == typeof(Upload)) initialText = "Click here to upload images \nRight click to open folder";
                 else initialText = string.Empty;
             }
 
@@ -100,6 +101,16 @@ namespace ChatPlus.Core.UI
             }
         }
 
+        public override void OnActivate()
+        {
+            base.OnActivate();
+
+            // a silly fix to avoid drawing at the wrong position the first frame
+            initialized = false;
+            initializeFrameCounter = 1; // when it reaches 0 -> initialize
+        }
+        private int initializeFrameCounter;
+
         public void SetText(string rawText)
         {
             var font = FontAssets.MouseText.Value;
@@ -108,7 +119,7 @@ namespace ChatPlus.Core.UI
             // Special case: uploads
             if (typeof(TData) == typeof(Features.Uploads.Upload))
             {
-                string t = "[c/FFF014:Uploads]: Click here to upload images \nRight click to open folder";
+                string t = "Click here to upload images \nRight click to open folder";
                 text.SetText(t);
                 text.VAlign = 0f;
                 Height.Set(62, 0);
@@ -167,6 +178,9 @@ namespace ChatPlus.Core.UI
 
         public override void Draw(SpriteBatch sb)
         {
+            if (!initialized)
+                return; // skip until first valid position is set
+
             if (typeof(TData) == typeof(Features.Uploads.Upload))
             {
                 // Lock panel height
@@ -195,7 +209,7 @@ namespace ChatPlus.Core.UI
             VAlign = 0f;
 
             var baseRect = ConnectedPanel.GetDimensions().ToRectangle();
-            float gap = 4f;
+            float gap = 0;
 
             float desiredLeft = baseRect.Left;
             float desiredTop = baseRect.Top - Height.Pixels - gap;
@@ -219,6 +233,12 @@ namespace ChatPlus.Core.UI
                 Top.Set(desiredTop, 0f);
                 Recalculate();
             }
+
+            if (initializeFrameCounter > 0)
+            {
+                initializeFrameCounter--;
+            }
+            initialized = initializeFrameCounter == 0;
         }
     }
 }

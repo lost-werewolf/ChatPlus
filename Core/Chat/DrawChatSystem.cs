@@ -6,6 +6,7 @@ using ChatPlus.Core.Features.Scrollbar;
 using ChatPlus.Core.Features.Stats.Base;
 using ChatPlus.Core.Features.TypingIndicators;
 using ChatPlus.Core.Features.Uploads;
+using ChatPlus.Core.Helpers;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -62,6 +63,7 @@ internal class DrawChatSystem : ModSystem
         }
 
         bool blockZoom = ShouldBlockMapInput();
+        //Log.Debug("blockZoom: " + blockZoom);
 
         // snapshot
         int wheel = PlayerInput.ScrollWheelDelta;
@@ -94,7 +96,8 @@ internal class DrawChatSystem : ModSystem
             return;
         }
 
-        bool block = ShouldBlockMapInput();
+        bool blockDrag = ShouldBlockMapInput();
+        //Log.Debug("blockDrag: " + blockDrag);
 
         // snapshot
         bool oldLeft = Main.mouseLeft;
@@ -102,7 +105,7 @@ internal class DrawChatSystem : ModSystem
 
         try
         {
-            if (block)
+            if (blockDrag)
             {
                 Main.LocalPlayer.mouseInterface = true;
                 Main.mouseLeft = false; // prevent pan
@@ -116,7 +119,7 @@ internal class DrawChatSystem : ModSystem
             Main.mouseLeft = oldLeft;
             Main.LocalPlayer.mouseInterface = oldMI;
 
-            if (block)
+            if (blockDrag)
             {
                 Main.grabMapX = Main.mouseX;
                 Main.grabMapY = Main.mouseY;

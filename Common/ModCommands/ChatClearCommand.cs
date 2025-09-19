@@ -44,7 +44,7 @@ namespace ChatPlus.Common.ModCommands
                 string tag = ModIconTagHandler.GenerateTag(chatPlus.Name);
                 tag = null;
                 //Main.NewTextMultiline(tag + ClearedText.Value, c: Color.Green);
-                Main.NewText(tag + ClearedText.Value, Color.Green);
+                //Main.NewText(tag + ClearedText.Value, Color.Green);
             }
         }
     }

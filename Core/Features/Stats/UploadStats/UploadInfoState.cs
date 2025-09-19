@@ -22,7 +22,7 @@ public class UploadInfoState : BaseInfoState, ILoadable
 
         var upload = _current.Value;
         if (TitlePanel.Text != upload.FileName)
-            TitlePanel.SetText(upload.FileName);
+            SetTitle(upload.FileName);
 
         var tex = _current.Value.Texture;
         int srcW = tex.Width;

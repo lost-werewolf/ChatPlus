@@ -1,3 +1,4 @@
+using System;
 using ChatPlus.Common.Configs;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.Features.PlayerColors;
@@ -38,28 +39,33 @@ public class MentionElement : BaseElement<Mention>
 
         // Player head
         string headTag = PlayerIconTagHandler.GenerateTag(playerName);
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, headTag,
-            pos + new Vector2(4, 3), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f);
+        ChatManager.DrawColorCodedStringWithShadow(
+            sb, FontAssets.MouseText.Value, headTag,
+            pos + new Vector2(4, 3), Color.White, 0f, Vector2.Zero, new Vector2(1.05f), -1f, 1f
+        );
 
-        // Colorized player name
+        // Colorized player name (default white unless a synced color exists)
         pos += new Vector2(35, 4);
         string hex = "FFFFFF";
-        // Try resolve active player index for synced color
+
         for (int i = 0; i < Main.maxPlayers; i++)
         {
             var p = Main.player[i];
-            if (p?.active == true && p.name == playerName)
+            if (p?.active == true && string.Equals(p.name, playerName, StringComparison.Ordinal))
             {
-                if (PlayerColorSystem.PlayerColors.TryGetValue(i, out var syncedHex) && !string.IsNullOrWhiteSpace(syncedHex))
+                if (PlayerColorSystem.PlayerColors.TryGetValue(i, out var syncedHex) &&
+                    !string.IsNullOrWhiteSpace(syncedHex))
+                {
                     hex = syncedHex;
-                else
-                    hex = PlayerColorHandler.HexFromName(playerName);
+                }
                 break;
             }
         }
 
         var coloredSnips = ChatManager.ParseMessage($"[c/{hex}:{playerName}]", Color.White).ToArray();
-        ChatManager.DrawColorCodedStringWithShadow(sb, FontAssets.MouseText.Value, coloredSnips,
-            pos, 0f, Vector2.Zero, Vector2.One, out _, 500f);
+        ChatManager.DrawColorCodedStringWithShadow(
+            sb, FontAssets.MouseText.Value, coloredSnips,
+            pos, 0f, Vector2.Zero, Vector2.One, out _, 500f
+        );
     }
 }

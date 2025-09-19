@@ -36,7 +36,7 @@ public class PlayerIconSnippet : TextSnippet
         Vector2 pos = default, Color color = default, float scale = 1f)
     {
         const float box = 26f;
-        scale = 0.75f;
+        scale *= 0.75f;
 
         size = new Vector2(box * scale + 4f, box * scale);
         if (justCheckingString || color == Color.Black) return true;
@@ -47,18 +47,18 @@ public class PlayerIconSnippet : TextSnippet
 
         Vector2 drawPos = new(pos.X + 12f, pos.Y + 8f);
 
-        sb.End();
-        sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp,
-                 DepthStencilState.Default, RasterizerState.CullNone,
-                 _isGray ? grayscaleEffect.Value.Value : null,
-                 Main.UIScaleMatrix);
+        //sb.End();
+        //sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp,
+        //         DepthStencilState.Default, RasterizerState.CullNone,
+        //         _isGray ? grayscaleEffect.Value.Value : null,
+        //         Main.UIScaleMatrix);
 
         MapHeadRendererHook.shouldFlipHeadDraw = player.direction == -1;
         Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, drawPos, 1f, scale, Color.White);
         MapHeadRendererHook.shouldFlipHeadDraw = false;
 
-        sb.End();
-        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+        //sb.End();
+        //sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
         return true;
     }
@@ -76,8 +76,8 @@ public class PlayerIconSnippet : TextSnippet
         // 🔒 block if no access
         if (target != null && !PlayerInfoDrawer.HasAccess(Main.LocalPlayer, target))
         {
-            Main.NewText($"{target.name}'s stats is private.", Color.OrangeRed);
-            return;
+            //Main.NewText($"{target.name}'s stats is private.", Color.OrangeRed);
+            //return;
         }
 
         var state = PlayerInfoState.instance;

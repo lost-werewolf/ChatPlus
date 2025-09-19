@@ -78,11 +78,13 @@ public sealed class MentionSnippet : TextSnippet
 
     private static string ResolveHex(string name)
     {
-        if (string.IsNullOrWhiteSpace(name)) return "FFFFFF";
-        if (_nameToHex.TryGetValue(name, out var hex)) return hex;
+        if (string.IsNullOrWhiteSpace(name))
+            return "FFFFFF";
 
+        if (_nameToHex.TryGetValue(name, out var hex))
+            return hex;
 
-        // prefer synced table
+        // Prefer synced table
         for (int i = 0; i < Main.maxPlayers; i++)
         {
             var p = Main.player[i];
@@ -96,9 +98,9 @@ public sealed class MentionSnippet : TextSnippet
             }
         }
 
-        var fallback = PlayerColorHandler.HexFromName(name);
-        _nameToHex[name] = fallback;
-        return fallback;
+        // No synced color → default to white (not a hashed color)
+        _nameToHex[name] = "FFFFFF";
+        return "FFFFFF";
     }
 
     public override bool UniqueDraw(
@@ -142,13 +144,13 @@ public sealed class MentionSnippet : TextSnippet
         {
             //DynamicSpriteFont boldFont = FontSystem.BoldFont;
             DynamicSpriteFont superboldFont = FontSystem.Bold;
-
+            //Log.Info(playerColor + ", " + playerName);
             ChatManager.DrawColorCodedStringWithShadow(sb, superboldFont,
             playerName, p, playerColor, 0f, Vector2.Zero, Vector2.One);
             //Utils.DrawBorderString(sb, playerName, pos, playerColor);
         }
-
-        //Utils.DrawBorderString(sb, playerName, pos, playerColor);
+        else
+            Utils.DrawBorderString(sb, playerName, pos, playerColor);
 
         // hover (acts like links)
         int width = (int)Math.Ceiling(size.X);
@@ -234,8 +236,8 @@ public sealed class MentionSnippet : TextSnippet
 
         if (target != null && !PlayerInfoDrawer.HasAccess(Main.LocalPlayer, target))
         {
-            Main.NewText($"{target.name}'s stats is private.", Color.OrangeRed);
-            return;
+            //Main.NewText($"{target.name}'s stats is private.", Color.OrangeRed);
+            //return;
         }
 
         var state = PlayerInfoState.instance;

@@ -180,8 +180,8 @@ public class PlayerIconPanel : BasePanel<PlayerIcon>
         // 🔒 block if no access
         if (target != null && !PlayerInfoDrawer.HasAccess(Main.LocalPlayer, target))
         {
-            Main.NewText($"{target.name}'s stats is private.", Color.OrangeRed);
-            return;
+            //Main.NewText($"{target.name}'s stats is private.", Color.OrangeRed);
+            //return;
         }
 
         // 2) Configure and open

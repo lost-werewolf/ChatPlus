@@ -16,7 +16,12 @@ namespace ChatPlus.Core.Features.Uploads
         public static bool TryGet(string key, out Texture2D tex) => Registry.TryGetValue(key, out tex);
         public static void Clear() => Registry.Clear();
         public static string GenerateTag(string key) => $"[u:{key}]";
-
+        public static bool Remove(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                return false;
+            return Registry.Remove(key.Trim());
+        }
         public static bool Register(string key, Texture2D texture)
         {
             if (texture == null || string.IsNullOrWhiteSpace(key))

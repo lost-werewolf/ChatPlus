@@ -17,7 +17,7 @@ internal class MentionButtonConfigElement : BaseBoolConfigElement
     protected override void DrawPreview(SpriteBatch sb)
     {
         var dims = GetDimensions();
-        Vector2 pos = new(dims.X + 175 - 6, dims.Y + 4);
-        ChatButtonRenderer.Draw(sb, ChatButtonType.Mentions, pos, 24, grayscale: true);
+        Vector2 pos = new(dims.X + 175 - 8, dims.Y + 4);
+        ChatButtonRenderer.Draw(sb, ChatButtonType.Mentions, pos, 24, grayscale: !Value);
     }
 }

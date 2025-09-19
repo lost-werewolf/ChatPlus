@@ -20,6 +20,11 @@ internal class ConfigButton : BaseChatButton
         if (!Main.drawingPlayerChat)
             return;
 
+        if (Main.mapFullscreen)
+        {
+            Main.mapFullscreen = false;
+        }
+
         // Open this mod's config UI
         try
         {

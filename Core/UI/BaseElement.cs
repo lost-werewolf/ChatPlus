@@ -1,10 +1,11 @@
-using ChatPlus.Core.Features.Emojis;
+using System.Reflection;
 using ChatPlus.Core.Features.Uploads;
 using ChatPlus.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
 using static ChatPlus.Common.Configs.Config;
 
@@ -20,7 +21,7 @@ public abstract class BaseElement<TData> : UIElement
 
     public TData Data { get; }
 
-    private BasePanel<TData> GetParentPanel()
+    protected BasePanel<TData> GetParentPanel()
     {
         UIElement parent = Parent;
         while (parent != null && parent is not BasePanel<TData>)
@@ -52,6 +53,7 @@ public abstract class BaseElement<TData> : UIElement
     {
         base.LeftClick(evt);
 
+
         bool leftShiftDown = Main.keyState.IsKeyDown(Keys.LeftShift);
         if (leftShiftDown) return;
 
@@ -66,28 +68,48 @@ public abstract class BaseElement<TData> : UIElement
         }
     }
 
+    // Ask the parent panel for this element’s description.
+    private string TryGetDescription()
+    {
+        var panel = GetParentPanel();
+        if (panel == null) return null;
+
+        // BasePanel<TData> has a protected GetDescription(TData) — call it via reflection.
+        var mi = panel.GetType().GetMethod(
+            "GetDescription",
+            BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+        );
+        if (mi == null) return null;
+
+        try
+        {
+            return mi.Invoke(panel, new object[] { Data }) as string;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public override void Update(GameTime gameTime)
     {
-        //base.Update(gameTime);
-        Log.Info("u");
+        base.Update(gameTime);
+
         if (IsMouseHovering)
         {
             var panel = GetParentPanel();
-            Log.Info("p: " + panel);
             if (panel != null)
             {
                 int index = panel.items.IndexOf(this);
                 if (index >= 0 && panel.CurrentIndex != index)
-                {
                     panel.SetSelectedIndex(index);
-                }
             }
         }
     }
 
     public override void Draw(SpriteBatch sb)
     {
-        // selection visuals
+        // selection visuals (unchanged) ...
         if (isSelected)
         {
             DrawHelper.DrawSlices(sb, ele: this);
@@ -99,16 +121,25 @@ public abstract class BaseElement<TData> : UIElement
             DrawHelper.DrawPixelatedBorder(sb, r, Color.Black * 0.75f, 2, 1);
         }
 
-        // always call into subclass rendering
         if (this is not UploadElement)
             base.Draw(sb);
 
-        // unified list vs grid
+        // list/grid draw (unchanged) ...
         bool forceGrid = IsGridSwitchSuppressed();
         if (!forceGrid && GetViewmode() == Viewmode.List)
             DrawListElement(sb);
         else
             DrawGridElement(sb);
+
+        // NEW: hover tooltip with the element’s description
+        if (IsMouseHovering)
+        {
+            string desc = TryGetDescription();
+            if (!string.IsNullOrWhiteSpace(desc))
+                UICommon.TooltipMouseText(desc);
+
+            Main.LocalPlayer.mouseInterface = true;
+        }
     }
 
     // subclasses must provide these

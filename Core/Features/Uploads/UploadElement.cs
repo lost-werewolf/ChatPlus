@@ -3,8 +3,11 @@ using System.IO;
 using ChatPlus.Core.Features.Glyphs;
 using ChatPlus.Core.UI;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
+using Terraria.UI;
 using Terraria.UI.Chat;
 using static ChatPlus.Common.Configs.Config;
 
@@ -28,18 +31,35 @@ namespace ChatPlus.Core.Features.Uploads
             img.Top.Set(8, 0);
             Append(img);
         }
+        public override void LeftClick(UIMouseEvent evt)
+        {
+            bool shift = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift);
+            if (shift)
+            {
+                var panel = GetParentPanel() as UploadPanel;
+                if (UploadManager.TryDelete(Data))
+                {
+                    panel?.PopulatePanel();
+                    Main.NewText($"Deleted {Data.FileName}", Color.OrangeRed);
+                }
+                return;
+            }
+
+            base.LeftClick(evt);
+        }
+
         protected override void DrawGridElement(SpriteBatch sb)
         {
+            var tex = Data.Texture;
+            if (tex == null || tex.IsDisposed)
+                return;
+
             var dims = GetDimensions();
             Rectangle cell = dims.ToRectangle();
 
             int pad = 4;
             int innerW = Math.Max(0, cell.Width - pad * 2);
             int innerH = Math.Max(0, cell.Height - pad * 2);
-
-            Texture2D tex = Data.Texture;
-            if (tex == null)
-                return;
 
             int srcW = tex.Width;
             int srcH = tex.Height;
@@ -70,10 +90,13 @@ namespace ChatPlus.Core.Features.Uploads
 
         protected override void DrawListElement(SpriteBatch sb)
         {
+            var tex = Data.Texture;
+            if (tex == null || tex.IsDisposed)
+                return;
+
             var dims = GetDimensions();
             Vector2 pos = dims.Position();
 
-            Texture2D tex = Data.Texture;
             if (tex != null && tex.Height > 0)
             {
                 float scale = 30f / tex.Height;

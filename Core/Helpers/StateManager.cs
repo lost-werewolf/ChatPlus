@@ -59,6 +59,7 @@ public class StateManager
         if (!Main.drawingPlayerChat)
         {
             CloseAll();
+            ResetAllWasOpenedByButton();
             return;
         }
 

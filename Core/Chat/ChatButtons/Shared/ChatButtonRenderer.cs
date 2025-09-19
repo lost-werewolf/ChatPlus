@@ -7,12 +7,22 @@ using Terraria.GameContent;
 using Terraria.GameContent.UI.Chat;
 using Terraria.ModLoader;
 using static ChatPlus.Common.Configs.Config;
-using static Terraria.ModLoader.BackupIO;
 
 namespace ChatPlus.Core.Chat.ChatButtons.Shared;
 
 public static class ChatButtonRenderer
 {
+    // Visual sheninagans that only affects the config's visual.
+    // Affects nothing functional.
+    private static Viewmode p = Viewmode.List;
+    public static void TogglePreviewViewmode()
+    {
+        p = p == Viewmode.List? Viewmode.Grid: Viewmode.List;
+    }
+
+    /// <summary>
+    /// Main method for drawing chat buttons.
+    /// </summary>
     public static void Draw(SpriteBatch sb, ChatButtonType type, Vector2 pos, int size, bool grayscale = false, bool preview = false)
     {
         switch (type)
@@ -38,7 +48,7 @@ public static class ChatButtonRenderer
             case ChatButtonType.Uploads:
                 {
                     // Use button asset; scale to the requested size so it’s stable at all UIScales
-                    DrawTexture(sb, "ChatPlus/Assets/ButtonUpload", pos, size, grayscale);
+                    DrawTexture(sb, "ChatPlus/Assets/ButtonUpload", pos + new Vector2(0,0), size, grayscale);
                     break;
                 }
 
@@ -73,7 +83,7 @@ public static class ChatButtonRenderer
 
             case ChatButtonType.Commands:
                 {
-                    DrawCharacter(sb, "/", pos + new Vector2(1, 2), grayscale);
+                    DrawCharacter(sb, "/", pos + new Vector2(3, 3), grayscale);
                     break;
                 }
 
@@ -90,51 +100,46 @@ public static class ChatButtonRenderer
 
             case ChatButtonType.PlayerIcons:
                 {
-                    if (Main.gameMenu || Main.LocalPlayer == null || !Main.LocalPlayer.active || string.IsNullOrEmpty(Main.LocalPlayer.name))
-                    {
-                        DrawTexture(sb, "ChatPlus/Assets/AuthorIcon", pos + new Vector2(1, 1), size, grayscale);
+                    //if (Main.gameMenu || Main.LocalPlayer == null || !Main.LocalPlayer.active || string.IsNullOrEmpty(Main.LocalPlayer.name))
+                    //{
+                        DrawTexture(sb, "ChatPlus/Assets/AuthorIcon", pos + new Vector2(1, 0), size, grayscale);
                         break;
-                    }
+                    //}
 
-                    if (preview)
-                    {
-                        // Stable preview path (no tags in config)
-                        DrawTexture(sb, "ChatPlus/Assets/AuthorIcon", pos + new Vector2(1, 1), size, grayscale);
-                    }
-                    else
-                    {
-                        DrawTag(sb, $"[p:{Main.LocalPlayer.name}]", pos + new Vector2(-2f, 1f), grayscale);
-                    }
-                    break;
+                    //if (preview)
+                    //{
+                    //    // Stable preview path (no tags in config)
+                    //    DrawTexture(sb, "ChatPlus/Assets/AuthorIcon", pos + new Vector2(1, 1), size, grayscale);
+                    //}
+                    //else
+                    //{
+                    //    DrawTag(sb, $"[p:{Main.LocalPlayer.name}]", pos + new Vector2(-2f, 1f), grayscale);
+                    //}
+                    //break;
                 }
 
             case ChatButtonType.Config:
                 {
-                    DrawTexture(sb, "ChatPlus/Assets/LastUpdatedIcon", pos, size, grayscale);
+                    DrawTexture(sb, "ChatPlus/Assets/ButtonConfig", pos, size, false);
                     break;
                 }
 
             case ChatButtonType.Viewmode:
                 {
                     var openPanel = ChatPlus.StateManager?.GetActivePanel();
-                    if (openPanel == null && !preview)
-                    {
-                        //Log.Debug("no panel");
-                        return;
-                    }
                     var gridListTex = ModContent.Request<Texture2D>("ChatPlus/Assets/FilterList", AssetRequestMode.ImmediateLoad).Value;
                     if (gridListTex == null) break;
 
-                    var mode = openPanel != null
+                    var mode = openPanel != null && !preview
                         ? ChatButtonLayout.GetViewmodeFor(openPanel.GetType())
-                        : Viewmode.List;
+                        : p; // config uses preview mode
 
                     var source = mode == Viewmode.List
                         ? new Rectangle(0, 0, 24, 24)
                         : new Rectangle(24, 0, 24, 24);
 
                     var target = new Rectangle((int)pos.X + 2, (int)pos.Y + 2, size - 4, size - 4);
-                    DrawWithGrayscale(sb, grayscale, () => sb.Draw(gridListTex, target, source, Color.White));
+                    DrawWithGrayscale(sb, false, () => sb.Draw(gridListTex, target, source, Color.White));
                     break;
                 }
         }

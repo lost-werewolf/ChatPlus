@@ -18,7 +18,7 @@ public class GlyphElement : BaseElement<Glyph>
         var pos = GetDimensions().Position();
         ChatManager.DrawColorCodedStringWithShadow(
             sb, FontAssets.MouseText.Value, Glyph.Tag,
-            pos + new Vector2(3, 2), Color.White, 0f, Vector2.Zero, Vector2.One
+            pos + new Vector2(2, 2), Color.White, 0f, Vector2.Zero, Vector2.One
         );
     }
 

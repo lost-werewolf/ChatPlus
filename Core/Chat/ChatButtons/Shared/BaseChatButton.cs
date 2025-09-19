@@ -101,17 +101,12 @@ internal abstract class BaseChatButton : UIElement
             }
             else
             {
-                static string SplitCamelCase(string input)
-                {
-                    return string.Concat(
-                        input.Select((ch, i) =>
-                            i > 0 && char.IsUpper(ch) ? " " + ch : ch.ToString()
-                        )
-                    );
-                }
-                string input = Type.ToString();
-                string output = SplitCamelCase(input);
-                UICommon.TooltipMouseText(output);
+                string tt = Type.ToString();
+
+                if (Type == ChatButtonType.PlayerIcons) tt = "Player Icons";
+                if (Type == ChatButtonType.ModIcons) tt = "Mod Icons";
+
+                UICommon.TooltipMouseText(tt);
 
                 // Draw border
                 var r = GetDimensions().ToRectangle();

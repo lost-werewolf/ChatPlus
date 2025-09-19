@@ -18,6 +18,6 @@ internal class ConfigButtonConfigElement : BaseBoolConfigElement
     {
         var dims = GetDimensions();
         Vector2 pos = new(dims.X + 175 - 6, dims.Y + 4);
-        ChatButtonRenderer.Draw(sb, ChatButtonType.Config, pos, 24, grayscale: true);
+        ChatButtonRenderer.Draw(sb, ChatButtonType.Config, pos, 24, grayscale: !Value);
     }
 }

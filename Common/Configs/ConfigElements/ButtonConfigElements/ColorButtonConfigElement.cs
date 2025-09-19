@@ -19,7 +19,6 @@ internal class ColorButtonConfigElement : BaseBoolConfigElement
         var dims = GetDimensions();
         Vector2 pos = new(dims.X + 175 - 7, dims.Y + 4);
 
-        ChatButtonRenderer.Draw(sb, ChatButtonType.Colors, pos, 24, grayscale: true);
-
+        ChatButtonRenderer.Draw(sb, ChatButtonType.Colors, pos, 24, grayscale: !Value);
     }
 }
