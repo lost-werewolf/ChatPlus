@@ -759,7 +759,8 @@ public class PlayerInfoState : BaseInfoState, ILoadable
                 Main.instance.MouseText(tooltip);
                 Main.LocalPlayer.mouseInterface = true;
 
-                if (Main.mouseRight && Main.mouseRightRelease && !Main.debuff[id])
+                if (Main.mouseRight && Main.mouseRightRelease && !Main.debuff[id] && 
+                    Main.LocalPlayer != null && Main.LocalPlayer == player)
                 {
                     player.DelBuff(i);
                     Main.mouseRightRelease = false;

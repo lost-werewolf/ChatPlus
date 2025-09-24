@@ -722,6 +722,9 @@ public static class PlayerInfoDrawer
     #region Helpers
     public static bool HasAccess(Player viewer, Player target)
     {
+        if (viewer == target || viewer == Main.LocalPlayer && target == Main.LocalPlayer)
+            return true;
+
         //if (Main.netMode == NetmodeID.SinglePlayer)
         //{
         //    var sp_privacy = PrivacyCache.Get(target.whoAmI);

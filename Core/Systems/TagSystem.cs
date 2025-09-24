@@ -11,6 +11,7 @@ using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
 namespace ChatPlus.Core.Systems;
+
 internal class TagSystem : ModSystem
 {
     /// <summary>
@@ -26,15 +27,13 @@ internal class TagSystem : ModSystem
     {
         ChatManager.Register<BoldTagHandler>(["b", "bold"]);
         ChatManager.Register<EmojiTagHandler>(["e", "emoji"]); // or :
-        ChatManager.Register<ItalicsTagHandler>(["italics"]); // avoid i
+        ChatManager.Register<ItalicsTagHandler>(["italics"]); // avoid i to prevent item tag conflict
         ChatManager.Register<LinkTagHandler>(["l", "link"]);
         ChatManager.Register<MentionTagHandler>(["mention"]); // or @
         ChatManager.Register<ModIconTagHandler>(["m", "mod"]);
         ChatManager.Register<PlayerIconTagHandler>(["p", "player"]);
         ChatManager.Register<UploadTagHandler>(["u", "upload"]); // or #
-        ChatManager.Register<UnderlineTagHandler>(["underline"]); // or #
-
-        
+        ChatManager.Register<UnderlineTagHandler>(["underline"]); // avoid u to prevent upload tag conflict
     }
 
     public override void PostSetupContent()

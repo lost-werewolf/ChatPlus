@@ -27,11 +27,11 @@ public class EmojiSnippet : TextSnippet
         var tex = emojiAsset.Value;
         if (tex == null)
         {
-            size = new Vector2(0f, 20f * scale);
+            size = new Vector2(0f, 24f * scale);
             return true;
         }
 
-        float h = 20f * scale;
+        float h = 20 * scale;
         float s = h / Math.Max(tex.Width, tex.Height);
         size = new Vector2(tex.Width * s, h);
         if (justCheckingString) return true;

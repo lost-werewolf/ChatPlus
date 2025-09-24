@@ -124,7 +124,7 @@ public class TypingIndicatorSystem : ModSystem
     }
 
     /// <summary>
-    /// Draws the chat bubble just above the chat box
+    /// Draws the chat bubble just below the chat box
     /// </summary>
     public static void DrawTypingLine(int yOffset=0)
     {

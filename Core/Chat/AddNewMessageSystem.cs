@@ -48,6 +48,13 @@ namespace ChatPlus.Core.Chat
         private void ModifyNewMessage(On_RemadeChatMonitor.orig_AddNewMessage orig,
                                       RemadeChatMonitor self, string text, Color color, int widthLimitInPixels)
         {
+            // Skip CalValEX missing-content spam
+            if (text.Contains("not found. Report this to the Calamity's Vanities developers"))
+            {
+                //Log.Error("please summon the YuH on discord :P"); 
+                return;
+            }
+
             // Start from original text
             string resultText = text;
 
