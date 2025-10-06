@@ -391,7 +391,7 @@ namespace ChatPlus.Core.Chat
                 return;
             }
 
-            // Populate text snippets in our text, and their indexes in the chat text
+            // Populate text snippets in our text and get the neighboring snippets
             GetNeighboringSnippets(out TextSnippet leftSnippet, out TextSnippet rightSnippet);
 
             if (Main.keyState.IsKeyDown(Keys.Left))
@@ -477,13 +477,13 @@ namespace ChatPlus.Core.Chat
         {
             GetNeighboringSnippets(out TextSnippet leftSnippet, out _);
 
-            // We want to remove the entire snippet if it's set to DeleteWhole, like vanilla does.
+            // We want to remove the entire snippet if it's set to DeleteWhole, like vanilla does
             if (leftSnippet != null && leftSnippet.DeleteWhole)
             {
-                // Need to move it first
+                // Cursor must be moved first
                 caretPos = Math.Max(0, caretPos - leftSnippet.TextOriginal.Length);
                 text = text.Remove(caretPos, leftSnippet.TextOriginal.Length);
-                caretPos++; // Move it by 1
+                caretPos++; // Correct positioning
             }
             else text = text.Remove(caretPos - 1, 1);
 
@@ -510,27 +510,15 @@ namespace ChatPlus.Core.Chat
 
         private int MoveCaretLeft(int pos, string text, TextSnippet leftSnippet)
         {
-            if (leftSnippet != null && leftSnippet.DeleteWhole)
-            {
-                pos -= leftSnippet.TextOriginal.Length;
-            }
-            else
-            {
-                pos -= 1;
-            }
+            if (leftSnippet != null && leftSnippet.DeleteWhole) pos -= leftSnippet.TextOriginal.Length;
+            else pos -= 1;
             return pos;
         }
 
         private int MoveCaretRight(int pos, string text, TextSnippet rightSnippet)
         {
-            if (rightSnippet != null && rightSnippet.DeleteWhole)
-            {
-                pos += rightSnippet.TextOriginal.Length;
-            }
-            else
-            {
-                pos += 1;
-            }
+            if (rightSnippet != null && rightSnippet.DeleteWhole) pos += rightSnippet.TextOriginal.Length;
+            else pos += 1;
             return pos;
         }
 
